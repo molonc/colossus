@@ -11,7 +11,7 @@ from django.db import models
 # from django.conf import settings
 # from django.core.validators import MinValueValidator, MaxValueValidator
 
-def create_chrfield(name, max_length=25, blank=True, **kwargs):
+def create_chrfield(name, max_length=50, blank=True, **kwargs):
     """wrap models.CharField for ease of use."""
     
     return models.CharField(name, max_length=max_length, blank=blank, **kwargs) 
@@ -22,46 +22,54 @@ class Sample(models.Model):
     Sample Information.
     """  
     
+    # Character fields
     # SA ID's
     sample_id = create_chrfield("Sample ID", blank=False)
-    
-    # pool information, unique wafergen chip number
+        # pool information, unique wafergen chip number
     pool_id = create_chrfield("Pool ID", blank=False)
-    
-    # Jira Ticket
+        # Jira Ticket
     jira_ticket = create_chrfield("Jira Ticket", blank=False)
-    
-    # most likely same as pool ID
+        # most likely same as pool ID
     tube_label = create_chrfield("Tube label")
+
+    # sub-library ID which is "sample_id"+"pool_id"+"cell_location"
+#     sub_library_id =  None
     
-    # number of libraries in pool (could be pulled from input file; see below)
+    # Integer fields
+    # number of libraries in pool (could be pulled from input file)
     num_libraries = models.IntegerField("Number of libraries", default=0)
     
-    # not sure if it's different than num_libraries, got this from old LIMS excel file
+    # not sure if it's different than num_libraries,
+    # got it from old LIMS excel file
     num_cells = models.IntegerField("Number of cells", default=0)
     
-    # sample collection date/passage number
+    
+    # DateTime fields
     collect_date = models.DateTimeField("Date sample collected", 
                                         blank=True, null=True)
     
-    # sub-library ID which is "sample_id"+"pool_id"+"cell_location"
-#     sub_library_id =  None
 
     # sample description
     description = create_chrfield("Description", max_length = 200)
     
     def __str__(self):
-        return self.sample_id
+        return '_'.join([
+                         self.sample_id,
+                         self.pool_id,
+                         ])
     
-    
+
 class Patient(models.Model):
     
     """
     Patient information.
     """
     
-    sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
+    # database relationships
+    sample = models.OneToOneField(Sample, null=True,
+                                  on_delete=models.CASCADE)
     
+    # Character fields
     patient_id = create_chrfield("Patient ID")
     tissue_state = create_chrfield("Tissue State")
     sample_state = create_chrfield("Sample State")
@@ -70,86 +78,150 @@ class Patient(models.Model):
     
     def __str__(self):
         return self.patient_id
+ 
+class CellTable(models.Model):
+    
+    """
+    Cell table containing info for each chip.
+    """
+    
+    # database relationships
+    sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
+    
+    
+    def __str__(self):
+        res = '_'.join([
+                        self.sample.sample_id,
+                        self.sample.pool_id,
+#                         str(self.row) + str(self.col)
+                        ])
+        return res
+   
+    
+class Cell(models.Model):
+    
+    """
+    A Row in the CellTable containing info for one cell.
+    """
+    
+    # database relationships
+    cell_table = models.ForeignKey(CellTable, on_delete=models.CASCADE)
+
+    # Integer fields
+    row = models.IntegerField("Row", null=True)
+    col = models.IntegerField("Column", null=True)
+    img_col = models.IntegerField("Image Column", null=True)
+    num_live = models.IntegerField("Num_Live", null=True)
+    num_dead = models.IntegerField("Num_Dead", null=True)
+    num_other = models.IntegerField("Num_Other", null=True)
+    rev_live = models.IntegerField("Rev_Live", null=True)
+    rev_dead = models.IntegerField("Rev_Dead", null=True)
+    rev_other = models.IntegerField("Rev_Other", null=True)
         
-class Library(object):
+    # Character fields
+    sample_cellcaller = create_chrfield("Sample")
+    file_ch1 = create_chrfield("File_Ch1")
+    file_ch2 = create_chrfield("File_Ch2")
+    index_i7 = create_chrfield("Index_I7")
+    primer_i7 = create_chrfield("Primer_I7")
+    index_i5 = create_chrfield("Index_I5")
+    primer_I5 = create_chrfield("Primer_I5")
+    pick_met = create_chrfield("Pick_Met")
+
+    
+#     def __str__(self):
+#         pass
+
+ 
+class Library(models.Model):
     
     """
     Library information.
     """
     
-    protocol = None # Protocol (wafergen, microfluidic, targeted, etc.)
-    spot_date = None # Sample spot date
-    type = None # Library Type
-    chip_format = None # Chip-format
-    prep_date = None # Library preparation date
-    construction_method = None # Library construction method 
-    trans_concentration = None # Transposase concentration
-    num_pcr_cycles = None # Number of PCR cycles
-    size_range = None # Size range
-    average_size = None # Average size
-    chip_inlet = None # Chip inlet
-    i7_index_id = None # I&_Index_ID
-    index = None # index
-    i5_index_id = None # I5_Index_ID
-    index2 = None # index2
-    library_location = None # Library location
+    # database relationships
+    cell_table = models.OneToOneField(CellTable, null=True,
+                                       on_delete=models.CASCADE)
+    
+    # Character fields    
+    protocol = create_chrfield("Protocol") # wafergen, microfluidic, targeted, etc.
+    lib_type = create_chrfield("Library Type")
+    chip_format = create_chrfield("Chip-format")
+    construction_method = create_chrfield("Library construction method") 
+    trans_concentration = create_chrfield("Transposase concentration")
+    size_range = create_chrfield("Size range")
+    i7_index_id = create_chrfield("I7_Index_ID")
+    index = create_chrfield("Index")
+    i5_index_id = create_chrfield("I5_Index_ID")
+    index2 = create_chrfield("Index2")
+    library_location = create_chrfield("Library location")
 
-class Analyte(object):
+    # Integer fields
+    num_pcr_cycles = models.IntegerField("Number of PCR cycles", 
+                                         blank=True, null=True)
+    average_size = models.IntegerField("Average size",
+                                       blank=True, null=True)
+    chip_inlet = models.IntegerField("Chip inlet",
+                                     blank=True, null=True)
+    
+    # DateTime fileds
+    spot_date = models.DateTimeField("Sample spot date",
+                                     blank=True, null=True)
+    prep_date = models.DateTimeField("Library preparation date",
+                                 blank=True, null=True)
+    
+#     def __str__(self):
+#         return ()
+        
+
+class Analyte(models.Model):
     
     """
     Analyte information.
     """
     
-    def __init__(self):
-        dna_volume = None # DNA volume
-        dna_concentration = None # DNA Concentration
-        storage_medium = None # Storage Medium
-        q_method = None # Quantification method
-        size_selection_method = None # Size selection method
-
-class CellCaller(object):
+    # database relationships
+    cell_table = models.OneToOneField(CellTable, null=True,
+                                      on_delete=models.CASCADE)
     
-    """
-    Output information of the cell caller.
-    """
+    # Character fields
+    dna_volume = create_chrfield("DNA volume")
+    dna_concentration = create_chrfield("DNA Concentration")
+    storage_medium = create_chrfield("Storage Medium")
+    q_method = create_chrfield("Quantification method")
+    size_selection_method = create_chrfield("Size selection method")
+
+    def __str__(self):
+        return self.sample.sample_id
+
     
-    def __init__(self):
-        sample = None # Sample
-        row = None # Row
-        col = None # Column
-        img_col = None # Img_Col
-        file_ch1 = None # File_Ch1
-        file_ch2 = None # File_Ch2
-        num_live = None # Num_Live
-        num_dead = None # Num_Dead
-        num_other = None # Num_Other
-        rev_live = None # Rev_Live
-        rev_dead = None # Rev_Dead
-        rev_other = None # Rev_Other
-        index_i7 = None # Index_I7
-        primer_i7 = None # Primer_I7
-        index_i5 = None # Index_I5
-        primer_I5 = None # Primer_I5
-        pick_met = None # Pick_Met
-
-
-class Sequencing(object):
+class SequencingInfo(models.Model):
     
     """
     Sequencing information from GSC.
     """
     
-    def __init__(self):
-        sequencing_id = None # Sequencing ID
-        submission_date = None # Sequencing submission date
-        sequencing_date = None # Sequencing date
-        sequencer_id = None # Sequencer ID
-        flow_cell_id = None # Flow cell ID
-        lane_id = None # Lane ID
-        gsc_lib_id = None # GSC library ID
-        read_length = None # Read length
-        paired_end = None # Paired-end (yes/no)
-        output_mode = None # Output mode
-        archive_path = None # Path to data in archive
-        notes = None # Notes
+    # database relationships
+    cell_table = models.OneToOneField(CellTable, null=True,
+                                      on_delete=models.CASCADE)
 
+    # Character fields
+    sequencing_id = create_chrfield("Sequencing ID")
+    sequencer_id = create_chrfield("Sequencer ID")
+    flow_cell_id = create_chrfield("Flow cell ID")
+    lane_id = create_chrfield("Lane ID")
+    gsc_lib_id = create_chrfield("GSC library ID")
+    read_length = create_chrfield("Read length")
+    paired_end = create_chrfield("Paired-end (yes/no)")
+    output_mode = create_chrfield("Output mode")
+    archive_path = create_chrfield("Path to data in archive")
+    notes = create_chrfield("Notes", max_length=200)
+
+    # DateTime fields
+    submission_date = models.DateTimeField("Sequencing submission date",
+                                           blank=True, null=True)
+    sequencing_date = models.DateTimeField("Sequencing date",
+                                           blank=True, null=True)
+    
+#     def __str__(self):
+#         return ()
