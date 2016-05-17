@@ -7,65 +7,92 @@ Created on May 16, 2016
 from __future__ import unicode_literals
 from django.db import models
 
-
 # import django.db.models.options as options
 # from django.conf import settings
 # from django.core.validators import MinValueValidator, MaxValueValidator
 
+def create_chrfield(name, max_length=25, blank=True, **kwargs):
+    """wrap models.CharField for ease of use."""
+    
+    return models.CharField(name, max_length=max_length, blank=blank, **kwargs) 
+
 class Sample(models.Model):
     
-    sample_id = models.CharField("Sample ID", max_length=100)
-    pool_id = models.CharField("Pool ID", max_length=100)
-    jira_ticket = models.CharField("Jira Ticket", max_length=100)
-    create_date = models.DateTimeField("Date added")
-    tube_label = models.CharField("Tube Label", max_length=100, blank=True)
+    """
+    Sample Information.
+    """  
+    
+    # SA ID's
+    sample_id = create_chrfield("Sample ID", blank=False)
+    
+    # pool information, unique wafergen chip number
+    pool_id = create_chrfield("Pool ID", blank=False)
+    
+    # Jira Ticket
+    jira_ticket = create_chrfield("Jira Ticket", blank=False)
+    
+    # most likely same as pool ID
+    tube_label = create_chrfield("Tube label")
+    
+    # number of libraries in pool (could be pulled from input file; see below)
+    num_libraries = models.IntegerField("Number of libraries", default=0)
+    
+    # not sure if it's different than num_libraries, got this from old LIMS excel file
+    num_cells = models.IntegerField("Number of cells", default=0)
+    
+    # sample collection date/passage number
+    collect_date = models.DateTimeField("Date sample collected", 
+                                        blank=True, null=True)
+    
+    # sub-library ID which is "sample_id"+"pool_id"+"cell_location"
+#     sub_library_id =  None
+
+    # sample description
+    description = create_chrfield("Description", max_length = 200)
     
     def __str__(self):
-        return '_'.join([self.sample_id,
-                         self.pool_id,
-                         ]
-                        )
+        return self.sample_id
     
-class SampleBase(object):
+    
+class Patient(models.Model):
     
     """
-    Sample information.
+    Patient information.
     """
     
-    def __init__(self):
-        sample_id = None # SA ID's
-        pool_id = None # pool information, unique wafergen chip number
-        tube_lable = None # most likely same as pool ID
-        num_libraries = None # number of libraries in pool (could be pulled from input file; see below)
-        num_cells = None # not sure if it's different than num_libraries, got this from old LIMS excel file
-        jira_ticket = None # Jira ticket ID
-        description = None # sample description
-        collect_date = None # Sample collection date/passage number
-        sub_library_id = None # Sub-library ID which is "sample_id"+"pool_id"+"cell_location"    
-
+    sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
+    
+    patient_id = create_chrfield("Patient ID")
+    tissue_state = create_chrfield("Tissue State")
+    sample_state = create_chrfield("Sample State")
+    taxonomy_id = create_chrfield("Taxonomy ID")
+    receipient_id = create_chrfield("Recipient ID")
+    
+    def __str__(self):
+        return self.patient_id
+        
 class Library(object):
     
     """
     Library information.
     """
     
-    def __init__(self):
-        protocol = None # Protocol (wafergen, microfluidic, targeted, etc.)
-        spot_date = None # Sample spot date
-        type = None # Library Type
-        chip_format = None # Chip-format
-        prep_date = None # Library preparation date
-        construction_method = None # Library construction method 
-        trans_concentration = None # Transposase concentration
-        num_pcr_cycles = None # Number of PCR cycles
-        size_range = None # Size range
-        average_size = None # Average size
-        chip_inlet = None # Chip inlet
-        i7_index_id = None # I&_Index_ID
-        index = None # index
-        i5_index_id = None # I5_Index_ID
-        index2 = None # index2
-        library_location = None # Library location
+    protocol = None # Protocol (wafergen, microfluidic, targeted, etc.)
+    spot_date = None # Sample spot date
+    type = None # Library Type
+    chip_format = None # Chip-format
+    prep_date = None # Library preparation date
+    construction_method = None # Library construction method 
+    trans_concentration = None # Transposase concentration
+    num_pcr_cycles = None # Number of PCR cycles
+    size_range = None # Size range
+    average_size = None # Average size
+    chip_inlet = None # Chip inlet
+    i7_index_id = None # I&_Index_ID
+    index = None # index
+    i5_index_id = None # I5_Index_ID
+    index2 = None # index2
+    library_location = None # Library location
 
 class Analyte(object):
     
@@ -79,19 +106,6 @@ class Analyte(object):
         storage_medium = None # Storage Medium
         q_method = None # Quantification method
         size_selection_method = None # Size selection method
-
-class Patient(object):
-    
-    """
-    Patient information.
-    """
-    
-    def __init__(self):
-        patient_id = None # Patient ID
-        tissue_state = None # Tissue state
-        sample_state = None # Sample state
-        taxonomy_id = None # Taxonomy ID
-        receipient_id = None # Recipient ID
 
 class CellCaller(object):
     
