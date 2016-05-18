@@ -5,4 +5,27 @@
     <h1>Project Single Cell Database</h1>
     <i>under development</i>
 </div>
+<div class="container" style="background-color:#eee;">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sample ID</th>
+                    <th>Pool ID</th>
+                    <th>Jira Ticket</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in samples %}
+                <tr>
+                    <td><a href="{% url 'core:sample_detail' %}?sid={{sample.pk}}">{{sample.sample_id}}</a></td>
+                    <td>{{sample.pool_id}}</td>
+                    <td>{{sample.jira_ticket}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+</div>
 {% endblock %}

@@ -6,6 +6,8 @@ Created on May 16, 2016
 
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
+from .models import Sample
+
 
 class MainView(TemplateView):
     
@@ -15,6 +17,10 @@ class MainView(TemplateView):
     
     template_name = "core/main.html"
     
+    def get_context_data(self):
+        return {'samples': Sample.objects.all()}
+    
+    
 class HomeView(TemplateView):
     
     """
@@ -22,4 +28,9 @@ class HomeView(TemplateView):
     """
     
     template_name = 'core/home.html'
-     
+    
+    
+def sample_detail(request):
+    sid = request.GET.get('sid')
+    sample = Sample.objects.get(pk=sid)
+    return render(request, 'core/sample_detail.html', context={'sample':sample})
