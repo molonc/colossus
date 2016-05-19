@@ -57,7 +57,7 @@ class Sample(models.Model):
                          self.sample_id,
                          self.pool_id,
                          ])
-    
+
 
 class Patient(models.Model):
     
@@ -86,7 +86,8 @@ class CellTable(models.Model):
     """
     
     # database relationships
-    sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
+    sample = models.OneToOneField(Sample, null=True,
+                                  on_delete=models.CASCADE)
     
     
     def __str__(self):
@@ -97,7 +98,7 @@ class CellTable(models.Model):
                         ])
         return res
    
-    
+   
 class Cell(models.Model):
     
     """
@@ -132,7 +133,7 @@ class Cell(models.Model):
 #     def __str__(self):
 #         pass
 
- 
+        
 class Library(models.Model):
     
     """

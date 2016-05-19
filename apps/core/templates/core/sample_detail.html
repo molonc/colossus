@@ -2,7 +2,52 @@
 {% load staticfiles %}
 
 {% block body %}
+<!-- Header -->
+      <div class="container-fluid" style="background-color:#5C6BC0;">
+        <div class="navbar-header">
+          <a class="navbar-brand" style="color:white;" href="{% url 'main_view' %}"><i class="fa fa-home" aria-hidden="true"></i> Single Cell Database</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" data-toggle="tooltip" title="AUTOCOMPLETE">
+          <form class="navbar-form navbar-right">
+            <input type="text" id="search" class="form-control" placeholder=" Search...">
+          </form>
+        </div>
+      </div>
 
-{{sample.sample_id}}
-
+<div class="container">
+    {% if sample.celltable %}
+    <div class="table-responsive">
+        <h3>{{sample.celltable}}</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sub_library ID</th>
+                    {% for field in cell_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for values in cell_values %}
+                <tr>
+                    <td>{{sample.sample_id}}_{{sample.pool_id}}_{{cell_location}}</td>
+                    {% for value in values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="container">
+        <h3>{{sample.sample_id}}_{{sample.pool_id}}</h3>
+        <i><h4>There is no cell table for this sample.</h4></i>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
+
+
+
+    
