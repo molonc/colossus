@@ -1,7 +1,7 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
 {% block body %}
-<div class="jumbotron", style="background-color:#CDDC39; color:black;">
+<div class="jumbotron", style="background-color:#CDDC39; color:black; padding:5px;">
     <h1>Project Single Cell Database</h1>
     <i>under development</i>
 </div>
@@ -10,17 +10,20 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Sample ID</th>
-                    <th>Pool ID</th>
-                    <th>Jira Ticket</th>
+                    {% for field in fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody>
                 {% for sample in samples %}
                 <tr>
                     <td><a href="{% url 'core:sample_detail' %}?sid={{sample.pk}}">{{sample.sample_id}}</a></td>
-                    <td>{{sample.pool_id}}</td>
-                    <td>{{sample.jira_ticket}}</td>
+                    {% for value in sample.get_values %}
+                    {% if value != sample.sample_id %}
+                    <td>{{value}}</td>
+                    {% endif %}
+                    {% endfor %}
                 </tr>
                 {% endfor %}
             </tbody>

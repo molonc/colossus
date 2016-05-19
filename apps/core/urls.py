@@ -5,7 +5,7 @@ Created on May 16, 2016
 """
 
 from django.conf.urls import url
-from .views import HomeView, SampleDetail, sample_detail
+from .views import HomeView, SampleDetail
 
 app_name = 'core'
 urlpatterns = [

@@ -11,12 +11,55 @@ from django.db import models
 # from django.conf import settings
 # from django.core.validators import MinValueValidator, MaxValueValidator
 
+#===============================
+# helpers
+#-------------------------------
 def create_chrfield(name, max_length=50, blank=True, **kwargs):
     """wrap models.CharField for ease of use."""
     
     return models.CharField(name, max_length=max_length, blank=blank, **kwargs) 
 
-class Sample(models.Model):
+
+class FieldValue:
+    
+    fields_to_exclude = ['ID']
+    values_to_exclude = ['id']
+    model = models.Model
+    
+    def get_fields(self):
+        """get verbose names of all the fields."""
+        field_names = [f.verbose_name for f in self._meta.fields
+                       if f.verbose_name not in self.fields_to_exclude]
+        return field_names
+    
+    def get_values(self):
+        """get values of all the fields."""
+        fields = [field.name for field in self._meta.fields]
+        values = [getattr(self, f) for f in fields
+                  if f not in self.values_to_exclude]
+        return values
+    
+#===============================
+# models
+#-------------------------------
+class Patient(models.Model, FieldValue):
+    
+    """
+    Patient information.
+    """
+    
+    # Character fields
+    patient_id = create_chrfield("Patient ID")
+    tissue_state = create_chrfield("Tissue State")
+    sample_state = create_chrfield("Sample State")
+    taxonomy_id = create_chrfield("Taxonomy ID")
+    receipient_id = create_chrfield("Recipient ID")
+    
+    def __str__(self):
+        return self.patient_id
+    
+
+class Sample(models.Model, FieldValue):
     
     """
     Sample Information.
@@ -32,23 +75,23 @@ class Sample(models.Model):
         # most likely same as pool ID
     tube_label = create_chrfield("Tube label")
 
-    # sub-library ID which is "sample_id"+"pool_id"+"cell_location"
-#     sub_library_id =  None
-    
+    # database relationships
+    patient = models.OneToOneField(
+                                   Patient,
+                                   null=True,
+                                   blank=True,
+                                   verbose_name="Patient",
+                                   on_delete=models.CASCADE
+                                   )
+        
     # Integer fields
     # number of libraries in pool (could be pulled from input file)
     num_libraries = models.IntegerField("Number of libraries", default=0)
-    
-    # not sure if it's different than num_libraries,
-    # got it from old LIMS excel file
-    num_cells = models.IntegerField("Number of cells", default=0)
-    
     
     # DateTime fields
     collect_date = models.DateTimeField("Date sample collected", 
                                         blank=True, null=True)
     
-
     # sample description
     description = create_chrfield("Description", max_length = 200)
     
@@ -58,36 +101,28 @@ class Sample(models.Model):
                          self.pool_id,
                          ])
 
+    def has_celltable(self):
+        res = True
+        try:
+            _ = self.celltable
+        except CellTable.DoesNotExist:
+            res = False
+        return res
 
-class Patient(models.Model):
-    
-    """
-    Patient information.
-    """
-    
-    # database relationships
-    sample = models.OneToOneField(Sample, null=True,
-                                  on_delete=models.CASCADE)
-    
-    # Character fields
-    patient_id = create_chrfield("Patient ID")
-    tissue_state = create_chrfield("Tissue State")
-    sample_state = create_chrfield("Sample State")
-    taxonomy_id = create_chrfield("Taxonomy ID")
-    receipient_id = create_chrfield("Recipient ID")
-    
-    def __str__(self):
-        return self.patient_id
  
-class CellTable(models.Model):
+class CellTable(models.Model, FieldValue):
     
     """
     Cell table containing info for each chip.
     """
     
     # database relationships
-    sample = models.OneToOneField(Sample, null=True,
-                                  on_delete=models.CASCADE)
+    sample = models.OneToOneField(
+                                  Sample,
+                                  null=True,
+                                  verbose_name="Sample",
+                                  on_delete=models.CASCADE
+                                  )
     
     
     def __str__(self):
@@ -99,15 +134,25 @@ class CellTable(models.Model):
         return res
    
    
-class Cell(models.Model):
+class Cell(models.Model, FieldValue):
     
     """
     A Row in the CellTable containing info for one cell.
     """
     
+    fields_to_exclude = ['ID', 'Cell Table']
+    values_to_exclude = ['id', 'cell_table']
+    
     # database relationships
-    cell_table = models.ForeignKey(CellTable, on_delete=models.CASCADE)
+    cell_table = models.ForeignKey(
+                                   CellTable,
+                                   verbose_name="Cell Table",
+                                   on_delete=models.CASCADE
+                                   )
 
+    #Character field
+    sample_cellcaller = create_chrfield("Sample")
+    
     # Integer fields
     row = models.IntegerField("Row", null=True)
     col = models.IntegerField("Column", null=True)
@@ -120,7 +165,6 @@ class Cell(models.Model):
     rev_other = models.IntegerField("Rev_Other", null=True)
         
     # Character fields
-    sample_cellcaller = create_chrfield("Sample")
     file_ch1 = create_chrfield("File_Ch1")
     file_ch2 = create_chrfield("File_Ch2")
     index_i7 = create_chrfield("Index_I7")
@@ -130,19 +174,28 @@ class Cell(models.Model):
     pick_met = create_chrfield("Pick_Met")
 
     
-#     def __str__(self):
-#         pass
+    def __str__(self):
+        res = '_'.join([
+                        self.cell_table.sample.sample_id,
+                        self.cell_table.sample.pool_id,
+                        str(self.row) + str(self.col),
+                        ])
+        return res
 
-        
-class Library(models.Model):
+    
+class Library(models.Model, FieldValue):
     
     """
     Library information.
     """
     
     # database relationships
-    cell_table = models.OneToOneField(CellTable, null=True,
-                                       on_delete=models.CASCADE)
+    cell_table = models.OneToOneField(
+                                      CellTable,
+                                      null=True,
+                                      verbose_name="Cell Table",
+                                      on_delete=models.CASCADE
+                                      )
     
     # Character fields    
     protocol = create_chrfield("Protocol") # wafergen, microfluidic, targeted, etc.
@@ -175,15 +228,19 @@ class Library(models.Model):
 #         return ()
         
 
-class Analyte(models.Model):
+class Analyte(models.Model, FieldValue):
     
     """
     Analyte information.
     """
     
     # database relationships
-    cell_table = models.OneToOneField(CellTable, null=True,
-                                      on_delete=models.CASCADE)
+    cell_table = models.OneToOneField(
+                                      CellTable,
+                                      null=True,
+                                      verbose_name="Cell Table",
+                                      on_delete=models.CASCADE
+                                      )
     
     # Character fields
     dna_volume = create_chrfield("DNA volume")
@@ -196,15 +253,19 @@ class Analyte(models.Model):
         return self.sample.sample_id
 
     
-class SequencingInfo(models.Model):
+class SequencingInfo(models.Model, FieldValue):
     
     """
     Sequencing information from GSC.
     """
     
     # database relationships
-    cell_table = models.OneToOneField(CellTable, null=True,
-                                      on_delete=models.CASCADE)
+    cell_table = models.OneToOneField(
+                                      CellTable,
+                                      null=True,
+                                      verbose_name="Cell Table",
+                                      on_delete=models.CASCADE
+                                      )
 
     # Character fields
     sequencing_id = create_chrfield("Sequencing ID")
