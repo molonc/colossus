@@ -20,13 +20,26 @@ class MainView(TemplateView):
     def get_context_data(self):
         s = Sample()
         fields = s.get_fields()
+        samples = Sample.objects.all()
+        self._update_sample_num_libraries(samples)
         context = {
-                   'samples': Sample.objects.all(),
+                   'samples': samples,
                    'fields': fields,
                    }
         return context
     
-    
+    # fixme: there must be a better way to set the value of 
+    # num_librarires field automatically when the sample celltable is set.
+    # now it's no efficient, since every time the page is loaded, it runs 
+    # through all the samples.
+    def _update_sample_num_libraries(self, samples):
+        for sample in samples:
+            if sample.has_celltable():
+                nl = len(sample.celltable.cell_set.all())
+                if sample.num_libraries != nl:
+                    sample.num_libraries = nl
+                    sample.save()
+                
 class HomeView(TemplateView):
     
     """
@@ -47,6 +60,7 @@ class SampleDetail(TemplateView):
     def get_context_data(self):
         sid = self.request.GET.get('sid')
         sample = Sample.objects.get(pk=sid)
+#         sample.set_num_libraries()
         c = Cell()
         fields = c.get_fields()
         context = {'sample': sample,

@@ -86,7 +86,11 @@ class Sample(models.Model, FieldValue):
         
     # Integer fields
     # number of libraries in pool (could be pulled from input file)
-    num_libraries = models.IntegerField("Number of libraries", default=0)
+    num_libraries = models.IntegerField(
+                                        "Number of libraries", 
+                                        default=0,
+                                        editable=False
+                                        )
     
     # DateTime fields
     collect_date = models.DateTimeField("Date sample collected", 
@@ -108,8 +112,8 @@ class Sample(models.Model, FieldValue):
         except CellTable.DoesNotExist:
             res = False
         return res
-
- 
+    
+        
 class CellTable(models.Model, FieldValue):
     
     """
@@ -189,6 +193,9 @@ class Library(models.Model, FieldValue):
     Library information.
     """
     
+    fields_to_exclude = ['ID', 'Cell Table']
+    values_to_exclude = ['id', 'cell_table']
+    
     # database relationships
     cell_table = models.OneToOneField(
                                       CellTable,
@@ -234,6 +241,9 @@ class Analyte(models.Model, FieldValue):
     Analyte information.
     """
     
+    fields_to_exclude = ['ID', 'Cell Table']
+    values_to_exclude = ['id', 'cell_table']
+    
     # database relationships
     cell_table = models.OneToOneField(
                                       CellTable,
@@ -258,6 +268,9 @@ class SequencingInfo(models.Model, FieldValue):
     """
     Sequencing information from GSC.
     """
+    
+    fields_to_exclude = ['ID', 'Cell Table']
+    values_to_exclude = ['id', 'cell_table']
     
     # database relationships
     cell_table = models.OneToOneField(
