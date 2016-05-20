@@ -6,6 +6,7 @@ Created on May 16, 2016
 
 from __future__ import unicode_literals
 from django.db import models
+import functools
 
 # import django.db.models.options as options
 # from django.conf import settings
@@ -21,7 +22,6 @@ def create_chrfield(name, max_length=50, blank=True, **kwargs):
 
 
 class FieldValue:
-    
     fields_to_exclude = ['ID']
     values_to_exclude = ['id']
     model = models.Model
@@ -38,6 +38,25 @@ class FieldValue:
         values = [getattr(self, f) for f in fields
                   if f not in self.values_to_exclude]
         return values
+    
+    
+class UpdateNumLib(object):
+    def __init__(self, sample):
+        self.s = sample
+    
+    def __call__(self, func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+#             print '>' * 40, 'before:', self.s.num_libraries
+            func(*args, **kwargs)
+#             print 'Updating num_libraries of', #self.s
+            print'<' * 40, self.s.target_field, '>' * 40
+            print dir(self.s)
+#             self.s.num_libraries = len(self.s.celltable.cell_set.all())
+#             self.s.save()
+#             print '>' * 40, 'after:', self.s.num_libraries
+        return wrapper
+    
     
 #===============================
 # models
@@ -137,7 +156,13 @@ class CellTable(models.Model, FieldValue):
                         ])
         return res
    
-   
+    # Updating Sample.num_libraries should happen after CellTabel.save()
+    # finished AND returned.
+#     @UpdateNumLib(sample)
+#     def save(self, *args, **kwargs):
+#         super(CellTable, self).save(*args, **kwargs)
+ 
+        
 class Cell(models.Model, FieldValue):
     
     """
@@ -186,7 +211,7 @@ class Cell(models.Model, FieldValue):
                         ])
         return res
 
-    
+
 class Library(models.Model, FieldValue):
     
     """
@@ -260,7 +285,7 @@ class Analyte(models.Model, FieldValue):
     size_selection_method = create_chrfield("Size selection method")
 
     def __str__(self):
-        return self.sample.sample_id
+        return self.cell_table.sample.sample_id
 
     
 class SequencingInfo(models.Model, FieldValue):

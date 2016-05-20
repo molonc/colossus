@@ -1,9 +1,21 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
 {% block body %}
-<div class="jumbotron", style="background-color:#CDDC39; color:black; padding:5px;">
-    <h1>Project Single Cell Database</h1>
-    <i>under development</i>
+<!-- Header -->
+  <div class="container-fluid" style="background-color:#5C6BC0;">
+    <div class="navbar-header">
+      <a class="navbar-brand" style="color:white;" href="{% url 'main_view' %}"><i class="fa fa-home" aria-hidden="true"></i> Single Cell Database (<i>development version</i>)</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse" data-toggle="tooltip" title="AUTOCOMPLETE">
+      <form class="navbar-form navbar-right">
+        <input type="text" id="search" class="form-control" placeholder=" Search...">
+      </form>
+    </div>
+  </div><br>
+<!-- end of header -->
+
+<div class="container">
+    <a style="float:right;" href="{% url 'main_view' %}admin/core/sample/add"> add sample</a>
 </div>
 <div class="container" style="background-color:#eee;">
     <div class="table-responsive">
@@ -13,6 +25,7 @@
                     {% for field in fields %}
                     <th>{{field}}</th>
                     {% endfor %}
+                    <th>Edit</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,6 +37,7 @@
                     <td>{{value}}</td>
                     {% endif %}
                     {% endfor %}
+                    <td><a href="{% url 'main_view' %}admin/core/sample/{{sample.pk}}/change">edit</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

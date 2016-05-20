@@ -2,33 +2,32 @@
 {% load staticfiles %}
 
 {% block body %}
+
 <!-- Header -->
-      <div class="container-fluid" style="background-color:#5C6BC0;">
-        <div class="navbar-header">
-          <a class="navbar-brand" style="color:white;" href="{% url 'main_view' %}"><i class="fa fa-home" aria-hidden="true"></i> Single Cell Database</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse" data-toggle="tooltip" title="AUTOCOMPLETE">
-          <form class="navbar-form navbar-right">
-            <input type="text" id="search" class="form-control" placeholder=" Search...">
-          </form>
-        </div>
-      </div><br>
+<div class="container", style="background-color:#CDDC39; color:black; padding:5px; width:100%;">
+    <a style="float:left; color:balck;" href="{% url 'main_view' %}"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
+    <h1>Sample Details</h1>
+</div>
 <!-- end of header -->
 
 <!-- Sample Information -->
 <div class="container">
-    <div class="container" style="float:left;">
-        <b><i style="color:darkgreen;">Sample ID: </i></b> {{sample.sample_id}}
-        <b><i style="color:darkgreen;">Pool ID: </i></b> {{sample.pool_id}}
-    </div><br>
-    <!-- end of Sample Information -->
+    <b><i style="color:darkgreen;">Sample ID: </i></b> {{sample.sample_id}}
+    <b><i style="color:darkgreen;">Pool ID: </i></b> {{sample.pool_id}}
+    {% if sample.has_celltable %}
+    <a href = "{% url 'main_view' %}admin/core/celltable/{{sample.celltable.pk}}/change" style="float:right;">edit</a>
+    {% else %}
+    <a href = "{% url 'main_view' %}admin/core/celltable/add" style="float:right;">add</a>
+    {% endif %}
+</div><br>
+
+<!-- end of Sample Information -->
     
-    <!-- Cell Table -->
-    <div class="table-responsive" style="padding:10px; text-align:center;">
-        <div class="container">
-            <h4><i>Cells Information</i></h4>
-        </div>
-        {% if sample.has_celltable %}
+<!-- Cell Table -->
+<div class="container">
+    <h4><i>Cells Information</i></h4>
+    {% if sample.has_celltable %}
+    <div class="table-responsive" style="text-align:center;">
         <table class="table-striped table-bordered">
             <thead>
                 <tr>
@@ -49,22 +48,18 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
-        <div class="container">
-            <h5><i class="text-warning">There is no cells information for this sample.</i></h5>
-        </div>
     </div>    
+    {% else %}
+    <h5><i class="text-warning">There is no cells information for this sample!</i></h5>
     {% endif %}
-</div>
+</div><br>
 <!-- end of Cell Table -->
     
 <!-- Library Information -->
 <div class="container">
-    <div class="table-responsive" style="padding:10px; text-align:center;">
-        <div class="container">
-            <h4><i>Library Information</i></h4>
-        </div>
-        {% if sample.has_celltable and sample.celltable.library %}
+    <h4><i>Library Information</i></h4>
+    {% if sample.has_celltable and sample.celltable.library %}
+    <div class="table-responsive" style="text-align:center;">
         <table class="table-striped table-bordered">
             <thead>
                 <tr>
@@ -81,22 +76,18 @@
                 </tr>
             </tbody>
         </table>
-        {% else %}
-        <div class="container">
-            <h5><i class="text-warning">There is no library information for this sample.</i></h5>
-        </div>
     </div>
+    {% else %}
+    <h5><i class="text-warning">There is no library information for this sample!</i></h5>
     {% endif %}
-</div>
+</div><br>
 <!-- end of Library Information -->  
 
 <!-- Analyte Information -->
 <div class="container">
-    <div class="table-responsive" style="padding:10px; text-align:center;">
-        <div class="container">
-            <h4><i>Analyte Information</i></h4>
-        </div>
-        {% if sample.has_celltable and sample.celltable.analyte %}
+    <h4><i>Analyte Information</i></h4>
+    {% if sample.has_celltable and sample.celltable.analyte %}
+    <div class="table-responsive" style="text-align:center;">        
         <table class="table-striped table-bordered">
             <thead>
                 <tr>
@@ -113,22 +104,18 @@
                 </tr>
             </tbody>
         </table>
-        {% else %}
-        <div class="container">
-            <h5><i class="text-warning">There is no Analyte information for this sample!</i></h5>
-        </div>
     </div>
+    {% else %}
+    <h5><i class="text-warning">There is no Analyte information for this sample!</i></h5>
     {% endif %}
-</div>
+</div><br>
 <!-- end of Analyte Information -->
   
 <!-- Sequencing Information -->
 <div class="container">
-    <div class="table-responsive" style="padding:10px; text-align:center;">
-        <div class="container">
-            <h4><i>Sequencing Information</i></h4>
-        </div>
-        {% if sample.has_celltable and sample.celltable.sequencinginfo %}
+    <h4><i>Sequencing Information</i></h4>
+    {% if sample.has_celltable and sample.celltable.sequencinginfo %}
+    <div class="table-responsive" style="text-align:center;">
         <table class="table-striped table-bordered">
             <thead>
                 <tr>
@@ -145,13 +132,11 @@
                 </tr>
             </tbody>
         </table>
-        {% else %}
-        <div class="container">
-            <h5><i class="text-warning">There is no sequencing information for this sample!</i></h5>
-        </div>
     </div>
+    {% else %}
+    <h5><i class="text-warning">There is no sequencing information for this sample!</i></h5>
     {% endif %}
-</div>
+</div><br>
 <!-- end of Sequencing Information -->
 {% endblock %}
 
