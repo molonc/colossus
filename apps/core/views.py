@@ -12,47 +12,34 @@ from .models import Sample, Cell
 from .forms import SampleForm
 
 
-class Index(TemplateView):
-    
-    """
-    Home page of the project.
-    """
-    
-    template_name = "core/index.html"
-    
-    def get_context_data(self):
-        s = Sample()
-        fields = s.get_fields()
-        samples = Sample.objects.all()
-        self._update_sample_num_libraries(samples)
-        context = {
-                   'samples': samples,
-                   'fields': fields,
-                   }
-        return context
-    
-    # fixme: there must be a better way to set the value of 
-    # num_librarires field automatically when the sample celltable is updated.
-    # Currently, it's not efficient, since every time the main page is loaded, it runs 
-    # through all the samples. Using post-save didn't do the desired functionality.
-    def _update_sample_num_libraries(self, samples):
-        for sample in samples:
-            if sample.has_celltable():
-                nl = len(sample.celltable.cell_set.all())
-                if sample.num_libraries != nl:
-                    sample.num_libraries = nl
-                    sample.save()
-                
+def index_view(request):
+    s = Sample()
+    samples = Sample.objects.all()
+    # self._update_sample_num_libraries(samples)
+    context = {
+               'samples': samples,
+               }
+    return render(request, 'core/index.html', context)
 
-def home(request):
+
+def home_view(request):
     """home page of this app."""
     return HttpResponse(render(request, 'core/home.html', {}))
-    
-    
+
 
 def sample_detail(request, pk):
     """sample detail page."""
     sample = get_object_or_404(Sample, pk=pk)
+
+    ## the post-save doesn't work in a sense that it's always
+    ## one save behind. 
+    ## this is to avoid that, but there must be a better way to handle this.
+    if sample.has_celltable():
+        nl = len(sample.celltable.cell_set.all())
+        if sample.num_libraries != nl:
+            sample.num_libraries = nl
+            sample.save()
+
     c = Cell()
     fields = c.get_fields()
     context = {'sample': sample,

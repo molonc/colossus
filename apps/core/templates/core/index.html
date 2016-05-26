@@ -1,41 +1,42 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
-{% block body %}
-<div class="container">
-    <!-- a style="float:right;" href="{% url 'core:home' %}admin/core/sample/add"> add sample</a -->
-    <a style="float:right;" href="{% url 'core:sample_create' %}">add sample</a>
 
-</div>
-<div class="container" style="background-color:#eee;">
+{% block title %}
+List of Libraries
+{% endblock %}
+
+{% block body %}
+<div class="container" style="background-color:#F5F5F5;">
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
-                    {% for field in fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
+                    <th>Sample ID</th>
+                    <th>Pool ID</th>
+                    <th>Jira Ticket</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for sample in samples %}
                 <tr>
-                    <td><a href="{% url 'core:sample_detail' pk=sample.pk %}">{{sample.sample_id}}</a></td>
-                    {% for value in sample.get_values %}
-                    {% if value != sample.sample_id %}
-                    <td>{{value}}</td>
-                    {% endif %}
-                    {% endfor %}
+                    <td>{{sample.sample_id}}</td>
+                    <td>{{sample.pool_id}}</td>
+                    <td>{{sample.jira_ticket}}</td>
                     <!-- td><a href="{% url 'core:home' %}admin/core/sample/{{sample.pk}}/change">edit</a></td -->
                     <td>
-                        <p><a href="{% url 'core:sample_update' pk=sample.pk %}">edit</a></p>
-                        <p><a href="{% url 'core:sample_delete' pk=sample.pk %}">delete</a></p>
+                        <a href="{% url 'core:sample_detail' pk=sample.pk %}">view</a>
+                        <p style="margin:0;"><a href="{% url 'core:sample_update' pk=sample.pk %}">edit</a></p>
+                        <p style="margin:0;"><a href="{% url 'core:sample_delete' pk=sample.pk %}">delete</a></p>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    
+</div>
+
+<div class="container" style="padding:0; ">
+    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url 'core:sample_create' %}">Add Library</a>
 </div>
 {% endblock %}

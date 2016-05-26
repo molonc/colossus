@@ -1,26 +1,34 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
 
+{% block title %}
+Library Details
+{% endblock %}
+
 {% block body %}
-
-<!-- Header -->
-<div class="container", style="background-color:#CDDC39; color:black; margin-bottom:5px; padding:5px;">
-    <h1 style="float:left;">Sample Details</h1>
-</div>
-<!-- end of header -->
-
-<!-- Sample Information -->
+<!-- Meta Information -->
 <div class="container">
-    <b><i style="color:darkgreen;">Sample ID: </i></b> {{sample.sample_id}}
-    <b><i style="color:darkgreen;">Pool ID: </i></b> {{sample.pool_id}}
-    {% if sample.has_celltable %}
-    <a href = "{% url 'index' %}admin/core/celltable/{{sample.celltable.pk}}/change" style="float:right;">edit</a>
-    {% else %}
-    <a href = "{% url 'index' %}admin/core/celltable/add" style="float:right;">add</a>
-    {% endif %}
+    <h4><i>Meta Information</i></h4>
+    <div class="container" style="float:left; width:22%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for field in sample.get_fields %}
+                <tr><b>{{field}}:</b></tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="container" style="float:left; width:78%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for value in sample.get_values %}
+                <tr>{{value}}</tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div><br>
-
-<!-- end of Sample Information -->
+<!-- end of Meta Information -->
     
 <!-- Cell Table -->
 <div class="container">

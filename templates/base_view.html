@@ -11,8 +11,8 @@
         <title>ElastiDjango Database Project</title>
     </head>
     <body>
-    <!-- Header -->
-        <div class="container-fluid" style="background-color:#5C6BC0;">
+        <!-- Header -->
+        <div class="container-fluid" style="background-color:#424242;">
             <div class="navbar-header">
                 <a class="navbar-brand" style="color:white;" href="{% url 'index' %}"><i class="fa fa-home" aria-hidden="true"></i> Single Cell Database (<i>development version</i>)</a>
             </div>
@@ -22,7 +22,14 @@
                 </form>
             </div>
         </div><br>
-    <!-- end of header -->
+        <!-- end of header -->
+
+        <!-- Page title -->
+        <div class="container", style="background-color:#FF9800; color:#212121; margin-bottom:5px; padding-left:5px;">
+            <h2 style="float:left;">{% block title %}Title{% endblock %}</h2>
+        </div>
+        <!-- end of page title -->
+
         {% block body %}{% endblock %}
     </body>
 </html>

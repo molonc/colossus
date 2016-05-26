@@ -1,20 +1,18 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
 
-{% block body %}
-<!-- Header -->
-<div class="container", style="background-color:#CDDC39; color:black; margin-bottom:5px; padding:5px;">
-    <h1 style="float:left;">Sample Update</h1>
-</div>
-<!-- end of header -->
+{% block title %}
+Edit Library
+{% endblock %}
 
-<div class="container" style="background-color:#eee;">
+{% block body %}
+<div class="container" style="background-color:#F5F5F5;">
 	<form action="{% url 'core:sample_update' pk=pk %}" method="POST">
 		{% csrf_token %}
 		<table class="table">
 			{{form}}	
 		</table>
-	<input type="submit" name="update" value="update">
-	</form>
+	<input class="btn btn-primary btn-sm" type="submit" name="update" value="update">
+	</form><br>
 </div>
 {% endblock %}

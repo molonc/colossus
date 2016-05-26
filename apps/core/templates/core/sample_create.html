@@ -1,19 +1,18 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
 
+{% block title %}
+Create Library
+{% endblock %}
+
 {% block body %}
-<!-- Header -->
-<div class="container", style="background-color:#CDDC39; color:black; margin-bottom:5px; padding:5px;">
-    <h1 style="float:left;">Create a new sample</h1>
-</div>
-<!-- end of header -->
-<div class="container" style="background-color:#eee;">
+<div class="container" style="background-color:#F5F5F5;">
     <form action="{% url 'core:sample_create' %}" method="POST">
         {% csrf_token %}
         <table class="table">
             {{form}}
-        </table><br>
-        <input type="submit" name="create" value="Create">
-    </form>
+        </table>
+        <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+    </form><br>
 </div>
 {% endblock %}
