@@ -6,7 +6,7 @@ Created on May 16, 2016
 
 from __future__ import unicode_literals
 from django.db import models
-import functools
+# import functools
 
 # import django.db.models.options as options
 # from django.conf import settings
@@ -17,55 +17,55 @@ import functools
 #-------------------------------
 def create_chrfield(name, max_length=50, blank=True, **kwargs):
     """wrap models.CharField for ease of use."""
-    
-    return models.CharField(name, max_length=max_length, blank=blank, **kwargs) 
+
+    return models.CharField(name, max_length=max_length, blank=blank, **kwargs)
 
 
 class FieldValue:
     fields_to_exclude = ['ID']
     values_to_exclude = ['id']
     model = models.Model
-    
+
     def get_fields(self):
         """get verbose names of all the fields."""
         field_names = [f.verbose_name for f in self._meta.fields
                        if f.verbose_name not in self.fields_to_exclude]
         return field_names
-    
+
     def get_values(self):
         """get values of all the fields."""
         fields = [field.name for field in self._meta.fields]
         values = [getattr(self, f) for f in fields
                   if f not in self.values_to_exclude]
         return values
-    
-    
+
+
 #===============================
 # models
 #-------------------------------
 class Patient(models.Model, FieldValue):
-    
+
     """
     Patient information.
     """
-    
+
     # Character fields
     patient_id = create_chrfield("Patient ID")
     tissue_state = create_chrfield("Tissue State")
     sample_state = create_chrfield("Sample State")
     taxonomy_id = create_chrfield("Taxonomy ID")
     receipient_id = create_chrfield("Recipient ID")
-    
+
     def __str__(self):
         return self.patient_id
-    
+
 
 class Sample(models.Model, FieldValue):
-    
+
     """
     Sample Information.
-    """  
-    
+    """
+
     # Character fields
     # SA ID's
     sample_id = create_chrfield("Sample ID", blank=False)
@@ -108,6 +108,7 @@ class Sample(models.Model, FieldValue):
 
     def has_celltable(self):
         res = True
+        ## use hasattr() instead
         try:
             _ = self.celltable
         except CellTable.DoesNotExist:

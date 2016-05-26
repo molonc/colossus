@@ -23,7 +23,7 @@ from django.contrib import admin
 from core import views 
 
 urlpatterns = [
-    url(r'^$', views.MainView.as_view(), name='main_view'),    
+    url(r'^$', views.Index.as_view(), name='index'),    
     url(r'^admin/', admin.site.urls),
     url(r'^apps/core/', include('core.urls')),
 ]

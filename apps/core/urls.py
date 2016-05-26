@@ -5,10 +5,14 @@ Created on May 16, 2016
 """
 
 from django.conf.urls import url
-from .views import HomeView, SampleDetail
+from . import views
 
 app_name = 'core'
 urlpatterns = [
-               url(r'^$', HomeView.as_view(), name='home_view'),
-               url(r'^/sample', SampleDetail.as_view(), name='sample_detail')
+               url(r'^$', views.home, name='home'),
+               url(r'^sample/create/$', views.sample_create, name='sample_create'),
+               url(r'^sample/(?P<pk>\d+)$', views.sample_detail, name='sample_detail'),
+               url(r'^sample/update/(?P<pk>\d+)$', views.sample_update, name='sample_update'),
+               url(r'^sample/delete/(?P<pk>\d+)$', views.sample_delete, name='sample_delete'),
+               # url(r'^sample/detail/(?P<id>\d+)$', views.sample_detail, name='sample_detail2'),
                ]

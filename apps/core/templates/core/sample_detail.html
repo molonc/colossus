@@ -4,11 +4,8 @@
 {% block body %}
 
 <!-- Header -->
-<div class="container", style="background-color:#CDDC39; color:black; margin-bottom:5px; padding:5px; width:100%;">
-    <div class="container">
-        <h1 style="float:left;">Sample Details</h1>
-        <a class="navbar-brand" style="float:right; color:black;" href="{% url 'main_view' %}"><i class="fa fa-home" aria-hidden="true" ></i> Home</a>
-    </div>
+<div class="container", style="background-color:#CDDC39; color:black; margin-bottom:5px; padding:5px;">
+    <h1 style="float:left;">Sample Details</h1>
 </div>
 <!-- end of header -->
 
@@ -17,9 +14,9 @@
     <b><i style="color:darkgreen;">Sample ID: </i></b> {{sample.sample_id}}
     <b><i style="color:darkgreen;">Pool ID: </i></b> {{sample.pool_id}}
     {% if sample.has_celltable %}
-    <a href = "{% url 'main_view' %}admin/core/celltable/{{sample.celltable.pk}}/change" style="float:right;">edit</a>
+    <a href = "{% url 'index' %}admin/core/celltable/{{sample.celltable.pk}}/change" style="float:right;">edit</a>
     {% else %}
-    <a href = "{% url 'main_view' %}admin/core/celltable/add" style="float:right;">add</a>
+    <a href = "{% url 'index' %}admin/core/celltable/add" style="float:right;">add</a>
     {% endif %}
 </div><br>
 

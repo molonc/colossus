@@ -1,0 +1,18 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block body %}
+<!-- Header -->
+<div class="container", style="background-color:#CDDC39; color:black; margin-bottom:5px; padding:5px;">
+    <h1 style="float:left;">Sample Delete</h1>
+</div>
+<!-- end of header -->
+
+<div class="container">
+    <h1>Do you want to detete the sample <i>{{sample.sample_id}}_{{sample.pool_id}}</i>?</h1>
+    <form action="{% url 'core:sample_delete' pk=pk %}" method="POST">
+    	{% csrf_token %}
+        <input type="submit" name="delete" value="Delete">
+    </form>
+</div>
+{% endblock %}

@@ -11,6 +11,18 @@
         <title>ElastiDjango Database Project</title>
     </head>
     <body>
+    <!-- Header -->
+        <div class="container-fluid" style="background-color:#5C6BC0;">
+            <div class="navbar-header">
+                <a class="navbar-brand" style="color:white;" href="{% url 'index' %}"><i class="fa fa-home" aria-hidden="true"></i> Single Cell Database (<i>development version</i>)</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse" data-toggle="tooltip" title="AUTOCOMPLETE">
+                <form class="navbar-form navbar-right">
+                    <input type="text" id="search" class="form-control" placeholder=" Search...">
+                </form>
+            </div>
+        </div><br>
+    <!-- end of header -->
         {% block body %}{% endblock %}
     </body>
 </html>

@@ -1,0 +1,41 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+{% block body %}
+<div class="container">
+    <!-- a style="float:right;" href="{% url 'core:home' %}admin/core/sample/add"> add sample</a -->
+    <a style="float:right;" href="{% url 'core:sample_create' %}">add sample</a>
+
+</div>
+<div class="container" style="background-color:#eee;">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for field in fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in samples %}
+                <tr>
+                    <td><a href="{% url 'core:sample_detail' pk=sample.pk %}">{{sample.sample_id}}</a></td>
+                    {% for value in sample.get_values %}
+                    {% if value != sample.sample_id %}
+                    <td>{{value}}</td>
+                    {% endif %}
+                    {% endfor %}
+                    <!-- td><a href="{% url 'core:home' %}admin/core/sample/{{sample.pk}}/change">edit</a></td -->
+                    <td>
+                        <p><a href="{% url 'core:sample_update' pk=sample.pk %}">edit</a></p>
+                        <p><a href="{% url 'core:sample_delete' pk=sample.pk %}">delete</a></p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+{% endblock %}

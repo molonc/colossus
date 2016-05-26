@@ -1,0 +1,19 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block body %}
+<!-- Header -->
+<div class="container", style="background-color:#CDDC39; color:black; margin-bottom:5px; padding:5px;">
+    <h1 style="float:left;">Create a new sample</h1>
+</div>
+<!-- end of header -->
+<div class="container" style="background-color:#eee;">
+    <form action="{% url 'core:sample_create' %}" method="POST">
+        {% csrf_token %}
+        <table class="table">
+            {{form}}
+        </table><br>
+        <input type="submit" name="create" value="Create">
+    </form>
+</div>
+{% endblock %}
