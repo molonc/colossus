@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import TemplateView
-from .models import Sample, Cell
+from .models import Sample
 from .forms import SampleForm
 
 
