@@ -34,17 +34,17 @@ def sample_detail(request, pk):
     ## the post-save doesn't work in a sense that it's always
     ## one save behind. 
     ## this is to avoid that, but there must be a better way to handle this.
-    if sample.has_celltable():
-        nl = len(sample.celltable.cell_set.all())
-        if sample.num_libraries != nl:
-            sample.num_libraries = nl
-            sample.save()
+    # if sample.has_celltable():
+    #     nl = len(sample.celltable.cell_set.all())
+    #     if sample.num_libraries != nl:
+    #         sample.num_libraries = nl
+    #         sample.save()
 
-    c = Cell()
-    fields = c.get_fields()
-    context = {'sample': sample,
-               'celltable_fields': fields,
-               }
+    # c = Cell()
+    # fields = c.get_fields()
+    context = {
+    'sample': sample
+    }
     return render(request, 'core/sample_detail.html', context)
             
 

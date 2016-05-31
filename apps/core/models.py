@@ -58,8 +58,14 @@ class FieldValue(object):
     def get_values(self):
         """get values of all the fields."""
         fields = [field.name for field in self._meta.fields]
-        values = [getattr(self, f) for f in fields
-                  if f not in self.values_to_exclude]
+        values = []
+        for f in fields:
+            if f not in self.values_to_exclude:
+                a = "get_%s_display" % (f)
+                if hasattr(self, a):
+                    values.append(getattr(self, a)())
+                else:
+                    values.append(getattr(self, f))
         return values
 
 
@@ -239,6 +245,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     # sublibrary_id = create_chrfield("Sub-Library ID")
     # tube_label = create_chrfield("Tube Label")
 
+
 class Library(models.Model, FieldValue):
 
     """
@@ -272,6 +279,7 @@ class Library(models.Model, FieldValue):
 
     def __str__(self):
         return self.get_library_id()
+
 
 class SublibraryInformation(models.Model, FieldValue):
 
@@ -325,6 +333,7 @@ class SublibraryInformation(models.Model, FieldValue):
 
     def __str__(self):
         return self.get_sublibrary_id()
+
 
 class LibrarySampleDetail(models.Model, FieldValue):
 
