@@ -2,38 +2,35 @@
 {% load staticfiles %}
 
 {% block title %}
-List of Samples
+List of Tables
 {% endblock %}
 
 {% block body %}
-<div class="container" style="background-color:#F5F5F5;">
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sample ID</th>
-                    <th>Sample Type</th>
-                    <th></th>
-                </tr>
-            </thead>
+<div class="container">
+        <table class="table-striped" style="width:100%;">
             <tbody>
-                {% for sample in samples %}
                 <tr>
-                    <td><a href="{% url 'core:sample_detail' pk=sample.pk %}">{{sample.sample_id}}</a></td>
-                    <td>{{sample.get_sample_type_display}}</td>
-                    <!-- td><a href="{% url 'core:home' %}admin/core/sample/{{sample.pk}}/change">edit</a></td -->
+                    <td><a href="{% url 'core:sample_list' %}">Samples</a></td>
                     <td>
-                        <p style="margin:0;"><a href="{% url 'core:sample_update' pk=sample.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;" "></i> edit</a></p>
-                        <p style="margin:0;"><a href="{% url 'core:sample_delete' pk=sample.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
+                        <p style="float:right;">
+                        <a href="{% url 'core:sample_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
                     </td>
                 </tr>
-                {% endfor %}
+                <tr>
+                    <td><a href="">Libraries</a></td>
+                    <td>
+                        <p style="float:right;">
+                        <a href="{% url 'core:sample_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href="">Sequencings</a></td>
+                    <td>
+                        <p style="float:right;">
+                        <a href="{% url 'core:sample_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                    </td>
+                </tr>
             </tbody>
         </table>
-    </div>
-</div>
-
-<div class="container" style="padding:0; ">
-    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url 'core:sample_create' %}">Add Sample</a>
 </div>
 {% endblock %}

@@ -12,7 +12,6 @@ from .models import LibraryConstructionInformation
 from .models import LibraryQuantificationAndStorage
 from .models import Sequencing, SequencingDetail
 
-
 ## Sample information
 class AdditionalSampleInformationInline(admin.StackedInline):
     model = AdditionalSampleInformation
@@ -74,4 +73,7 @@ class SequencingAdmin(admin.ModelAdmin):
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(Library, LibraryAdmin)
 admin.site.register(Sequencing, SequencingAdmin)
+
+# extra admin only information
+admin.site.register(AdditionalSampleInformation)
 

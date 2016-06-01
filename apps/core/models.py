@@ -90,27 +90,35 @@ class Sample(models.Model, FieldValue):
     sample_id = create_chrfield("Sample ID", blank=False)
 
     ## other fields
-    anonymou_patient_id = create_chrfield("Anonymous Patient ID")
-    cell_line_id = create_chrfield("Cell Line ID")
-    sample_type = create_chrfield(
-        "Sample Type",
-        choices=sample_type_choices
-        )
-    strain = create_chrfield("Strain")
     taxonomy_id = create_chrfield(
         "Taxonomy ID",
         default="9606"
         )
-    xenograft_biopsy_date = models.DateField(
-        "Xenograft biopsy date",
-        null=True,
-        blank=True,
+    sample_type = create_chrfield(
+        "Sample Type",
+        choices=sample_type_choices
         )
+    anonymous_patient_id = create_chrfield("Anonymous Patient ID")
+    cell_line_id = create_chrfield("Cell Line ID")
     xenograft_id = create_chrfield("Xenograft ID")
     xenograft_recipient_taxonomy_id = create_chrfield(
         "Xenograft recipient taxonomy ID",
         default="10090"
         )
+    strain = create_chrfield("Strain")
+    xenograft_biopsy_date = models.DateField(
+        "Xenograft biopsy date",
+        null=True,
+        blank=True,
+        )
+
+    def get_sample_types(self):
+        """get all the sample types under the same sample_id."""
+        samples = Sample.objects.filter(sample_id=self.sample_id)
+        types = [getattr(s, "get_sample_type_display")()
+            for s in samples
+            ]
+        return types
 
     def __str__(self):
         return self.sample_id
@@ -185,7 +193,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         )
     sex = create_chrfield(
         "Sex",
-        choices=sex_choices
+        choices=sex_choices,
         )
     patient_biopsy_date = models.DateField(
         "Patient biopsy date",
@@ -244,6 +252,13 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     # storage_medium = create_chrfield("Storage Medium")
     # sublibrary_id = create_chrfield("Sub-Library ID")
     # tube_label = create_chrfield("Tube Label")
+
+    def __str__(self):
+        res = '_'.join([
+            self.sample.sample_id,
+            'additional_information'
+            ])
+        return res
 
 
 class Library(models.Model, FieldValue):

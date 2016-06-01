@@ -4,29 +4,40 @@ Created on May 16, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 """
 
+from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
+from .decorators import Render
 from .models import Sample
-from .forms import SampleForm
+from .forms import SampleForm, AdditionalSampleInformationForm
 
 
+@Render("core/index.html")
 def index_view(request):
+    context = {}
+    return context
+
+
+@Render("core/home.html")
+def home_view(request):
+    """home page of the app."""
+    context = {}
+    return context
+
+
+@Render("core/sample_list.html")
+def sample_list(request):
+    """list of samples."""
     s = Sample()
     samples = Sample.objects.all()
     # self._update_sample_num_libraries(samples)
-    context = {
-               'samples': samples,
-               }
-    return render(request, 'core/index.html', context)
+    context = {'samples': samples}
+    return context
 
 
-def home_view(request):
-    """home page of this app."""
-    return HttpResponse(render(request, 'core/home.html', {}))
-
-
+@Render("core/sample_detail.html")
 def sample_detail(request, pk):
     """sample detail page."""
     sample = get_object_or_404(Sample, pk=pk)
@@ -40,41 +51,57 @@ def sample_detail(request, pk):
     #         sample.num_libraries = nl
     #         sample.save()
 
-    # c = Cell()
-    # fields = c.get_fields()
     context = {
     'sample': sample
     }
-    return render(request, 'core/sample_detail.html', context)
+    return context
             
 
+@Render("core/sample_create.html")
+@permission_required("core.groups.shahuser")
 def sample_create(request):
     """sample create page."""
-    if not request.user.is_staff or not request.user.is_superuser:
-        raise Http404
     if request.method == 'POST':
-        form = SampleForm(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
+        form_sample = SampleForm(request.POST)
+        form_sample_info = AdditionalSampleInformationForm(request.POST)
+        if form_sample.is_valid():
+            instance = form_sample.save(commit=False)
             instance.save()
-            return HttpResponseRedirect(reverse("index"))
+            sample_id = instance.pk
+            ## should use django messages
+            print 'form_sample saved successfully.'
+    
+            if form_sample_info.is_valid():
+                instance = form_sample_info.save(commit=False)
+                instance.sample_id = sample_id
+                instance.save()
+                ## should use django messages
+                print 'form_sample_info saved successfully.'
+
+        return HttpResponseRedirect(reverse("core:sample_list"))
     
     else:
-        form = SampleForm()
-    return render(request, "core/sample_create.html", {'form':form})
+        form_sample = SampleForm()
+        form_sample_info = AdditionalSampleInformationForm()
+
+    context = {
+        'form_sample': form_sample,
+        'form_additional_sample_information': form_sample_info
+        }
+    return context
 
 
+@Render("core/sample_update.html")
+@permission_required("core.groups.shahuser")
 def sample_update(request, pk):
     """sample update page."""
-    if not request.user.is_staff or not request.user.is_superuser:
-        raise Http404
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == 'POST':
         form = SampleForm(request.POST, instance=sample)
         if form.is_valid():
             sample = form.save(commit=False)
             sample.save()
-            return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("core:sample_list"))
 
     else:
         form = SampleForm(instance=sample)
@@ -83,24 +110,24 @@ def sample_update(request, pk):
         'form': form,
         'pk': pk,
     }
-    return render(request, "core/sample_update.html", context)
+    return context
 
 
+@Render("core/sample_delete.html")
+@permission_required("core.groups.shahuser")
 def sample_delete(request, pk):
     """sample delete page."""
-    if not request.user.is_staff or not request.user.is_superuser:
-        raise Http404
     sample = get_object_or_404(Sample, pk=pk)
 
     if request.method == 'POST':
         sample.delete()
-        return HttpResponseRedirect(reverse("index"))    
+        return HttpResponseRedirect(reverse("core:sample_list"))    
 
     context = {
         'sample': sample,
         'pk': pk
     }
-    return render(request, "core/sample_delete.html", context)
+    return context
 
 
 

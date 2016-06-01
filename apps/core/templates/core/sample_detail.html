@@ -9,7 +9,7 @@ Sample Details
 <!-- Meta Information -->
 <div class="container">
     <h4><i>Meta Information</i></h4>
-    <div class="container" style="float:left; width:25%; padding:0">
+    <div class="container" style="float:left; width:35%; padding:0">
         <table class="table-striped">
             <tbody>
                 {% for field in sample.get_fields %}
@@ -18,7 +18,7 @@ Sample Details
             </tbody>
         </table>
     </div>
-    <div class="container" style="float:left; width:75%; padding:0">
+    <div class="container" style="float:left; width:65%; padding:0">
         <table class="table-striped">
             <tbody>
                 {% for value in sample.get_values %}
@@ -29,6 +29,122 @@ Sample Details
     </div>
 </div><br>
 <!-- end of Meta Information -->
+    
+<!-- Cell Table -->
+<div class="container">
+    <h4><i>Additional Sample Information</i></h4>
+    {% if sample.has_celltable %}
+    <div class="table-responsive" style="text-align:center;">
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Sub_library ID</th>
+                    {% for field in celltable_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for cell in sample.celltable.cell_set.all %}
+                <tr>
+                    <td>{{cell}}</td>
+                    {% for value in cell.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+    {% else %}
+    <h5><i class="text-warning">There is no cells information for this sample!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Cell Table -->
+    
+<!-- Library Information -->
+<div class="container">
+    <h4><i>Library Information</i></h4>
+    {% if sample.has_celltable and sample.celltable.library %}
+    <div class="table-responsive" style="text-align:center;">
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% for field in sample.celltable.library.get_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in sample.celltable.library.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <h5><i class="text-warning">There is no library information for this sample!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Library Information -->  
+
+<!-- Analyte Information -->
+<div class="container">
+    <h4><i>Analyte Information</i></h4>
+    {% if sample.has_celltable and sample.celltable.analyte %}
+    <div class="table-responsive" style="text-align:center;">        
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% for field in sample.celltable.analyte.get_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in sample.celltable.analyte.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <h5><i class="text-warning">There is no Analyte information for this sample!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Analyte Information -->
+  
+<!-- Sequencing Information -->
+<div class="container">
+    <h4><i>Sequencing Information</i></h4>
+    {% if sample.has_celltable and sample.celltable.sequencinginfo %}
+    <div class="table-responsive" style="text-align:center;">
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% for field in sample.celltable.sequencinginfo.get_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in sample.celltable.sequencinginfo.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <h5><i class="text-warning">There is no sequencing information for this sample!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Sequencing Information -->
 {% endblock %}
 
 

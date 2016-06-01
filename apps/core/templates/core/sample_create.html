@@ -2,16 +2,29 @@
 {% load staticfiles %}
 
 {% block title %}
-Create Library
+Create Sample
 {% endblock %}
 
 {% block body %}
 <div class="container" style="background-color:#F5F5F5;">
     <form action="{% url 'core:sample_create' %}" method="POST">
         {% csrf_token %}
-        <table class="table">
-            {{form}}
-        </table>
+        <fieldset>
+            <legend style="color:#5D4037">Sample Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{form_sample}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend style="color:#5D4037">Additional Sample Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{form_additional_sample_information}}
+                </thead>
+            </table>
+         </fieldset>
         <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
     </form><br>
 </div>
