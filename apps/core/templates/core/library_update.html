@@ -1,0 +1,18 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Edit Library
+{% endblock %}
+
+{% block body %}
+<div class="container" style="background-color:#F5F5F5;">
+	<form action="{% url 'core:library_update' pk=pk %}" method="POST">
+		{% csrf_token %}
+		<table class="table">
+			{{form}}	
+		</table>
+	<input class="btn btn-primary btn-sm" type="submit" name="update" value="update">
+	</form><br>
+</div>
+{% endblock %}

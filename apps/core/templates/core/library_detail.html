@@ -1,0 +1,152 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Library Details
+{% endblock %}
+
+{% block body %}
+<!-- Meta Information -->
+<div class="container">
+    <h4 style="color:#5D4037">Meta Information</h4>
+    <div class="container" style="float:left; width:35%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for field in library.get_fields %}
+                <tr><b>{{field}}:</b></tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="container" style="float:left; width:65%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for value in library.get_values %}
+                <tr>{{value}}</tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div><br>
+<!-- end of Meta Information -->
+    
+<!-- Sublibrary Information -->
+<div class="container">
+    <h4 style="color:#5D4037">Sublibrary Information</h4>
+    {% if sample.has_celltable %}
+    <div class="table-responsive" style="text-align:center;">
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Sub_library ID</th>
+                    {% for field in celltable_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for cell in sample.celltable.cell_set.all %}
+                <tr>
+                    <td>{{cell}}</td>
+                    {% for value in cell.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+    {% else %}
+    <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Sublibrary Information -->
+    
+<!-- Library Sample Detail -->
+<div class="container">
+    <h4 style="color:#5D4037">Library Sample Detail</h4>
+    {% if sample.has_celltable and sample.celltable.library %}
+    <div class="table-responsive" style="text-align:center;">
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% for field in sample.celltable.library.get_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in sample.celltable.library.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <h5><i class="text-warning">There is no library sample detail for this library!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Library Sample Detail -->  
+
+<!-- Library Construction Information -->
+<div class="container">
+    <h4 style="color:#5D4037">Library Construction Information</h4>
+    {% if sample.has_celltable and sample.celltable.analyte %}
+    <div class="table-responsive" style="text-align:center;">        
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% for field in sample.celltable.analyte.get_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in sample.celltable.analyte.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <h5><i class="text-warning">There is no library construction information for this library!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Library Construction Information -->
+  
+<!-- Library Quantification and Storage -->
+<div class="container">
+    <h4 style="color:#5D4037">Library Quantification and Storage</h4>
+    {% if sample.has_celltable and sample.celltable.sequencinginfo %}
+    <div class="table-responsive" style="text-align:center;">
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% for field in sample.celltable.sequencinginfo.get_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in sample.celltable.sequencinginfo.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <h5><i class="text-warning">There is no library quantification and storage for this library!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Library Quantification and Storage -->
+{% endblock %}
+
+
+
+    

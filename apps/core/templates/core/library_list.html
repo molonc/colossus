@@ -1,0 +1,41 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+List of Libraries
+{% endblock %}
+
+{% block body %}
+<div class="container" style="padding:0; margin-bottom:5px;">
+    <h4 style="float:left;">Select a library to view details</h4>
+    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url 'core:library_create' %}">Add Library</a>
+</div>
+<div class="container" style="background-color:#F5F5F5;">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sample ID</th>
+                    <th>Pool ID</th>
+                    <th>JIRA Ticket</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for library in libraries %}
+                <tr>
+                    <td><a href="{% url 'core:library_detail' pk=library.pk %}">{{library.sample.sample_id}}</a></td>
+                    <td>{{library.pool_id}}</td>
+                    <td>{{library.jira_ticket}}</td>
+                    <td>
+                        <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:library_update' pk=library.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;" "></i> edit</a>
+                        <a href="{% url 'core:library_delete' pk=library.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
