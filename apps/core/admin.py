@@ -38,7 +38,6 @@ class LibraryQuantificationAndStorageInline(admin.StackedInline):
     model = LibraryQuantificationAndStorage
 
 class LibraryAdmin(admin.ModelAdmin):
-    ## to avoid showing the field "num_libraries"
     fieldsets = [
       (
         '',
@@ -47,6 +46,7 @@ class LibraryAdmin(admin.ModelAdmin):
           "pool_id",
           "jira_ticket",
           "description",
+          "num_libraries"
         ]
         }
       ),
@@ -76,4 +76,8 @@ admin.site.register(Sequencing, SequencingAdmin)
 
 # extra admin only information
 admin.site.register(AdditionalSampleInformation)
-
+admin.site.register(SublibraryInformation)
+admin.site.register(LibrarySampleDetail)
+admin.site.register(LibraryConstructionInformation)
+admin.site.register(LibraryQuantificationAndStorage)
+admin.site.register(SequencingDetail)
