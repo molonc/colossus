@@ -268,7 +268,7 @@ class Library(models.Model, FieldValue):
     """
 
     ## database relationships
-    sample = models.OneToOneField(
+    sample = models.ForeignKey(
         Sample,
         verbose_name="Sample",
         on_delete=models.CASCADE
@@ -277,8 +277,8 @@ class Library(models.Model, FieldValue):
     # sample_id = create_chrfield("Sample ID", blank=False)
     pool_id = create_chrfield("Pool ID", blank=False)
     jira_ticket = create_chrfield("Jira Ticket", blank=False)
+    num_libraries = create_intfield("Number of Libraries", default=0)
     description = create_textfield("Description")
-    num_libraries = create_intfield("Number of Libraries")
 
     ## fixme: use hasattr() instead.
     def has_sublibrary(self):
@@ -533,7 +533,7 @@ class Sequencing(models.Model, FieldValue):
         "Index Read1 Length",
         default=6
         )
-    index_read2_length = create_chrfield(
+    index_read2_length = create_intfield(
         "Index Read2 Length",
         default=6
         )

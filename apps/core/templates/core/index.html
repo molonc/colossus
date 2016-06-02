@@ -17,17 +17,17 @@ List of Tables
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="">Libraries</a></td>
+                    <td><a href="{% url 'core:library_list' %}">Libraries</a></td>
                     <td>
                         <p style="float:right;">
-                        <a href="{% url 'core:sample_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                        <a href="{% url 'core:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="">Sequencings</a></td>
+                    <td><a href="{% url 'core:sequencing_list' %}">Sequencings</a></td>
                     <td>
                         <p style="float:right;">
-                        <a href="{% url 'core:sample_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                        <a href="{% url 'core:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
                     </td>
                 </tr>
             </tbody>

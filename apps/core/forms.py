@@ -5,9 +5,15 @@ Created on May 24, 2016
 """
 
 from .models import Sample, AdditionalSampleInformation
+from .models import Library, SublibraryInformation, LibraryConstructionInformation
+from .models import Sequencing
 from django.forms import ModelForm
+from django.forms import inlineformset_factory
 
 
+#===========================
+# Sample forms
+#---------------------------
 class SampleForm(ModelForm):
     class Meta:
         model = Sample
@@ -24,8 +30,36 @@ class SampleForm(ModelForm):
         }
 
 
-class AdditionalSampleInformationForm(ModelForm):
+AdditionalInfoInlineFormset =  inlineformset_factory(
+	Sample,
+    AdditionalSampleInformation,
+    # exclude = ['delete'],
+    fields = "__all__",
+    # can_delete = True,
+    )
+
+
+#===========================
+# Library forms
+#---------------------------
+class LibraryForm(ModelForm):
 	class Meta:
-		model = AdditionalSampleInformation
+		model = Library
 		fields = "__all__"
-		exclude = ['sample']
+		# exclude = ['sample']
+
+class SequencingForm(ModelForm):
+	class Meta:
+		model = Sequencing
+		# fields = "__all__"
+		exclude = ['pool_id']
+
+# InlineFormset =  inlineformset_factory(
+#     Library,
+#     [
+#         SublibraryInformation,
+#         LibraryConstructionInformation
+#     ],
+#     # exclude = ['delete']
+#     fields = "__all__"
+#         )

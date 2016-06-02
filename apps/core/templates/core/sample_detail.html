@@ -8,7 +8,7 @@ Sample Details
 {% block body %}
 <!-- Meta Information -->
 <div class="container">
-    <h4><i>Meta Information</i></h4>
+    <h4 style="color:#5D4037">Meta Information</h4>
     <div class="container" style="float:left; width:35%; padding:0">
         <table class="table-striped">
             <tbody>
@@ -32,7 +32,7 @@ Sample Details
     
 <!-- Cell Table -->
 <div class="container">
-    <h4><i>Additional Sample Information</i></h4>
+    <h4 style="color:#5D4037">Additional Sample Information</h4>
     {% if sample.has_celltable %}
     <div class="table-responsive" style="text-align:center;">
         <table class="table-striped table-bordered">
@@ -64,7 +64,7 @@ Sample Details
     
 <!-- Library Information -->
 <div class="container">
-    <h4><i>Library Information</i></h4>
+    <h4 style="color:#5D4037">Library Information</h4>
     {% if sample.has_celltable and sample.celltable.library %}
     <div class="table-responsive" style="text-align:center;">
         <table class="table-striped table-bordered">
@@ -92,7 +92,7 @@ Sample Details
 
 <!-- Analyte Information -->
 <div class="container">
-    <h4><i>Analyte Information</i></h4>
+    <h4 style="color:#5D4037">Analyte Information</h4>
     {% if sample.has_celltable and sample.celltable.analyte %}
     <div class="table-responsive" style="text-align:center;">        
         <table class="table-striped table-bordered">
@@ -120,7 +120,7 @@ Sample Details
   
 <!-- Sequencing Information -->
 <div class="container">
-    <h4><i>Sequencing Information</i></h4>
+    <h4 style="color:#5D4037">Sequencing Information</h4>
     {% if sample.has_celltable and sample.celltable.sequencinginfo %}
     <div class="table-responsive" style="text-align:center;">
         <table class="table-striped table-bordered">

@@ -9,9 +9,23 @@ Edit Sample
 <div class="container" style="background-color:#F5F5F5;">
 	<form action="{% url 'core:sample_update' pk=pk %}" method="POST">
 		{% csrf_token %}
-		<table class="table">
-			{{form}}	
-		</table>
+         <fieldset>
+            <legend style="color:#5D4037">Sample Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{form}}
+                </thead>
+            </table>
+         </fieldset>
+         <fieldset>
+            <legend style="color:#5D4037">Additional Sample Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{formset}}
+                </thead>
+            </table>
+         </fieldset>
+
 	<input class="btn btn-primary btn-sm" type="submit" name="update" value="update">
 	</form><br>
 </div>
