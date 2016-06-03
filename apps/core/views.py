@@ -10,10 +10,11 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from .decorators import Render
-from .models import Sample, Library, Sequencing
-from .forms import SampleForm, AdditionalInfoInlineFormset
-from .forms import LibraryForm, SublibraryInlineFormset, LibrarySampleDetailInlineFormset, LibraryConstructionInlineFormset, LibraryQSInlineFormset
-from .forms import SequencingForm, SequencingDetailFormset
+from .models import Sample, Library, Sequencing, SublibraryInformation
+from .forms import SampleForm, AdditionalSampleInfoInlineFormset
+from .forms import LibraryForm, SublibraryInfoInlineFormset, LibrarySampleDetailInlineFormset
+from .forms import LibraryConstructionInfoInlineFormset, LibraryQuantificationAndStorageInlineFormset
+from .forms import SequencingForm, SequencingDetailInlineFormset
 
 #============================
 # Index page
@@ -74,25 +75,23 @@ def sample_create(request):
             print '>' * 100
             instance = form.save(commit=False)
             instance.save()
-            formset = AdditionalInfoInlineFormset(
+            additional_info_formset = AdditionalSampleInfoInlineFormset(
                 request.POST,
                 instance=instance
                 )
             ## should use django messages
             print 'created sample successfully.'            
-            if formset.is_valid():
-                instances = formset.save(commit=False)
-                for instance in instances:
-                    instance.save()
-                    ## should use django messages
-                    print 'added additional sample information successfully.'
-                return HttpResponseRedirect(reverse("core:sample_list"))
+            if additional_info_formset.is_valid():
+                additional_info_formset.save()
+                ## should use django messages
+                print 'added additional sample information successfully.'
+            return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            formset = AdditionalInfoInlineFormset()
+            formset = AdditionalSampleInfoInlineFormset()
     
     else:
         form = SampleForm()
-        formset = AdditionalInfoInlineFormset()
+        formset = AdditionalSampleInfoInlineFormset()
     
     context = {
         'form': form,
@@ -111,25 +110,23 @@ def sample_update(request, pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            formset = AdditionalInfoInlineFormset(
+            additional_info_formset = AdditionalSampleInfoInlineFormset(
                 request.POST,
                 instance=instance
                 )
             ## should use django messages
             print 'created sample successfully.'            
-            if formset.is_valid():
-                instances = formset.save(commit=False)
-                for instance in instances:
-                    instance.save()
-                    ## should use django messages
-                    print 'added additional sample information successfully.'
-            return HttpResponseRedirect(reverse("core:sample_list"))
+            if additional_info_formset.is_valid():
+                additional_info_formset.save()
+                ## should use django messages
+                print 'added additional sample information successfully.'
+            return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            formset = AdditionalInfoInlineFormset(instance=sample)
+            formset = AdditionalSampleInfoInlineFormset(instance=sample)
 
     else:
         form = SampleForm(instance=sample)
-        formset = AdditionalInfoInlineFormset(instance=sample)
+        formset = AdditionalSampleInfoInlineFormset(instance=sample)
 
     context = {
         'form': form,
@@ -169,8 +166,10 @@ def library_list(request):
 def library_detail(request, pk):
     """library detail page."""
     library = get_object_or_404(Library, pk=pk)
+    sublibinfo = SublibraryInformation()
     context = {
-    'library': library
+    'library': library,
+    'sublibinfo_fields': sublibinfo.get_fields()
     }
     return context
             
@@ -183,7 +182,7 @@ def library_create(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            sublib_formset = SublibraryInlineFormset(
+            sublib_formset = SublibraryInfoInlineFormset(
                 request.POST,
                 instance=instance
                 )
@@ -191,11 +190,11 @@ def library_create(request):
                 request.POST,
                 instance=instance
                 )
-            libcons_formset = LibraryConstructionInlineFormset(
+            libcons_formset = LibraryConstructionInfoInlineFormset(
                 request.POST,
                 instance=instance
                 )
-            libqs_formset = LibraryQSInlineFormset(
+            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
                 request.POST,
                 instance=instance
                 )
@@ -208,19 +207,19 @@ def library_create(request):
                 libcons_formset.save()
             if libqs_formset.is_valid():
                 libqs_formset.save()
-            return HttpResponseRedirect(reverse("core:library_list"))
+            return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            sublib_formset = SublibraryInlineFormset()
+            sublib_formset = SublibraryInfoInlineFormset()
             libdetail_formset = LibrarySampleDetailInlineFormset()
-            libcons_formset = LibraryConstructionInlineFormset()
-            libqs_formset = LibraryQSInlineFormset()
+            libcons_formset = LibraryConstructionInfoInlineFormset()
+            libqs_formset = LibraryQuantificationAndStorageInlineFormset()
     
     else:
         form = LibraryForm()
-        sublib_formset = SublibraryInlineFormset()
+        sublib_formset = SublibraryInfoInlineFormset()
         libdetail_formset = LibrarySampleDetailInlineFormset()
-        libcons_formset = LibraryConstructionInlineFormset()
-        libqs_formset = LibraryQSInlineFormset()
+        libcons_formset = LibraryConstructionInfoInlineFormset()
+        libqs_formset = LibraryQuantificationAndStorageInlineFormset()
 
     context = {
         'form': form,
@@ -241,7 +240,7 @@ def library_update(request, pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            sublib_formset = SublibraryInlineFormset(
+            sublib_formset = SublibraryInfoInlineFormset(
                 request.POST,
                 instance=instance
                 )
@@ -249,11 +248,11 @@ def library_update(request, pk):
                 request.POST,
                 instance=instance
                 )
-            libcons_formset = LibraryConstructionInlineFormset(
+            libcons_formset = LibraryConstructionInfoInlineFormset(
                 request.POST,
                 instance=instance
                 )
-            libqs_formset = LibraryQSInlineFormset(
+            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
                 request.POST,
                 instance=instance
                 )
@@ -267,28 +266,28 @@ def library_update(request, pk):
                 libcons_formset.save()
             if libqs_formset.is_valid():
                 libqs_formset.save()
-            return HttpResponseRedirect(reverse("core:library_list"))
+            return HttpResponseRedirect(instance.get_absolute_url())
 
         else:
-            sublib_formset = SublibraryInlineFormset(
+            sublib_formset = SublibraryInfoInlineFormset(
                 instance=library
                 )
             libdetail_formset = LibrarySampleDetailInlineFormset(
                 instance=library
                 )
-            libcons_formset = LibraryConstructionInlineFormset(
+            libcons_formset = LibraryConstructionInfoInlineFormset(
                 instance=library
                 )
-            libqs_formset = LibraryQSInlineFormset(
+            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
                 instance=library
                 )
     
     else:
         form = LibraryForm(instance=library)
-        sublib_formset = SublibraryInlineFormset(instance=library)
+        sublib_formset = SublibraryInfoInlineFormset(instance=library)
         libdetail_formset = LibrarySampleDetailInlineFormset(instance=library)
-        libcons_formset = LibraryConstructionInlineFormset(instance=library)
-        libqs_formset = LibraryQSInlineFormset(instance=library)
+        libcons_formset = LibraryConstructionInfoInlineFormset(instance=library)
+        libqs_formset = LibraryQuantificationAndStorageInlineFormset(instance=library)
 
     context = {
         'pk': pk,
@@ -343,25 +342,23 @@ def sequencing_create(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            seqdetail_formset = SequencingDetailFormset(
+            seqdetail_formset = SequencingDetailInlineFormset(
                 request.POST,
                 instance=instance
                 )
             ## should use django messages
             print 'created sequencing successfully.'
             if seqdetail_formset.is_valid():
-                instances = seqdetail_formset.save(commit=False)
-                for instance in instances:
-                    instance.save()
-                    ## should use django messages
-                    print 'added sample details successfully.'                    
-            return HttpResponseRedirect(reverse("core:sequencing_list"))
+                seqdetail_formset.save()
+                ## should use django messages
+                print 'added sample details successfully.'                    
+            return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            seqdetail_formset = SequencingDetailFormset()
+            seqdetail_formset = SequencingDetailInlineFormset()
     
     else:
         form = SequencingForm()
-        seqdetail_formset = SequencingDetailFormset()
+        seqdetail_formset = SequencingDetailInlineFormset()
 
     context = {
         'form': form,
@@ -380,22 +377,20 @@ def sequencing_update(request, pk):
             instance = form.save(commit=False)
             instance.save()
             ## should use django messages
-            seqdetail_formset = SequencingDetailFormset(
+            seqdetail_formset = SequencingDetailInlineFormset(
                 request.POST,
                 instance=instance
                 )                        
             print 'updated sequencing successfully.'
             if seqdetail_formset.is_valid():
-                instances = seqdetail_formset.save(commit=False)
-                for instance in instances:
-                    instance.save()
-            return HttpResponseRedirect(reverse("core:sequencing_list"))
+                seqdetail_formset.save()
+            return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            seqdetail_formset = SequencingDetailFormset(instance=sequencing)
+            seqdetail_formset = SequencingDetailInlineFormset(instance=sequencing)
     
     else:
         form = SequencingForm(instance=sequencing)
-        seqdetail_formset = SequencingDetailFormset(instance=sequencing)
+        seqdetail_formset = SequencingDetailInlineFormset(instance=sequencing)
 
     context = {
         'pk': pk,

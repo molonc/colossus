@@ -7,11 +7,11 @@ Library Details
 
 {% block body %}
 <!-- Meta Information -->
-<div class="container">
-    <h4 style="color:#5D4037">Meta Information</h4>
+<div class="container" style="background-color:#FFF3E0;">
     <div class="container" style="float:left; width:35%; padding:0">
         <table class="table-striped">
             <tbody>
+                <tr><b>Sample:</b></tr><br>
                 {% for field in library.get_fields %}
                 <tr><b>{{field}}:</b></tr><br>
                 {% endfor %}
@@ -21,6 +21,7 @@ Library Details
     <div class="container" style="float:left; width:65%; padding:0">
         <table class="table-striped">
             <tbody>
+                <tr><a href="{{library.sample.get_absolute_url}}">{{library.sample}}</a></tr><br>
                 {% for value in library.get_values %}
                 <tr>{{value}}</tr><br>
                 {% endfor %}
@@ -33,22 +34,22 @@ Library Details
 <!-- Sublibrary Information -->
 <div class="container">
     <h4 style="color:#5D4037">Sublibrary Information</h4>
-    {% if sample.has_celltable %}
+    {% if library.sublibraryinformation_set.all %}
     <div class="table-responsive" style="text-align:center;">
         <table class="table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Sub_library ID</th>
-                    {% for field in celltable_fields %}
+                    <th>Sublibrary ID</th>
+                    {% for field in  sublibinfo_fields %}
                     <th>{{field}}</th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
-                {% for cell in sample.celltable.cell_set.all %}
+                {% for sublibinfo in library.sublibraryinformation_set.all %}
                 <tr>
-                    <td>{{cell}}</td>
-                    {% for value in cell.get_values %}
+                    <td>{{sublibinfo.get_sublibrary_id}}</td>
+                    {% for value in sublibinfo.get_values %}
                     <td>{{value}}</td>
                     {% endfor %}
                 </tr>
@@ -65,22 +66,22 @@ Library Details
 <!-- Library Sample Detail -->
 <div class="container">
     <h4 style="color:#5D4037">Library Sample Detail</h4>
-    {% if sample.has_celltable and sample.celltable.library %}
-    <div class="table-responsive" style="text-align:center;">
-        <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    {% for field in sample.celltable.library.get_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
+    {% if library.has_library_sample_detail %}
+    <div class="container" style="float:left; width:35%; padding:0">
+        <table class="table-striped">
             <tbody>
-                <tr>
-                    {% for value in sample.celltable.library.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
+                {% for field in library.librarysampledetail.get_fields %}
+                <tr><b>{{field}}:</b></tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="container" style="float:left; width:65%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for value in library.librarysampledetail.get_values %}
+                <tr>{{value}}</tr><br>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -93,22 +94,22 @@ Library Details
 <!-- Library Construction Information -->
 <div class="container">
     <h4 style="color:#5D4037">Library Construction Information</h4>
-    {% if sample.has_celltable and sample.celltable.analyte %}
-    <div class="table-responsive" style="text-align:center;">        
-        <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    {% for field in sample.celltable.analyte.get_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
+    {% if library.has_library_construction_information %}
+    <div class="container" style="float:left; width:35%; padding:0">
+        <table class="table-striped">
             <tbody>
-                <tr>
-                    {% for value in sample.celltable.analyte.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
+                {% for field in library.libraryconstructioninformation.get_fields %}
+                <tr><b>{{field}}:</b></tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="container" style="float:left; width:65%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for value in library.libraryconstructioninformation.get_values %}
+                <tr>{{value}}</tr><br>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -121,22 +122,22 @@ Library Details
 <!-- Library Quantification and Storage -->
 <div class="container">
     <h4 style="color:#5D4037">Library Quantification and Storage</h4>
-    {% if sample.has_celltable and sample.celltable.sequencinginfo %}
-    <div class="table-responsive" style="text-align:center;">
-        <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    {% for field in sample.celltable.sequencinginfo.get_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
+    {% if library.has_library_quantification_and_storage %}
+    <div class="container" style="float:left; width:35%; padding:0">
+        <table class="table-striped">
             <tbody>
-                <tr>
-                    {% for value in sample.celltable.sequencinginfo.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
+                {% for field in library.libraryquantificationandstorage.get_fields %}
+                <tr><b>{{field}}:</b></tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="container" style="float:left; width:65%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for value in library.libraryquantificationandstorage.get_values %}
+                <tr>{{value}}</tr><br>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -149,30 +150,41 @@ Library Details
 <!-- Sequencing Information -->
 <div class="container">
     <h4 style="color:#5D4037">Sequencing Information</h4>
-    {% if sample.has_celltable and sample.celltable.sequencinginfo %}
-    <div class="table-responsive" style="text-align:center;">
-        <table class="table-striped table-bordered">
+    {% if library.sequencing_set.all %}
+    <div class="table">
+        <table class="table">
             <thead>
                 <tr>
-                    {% for field in sample.celltable.sequencinginfo.get_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
+                    <th>Sample ID</th>
+                    <th>Pool ID</th>
+                    <th>Adapter</th>
                 </tr>
             </thead>
             <tbody>
+                {% for sequencing in library.sequencing_set.all %}
                 <tr>
-                    {% for value in sample.celltable.sequencinginfo.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
+                    <td><a href="{{sequencing.get_absolute_url}}">{{sequencing.library.sample.sample_id}}</a></td>
+                    <td>{{sequencing.library.pool_id}}</td>
+                    <td>{{sequencing.adapter}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
-    </div>
+    </div>    
     {% else %}
     <h5><i class="text-warning">There is no sequencing information for this library!</i></h5>
     {% endif %}
+    <a href="{% url 'core:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Sequencing</a></p>
 </div><br>
 <!-- end of Sequencing Information -->
+
+<!-- footer bottons -->
+<div class="container" style="margin-bottom:5px;">
+    <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url 'core:library_update' pk=library.pk %}">Edit</a>
+    <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url 'core:library_delete' pk=library.pk %}">Delete</a>
+    <a style="float:right; margin:5px;" href="{% url 'core:library_list' %}">List of libraries</a>
+</div><br>
+<!-- end of footer bottons -->
 
 {% endblock %}
 

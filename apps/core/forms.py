@@ -4,11 +4,12 @@ Created on May 24, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 """
 
-from .models import Sample, AdditionalSampleInformation
-from .models import Library, SublibraryInformation, LibrarySampleDetail, LibraryConstructionInformation, LibraryQuantificationAndStorage
-from .models import Sequencing, SequencingDetail
 from django.forms import ModelForm
 from django.forms import inlineformset_factory
+from .models import Sample, AdditionalSampleInformation
+from .models import Library, SublibraryInformation, LibrarySampleDetail
+from .models import LibraryConstructionInformation, LibraryQuantificationAndStorage
+from .models import Sequencing, SequencingDetail
 
 
 #===========================
@@ -30,7 +31,7 @@ class SampleForm(ModelForm):
         }
 
 
-AdditionalInfoInlineFormset =  inlineformset_factory(
+AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 	Sample,
     AdditionalSampleInformation,
     # exclude = ['delete'],
@@ -48,7 +49,7 @@ class LibraryForm(ModelForm):
 		fields = "__all__"
 		# exclude = ['sample']
 
-SublibraryInlineFormset =  inlineformset_factory(
+SublibraryInfoInlineFormset =  inlineformset_factory(
     Library,
     SublibraryInformation,
     # exclude = ['delete'],
@@ -62,14 +63,14 @@ LibrarySampleDetailInlineFormset = inlineformset_factory(
     fields = "__all__"
     )
 
-LibraryConstructionInlineFormset =  inlineformset_factory(
+LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     Library,
     LibraryConstructionInformation,
     # exclude = ['delete'],
     fields = "__all__"
         )
 
-LibraryQSInlineFormset =  inlineformset_factory(
+LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     Library,
     LibraryQuantificationAndStorage,
     # exclude = ['delete'],
@@ -86,7 +87,7 @@ class SequencingForm(ModelForm):
 		# fields = "__all__"
 		exclude = ['pool_id']
 
-SequencingDetailFormset = inlineformset_factory(
+SequencingDetailInlineFormset = inlineformset_factory(
 	Sequencing,
 	SequencingDetail,
 	# exclude = ['delete'],

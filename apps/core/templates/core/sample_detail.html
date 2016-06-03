@@ -7,8 +7,7 @@ Sample Details
 
 {% block body %}
 <!-- Meta Information -->
-<div class="container">
-    <h4 style="color:#5D4037">Meta Information</h4>
+<div class="container" style="background-color:#FFF3E0;">
     <div class="container" style="float:left; width:35%; padding:0">
         <table class="table-striped">
             <tbody>
@@ -30,68 +29,72 @@ Sample Details
 </div><br>
 <!-- end of Meta Information -->
     
-<!-- Cell Table -->
+<!-- Additional Sample Information -->
 <div class="container">
     <h4 style="color:#5D4037">Additional Sample Information</h4>
-    {% if sample.has_celltable %}
-    <div class="table-responsive" style="text-align:center;">
-        <table class="table-striped table-bordered">
+    {% if sample.has_additional_sample_information %}
+    <div class="container" style="float:left; width:35%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for field in sample.additionalsampleinformation.get_fields %}
+                <tr><b>{{field}}:</b></tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="container" style="float:left; width:65%; padding:0">
+        <table class="table-striped">
+            <tbody>
+                {% for value in sample.additionalsampleinformation.get_values %}
+                <tr>{{value}}</tr><br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <h5><i class="text-warning">There is no additional sample information for this sample!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Additional Sample Information -->
+    
+<!-- Library Information -->
+<div class="container">
+    <h4 style="color:#5D4037">Library Information</h4>
+    {% if sample.library_set.all %}
+    <div class="table">
+        <table class="table">
             <thead>
                 <tr>
-                    <th>Sub_library ID</th>
-                    {% for field in celltable_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
+                    <th>Pool ID</th>
+                    <th>JIRA Ticket</th>
+                    <th>Description</th>
                 </tr>
             </thead>
             <tbody>
-                {% for cell in sample.celltable.cell_set.all %}
+                {% for library in sample.library_set.all %}
                 <tr>
-                    <td>{{cell}}</td>
-                    {% for value in cell.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
+                    <td><a href="{{library.get_absolute_url}}">{{library.pool_id}}</a></td>
+                    <td>{{library.jira_ticket}}</td>
+                    <td>{{library.description}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>    
     {% else %}
-    <h5><i class="text-warning">There is no additional sample information for this sample!</i></h5>
-    {% endif %}
-</div><br>
-<!-- end of Cell Table -->
-    
-<!-- Library Information -->
-<div class="container">
-    <h4 style="color:#5D4037">Library Information</h4>
-    {% if sample.has_celltable and sample.celltable.library %}
-    <div class="table-responsive" style="text-align:center;">
-        <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    {% for field in sample.celltable.library.get_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for value in sample.celltable.library.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    {% else %}
     <h5><i class="text-warning">There is no library information for this sample!</i></h5>
     {% endif %}
+    <a href="{% url 'core:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Library</a></p>
 </div><br>
-<!-- end of Library Information -->  
+<!-- end of Library Information -->
+
+<!-- footer bottons -->
+<div class="container" style="margin-bottom:5px;">
+    <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url 'core:sample_update' pk=sample.pk %}">Edit</a>
+    <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url 'core:sample_delete' pk=sample.pk %}">Delete</a>
+    <a style="float:right; margin:5px;" href="{% url 'core:sample_list' %}">List of samples</a>
+</div><br>
+<!-- end of footer bottons -->
 
 {% endblock %}
 
-
-
-    
