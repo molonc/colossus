@@ -55,8 +55,8 @@ def sample_detail(request, pk):
     ## this is to avoid that, but there must be a better way to handle this.
     # if sample.has_celltable():
     #     nl = len(sample.celltable.cell_set.all())
-    #     if sample.num_libraries != nl:
-    #         sample.num_libraries = nl
+    #     if sample.num_sublibraries != nl:
+    #         sample.num_sublibraries = nl
     #         sample.save()
 
     context = {
@@ -414,3 +414,4 @@ def sequencing_delete(request, pk):
         'pk': pk
     }
     return context
+

@@ -46,7 +46,7 @@ class LibraryAdmin(admin.ModelAdmin):
           "pool_id",
           "jira_ticket",
           "description",
-          "num_libraries"
+          "num_sublibraries"
         ]
         }
       ),
