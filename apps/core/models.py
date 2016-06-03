@@ -5,6 +5,7 @@ Created on May 16, 2016
 """
 
 from __future__ import unicode_literals
+from django.core.urlresolvers import reverse
 from django.db import models
 
 
@@ -69,9 +70,9 @@ class FieldValue(object):
         return values
 
 
-#===============================
-# models
-#-------------------------------
+#============================
+# Sample models
+#----------------------------
 class Sample(models.Model, FieldValue):
 
     """
@@ -112,13 +113,22 @@ class Sample(models.Model, FieldValue):
         blank=True,
         )
 
-    def get_sample_types(self):
-        """get all the sample types under the same sample_id."""
-        samples = Sample.objects.filter(sample_id=self.sample_id)
-        types = [getattr(s, "get_sample_type_display")()
-            for s in samples
-            ]
-        return types
+    def has_additional_sample_information(self):
+        return hasattr(self,
+            'additionalsampleinformation'
+            )
+
+    def get_absolute_url(self):
+        return reverse("core:sample_detail", kwargs={"pk": self.pk})
+
+    ## this is no longer needed since each sample can now have only one type.
+    # def get_sample_types(self):
+    #     """get all the sample types under the same sample_id."""
+    #     samples = Sample.objects.filter(sample_id=self.sample_id)
+    #     types = [getattr(s, "get_sample_type_display")()
+    #         for s in samples
+    #         ]
+    #     return types
 
     def __str__(self):
         return self.sample_id
@@ -225,34 +235,6 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         )
     family_information = create_chrfield("Family Information")
 
-
-    ## fields in GSC form only
-    # amount_of_antibody_used = create_chrfield("Amount of Antibody Used")
-    # antibody_use = create_chrfield("Antibody Used")
-    # antibody_vendor = create_chrfield("Antibody Vendor")
-    # antibody_catalogue = create_chrfield("Antibody catalogue #")
-    # average_size = create_chrfield("Average Size (bp)")
-    # crosslinking_method = create_chrfield("Crosslinking Method")
-    # crosslinking_time = create_chrfield("Crosslinking Time")
-    # dna_concentratino = create_chrfield("DNA Concentration (nM)")
-    # dna_volumne = create_chrfield("DNA Volume (uL)")
-    # index_read_type = create_chrfield(
-    #     "Index Read Type",
-    #     choices=index_read_type_choices,
-    #     )
-    # indexed = create_chrfield("Indexed?")
-    # library_construction_method = create_chrfield(
-    #     "Library Construction Method"
-    #     )
-    # library_type = create_chrfield("Library Type")
-    # no_of_cells_ip = create_chrfield("No. of cells/IP")
-    # quantification_method = create_chrfield("Quantification Method")
-    # size_range = create_chrfield("Size Range (bp)")
-    # sonication_time = create_chrfield("Sonication Time")
-    # storage_medium = create_chrfield("Storage Medium")
-    # sublibrary_id = create_chrfield("Sub-Library ID")
-    # tube_label = create_chrfield("Tube Label")
-
     def __str__(self):
         res = '_'.join([
             self.sample.sample_id,
@@ -261,11 +243,18 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         return res
 
 
+#============================
+# Library models
+#----------------------------
 class Library(models.Model, FieldValue):
 
     """
     Library contains several Cell objects.
     """
+
+    fields_to_exclude = ['ID', 'Sample']
+    values_to_exclude = ['id', 'sample']
+
 
     ## database relationships
     sample = models.ForeignKey(
@@ -277,17 +266,25 @@ class Library(models.Model, FieldValue):
     # sample_id = create_chrfield("Sample ID", blank=False)
     pool_id = create_chrfield("Pool ID", blank=False)
     jira_ticket = create_chrfield("Jira Ticket", blank=False)
-    num_libraries = create_intfield("Number of Libraries", default=0)
+    num_sublibraries = create_intfield("Number of Sublibraries", default=0)
     description = create_textfield("Description")
 
-    ## fixme: use hasattr() instead.
-    def has_sublibrary(self):
-        res = True
-        try:
-            _ = self.sublibrary_information
-        except SublibraryInformation.DoesNotExist:
-            res = False
-        return res
+    def has_library_sample_detail(self):
+        return hasattr(self,
+            'librarysampledetail')
+
+    def has_library_construction_information(self):
+        return hasattr(self,
+            'libraryconstructioninformation'
+            )
+
+    def has_library_quantification_and_storage(self):
+        return hasattr(self,
+            'libraryquantificationandstorage'
+            )
+
+    def get_absolute_url(self):
+        return reverse("core:library_detail", kwargs={"pk": self.pk})
 
     def get_library_id(self):
         return '_'.join([self.sample.sample_id, self.pool_id])
@@ -303,8 +300,8 @@ class SublibraryInformation(models.Model, FieldValue):
     It's technically a table of cell information.
     """
 
-    # fields_to_exclude = ['ID', 'Sublibrary Information']
-    # values_to_exclude = ['id', 'sublibrary_info']
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
 
     ## database relationships
     library = models.ForeignKey(
@@ -356,6 +353,9 @@ class LibrarySampleDetail(models.Model, FieldValue):
     Library sample details.
     """
 
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
     ## database relationships
     library = models.OneToOneField(
         Library,
@@ -400,6 +400,9 @@ class LibraryConstructionInformation(models.Model, FieldValue):
     """
     Library construction information.
     """
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
 
     ## database relationships
     library = models.OneToOneField(
@@ -456,6 +459,9 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
     Library quantification and storage.
     """
 
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
     ## database relationships
     library = models.OneToOneField(
         Library,
@@ -488,18 +494,23 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         )
 
 
+#============================
+# Sequencing models
+#----------------------------
 class Sequencing(models.Model, FieldValue):
 
     """
     Sequencing information.
     """
 
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
     ## database relationships
-    library = models.OneToOneField(
+    library = models.ForeignKey(
         Library,
         verbose_name="Library",
         on_delete=models.CASCADE,
-        null=True,
         )
 
     ## choices 
@@ -517,6 +528,8 @@ class Sequencing(models.Model, FieldValue):
         )
 
     ## fields
+    pool_id = create_chrfield("Pool ID")
+
     adapter = create_chrfield(
         "Adapter",
         default="CTGTCTCTTATACACATCT"
@@ -537,7 +550,6 @@ class Sequencing(models.Model, FieldValue):
         "Index Read2 Length",
         default=6
         )
-    pool_id = create_chrfield("Pool ID")
     read_type = create_chrfield(
         "Read type",
         choices=read_type_choices,
@@ -567,6 +579,13 @@ class Sequencing(models.Model, FieldValue):
         blank=True,
         )
 
+    def has_sequencing_detail(self):
+        return hasattr(self,
+            'sequencingdetail')
+
+    def get_absolute_url(self):
+        return reverse("core:sequencing_detail", kwargs={"pk": self.pk})
+
     def __str__(self):
         return self.library.get_library_id()
 
@@ -576,6 +595,9 @@ class SequencingDetail(models.Model, FieldValue):
     """
     Sequencing details.
     """
+
+    fields_to_exclude = ['ID', 'Sequencing']
+    values_to_exclude = ['id', 'sequencing']
 
     ## database relationships
     sequencing = models.OneToOneField(
@@ -598,6 +620,9 @@ class SequencingDetail(models.Model, FieldValue):
     sequencer_notes = create_textfield("Sequencing notes")
 
 
+#============================
+# Other models
+#----------------------------
 # class Patient(models.Model, FieldValue):
 
 #     """
