@@ -7,12 +7,49 @@ Edit Library
 
 {% block body %}
 <div class="container" style="background-color:#F5F5F5;">
-	<form action="{% url 'core:library_update' pk=pk %}" method="POST">
-		{% csrf_token %}
-		<table class="table">
-			{{form}}	
-		</table>
-	<input class="btn btn-primary btn-sm" type="submit" name="update" value="update">
-	</form><br>
+    <form action="{% url 'core:library_update' pk=pk %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend style="color:#5D4037">Library Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{form}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend style="color:#5D4037">Sublibrary Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{sublib_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend style="color:#5D4037">Library Sample Details</legend>
+            <table class="table-condensed">
+                <thead>
+                {{libdetail_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend style="color:#5D4037">Library Construction Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{libcons_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend style="color:#5D4037">Library Construction and Storage</legend>
+            <table class="table-condensed">
+                <thead>
+                {{libqs_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+    <input class="btn btn-primary btn-sm" type="submit" name="update" value="update">
+    </form><br>
 </div>
 {% endblock %}

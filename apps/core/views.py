@@ -10,11 +10,10 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from .decorators import Render
-from .models import Sample, AdditionalSampleInformation
-from .models import Library, SublibraryInformation
-from .models import Sequencing
+from .models import Sample, Library, Sequencing
 from .forms import SampleForm, AdditionalInfoInlineFormset
-from .forms import LibraryForm, SequencingForm
+from .forms import LibraryForm, SublibraryInlineFormset, LibrarySampleDetailInlineFormset, LibraryConstructionInlineFormset, LibraryQSInlineFormset
+from .forms import SequencingForm, SequencingDetailFormset
 
 #============================
 # Index page
@@ -36,7 +35,7 @@ def home_view(request):
 
 
 #============================
-# Sample handling
+# Sample views
 #----------------------------
 @Render("core/sample_list.html")
 def sample_list(request):
@@ -123,13 +122,14 @@ def sample_update(request, pk):
                 for instance in instances:
                     instance.save()
                     ## should use django messages
-                    print 'added additional sample information successfully.'            
+                    print 'added additional sample information successfully.'
             return HttpResponseRedirect(reverse("core:sample_list"))
+        else:
+            formset = AdditionalInfoInlineFormset(instance=sample)
 
     else:
         form = SampleForm(instance=sample)
-        formset = AdditionalInfoInlineFormset(
-            instance=sample)
+        formset = AdditionalInfoInlineFormset(instance=sample)
 
     context = {
         'form': form,
@@ -156,7 +156,7 @@ def sample_delete(request, pk):
 
 
 #============================
-# Library handling
+# Library views
 #----------------------------
 @Render("core/library_list.html")
 def library_list(request):
@@ -183,15 +183,51 @@ def library_create(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            ## should use django messages
+            sublib_formset = SublibraryInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libdetail_formset = LibrarySampleDetailInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libcons_formset = LibraryConstructionInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libqs_formset = LibraryQSInlineFormset(
+                request.POST,
+                instance=instance
+                )
             print 'created library successfully.'
+            if sublib_formset.is_valid():
+                sublib_formset.save()
+            if libdetail_formset.is_valid():
+                libdetail_formset.save()
+            if libcons_formset.is_valid():
+                libcons_formset.save()
+            if libqs_formset.is_valid():
+                libqs_formset.save()
             return HttpResponseRedirect(reverse("core:library_list"))
+        else:
+            sublib_formset = SublibraryInlineFormset()
+            libdetail_formset = LibrarySampleDetailInlineFormset()
+            libcons_formset = LibraryConstructionInlineFormset()
+            libqs_formset = LibraryQSInlineFormset()
     
     else:
         form = LibraryForm()
+        sublib_formset = SublibraryInlineFormset()
+        libdetail_formset = LibrarySampleDetailInlineFormset()
+        libcons_formset = LibraryConstructionInlineFormset()
+        libqs_formset = LibraryQSInlineFormset()
 
     context = {
         'form': form,
+        'sublib_formset': sublib_formset,
+        'libdetail_formset': libdetail_formset,
+        'libcons_formset': libcons_formset,
+        'libqs_formset': libqs_formset
         }
     return context
 
@@ -205,17 +241,63 @@ def library_update(request, pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
+            sublib_formset = SublibraryInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libdetail_formset = LibrarySampleDetailInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libcons_formset = LibraryConstructionInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libqs_formset = LibraryQSInlineFormset(
+                request.POST,
+                instance=instance
+                )
             ## should use django messages
             print 'updated library successfully.'
+            if sublib_formset.is_valid():
+                sublib_formset.save()
+            if libdetail_formset.is_valid():
+                libdetail_formset.save()
+            if libcons_formset.is_valid():
+                libcons_formset.save()
+            if libqs_formset.is_valid():
+                libqs_formset.save()
             return HttpResponseRedirect(reverse("core:library_list"))
 
+        else:
+            sublib_formset = SublibraryInlineFormset(
+                instance=library
+                )
+            libdetail_formset = LibrarySampleDetailInlineFormset(
+                instance=library
+                )
+            libcons_formset = LibraryConstructionInlineFormset(
+                instance=library
+                )
+            libqs_formset = LibraryQSInlineFormset(
+                instance=library
+                )
+    
     else:
         form = LibraryForm(instance=library)
+        sublib_formset = SublibraryInlineFormset(instance=library)
+        libdetail_formset = LibrarySampleDetailInlineFormset(instance=library)
+        libcons_formset = LibraryConstructionInlineFormset(instance=library)
+        libqs_formset = LibraryQSInlineFormset(instance=library)
 
     context = {
-        'form': form,
         'pk': pk,
-    }
+        'form': form,
+        'sublib_formset': sublib_formset,
+        'libdetail_formset': libdetail_formset,
+        'libcons_formset': libcons_formset,
+        'libqs_formset': libqs_formset
+        }
     return context
 
 @Render("core/library_delete.html")
@@ -236,7 +318,7 @@ def library_delete(request, pk):
 
 
 #============================
-# Sequencing handling
+# Sequencing views
 #----------------------------
 @Render("core/sequencing_list.html")
 def sequencing_list(request):
@@ -261,14 +343,30 @@ def sequencing_create(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
+            seqdetail_formset = SequencingDetailFormset(
+                request.POST,
+                instance=instance
+                )
             ## should use django messages
             print 'created sequencing successfully.'
+            if seqdetail_formset.is_valid():
+                instances = seqdetail_formset.save(commit=False)
+                for instance in instances:
+                    instance.save()
+                    ## should use django messages
+                    print 'added sample details successfully.'                    
             return HttpResponseRedirect(reverse("core:sequencing_list"))
+        else:
+            seqdetail_formset = SequencingDetailFormset()
     
     else:
         form = SequencingForm()
+        seqdetail_formset = SequencingDetailFormset()
 
-    context = {'form': form}
+    context = {
+        'form': form,
+        'seqdetail_formset': seqdetail_formset,
+        }
     return context
 
 @Render("core/sequencing_update.html")
@@ -282,16 +380,28 @@ def sequencing_update(request, pk):
             instance = form.save(commit=False)
             instance.save()
             ## should use django messages
+            seqdetail_formset = SequencingDetailFormset(
+                request.POST,
+                instance=instance
+                )                        
             print 'updated sequencing successfully.'
+            if seqdetail_formset.is_valid():
+                instances = seqdetail_formset.save(commit=False)
+                for instance in instances:
+                    instance.save()
             return HttpResponseRedirect(reverse("core:sequencing_list"))
-
+        else:
+            seqdetail_formset = SequencingDetailFormset(instance=sequencing)
+    
     else:
         form = SequencingForm(instance=sequencing)
+        seqdetail_formset = SequencingDetailFormset(instance=sequencing)
 
     context = {
-        'form': form,
         'pk': pk,
-    }
+        'form': form,
+        'seqdetail_formset': seqdetail_formset,
+        }
     return context
 
 @Render("core/sequencing_delete.html")

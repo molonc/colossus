@@ -57,7 +57,7 @@ Sample Details
         </table>
     </div>    
     {% else %}
-    <h5><i class="text-warning">There is no cells information for this sample!</i></h5>
+    <h5><i class="text-warning">There is no additional sample information for this sample!</i></h5>
     {% endif %}
 </div><br>
 <!-- end of Cell Table -->
@@ -90,61 +90,6 @@ Sample Details
 </div><br>
 <!-- end of Library Information -->  
 
-<!-- Analyte Information -->
-<div class="container">
-    <h4 style="color:#5D4037">Analyte Information</h4>
-    {% if sample.has_celltable and sample.celltable.analyte %}
-    <div class="table-responsive" style="text-align:center;">        
-        <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    {% for field in sample.celltable.analyte.get_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for value in sample.celltable.analyte.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <h5><i class="text-warning">There is no Analyte information for this sample!</i></h5>
-    {% endif %}
-</div><br>
-<!-- end of Analyte Information -->
-  
-<!-- Sequencing Information -->
-<div class="container">
-    <h4 style="color:#5D4037">Sequencing Information</h4>
-    {% if sample.has_celltable and sample.celltable.sequencinginfo %}
-    <div class="table-responsive" style="text-align:center;">
-        <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    {% for field in sample.celltable.sequencinginfo.get_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for value in sample.celltable.sequencinginfo.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <h5><i class="text-warning">There is no sequencing information for this sample!</i></h5>
-    {% endif %}
-</div><br>
-<!-- end of Sequencing Information -->
 {% endblock %}
 
 

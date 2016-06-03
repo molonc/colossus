@@ -5,8 +5,8 @@ Created on May 24, 2016
 """
 
 from .models import Sample, AdditionalSampleInformation
-from .models import Library, SublibraryInformation, LibraryConstructionInformation
-from .models import Sequencing
+from .models import Library, SublibraryInformation, LibrarySampleDetail, LibraryConstructionInformation, LibraryQuantificationAndStorage
+from .models import Sequencing, SequencingDetail
 from django.forms import ModelForm
 from django.forms import inlineformset_factory
 
@@ -48,18 +48,47 @@ class LibraryForm(ModelForm):
 		fields = "__all__"
 		# exclude = ['sample']
 
+SublibraryInlineFormset =  inlineformset_factory(
+    Library,
+    SublibraryInformation,
+    # exclude = ['delete'],
+    fields = "__all__"
+        )
+
+LibrarySampleDetailInlineFormset = inlineformset_factory(
+    Library,
+    LibrarySampleDetail,
+    # exclude = ['delete'],
+    fields = "__all__"
+    )
+
+LibraryConstructionInlineFormset =  inlineformset_factory(
+    Library,
+    LibraryConstructionInformation,
+    # exclude = ['delete'],
+    fields = "__all__"
+        )
+
+LibraryQSInlineFormset =  inlineformset_factory(
+    Library,
+    LibraryQuantificationAndStorage,
+    # exclude = ['delete'],
+    fields = "__all__"
+        )
+
+
+#===========================
+# Sequencing forms
+#---------------------------
 class SequencingForm(ModelForm):
 	class Meta:
 		model = Sequencing
 		# fields = "__all__"
 		exclude = ['pool_id']
 
-# InlineFormset =  inlineformset_factory(
-#     Library,
-#     [
-#         SublibraryInformation,
-#         LibraryConstructionInformation
-#     ],
-#     # exclude = ['delete']
-#     fields = "__all__"
-#         )
+SequencingDetailFormset = inlineformset_factory(
+	Sequencing,
+	SequencingDetail,
+	# exclude = ['delete'],
+	fields = "__all__"
+	)
