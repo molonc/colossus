@@ -330,7 +330,7 @@ class SublibraryInformation(models.Model, FieldValue):
     index_i7 = create_chrfield("Index_I7")
     primer_i7 = create_chrfield("Primer_I7")
     index_i5 = create_chrfield("Index_I5")
-    primer_I5 = create_chrfield("Primer_I5")
+    primer_i5 = create_chrfield("Primer_I5")
     pick_met = create_chrfield("Pick_Met")
 
     def get_sublibrary_id(self):
@@ -618,6 +618,31 @@ class SequencingDetail(models.Model, FieldValue):
         default="BCCAGSC"
         )
     sequencer_notes = create_textfield("Sequencing notes")
+
+
+#============================
+# Other models
+#----------------------------
+class Project(models.Model, FieldValue):
+
+    """
+    Project tag.
+    """
+
+    ## database relationships
+    libraries = models.ManyToManyField(
+        Library,
+        verbose_name="Library"
+        )
+
+    ## fields
+    project_name = create_chrfield("Project")
+
+    # def get_absolute_url(self):
+    #     return reverse("core:project_detail", kwargs={"pk": self.pk})
+
+    def __str__(self):
+        return self.project_name
 
 
 #============================
