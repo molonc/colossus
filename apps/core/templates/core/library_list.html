@@ -18,7 +18,8 @@ List of Libraries
                     <th>Sample ID</th>
                     <th>Pool ID</th>
                     <th>JIRA Ticket</th>
-                    <th>Number of Sublibraries</th>
+                    <th>Porject</th>
+                    <th>#Sublibraries</th>
                     <th>Sequenced</th>
                     <th></th>                    
                 </tr>
@@ -29,11 +30,16 @@ List of Libraries
                     <td><a href="{% url 'core:library_detail' pk=library.pk %}">{{library.sample.sample_id}}</a></td>
                     <td>{{library.pool_id}}</td>
                     <td>{{library.jira_ticket}}</td>
+                    <td>
+                        {% for project in library.project_set.all %}
+                        {{project}}<br>
+                        {% endfor %}
+                    </td>
                     <td style="text-align:center;">{{library.num_sublibraries}}</td>
                     {% if library.sequencing_set.all %}
-                    <td><i class="fa fa-check" aria-hidden="true" style="color:green;"></i></td>
+                    <td style="text-align:center;"><i class="fa fa-check" aria-hidden="true" style="color:green;"></i></td>
                     {% else %}
-                    <td><i class="fa fa-times" aria-hidden="true" style="color:red;"></i></td>
+                    <td style="text-align:center;"><i class="fa fa-times" aria-hidden="true" style="color:red;"></i></td>
                     {% endif %}
                     <td>
                         <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:library_update' pk=library.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;" "></i> edit</a>
