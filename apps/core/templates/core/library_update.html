@@ -7,21 +7,33 @@ Edit Library
 
 {% block body %}
 <div class="container" style="background-color:#F5F5F5;">
-    <form action="{% url 'core:library_update' pk=pk %}" method="POST">
+    <form action="{% url 'core:library_update' pk=pk %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset>
             <legend style="color:#5D4037">Library Information</legend>
             <table class="table-condensed">
                 <thead>
                 {{form}}
+                <!-- project update -->
+                <!-- td><b>Project:<b></td>
+                <td>
+                    <select name="projects" class="selectpicker" multiple>
+                        {% for project in projects %}
+                        <option>{{project}}</option>
+                        {% endfor %}
+                    </select>
+                </td -->
+                <!-- end of project update -->
                 </thead>
             </table>
          </fieldset><br>
          <fieldset>
             <legend style="color:#5D4037">Sublibrary Information</legend>
+            <i>Select a SmartChipApp result file to upload:</i>
             <table class="table-condensed">
                 <thead>
-                {{sublib_formset}}
+                {{sublib_form}}
+                <!-- {{sublib_formset}} -->
                 </thead>
             </table>
          </fieldset><br>

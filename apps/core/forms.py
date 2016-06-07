@@ -4,7 +4,7 @@ Created on May 24, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 """
 
-from django.forms import ModelForm
+from django.forms import ModelForm, Form, FileField
 from django.forms import inlineformset_factory
 from .models import Sample, AdditionalSampleInformation
 from .models import Library, SublibraryInformation, LibrarySampleDetail
@@ -49,12 +49,16 @@ class LibraryForm(ModelForm):
 		fields = "__all__"
 		# exclude = ['sample']
 
-SublibraryInfoInlineFormset =  inlineformset_factory(
-    Library,
-    SublibraryInformation,
-    # exclude = ['delete'],
-    fields = "__all__"
-        )
+class SublibraryForm(Form):
+    ## File field
+    smartchipapp_file = FileField()
+
+# SublibraryInfoInlineFormset =  inlineformset_factory(
+#     Library,
+#     SublibraryInformation,
+#     # exclude = ['delete'],
+#     fields = "__all__"
+#         )
 
 LibrarySampleDetailInlineFormset = inlineformset_factory(
     Library,

@@ -10,11 +10,13 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from .decorators import Render
-from .models import Sample, Library, Sequencing, SublibraryInformation
+from .models import Sample, Library, Sequencing, SublibraryInformation, Project
 from .forms import SampleForm, AdditionalSampleInfoInlineFormset
-from .forms import LibraryForm, SublibraryInfoInlineFormset, LibrarySampleDetailInlineFormset
+from .forms import LibraryForm, LibrarySampleDetailInlineFormset #, SublibraryInfoInlineFormset
 from .forms import LibraryConstructionInfoInlineFormset, LibraryQuantificationAndStorageInlineFormset
-from .forms import SequencingForm, SequencingDetailInlineFormset
+from .forms import SequencingForm, SequencingDetailInlineFormset, SublibraryForm
+from .utils import bulk_create_sublibrary
+
 
 #============================
 # Index page
@@ -173,6 +175,27 @@ def library_detail(request, pk):
     }
     return context
             
+class LibrarCreate(TemplateView):
+
+    """
+    Library create page.
+    """
+
+    template_name = "core/library_create.html"
+
+    def _save_formset(self, formset):
+        pass
+
+    def _update_project(self):
+        pass
+
+    def _uploaded_file_handler(self):
+        pass
+
+    def get_context_data(self):
+        pass
+
+
 @Render("core/library_create.html")
 @permission_required("core.groups.shahuser")
 def library_create(request):
@@ -182,9 +205,13 @@ def library_create(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            sublib_formset = SublibraryInfoInlineFormset(
+            # sublib_formset = SublibraryInfoInlineFormset(
+                # request.POST,
+                # instance=instance
+                # )
+            sublib_form = SublibraryForm(
                 request.POST,
-                instance=instance
+                request.FILES,
                 )
             libdetail_formset = LibrarySampleDetailInlineFormset(
                 request.POST,
@@ -199,8 +226,12 @@ def library_create(request):
                 instance=instance
                 )
             print 'created library successfully.'
-            if sublib_formset.is_valid():
-                sublib_formset.save()
+            # if sublib_formset.is_valid():
+                # sublib_formset.save()
+            if sublib_form.is_valid():
+                num_sublibraries = bulk_create_sublibrary(instance, request.FILES['smartchipapp_file'])
+                instance.num_sublibraries = num_sublibraries
+                instance.save()
             if libdetail_formset.is_valid():
                 libdetail_formset.save()
             if libcons_formset.is_valid():
@@ -209,24 +240,27 @@ def library_create(request):
                 libqs_formset.save()
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            sublib_formset = SublibraryInfoInlineFormset()
+            # sublib_formset = SublibraryInfoInlineFormset()
+            sublib_form = SublibraryForm()
             libdetail_formset = LibrarySampleDetailInlineFormset()
             libcons_formset = LibraryConstructionInfoInlineFormset()
             libqs_formset = LibraryQuantificationAndStorageInlineFormset()
     
     else:
         form = LibraryForm()
-        sublib_formset = SublibraryInfoInlineFormset()
+        # sublib_formset = SublibraryInfoInlineFormset()
+        sublib_form = SublibraryForm()        
         libdetail_formset = LibrarySampleDetailInlineFormset()
         libcons_formset = LibraryConstructionInfoInlineFormset()
         libqs_formset = LibraryQuantificationAndStorageInlineFormset()
 
     context = {
         'form': form,
-        'sublib_formset': sublib_formset,
+        # 'sublib_formset': sublib_formset,
+        'sublib_form': sublib_form,
         'libdetail_formset': libdetail_formset,
         'libcons_formset': libcons_formset,
-        'libqs_formset': libqs_formset
+        'libqs_formset': libqs_formset,
         }
     return context
 
@@ -239,10 +273,18 @@ def library_update(request, pk):
         form = LibraryForm(request.POST, instance=library)
         if form.is_valid():
             instance = form.save(commit=False)
+            # ## update the project names
+            # if "projects" in request.POST:
+            #     p = Porject.objects.filter(project_name=request.POST["projects"])
+            #     instance.project_set.add(p)
+            # sublib_formset = SublibraryInfoInlineFormset(
+            #     request.POST,
+            #     instance=instance
+            #     )
             instance.save()
-            sublib_formset = SublibraryInfoInlineFormset(
+            sublib_form = SublibraryForm(
                 request.POST,
-                instance=instance
+                request.FILES,
                 )
             libdetail_formset = LibrarySampleDetailInlineFormset(
                 request.POST,
@@ -258,8 +300,12 @@ def library_update(request, pk):
                 )
             ## should use django messages
             print 'updated library successfully.'
-            if sublib_formset.is_valid():
-                sublib_formset.save()
+            # if sublib_formset.is_valid():
+            #     sublib_formset.save()
+            if sublib_form.is_valid():
+                num_sublibraries = bulk_create_sublibrary(instance, request.FILES['smartchipapp_file'])
+                instance.num_sublibraries = num_sublibraries
+                instance.save()
             if libdetail_formset.is_valid():
                 libdetail_formset.save()
             if libcons_formset.is_valid():
@@ -269,9 +315,10 @@ def library_update(request, pk):
             return HttpResponseRedirect(instance.get_absolute_url())
 
         else:
-            sublib_formset = SublibraryInfoInlineFormset(
-                instance=library
-                )
+            # sublib_formset = SublibraryInfoInlineFormset(
+            #     instance=library
+            #     )
+            sublib_form = SublibraryForm()
             libdetail_formset = LibrarySampleDetailInlineFormset(
                 instance=library
                 )
@@ -284,7 +331,8 @@ def library_update(request, pk):
     
     else:
         form = LibraryForm(instance=library)
-        sublib_formset = SublibraryInfoInlineFormset(instance=library)
+        # sublib_formset = SublibraryInfoInlineFormset(instance=library)
+        sublib_form = SublibraryForm()
         libdetail_formset = LibrarySampleDetailInlineFormset(instance=library)
         libcons_formset = LibraryConstructionInfoInlineFormset(instance=library)
         libqs_formset = LibraryQuantificationAndStorageInlineFormset(instance=library)
@@ -292,10 +340,12 @@ def library_update(request, pk):
     context = {
         'pk': pk,
         'form': form,
-        'sublib_formset': sublib_formset,
+        # 'sublib_formset': sublib_formset,
+        'sublib_form': sublib_form,
         'libdetail_formset': libdetail_formset,
         'libcons_formset': libcons_formset,
-        'libqs_formset': libqs_formset
+        'libqs_formset': libqs_formset,
+        # 'projects': Project.objects.all()
         }
     return context
 
