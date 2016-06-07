@@ -15,6 +15,7 @@ Library Details
                 {% for field in library.get_fields %}
                 <tr><b>{{field}}:</b></tr><br>
                 {% endfor %}
+                <tr><b>Project:</b></tr><br>
             </tbody>
         </table>
     </div>
@@ -25,6 +26,8 @@ Library Details
                 {% for value in library.get_values %}
                 <tr>{{value}}</tr><br>
                 {% endfor %}
+                <tr>{{library.project_set.all|join:", "}}
+                </tr><br>
             </tbody>
         </table>
     </div>
