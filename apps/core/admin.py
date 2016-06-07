@@ -11,6 +11,7 @@ from .models import Library, SublibraryInformation, LibrarySampleDetail
 from .models import LibraryConstructionInformation
 from .models import LibraryQuantificationAndStorage
 from .models import Sequencing, SequencingDetail
+from .models import Project
 
 ## Sample information
 class AdditionalSampleInformationInline(admin.StackedInline):
@@ -81,3 +82,4 @@ admin.site.register(LibrarySampleDetail)
 admin.site.register(LibraryConstructionInformation)
 admin.site.register(LibraryQuantificationAndStorage)
 admin.site.register(SequencingDetail)
+admin.site.register(Project)
