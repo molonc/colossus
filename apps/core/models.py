@@ -634,7 +634,7 @@ class Project(models.Model, FieldValue):
     libraries = models.ManyToManyField(
         Library,
         verbose_name="Library",
-        related_names="projects"
+        related_name="projects"
         )
 
     ## fields
