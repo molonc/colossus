@@ -310,35 +310,36 @@ class SublibraryInformation(models.Model, FieldValue):
         on_delete=models.CASCADE
         )
 
-    ## Character field
-    sample_cellcaller = create_chrfield("Sample")
-    
-    ## Integer fields
+    ## fields
+    sample = create_chrfield("Sample")
     row = create_intfield("Row")
-    col = create_intfield("Column")
+    column = create_intfield("Column")
     img_col = create_intfield("Image Column")
+    file_ch1 = create_chrfield("File_Ch1")
+    file_ch2 = create_chrfield("File_Ch2")
+    fld_section = create_chrfield("Fld_Section")
+    fld_index = create_chrfield("Fld_Index")
     num_live = create_intfield("Num_Live")
     num_dead = create_intfield("Num_Dead")
     num_other = create_intfield("Num_Other")
     rev_live = create_intfield("Rev_Live")
     rev_dead = create_intfield("Rev_Dead")
     rev_other = create_intfield("Rev_Other")
-        
-    ## Character fields
-    file_ch1 = create_chrfield("File_Ch1")
-    file_ch2 = create_chrfield("File_Ch2")
+    spot_class = create_chrfield("Spot_Class")
     index_i7 = create_chrfield("Index_I7")
     primer_i7 = create_chrfield("Primer_I7")
     index_i5 = create_chrfield("Index_I5")
     primer_i5 = create_chrfield("Primer_I5")
     pick_met = create_chrfield("Pick_Met")
+    spot_well = create_chrfield("Spot_Well")
+    num_drops = create_intfield("Num_Drops")
 
     def get_sublibrary_id(self):
         res = '_'.join(
             [
                 self.library.sample.sample_id,
                 self.library.pool_id,
-                str(self.row) + str(self.col),
+                str(self.row) + str(self.column),
             ]
             )
         return res
