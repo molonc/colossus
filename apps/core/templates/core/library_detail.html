@@ -26,46 +26,13 @@ Library Details
                 {% for value in library.get_values %}
                 <tr>{{value}}</tr><br>
                 {% endfor %}
-                <tr>{{library.project_set.all|join:", "}}
-                </tr><br>
+                <tr>{{library.projects.all|join:", "}}</tr><br>
             </tbody>
         </table>
     </div>
 </div><br>
 <!-- end of Meta Information -->
-    
-<!-- Sublibrary Information -->
-<div class="container">
-    <h4 style="color:#5D4037">Sublibrary Information</h4>
-    {% if library.sublibraryinformation_set.all %}
-    <div class="table-responsive" style="text-align:center;">
-        <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th>Sublibrary ID</th>
-                    {% for field in  sublibinfo_fields %}
-                    <th>{{field}}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for sublibinfo in library.sublibraryinformation_set.all %}
-                <tr>
-                    <td>{{sublibinfo.get_sublibrary_id}}</td>
-                    {% for value in sublibinfo.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>    
-    {% else %}
-    <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
-    {% endif %}
-</div><br>
-<!-- end of Sublibrary Information -->
-    
+        
 <!-- Library Sample Detail -->
 <div class="container">
     <h4 style="color:#5D4037">Library Sample Detail</h4>
@@ -150,6 +117,38 @@ Library Details
 </div><br>
 <!-- end of Library Quantification and Storage -->
 
+<!-- Sublibrary Information -->
+<div class="container">
+    <h4 style="color:#5D4037">Sublibrary Information</h4>
+    {% if library.sublibraryinformation_set.all %}
+    <div class="table-responsive" style="text-align:center;">
+        <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Sublibrary ID</th>
+                    {% for field in  sublibinfo_fields %}
+                    <th>{{field}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for sublibinfo in library.sublibraryinformation_set.all %}
+                <tr>
+                    <td>{{sublibinfo.get_sublibrary_id}}</td>
+                    {% for value in sublibinfo.get_values %}
+                    <td>{{value}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+    {% else %}
+    <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
+    {% endif %}
+</div><br>
+<!-- end of Sublibrary Information -->
+
 <!-- Sequencing Information -->
 <div class="container">
     <h4 style="color:#5D4037">Sequencing Information</h4>
@@ -161,6 +160,7 @@ Library Details
                     <th>Sample ID</th>
                     <th>Pool ID</th>
                     <th>Adapter</th>
+                    <th>Sequencing instrument</th>
                 </tr>
             </thead>
             <tbody>
@@ -169,6 +169,7 @@ Library Details
                     <td><a href="{{sequencing.get_absolute_url}}">{{sequencing.library.sample.sample_id}}</a></td>
                     <td>{{sequencing.library.pool_id}}</td>
                     <td>{{sequencing.adapter}}</td>
+                    <td>{{sequencing.sequencing_instrument}}</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -12,13 +12,13 @@ List of Libraries
 </div>
 <div class="container" style="background-color:#F5F5F5;">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Sample ID</th>
                     <th>Pool ID</th>
                     <th>JIRA Ticket</th>
-                    <th>Porject</th>
+                    <th>Project</th>
                     <th>#Sublibraries</th>
                     <th>Sequenced</th>
                     <th></th>                    
@@ -31,7 +31,7 @@ List of Libraries
                     <td>{{library.pool_id}}</td>
                     <td>{{library.jira_ticket}}</td>
                     <td>
-                        {% for project in library.project_set.all %}
+                        {% for project in library.projects.all %}
                         {{project}}<br>
                         {% endfor %}
                     </td>
