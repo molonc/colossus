@@ -1,0 +1,16 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Delete project
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h3>Do you want to detete project <i>{{project}}</i>?</h3>
+    <form action="{% url 'core:project_delete' pk=pk %}" method="POST">
+    	{% csrf_token %}
+        <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Delete">
+    </form>
+</div>
+{% endblock %}

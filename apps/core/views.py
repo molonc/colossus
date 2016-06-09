@@ -10,12 +10,22 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from .decorators import Render
-from .models import Sample, Library, Sequencing, SublibraryInformation, Project
+from .models import Sample, Library, Sequencing, SublibraryInformation
 from .forms import SampleForm, AdditionalSampleInfoInlineFormset
-from .forms import LibraryForm, LibrarySampleDetailInlineFormset #, SublibraryInfoInlineFormset
+from .forms import LibraryForm, LibrarySampleDetailInlineFormset
 from .forms import LibraryConstructionInfoInlineFormset, LibraryQuantificationAndStorageInlineFormset
-from .forms import SequencingForm, SequencingDetailInlineFormset, SublibraryForm
+from .forms import SequencingForm, SequencingDetailInlineFormset, SublibraryForm, ProjectForm
 from .utils import bulk_create_sublibrary
+from taggit.models import Tag
+
+
+#============================
+# Helpers
+#----------------------------
+def get_libraries(self):
+    return Library.objects.filter(projects__name=self.name)
+## add a method to get the list of libraries for each project name
+Tag.get_libraries = get_libraries
 
 
 #============================
@@ -43,7 +53,7 @@ def home_view(request):
 @Render("core/sample_list.html")
 def sample_list(request):
     """list of samples."""
-    samples = Sample.objects.all()
+    samples = Sample.objects.all().order_by('sample_id')
     context = {'samples': samples}
     return context
 
@@ -74,7 +84,6 @@ def sample_create(request):
     if request.method == 'POST':
         form = SampleForm(request.POST)
         if form.is_valid():
-            print '>' * 100
             instance = form.save(commit=False)
             instance.save()
             additional_info_formset = AdditionalSampleInfoInlineFormset(
@@ -160,7 +169,7 @@ def sample_delete(request, pk):
 @Render("core/library_list.html")
 def library_list(request):
     """list of libraries."""
-    libraries = Library.objects.all()
+    libraries = Library.objects.all().order_by('pool_id')
     context = {'libraries': libraries}
     return context
 
@@ -175,26 +184,22 @@ def library_detail(request, pk):
     }
     return context
             
-class LibrarCreate(TemplateView):
+# class LibrarCreate(TemplateView):
 
-    """
-    Library create page.
-    """
+#     """
+#     Library create page.
+#     """
 
-    template_name = "core/library_create.html"
+#     template_name = "core/library_create.html"
 
-    def _save_formset(self, formset):
-        pass
+#     def _save_formset(self, formset):
+#         pass
 
-    def _update_project(self):
-        pass
+#     def _uploaded_file_handler(self):
+#         pass
 
-    def _uploaded_file_handler(self):
-        pass
-
-    def get_context_data(self):
-        pass
-
+#     def get_context_data(self):
+#         pass
 
 @Render("core/library_create.html")
 @permission_required("core.groups.shahuser")
@@ -205,10 +210,10 @@ def library_create(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            # sublib_formset = SublibraryInfoInlineFormset(
-                # request.POST,
-                # instance=instance
-                # )
+
+            # save project tags 
+            form.save_m2m()
+
             sublib_form = SublibraryForm(
                 request.POST,
                 request.FILES,
@@ -226,8 +231,6 @@ def library_create(request):
                 instance=instance
                 )
             print 'created library successfully.'
-            # if sublib_formset.is_valid():
-                # sublib_formset.save()
             if sublib_form.is_valid():
                 num_sublibraries = bulk_create_sublibrary(instance, request.FILES['smartchipapp_file'])
                 instance.num_sublibraries = num_sublibraries
@@ -240,7 +243,6 @@ def library_create(request):
                 libqs_formset.save()
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            # sublib_formset = SublibraryInfoInlineFormset()
             sublib_form = SublibraryForm()
             libdetail_formset = LibrarySampleDetailInlineFormset()
             libcons_formset = LibraryConstructionInfoInlineFormset()
@@ -248,7 +250,6 @@ def library_create(request):
     
     else:
         form = LibraryForm()
-        # sublib_formset = SublibraryInfoInlineFormset()
         sublib_form = SublibraryForm()        
         libdetail_formset = LibrarySampleDetailInlineFormset()
         libcons_formset = LibraryConstructionInfoInlineFormset()
@@ -256,7 +257,6 @@ def library_create(request):
 
     context = {
         'form': form,
-        # 'sublib_formset': sublib_formset,
         'sublib_form': sublib_form,
         'libdetail_formset': libdetail_formset,
         'libcons_formset': libcons_formset,
@@ -273,15 +273,11 @@ def library_update(request, pk):
         form = LibraryForm(request.POST, instance=library)
         if form.is_valid():
             instance = form.save(commit=False)
-            # ## update the project names
-            # if "projects" in request.POST:
-            #     p = Porject.objects.filter(project_name=request.POST["projects"])
-            #     instance.project_set.add(p)
-            # sublib_formset = SublibraryInfoInlineFormset(
-            #     request.POST,
-            #     instance=instance
-            #     )
             instance.save()
+            
+            # save project tags
+            form.save_m2m()
+
             sublib_form = SublibraryForm(
                 request.POST,
                 request.FILES,
@@ -300,8 +296,6 @@ def library_update(request, pk):
                 )
             ## should use django messages
             print 'updated library successfully.'
-            # if sublib_formset.is_valid():
-            #     sublib_formset.save()
             if sublib_form.is_valid():
                 num_sublibraries = bulk_create_sublibrary(instance, request.FILES['smartchipapp_file'])
                 instance.num_sublibraries = num_sublibraries
@@ -315,9 +309,6 @@ def library_update(request, pk):
             return HttpResponseRedirect(instance.get_absolute_url())
 
         else:
-            # sublib_formset = SublibraryInfoInlineFormset(
-            #     instance=library
-            #     )
             sublib_form = SublibraryForm()
             libdetail_formset = LibrarySampleDetailInlineFormset(
                 instance=library
@@ -331,7 +322,6 @@ def library_update(request, pk):
     
     else:
         form = LibraryForm(instance=library)
-        # sublib_formset = SublibraryInfoInlineFormset(instance=library)
         sublib_form = SublibraryForm()
         libdetail_formset = LibrarySampleDetailInlineFormset(instance=library)
         libcons_formset = LibraryConstructionInfoInlineFormset(instance=library)
@@ -340,12 +330,10 @@ def library_update(request, pk):
     context = {
         'pk': pk,
         'form': form,
-        # 'sublib_formset': sublib_formset,
         'sublib_form': sublib_form,
         'libdetail_formset': libdetail_formset,
         'libcons_formset': libcons_formset,
         'libqs_formset': libqs_formset,
-        # 'projects': Project.objects.all()
         }
     return context
 
@@ -367,12 +355,61 @@ def library_delete(request, pk):
 
 
 #============================
+# Project views
+#----------------------------
+@Render("core/project_list.html")
+def project_list(request):
+    """projects detail page."""
+    projects = Tag.objects.all().order_by('name')
+    context = {'projects': projects}
+    return context
+
+@Render("core/project_delete.html")
+@permission_required("core.groups.shahuser")
+def project_delete(request, pk):
+    """project delete page."""
+    project = get_object_or_404(Tag, pk=pk)
+
+    if request.method == 'POST':
+        project.delete()
+        return HttpResponseRedirect(reverse("core:project_list"))
+
+    context = {
+        'project': project,
+        'pk': pk
+    }
+    return context
+
+@Render("core/project_update.html")
+@permission_required("core.groups.shahuser")
+def project_update(request, pk):
+    project = get_object_or_404(Tag, pk=pk)
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.save()
+            ## should use django messages
+            print 'updated project successfully.'
+            return HttpResponseRedirect(reverse("core:project_list"))
+    
+    else:
+        form = ProjectForm(instance=project)
+
+    context = {
+        'pk': pk,
+        'form': form
+        }
+    return context
+
+
+#============================
 # Sequencing views
 #----------------------------
 @Render("core/sequencing_list.html")
 def sequencing_list(request):
     """list of sequencings."""
-    sequencings = Sequencing.objects.all()
+    sequencings = Sequencing.objects.all().order_by('library')
     context = {'sequencings': sequencings}
     return context
 

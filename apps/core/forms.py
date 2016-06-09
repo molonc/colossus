@@ -10,6 +10,7 @@ from .models import Sample, AdditionalSampleInformation
 from .models import Library, SublibraryInformation, LibrarySampleDetail
 from .models import LibraryConstructionInformation, LibraryQuantificationAndStorage
 from .models import Sequencing, SequencingDetail
+from taggit.models import Tag
 
 
 #===========================
@@ -80,6 +81,15 @@ LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     # exclude = ['delete'],
     fields = "__all__"
         )
+
+
+#===========================
+# Sequencing forms
+#---------------------------
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Tag
+        fields = ['name']
 
 
 #===========================

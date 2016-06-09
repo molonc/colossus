@@ -7,7 +7,7 @@ Created on May 16, 2016
 from __future__ import unicode_literals
 from django.core.urlresolvers import reverse
 from django.db import models
-
+from taggit.managers import TaggableManager
 
 #===============================
 # helpers
@@ -255,6 +255,12 @@ class Library(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Sample']
     values_to_exclude = ['id', 'sample']
 
+    ## Taggit
+    projects = TaggableManager(
+        verbose_name="Project",
+        help_text="A comma-separated list of project names",
+        blank=True
+        )
 
     ## database relationships
     sample = models.ForeignKey(
@@ -622,29 +628,29 @@ class SequencingDetail(models.Model, FieldValue):
 
 
 #============================
-# Other models
+# Project tag model
 #----------------------------
-class Project(models.Model, FieldValue):
+# class Project(models.Model, FieldValue):
 
-    """
-    Project tag.
-    """
+#     """
+#     Project tag.
+#     """
 
-    ## database relationships
-    libraries = models.ManyToManyField(
-        Library,
-        verbose_name="Library",
-        related_name="projects"
-        )
+#     ## database relationships
+#     libraries = models.ManyToManyField(
+#         Library,
+#         verbose_name="Library",
+#         related_name="projects"
+#         )
 
-    ## fields
-    project_name = create_chrfield("Project")
+#     ## fields
+#     project_name = create_chrfield("Project")
 
-    # def get_absolute_url(self):
-    #     return reverse("core:project_detail", kwargs={"pk": self.pk})
+#     # def get_absolute_url(self):
+#     #     return reverse("core:project_detail", kwargs={"pk": self.pk})
 
-    def __str__(self):
-        return self.project_name
+#     def __str__(self):
+#         return self.project_name
 
 
 #============================

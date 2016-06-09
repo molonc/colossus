@@ -25,5 +25,8 @@ urlpatterns = [
                url(r'^sequensing/create/$', views.sequencing_create, name='sequencing_create'),
                url(r'^sequensing/update/(?P<pk>\d+)$', views.sequencing_update, name='sequencing_update'),
                url(r'^sequensing/delete/(?P<pk>\d+)$', views.sequencing_delete, name='sequencing_delete'),
+               url(r'^project/list$', views.project_list, name='project_list'),
+               url(r'^project/update/(?P<pk>\d+)$', views.project_update, name='project_update'),
+               url(r'^project/delete/(?P<pk>\d+)$', views.project_delete, name='project_delete'),
                ]
 
