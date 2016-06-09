@@ -31,9 +31,15 @@ class SampleForm(ModelForm):
         'sample_id': ('*Sample ID'),
         }
 
+    def clean(self):
+        cleaned_data = super(SampleForm, self).clean()
+        sample_id = cleaned_data.get("sample_id")
+        if len(Sample.objects.filter(sample_id=sample_id)):
+            msg = "Sample ID already exists."
+            self.add_error('sample_id', msg)
 
 AdditionalSampleInfoInlineFormset =  inlineformset_factory(
-	Sample,
+    Sample,
     AdditionalSampleInformation,
     # exclude = ['delete'],
     fields = "__all__",
@@ -45,10 +51,18 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 # Library forms
 #---------------------------
 class LibraryForm(ModelForm):
-	class Meta:
-		model = Library
-		fields = "__all__"
-		# exclude = ['sample']
+    class Meta:
+        model = Library
+        fields = "__all__"
+        # exclude = ['sample']
+
+    def clean(self):
+        cleaned_data = super(LibraryForm, self).clean()
+        pool_id = cleaned_data.get("pool_id")
+        if len(Library.objects.filter(pool_id=pool_id)):
+            msg = "Pool ID already exists."
+            self.add_error('pool_id', msg)
+
 
 class SublibraryForm(Form):
     ## File field
@@ -96,14 +110,14 @@ class ProjectForm(ModelForm):
 # Sequencing forms
 #---------------------------
 class SequencingForm(ModelForm):
-	class Meta:
-		model = Sequencing
-		# fields = "__all__"
-		exclude = ['pool_id']
+    class Meta:
+        model = Sequencing
+        # fields = "__all__"
+        exclude = ['pool_id']
 
 SequencingDetailInlineFormset = inlineformset_factory(
-	Sequencing,
-	SequencingDetail,
-	# exclude = ['delete'],
-	fields = "__all__"
-	)
+    Sequencing,
+    SequencingDetail,
+    # exclude = ['delete'],
+    fields = "__all__"
+    )
