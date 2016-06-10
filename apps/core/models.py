@@ -5,13 +5,22 @@ Created on May 16, 2016
 """
 
 from __future__ import unicode_literals
+
+#============================
+# Django imports
+#----------------------------
 from django.core.urlresolvers import reverse
 from django.db import models
+
+#============================
+# 3rd-party app imports
+#----------------------------
 from taggit.managers import TaggableManager
 
-#===============================
+
+#============================
 # helpers
-#-------------------------------
+#----------------------------
 def create_chrfield(name, max_length=50, blank=True, null=True, **kwargs):
     """wrap models.CharField for ease of use."""
     return models.CharField(
@@ -258,7 +267,7 @@ class Library(models.Model, FieldValue):
     ## Taggit
     projects = TaggableManager(
         verbose_name="Project",
-        help_text="A comma-separated list of project names",
+        help_text="A comma-separated list of project names.",
         blank=True
         )
 
