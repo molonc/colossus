@@ -16,9 +16,9 @@
             <div class="navbar-header">
                 <a class="navbar-brand" style="color:white;" href="{% url 'index' %}"><i class="fa fa-home" aria-hidden="true"></i> Single Cell Database (<i>development version</i>)</a>
             </div>
-            <div id="navbar" class="navbar-collapse collapse" data-toggle="tooltip" title="AUTOCOMPLETE">
-                <form class="navbar-form navbar-right">
-                    <input type="text" id="search" class="form-control" placeholder=" Search...">
+            <div id="navbar" class="navbar-collapse collapse" data-toggle="tooltip">
+                <form class="navbar-form navbar-right" action="{% url 'search' %}">
+                    <input type="text" id="search" name="query_str" class="form-control" placeholder=" Search...">
                 </form>
             </div>
         </div><br>

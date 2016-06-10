@@ -4,18 +4,42 @@ Created on May 16, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 """
 
+#============================
+# Django imports
+#----------------------------
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
+
+#============================
+# App imports
+#----------------------------
 from .decorators import Render
-from .models import Sample, Library, Sequencing, SublibraryInformation
-from .forms import SampleForm, AdditionalSampleInfoInlineFormset
-from .forms import LibraryForm, LibrarySampleDetailInlineFormset
-from .forms import LibraryConstructionInfoInlineFormset, LibraryQuantificationAndStorageInlineFormset
-from .forms import SequencingForm, SequencingDetailInlineFormset, SublibraryForm, ProjectForm
+from .models import (
+    Sample,
+    Library,
+    Sequencing,
+    SublibraryInformation
+    )
+from .forms import (
+    SampleForm, 
+    AdditionalSampleInfoInlineFormset,
+    LibraryForm,
+    LibrarySampleDetailInlineFormset,
+    LibraryConstructionInfoInlineFormset,
+    LibraryQuantificationAndStorageInlineFormset,
+    SublibraryForm,
+    SequencingForm,
+    SequencingDetailInlineFormset,
+    ProjectForm
+    )
 from .utils import bulk_create_sublibrary
+
+#============================
+# 3rd-party app imports
+#----------------------------
 from taggit.models import Tag
 
 
@@ -232,7 +256,10 @@ def library_create(request):
                 )
             print 'created library successfully.'
             if sublib_form.is_valid():
-                num_sublibraries = bulk_create_sublibrary(instance, request.FILES['smartchipapp_file'])
+                num_sublibraries = bulk_create_sublibrary(
+                    instance,
+                    request.FILES['smartchipapp_file']
+                    )
                 instance.num_sublibraries = num_sublibraries
                 instance.save()
             if libdetail_formset.is_valid():
@@ -297,7 +324,10 @@ def library_update(request, pk):
             ## should use django messages
             print 'updated library successfully.'
             if sublib_form.is_valid():
-                num_sublibraries = bulk_create_sublibrary(instance, request.FILES['smartchipapp_file'])
+                num_sublibraries = bulk_create_sublibrary(
+                    instance,
+                    request.FILES['smartchipapp_file']
+                    )
                 instance.num_sublibraries = num_sublibraries
                 instance.save()
             if libdetail_formset.is_valid():
@@ -323,9 +353,15 @@ def library_update(request, pk):
     else:
         form = LibraryForm(instance=library)
         sublib_form = SublibraryForm()
-        libdetail_formset = LibrarySampleDetailInlineFormset(instance=library)
-        libcons_formset = LibraryConstructionInfoInlineFormset(instance=library)
-        libqs_formset = LibraryQuantificationAndStorageInlineFormset(instance=library)
+        libdetail_formset = LibrarySampleDetailInlineFormset(
+            instance=library
+            )
+        libcons_formset = LibraryConstructionInfoInlineFormset(
+            instance=library
+            )
+        libqs_formset = LibraryQuantificationAndStorageInlineFormset(
+            instance=library
+            )
 
     context = {
         'pk': pk,
@@ -473,11 +509,17 @@ def sequencing_update(request, pk):
                 seqdetail_formset.save()
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            seqdetail_formset = SequencingDetailInlineFormset(instance=sequencing)
+            seqdetail_formset = SequencingDetailInlineFormset(
+                instance=sequencing
+                )
     
     else:
-        form = SequencingForm(instance=sequencing)
-        seqdetail_formset = SequencingDetailInlineFormset(instance=sequencing)
+        form = SequencingForm(
+            instance=sequencing
+            )
+        seqdetail_formset = SequencingDetailInlineFormset(
+            instance=sequencing
+            )
 
     context = {
         'pk': pk,
@@ -501,4 +543,32 @@ def sequencing_delete(request, pk):
         'pk': pk
     }
     return context
+
+
+#============================
+# Search view
+#----------------------------
+def search(request):
+    query_str = request.GET.get('query_str')
+    instance = None
+
+    ## search for samples
+    qs = Sample.objects.filter(sample_id=query_str)
+    if qs:
+        instance = qs[0]
+        
+    ## search for libraries
+    else:
+        qs = Library.objects.filter(pool_id=query_str)
+        if qs:
+            instance = qs[0]
+
+    if instance:
+        ## should use django.messages
+        print "found a match."        
+        return HttpResponseRedirect(instance.get_absolute_url())
+    else:
+        ## should use django.messages
+        print "no match found."
+        return HttpResponseRedirect(reverse("index"))
 

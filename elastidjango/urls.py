@@ -25,5 +25,6 @@ from core import views
 urlpatterns = [
     url(r'^$', views.index_view, name='index'),    
     url(r'^admin/', admin.site.urls),
+    url(r'^search/', views.search, name='search'),
     url(r'^apps/core/', include('core.urls')),
 ]
