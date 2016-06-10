@@ -519,8 +519,8 @@ class Sequencing(models.Model, FieldValue):
     Sequencing information.
     """
 
-    fields_to_exclude = ['ID', 'Library']
-    values_to_exclude = ['id', 'library']
+    fields_to_exclude = ['ID', 'Library', 'Pool ID']
+    values_to_exclude = ['id', 'library', 'pool_id']
 
     ## database relationships
     library = models.ForeignKey(
