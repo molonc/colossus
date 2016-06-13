@@ -230,12 +230,15 @@ def library_detail(request, pk):
 def library_create(request):
     """library create page."""
     if request.method == 'POST':
+        ## this is becaues of this django feature:
+        ## https://code.djangoproject.com/ticket/1130
+        request.POST['projects'] = ','.join(request.POST.getlist('projects'))
+
         form = LibraryForm(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            ## save instace with its ManyToMany relation.
             instance.save()
-
-            # save project tags 
             form.save_m2m()
 
             sublib_form = SublibraryForm(
@@ -282,12 +285,14 @@ def library_create(request):
         libcons_formset = LibraryConstructionInfoInlineFormset()
         libqs_formset = LibraryQuantificationAndStorageInlineFormset()
 
+    projects = [t.name for t in Tag.objects.all()]
     context = {
         'form': form,
         'sublib_form': sublib_form,
         'libdetail_formset': libdetail_formset,
         'libcons_formset': libcons_formset,
         'libqs_formset': libqs_formset,
+        'projects': projects,
         }
     return context
 
@@ -297,6 +302,10 @@ def library_update(request, pk):
     """library update page."""
     library = get_object_or_404(Library, pk=pk)
     if request.method == 'POST':
+        ## this is becaues of this django feature:
+        ## https://code.djangoproject.com/ticket/1130
+        request.POST['projects'] = ','.join(request.POST.getlist('projects'))
+
         form = LibraryForm(request.POST, instance=library)
         if form.is_valid():
             instance = form.save(commit=False)
@@ -363,6 +372,8 @@ def library_update(request, pk):
             instance=library
             )
 
+    selected_projects = library.projects.names()
+    projects = [t.name for t in Tag.objects.all()]
     context = {
         'pk': pk,
         'form': form,
@@ -370,6 +381,8 @@ def library_update(request, pk):
         'libdetail_formset': libdetail_formset,
         'libcons_formset': libcons_formset,
         'libqs_formset': libqs_formset,
+        'projects': projects,
+        'selected_projects': selected_projects,
         }
     return context
 
@@ -556,7 +569,7 @@ def search(request):
     qs = Sample.objects.filter(sample_id=query_str)
     if qs:
         instance = qs[0]
-        
+
     ## search for libraries
     else:
         qs = Library.objects.filter(pool_id=query_str)

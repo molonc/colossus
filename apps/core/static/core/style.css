@@ -1,5 +1,5 @@
 #grey_background {
-	background-color: #F5F5F5;
+    background-color: #F5F5F5;
 }
 
 .left-inner-addon {
@@ -32,16 +32,16 @@
 }
 
 h4 {
-	color: #5D4037;
-	font-style: italic;
+    color: #5D4037;
+    font-style: italic;
 }
 
 td, th {
-	padding:4px;
+    padding:4px;
 }
 
 a:hover {
-	color: #FF5722;
+    color: #FF5722;
 }
 
 #footer {
@@ -50,4 +50,16 @@ a:hover {
     z-index: 10;
     height: 3em;
     margin-top: -3em;
+}
+
+.errorlist {
+    color:red;
+    font-style: italic;
+}
+
+.helptext {
+    /*font-style: italic;*/
+    margin-bottom: 5px;
+    color: #616161;
+    font-size: 12px;
 }

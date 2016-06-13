@@ -13,17 +13,42 @@ Edit Library
             <legend style="color:#5D4037">Library Information</legend>
             <table class="table-condensed">
                 <thead>
-                {{form}}
-                <!-- project update -->
-                <!-- td><b>Project:<b></td>
-                <td>
-                    <select name="projects" class="selectpicker" multiple>
+                <!-- {{form}} -->
+                {% for field in form %} 
+                <tr>
+                    {% if field.name == "projects" %}
+                    <th>
+                    {{field.label_tag}}
+                    </th>
+                    <td>
+                    {{ field.errors }}
+                    <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
                         {% for project in projects %}
+                        {% if project in selected_projects %}
+                        <option selected="{{project}}">{{project}}</option>
+                        {% else %}
                         <option>{{project}}</option>
+                        {% endif %}
                         {% endfor %}
                     </select>
-                </td -->
-                <!-- end of project update -->
+                    <!-- {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text }}</p>
+                    {% endif %} -->
+                    </td>
+                    {% else %}
+                    <th>
+                    {{ field.label_tag}}
+                    </th>
+                    <td>
+                    {{ field.errors }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text }}</p>
+                    {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
                 </thead>
             </table>
          </fieldset><br>
