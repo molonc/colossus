@@ -46,11 +46,11 @@ class SampleForm(ModelForm):
         #         )
         #     }
         help_texts = {
-        'sample_id': ('Sequencing ID (usually SA ID).'),
-        'anonymous_patient_id': ('Original/clinical patient ID.'),
-        }
+            'sample_id': ('Sequencing ID (usually SA ID).'),
+            'anonymous_patient_id': ('Original/clinical patient ID.'),
+            }
         labels = {
-        'sample_id': ('*Sample ID'),
+            'sample_id': ('*Sample ID'),
         }
 
     def clean(self):
@@ -79,6 +79,16 @@ class LibraryForm(ModelForm):
         model = Library
         fields = "__all__"
         # exclude = ['projects']
+        help_texts = {
+            'sample': ('Sequencing ID (usually SA ID).'),
+            'pool_id': ('Pool ID.'),
+            'jira_ticket': ('Jira Ticket.'),
+            }
+        labels = {
+            'sample': ('*Sample'),
+            'pool_id': ('*Pool ID'),
+            'jira_ticket': ('*Jira Ticket'),
+            }
 
     def clean(self):
         ## if it's a new instance, the pool_id should not exist.
