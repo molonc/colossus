@@ -150,6 +150,12 @@ class SequencingForm(ModelForm):
         model = Sequencing
         # fields = "__all__"
         exclude = ['pool_id']
+        help_texts = {
+            'library': ('Select a library.'),
+            }
+        labels = {
+            'library': ('*Library'),
+            }
 
 SequencingDetailInlineFormset = inlineformset_factory(
     Sequencing,
