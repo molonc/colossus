@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'mod_wsgi.server',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -147,8 +148,11 @@ STATIFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn") 
 
 # Media files
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "uploads")
 
+# Login url
+LOGIN_URL = '/login/'
