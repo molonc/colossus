@@ -1,33 +1,45 @@
+{% extends "base_view.html" %}
 {% load staticfiles %}
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
-    <title>Single Cell Login</title>
 
-    <link rel="stylesheet" href="{% static 'core/style.css' %}" />
+{% block title %}
+{% endblock %}
 
-</head>
-<body>
-    <div class="container" id="login">
-    <form action="" method="POST">
-        {% csrf_token %}
-        <div class="table">
-            <table class="table-condensed">
-                <tr>
-                    <th><label for="username">Username:</label></th>
-                    <td><input type="text" id="username" name="username"></td>
-                </tr>
-                <tr>
-                    <th><label for="password">Password:</label></th>
-                    <td><input type="password" id="password" name="password"></td>
-                </tr>
-            </table>
-            <button type="submit" style="float:right;">Login</button>
-    </form>
-    </div>
+{% block body %}
+<div class="modal show" tabindex="-1" role="dialog" style="background-color:white;">
+      <div class="modal-dialog">
+        <div class="modal-content" style="background-color:#F1F8E9">
+          <div class="modal-header">
+<!--             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+ -->            <h4 class="modal-title" style="color:#33691E;">Login required for this action &hellip;</h4>
+          </div>
+          <div class="modal-body">
+              {% if next %}
+              <form action="{% url 'login' %}?next={{next}}" method="post" >
+              {%else%}
+              <form action="{% url 'login' %}" method="POST">
+              {% endif %}
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true" style="color:#33691E;"></i></span>
+                        <input type="text" class="form-control" placeholder="Username" name="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                  <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-key" aria-hidden="true" style="color:#33691E;"></i></span>
+                      <input type="password" class="form-control" placeholder="Password" name="password">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+              </form>
+          </div>
+          <!-- <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" style="width:120px;">Login</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          </div> -->
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
-</body>
-</html>
+{% endblock%}

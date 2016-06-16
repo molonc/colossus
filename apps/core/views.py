@@ -593,7 +593,6 @@ def search_view(request):
 def login_view(request):
     next_url = request.GET.get('next')
     if request.method == 'POST':
-        print next_url
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(
@@ -603,9 +602,13 @@ def login_view(request):
         if user is not None:
             if user.is_active:
                 ## should use django messages
-                print("User is valid, active and authenticated")
+                print("User is valid, active and authenticated.")
                 login(request, user)
+                ## should use django messages
+                print("Successully logged in.")
                 if next_url:
+                    ## should use django messages
+                    print("Redirected to %s" % (next_url))
                     return HttpResponseRedirect(next_url)
                 else:
                     return HttpResponseRedirect(reverse("index"))                    
@@ -615,7 +618,9 @@ def login_view(request):
         else:
             print("The username and password were incorrect.")
 
-    contex = {}
+    contex = {
+        'next': next_url,
+        }
     return contex
 
 #============================
@@ -623,6 +628,8 @@ def login_view(request):
 #----------------------------
 def logout_view(request):
     logout(request)
+    ## should use django messages
+    print("Successfully logged out.")
     return HttpResponseRedirect(reverse("index"))
     # contex = {}
     # return contex

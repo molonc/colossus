@@ -71,9 +71,24 @@ a:hover {
     padding-left: 5px;
 }
 
-#login {
-    background-color: #C5E1A5;
-    border: solid 1px #BDBDBD;
-    width: 400px;
-    margin: 0 auto;
+/* Login styles */
+.modal {
+  text-align: center;
 }
+
+@media screen and (min-width: 768px) { 
+  .modal:before {
+    display: inline-block;
+    vertical-align: middle;
+    content: " ";
+    height: 100%;
+  }
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* end of Login styles*/
