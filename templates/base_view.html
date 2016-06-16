@@ -16,9 +16,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/i18n/defaults-*.min.js"></script>
         <!-- end of Bootstrap-select assets -->
 
-        <title>ElastiDjango Database Project</title>
         <link rel="stylesheet" href="{% static 'core/style.css' %}" />
         <!-- <script scr="{% static 'core/scripts.js' %}"></script> -->
+
+        <title>ElastiDjango Database Project</title>
 
     </head>
     <body>
@@ -46,12 +47,16 @@
                 <input type="text" class="form-control" placeholder="Username" />
             </div>
  -->            <!-- end of Username input box -->
-        
+
         </div><br>
         <!-- end of header -->
 
+        <div class="container">
+            <a href="{% url 'logout' %}" style="float:right;">logout</a>
+        </div>
+
         <!-- Page title -->
-        <div class="container", style="background-color:#DCE775; color:#212121; margin-bottom:5px; padding-left:5px;">
+        <div class="container header">
             <h2 style="float:left;">{% block title %}Title{% endblock %}</h2>
         </div>
         <!-- end of page title -->

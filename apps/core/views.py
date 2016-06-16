@@ -7,7 +7,8 @@ Created on May 16, 2016
 #============================
 # Django imports
 #----------------------------
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required #, permission_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
@@ -102,7 +103,7 @@ def sample_detail(request, pk):
             
 
 @Render("core/sample_create.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def sample_create(request):
     """sample create page."""
     if request.method == 'POST':
@@ -136,7 +137,7 @@ def sample_create(request):
 
 
 @Render("core/sample_update.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def sample_update(request, pk):
     """sample update page."""
     sample = get_object_or_404(Sample, pk=pk)
@@ -171,7 +172,7 @@ def sample_update(request, pk):
     return context
 
 @Render("core/sample_delete.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def sample_delete(request, pk):
     """sample delete page."""
     sample = get_object_or_404(Sample, pk=pk)
@@ -226,7 +227,7 @@ def library_detail(request, pk):
 #         pass
 
 @Render("core/library_create.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def library_create(request):
     """library create page."""
     if request.method == 'POST':
@@ -297,7 +298,7 @@ def library_create(request):
     return context
 
 @Render("core/library_update.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def library_update(request, pk):
     """library update page."""
     library = get_object_or_404(Library, pk=pk)
@@ -387,7 +388,7 @@ def library_update(request, pk):
     return context
 
 @Render("core/library_delete.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def library_delete(request, pk):
     """library delete page."""
     library = get_object_or_404(Library, pk=pk)
@@ -414,7 +415,7 @@ def project_list(request):
     return context
 
 @Render("core/project_delete.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def project_delete(request, pk):
     """project delete page."""
     project = get_object_or_404(Tag, pk=pk)
@@ -430,7 +431,7 @@ def project_delete(request, pk):
     return context
 
 @Render("core/project_update.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def project_update(request, pk):
     project = get_object_or_404(Tag, pk=pk)
     if request.method == 'POST':
@@ -470,7 +471,7 @@ def sequencing_detail(request, pk):
     return context
             
 @Render("core/sequencing_create.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def sequencing_create(request):
     """sequencing create page."""
     if request.method == 'POST':
@@ -503,7 +504,7 @@ def sequencing_create(request):
     return context
 
 @Render("core/sequencing_update.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def sequencing_update(request, pk):
     """sequencing update page."""
     sequencing = get_object_or_404(Sequencing, pk=pk)
@@ -542,7 +543,7 @@ def sequencing_update(request, pk):
     return context
 
 @Render("core/sequencing_delete.html")
-@permission_required("core.groups.shahuser")
+@login_required()
 def sequencing_delete(request, pk):
     """sequencing delete page."""
     sequencing = get_object_or_404(Sequencing, pk=pk)
@@ -561,7 +562,7 @@ def sequencing_delete(request, pk):
 #============================
 # Search view
 #----------------------------
-def search(request):
+def search_view(request):
     query_str = request.GET.get('query_str')
     instance = None
 
@@ -584,4 +585,45 @@ def search(request):
         ## should use django.messages
         print "no match found."
         return HttpResponseRedirect(reverse("index"))
+
+#============================
+# Login view
+#----------------------------
+@Render("login.html")
+def login_view(request):
+    next_url = request.GET.get('next')
+    if request.method == 'POST':
+        print next_url
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(
+            username=username,
+            password=password
+            )
+        if user is not None:
+            if user.is_active:
+                ## should use django messages
+                print("User is valid, active and authenticated")
+                login(request, user)
+                if next_url:
+                    return HttpResponseRedirect(next_url)
+                else:
+                    return HttpResponseRedirect(reverse("index"))                    
+            else:
+                ## should use django messages
+                print("The password is valid, but the account has been disabled!")
+        else:
+            print("The username and password were incorrect.")
+
+    contex = {}
+    return contex
+
+#============================
+# Logout view
+#----------------------------
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("index"))
+    # contex = {}
+    # return contex
 

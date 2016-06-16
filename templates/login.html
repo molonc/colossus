@@ -1,0 +1,33 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+    <title>Single Cell Login</title>
+
+    <link rel="stylesheet" href="{% static 'core/style.css' %}" />
+
+</head>
+<body>
+    <div class="container" id="login">
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="table">
+            <table class="table-condensed">
+                <tr>
+                    <th><label for="username">Username:</label></th>
+                    <td><input type="text" id="username" name="username"></td>
+                </tr>
+                <tr>
+                    <th><label for="password">Password:</label></th>
+                    <td><input type="password" id="password" name="password"></td>
+                </tr>
+            </table>
+            <button type="submit" style="float:right;">Login</button>
+    </form>
+    </div>
+
+</body>
+</html>
