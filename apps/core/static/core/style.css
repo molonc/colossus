@@ -18,6 +18,10 @@
     text-align:right;
 }
 
+.messages {
+    color: #33691E;
+}
+
 h4 {
     color: #5D4037;
     /*font-style: italic;*/

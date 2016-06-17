@@ -7,6 +7,7 @@ Created on May 16, 2016
 #============================
 # Django imports
 #----------------------------
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required #, permission_required
 from django.core.urlresolvers import reverse
@@ -86,16 +87,6 @@ def sample_list(request):
 def sample_detail(request, pk):
     """sample detail page."""
     sample = get_object_or_404(Sample, pk=pk)
-
-    ## the post-save doesn't work in a sense that it's always
-    ## one save behind. 
-    ## this is to avoid that, but there must be a better way to handle this.
-    # if sample.has_celltable():
-    #     nl = len(sample.celltable.cell_set.all())
-    #     if sample.num_sublibraries != nl:
-    #         sample.num_sublibraries = nl
-    #         sample.save()
-
     context = {
     'sample': sample
     }
@@ -115,12 +106,11 @@ def sample_create(request):
                 request.POST,
                 instance=instance
                 )
-            ## should use django messages
-            print 'created sample successfully.'            
             if additional_info_formset.is_valid():
                 additional_info_formset.save()
-                ## should use django messages
-                print 'added additional sample information successfully.'
+
+            msg = "Successfully created Sample."
+            messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
             formset = AdditionalSampleInfoInlineFormset()
@@ -150,12 +140,11 @@ def sample_update(request, pk):
                 request.POST,
                 instance=instance
                 )
-            ## should use django messages
-            print 'created sample successfully.'            
             if additional_info_formset.is_valid():
                 additional_info_formset.save()
-                ## should use django messages
-                print 'added additional sample information successfully.'
+
+            msg = "Successfully updated Sample."
+            messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
             formset = AdditionalSampleInfoInlineFormset(instance=sample)
@@ -179,6 +168,8 @@ def sample_delete(request, pk):
 
     if request.method == 'POST':
         sample.delete()
+        msg = "Successfully deleted Sample."
+        messages.success(request, msg)
         return HttpResponseRedirect(reverse("core:sample_list"))    
 
     context = {
@@ -258,7 +249,6 @@ def library_create(request):
                 request.POST,
                 instance=instance
                 )
-            print 'created library successfully.'
             if sublib_form.is_valid():
                 num_sublibraries = bulk_create_sublibrary(
                     instance,
@@ -272,6 +262,9 @@ def library_create(request):
                 libcons_formset.save()
             if libqs_formset.is_valid():
                 libqs_formset.save()
+
+            msg = "Successfully created Library."
+            messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
             sublib_form = SublibraryForm()
@@ -331,8 +324,6 @@ def library_update(request, pk):
                 request.POST,
                 instance=instance
                 )
-            ## should use django messages
-            print 'updated library successfully.'
             if sublib_form.is_valid():
                 num_sublibraries = bulk_create_sublibrary(
                     instance,
@@ -346,6 +337,9 @@ def library_update(request, pk):
                 libcons_formset.save()
             if libqs_formset.is_valid():
                 libqs_formset.save()
+
+            msg = "Successfully updated Library."
+            messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
 
         else:
@@ -395,6 +389,8 @@ def library_delete(request, pk):
 
     if request.method == 'POST':
         library.delete()
+        msg = "Successfully deleted Library."
+        messages.success(request, msg)
         return HttpResponseRedirect(reverse("core:library_list"))    
 
     context = {
@@ -422,6 +418,8 @@ def project_delete(request, pk):
 
     if request.method == 'POST':
         project.delete()
+        msg = "Successfully deleted Project."
+        messages.success(request, msg)
         return HttpResponseRedirect(reverse("core:project_list"))
 
     context = {
@@ -439,8 +437,8 @@ def project_update(request, pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            ## should use django messages
-            print 'updated project successfully.'
+            msg = "Successfully updated Project."
+            messages.success(request, msg)
             return HttpResponseRedirect(reverse("core:project_list"))
     
     else:
@@ -483,12 +481,11 @@ def sequencing_create(request):
                 request.POST,
                 instance=instance
                 )
-            ## should use django messages
-            print 'created sequencing successfully.'
             if seqdetail_formset.is_valid():
                 seqdetail_formset.save()
-                ## should use django messages
-                print 'added sample details successfully.'                    
+
+            msg = "Successfully created Sequencing."
+            messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
             seqdetail_formset = SequencingDetailInlineFormset()
@@ -513,14 +510,15 @@ def sequencing_update(request, pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            ## should use django messages
             seqdetail_formset = SequencingDetailInlineFormset(
                 request.POST,
                 instance=instance
                 )                        
-            print 'updated sequencing successfully.'
             if seqdetail_formset.is_valid():
                 seqdetail_formset.save()
+
+            msg = "Successfully updated Sequencing."
+            messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
             seqdetail_formset = SequencingDetailInlineFormset(
@@ -550,6 +548,8 @@ def sequencing_delete(request, pk):
 
     if request.method == 'POST':
         sequencing.delete()
+        msg = "Successfully deleted Sequencing."
+        messages.success(request, msg)
         return HttpResponseRedirect(reverse("core:sequencing_list"))    
 
     context = {
@@ -578,12 +578,10 @@ def search_view(request):
             instance = qs[0]
 
     if instance:
-        ## should use django.messages
-        print "found a match."        
         return HttpResponseRedirect(instance.get_absolute_url())
     else:
-        ## should use django.messages
-        print "no match found."
+        msg = "Sorry, no match found."
+        messages.warning(request, msg)
         return HttpResponseRedirect(reverse("index"))
 
 #============================
@@ -601,22 +599,18 @@ def login_view(request):
             )
         if user is not None:
             if user.is_active:
-                ## should use django messages
-                print("User is valid, active and authenticated.")
                 login(request, user)
-                ## should use django messages
-                print("Successully logged in.")
+                print "%s, successully logged in." % user.username
                 if next_url:
-                    ## should use django messages
-                    print("Redirected to %s" % (next_url))
                     return HttpResponseRedirect(next_url)
                 else:
                     return HttpResponseRedirect(reverse("index"))                    
             else:
-                ## should use django messages
-                print("The password is valid, but the account has been disabled!")
+                msg = "This account has been disabled!"
+                messages.error(request, msg)
         else:
-            print("The username and password were incorrect.")
+            msg = "The username and/or password were incorrect."
+            messages.error(request, msg)
 
     contex = {
         'next': next_url,
@@ -628,9 +622,7 @@ def login_view(request):
 #----------------------------
 def logout_view(request):
     logout(request)
-    ## should use django messages
-    print("Successfully logged out.")
+    msg = "Successfully logged out."
+    messages.success(request, msg)
     return HttpResponseRedirect(reverse("index"))
-    # contex = {}
-    # return contex
 

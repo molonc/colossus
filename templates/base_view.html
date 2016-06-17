@@ -44,6 +44,12 @@
         </div><br>
         <!-- end of header -->
 
+        <!-- Display messages -->
+        <div class="container messages">
+            {% include "messages_display.html" %}
+        </div>
+        <!-- End of Display messages -->
+
         <div class="container" id="welcome">
             {% if user.is_authenticated %}
             <span>Welcome, <b>{{user.username}}</b></span>
