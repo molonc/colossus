@@ -2,6 +2,39 @@
     background-color: #F5F5F5;
 }
 
+.header {
+    background-color:#424242;
+}
+
+.subheader {
+    background-color: #DCE775;
+    color: #212121;
+    margin-bottom: 5px;
+    padding-left: 5px;
+}
+
+#welcome {
+    color: #33691E;
+    text-align:right;
+}
+
+h4 {
+    color: #5D4037;
+    /*font-style: italic;*/
+}
+
+legend {
+    color:#5D4037;
+}
+
+td, th {
+    padding:4px;
+}
+
+a:hover {
+    color: #FF5722;
+}
+
 .left-inner-addon {
     position: relative;
 }
@@ -31,27 +64,6 @@
     pointer-events: none;
 }
 
-h4 {
-    color: #5D4037;
-    font-style: italic;
-}
-
-td, th {
-    padding:4px;
-}
-
-a:hover {
-    color: #FF5722;
-}
-
-#footer {
-    clear: both;
-    position: relative;
-    z-index: 10;
-    height: 3em;
-    margin-top: -3em;
-}
-
 .errorlist {
     color:red;
     font-style: italic;
@@ -62,13 +74,6 @@ a:hover {
     margin-bottom: 5px;
     color: #616161;
     font-size: 12px;
-}
-
-.header {
-    background-color: #DCE775;
-    color: #212121;
-    margin-bottom: 5px;
-    padding-left: 5px;
 }
 
 /* Login styles */
@@ -93,6 +98,10 @@ a:hover {
 
 /* end of Login styles*/
 
-#welcome {
-    color: #33691E;
+#footer {
+    clear: both;
+    position: relative;
+    z-index: 10;
+    height: 3em;
+    margin-top: -3em;
 }

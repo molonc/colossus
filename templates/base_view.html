@@ -24,46 +24,39 @@
     </head>
     <body>
         <!-- Header -->
-        <div class="container-fluid" style="background-color:#424242;">
+        <div class="container-fluid header">
             <div class="navbar-header">
                 <a class="navbar-brand" style="color:white;" href="{% url 'index' %}"><i class="fa fa-home" aria-hidden="true"></i> Single Cell Database (<i>development version</i>)</a>
             </div>
 
 
             <!-- Search input box -->
-            <div id="navbar" class="navbar-collapse collapse" data-toggle="tooltip">
-            <form id="search-form" name="search-form" class="navbar-form navbar-right" action="{% url 'search' %}">
+            <div class="navbar-collapse collapse" data-toggle="tooltip">
+            <form name="search-form" class="navbar-form navbar-right" action="{% url 'search' %}">
                 <div class="right-inner-addon">
                     <i class="icon-search"></i>
-                    <input type="text" id="search" name="query_str" class="form-control" placeholder="Search..." />
+                    <input type="text" name="query_str" class="form-control" placeholder="Search..." />
                 </div>
             </form>
             </div>
             <!-- end of Search input box -->
 
-            <!-- Username input box -->
-<!--              <div class="left-inner-addon ">
-                <i class="icon-user"></i>
-                <input type="text" class="form-control" placeholder="Username" />
-            </div>
- -->            <!-- end of Username input box -->
-
         </div><br>
         <!-- end of header -->
 
-        <div class="container" style="text-align:right;">
+        <div class="container" id="welcome">
             {% if user.is_authenticated %}
-            <span id="welcome">Welcome, <b>{{user.username}}</b></span>
+            <span>Welcome, <b>{{user.username}}</b></span>
             <span> / </span>
-            <a href="{% url 'logout' %}">logout</a>
+            <a href="{% url 'logout' %}">Logout</a>
             {% else %}
-            <a href="{% url 'login' %}">login</a>
+            <a href="{% url 'login' %}">Login</a>
             {% endif %}
         </div>
 
         <!-- Page title -->
-        <div class="container header">
-            <h2 style="float:left;">{% block title %}Title{% endblock %}</h2>
+        <div class="container subheader">
+            <h2>{% block title %}Title{% endblock %}</h2>
         </div>
         <!-- end of page title -->
 
