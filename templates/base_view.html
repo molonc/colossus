@@ -51,8 +51,14 @@
         </div><br>
         <!-- end of header -->
 
-        <div class="container">
-            <a href="{% url 'logout' %}" style="float:right;">logout</a>
+        <div class="container" style="text-align:right;">
+            {% if user.is_authenticated %}
+            <span id="welcome">Welcome, <b>{{user.username}}</b></span>
+            <span> / </span>
+            <a href="{% url 'logout' %}">logout</a>
+            {% else %}
+            <a href="{% url 'login' %}">login</a>
+            {% endif %}
         </div>
 
         <!-- Page title -->
