@@ -54,9 +54,9 @@
             {% if user.is_authenticated %}
             <span>Welcome, <b>{{user.username}}</b></span>
             <span> / </span>
-            <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'account:logout' %}">Logout</a>
             {% else %}
-            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'account:login' %}">Login</a>
             {% endif %}
         </div>
 

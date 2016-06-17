@@ -14,9 +14,9 @@
           </div>
           <div class="modal-body">
               {% if next %}
-              <form action="{% url 'login' %}?next={{next}}" method="post" >
+              <form action="{% url 'account:login' %}?next={{next}}" method="post" >
               {%else%}
-              <form action="{% url 'login' %}" method="POST">
+              <form action="{% url 'account:login' %}" method="POST">
               {% endif %}
                 {% csrf_token %}
                 <div class="form-group">

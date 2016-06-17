@@ -21,14 +21,11 @@ Created on May 16, 2016
 from django.conf.urls import url, include
 from django.contrib import admin
 from core import views 
-# from account import views as account_views
 
 urlpatterns = [
     url(r'^$', views.index_view, name='index'),    
     url(r'^admin/', admin.site.urls),
     url(r'^search/', views.search_view, name='search'),
-    url(r'^login/', views.login_view, name='login'),
-    url(r'^logout/', views.logout_view, name='logout'),
     url(r'^apps/core/', include('core.urls')),
     url(r'^apps/account/', include('account.urls')),
 ]
