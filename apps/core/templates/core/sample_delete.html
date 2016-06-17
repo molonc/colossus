@@ -11,6 +11,7 @@ Delete Sample
     <form action="{% url 'core:sample_delete' pk=pk %}" method="POST">
     	{% csrf_token %}
         <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Delete">
+        <a class="btn btn-default btn-sm" href="{% url 'core:sample_list' %}">Cancel</a>
     </form>
 </div>
 {% endblock %}
