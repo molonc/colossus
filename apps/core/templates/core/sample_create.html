@@ -10,7 +10,7 @@ Create Sample
     <form action="{% url 'core:sample_create' %}" method="POST">
         {% csrf_token %}
         <fieldset>
-            <legend style="color:#5D4037">Sample Information</legend>
+            <legend>Sample Information</legend>
             <table class="table-condensed">
                 <thead>
                 {{form}}
@@ -18,7 +18,7 @@ Create Sample
             </table>
          </fieldset><br>
          <fieldset>
-            <legend style="color:#5D4037">Additional Sample Information</legend>
+            <legend>Additional Sample Information</legend>
             <table class="table-condensed">
                 <thead>
                 {{formset}}
