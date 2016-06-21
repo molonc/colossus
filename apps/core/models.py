@@ -157,11 +157,11 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         )
 
     ## choices 
-    disease_condition_health_status_choices = (
-        ('H','Healthy'),
-        ('C','Cystic Fibrosis'),
-        ('B','Breast Cancer'),
-        )
+    # disease_condition_health_status_choices = (
+    #     ('H','Healthy'),
+    #     ('C','Cystic Fibrosis'),
+    #     ('B','Breast Cancer'),
+    #     )
 
     # index_read_type_choices = (
     #     ('on_3rd_read','On 3rd (index-specific) read'),
@@ -208,7 +208,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     ## fields
     disease_condition_health_status = create_chrfield(
         "Disease Condition/Health Status",
-        choices=disease_condition_health_status_choices,
+        # choices=disease_condition_health_status_choices,
         )
     sex = create_chrfield(
         "Sex",
@@ -403,10 +403,14 @@ class LibrarySampleDetail(models.Model, FieldValue):
     original_storage_temperature = create_intfield(
         "Original storage temperature (C)",
         )
-    passage_of_cell_line  = create_intfield("Passage of cell line")
-    sample_notes = create_textfield("Sample notes")
+    passage_of_cell_line  = create_intfield("Passage")
+    sample_notes = create_textfield(
+        "Sample notes",
+        max_length=1000
+        )
     sample_preparation_method = create_textfield(
-        "Sample preparation method"
+        "Sample preparation method",
+        max_length=1000
         )
     sample_preservation_method = create_chrfield("Sample preservation method")
 
@@ -451,7 +455,10 @@ class LibraryConstructionInformation(models.Model, FieldValue):
         "Library Type",
         default="genome"
         )
-    library_notes = create_textfield("Library notes")
+    library_notes = create_textfield(
+        "Library notes",
+        max_length=1000
+        )
     library_prep_date = models.DateField(
         "Library prep date",
         null=True,
@@ -461,7 +468,10 @@ class LibraryConstructionInformation(models.Model, FieldValue):
         "Number of PCR cycles",
         default=11
         )
-    protocol = create_textfield("Protocol")
+    protocol = create_textfield(
+        "Protocol",
+        max_length=1000
+        )
     sample_spot_date = models.DateField(
         "Sample spot date",
         null=True,
@@ -627,7 +637,10 @@ class SequencingDetail(models.Model, FieldValue):
     flow_cell_id = create_chrfield("Flow cell ID")
     gsc_library_id = create_chrfield("GSC library ID")
     lane_id = create_chrfield("Lane ID")
-    path_to_archive = create_chrfield("Path to archive")
+    path_to_archive = create_chrfield(
+        "Path to archive",
+        max_length=150
+        )
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
         "Sequencing center",

@@ -48,6 +48,7 @@ class SampleForm(ModelForm):
         help_texts = {
             'sample_id': ('Sequencing ID (usually SA ID).'),
             'anonymous_patient_id': ('Original/clinical patient ID.'),
+            'xenograft_biopsy_date': ('yyyy-mm-dd.')
             }
         labels = {
             'sample_id': ('*Sample ID'),
@@ -67,6 +68,9 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     AdditionalSampleInformation,
     # exclude = ['delete'],
     fields = "__all__",
+    help_texts = {
+        'patient_biopsy_date': ('yyyy-mm-dd.')
+    }
     # can_delete = True,
     )
 
@@ -122,8 +126,12 @@ LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     Library,
     LibraryConstructionInformation,
     # exclude = ['delete'],
-    fields = "__all__"
-        )
+    fields = "__all__",
+    help_texts = {
+        'library_prep_date': ('yyyy-mm-dd.'),
+        'sample_spot_date': ('yyyy-mm-dd.')
+    }
+    )
 
 LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     Library,
@@ -152,6 +160,7 @@ class SequencingForm(ModelForm):
         exclude = ['pool_id']
         help_texts = {
             'library': ('Select a library.'),
+            'submission_date': ('yyyy-mm-dd.')
             }
         labels = {
             'library': ('*Library'),
