@@ -11,8 +11,8 @@ Edit Project
         {% csrf_token %}
         <table class="table-condensed">
         {{form}}
-        </table>
-        <input class="btn btn-primary btn-sm" type="submit" name="update" value="update">
+        </table><br>
+        <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
         <a class="btn btn-default btn-sm" href="{% url 'core:project_list' %}">Cancel</a>
     </form><br>
 </div>
