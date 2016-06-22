@@ -1,11 +1,20 @@
 {% if messages %}
-    <div class='messages'>
-
-    <ul class="messages">
+<!--     <div class='messages'>
+ -->
+    <ul class="messages" style="list-style: none;">
     {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{% if "html_safe" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}</li>
+    <li class="{{ message.tags }}">
+        {% if "success" in message.tags %}
+        <i class="fa fa-check" aria-hidden="true"></i>
+        {% elif "warning" in message.tags %}
+        <i class="fa fa-exclamation" aria-hidden="true"></i>
+        {% elif "error" in message.tags %}
+        <i class="fa fa-times" aria-hidden="true"></i>
+        {% endif %}
+        {{message}}
+    </li>
     {% endfor %}
     </ul>
 
-    </div>
+    <!-- </div> -->
 {% endif %}

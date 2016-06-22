@@ -18,10 +18,32 @@
     text-align:right;
 }
 
-.messages {
+/* Messages styles */
+.success {
     color: #33691E;
     font-style: italic;
+    background-color: #DCEDC8;
+    border: solid 1px #33691E;
+    padding: 5px;
 }
+
+.warning {
+    color: #D84315;
+    font-style: italic;
+    background-color: #FFE0B2;
+    border: solid 1px #D84315;
+    padding: 5px;
+}
+
+.error {
+    color: #D32F2F;
+    font-style: italic;
+    background-color: #FFCDD2;
+    border: solid 1px #D32F2F;
+    padding: 5px;
+}
+
+/* end of Messages styles*/
 
 h4 {
     color: #5D4037;
@@ -70,7 +92,7 @@ a:hover {
 }
 
 .errorlist {
-    color:red;
+    color:#D32F2F;
     font-style: italic;
 }
 
