@@ -8,24 +8,14 @@ Sample Details
 {% block body %}
 <!-- Meta Information -->
 <div class="container" style="background-color:#FFF3E0;">
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for field in sample.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for value in sample.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        {% for field, value in sample.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div><br>
 <!-- end of Meta Information -->
     
@@ -33,24 +23,14 @@ Sample Details
 <div class="container">
     <h4>Additional Sample Information</h4>
     {% if sample.has_additional_sample_information %}
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for field in sample.additionalsampleinformation.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for value in sample.additionalsampleinformation.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        {% for field, value in sample.additionalsampleinformation.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
     {% else %}
     <h5><i class="text-warning">There is no additional sample information for this sample!</i></h5>
     {% endif %}

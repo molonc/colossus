@@ -8,26 +8,18 @@ Sequencing Details
 {% block body %}
 <!-- Meta Information -->
 <div class="container" style="background-color:#FFF3E0;">
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                <tr><b>Library:</b></tr><br>
-                {% for field in sequencing.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                <tr><a href="{{sequencing.library.get_absolute_url}}">{{sequencing.library}}</a></tr><br>
-                {% for value in sequencing.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        <tr>
+            <th id="thid">Library:</th>
+            <td id="tdid"><a href="{{sequencing.library.get_absolute_url}}">{{sequencing.library}}</a></td>
+        </tr>
+        {% for field, value in sequencing.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div><br>
 <!-- end of Meta Information -->
     
@@ -35,24 +27,14 @@ Sequencing Details
 <div class="container">
     <h4>Sequencing Details</h4>
     {% if sequencing.has_sequencing_detail %}
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for field in sequencing.sequencingdetail.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for value in sequencing.sequencingdetail.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        {% for field, value in sequencing.sequencingdetail.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
     {% else %}
     <h5><i class="text-warning">There is no sequencing details for this library!</i></h5>
     {% endif %}

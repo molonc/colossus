@@ -8,28 +8,20 @@ Library Details
 {% block body %}
 <!-- Meta Information -->
 <div class="container" style="background-color:#FFF3E0;">
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                <tr><b>Sample:</b></tr><br>
-                {% for field in library.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-                <tr><b>Project:</b></tr><br>
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                <tr><a href="{{library.sample.get_absolute_url}}">{{library.sample}}</a></tr><br>
-                {% for value in library.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-                <tr>{{library.projects.all|join:", "}}</tr><br>
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        <tr>
+            <th id="thid"> Sample:</th>
+            <td id="tdid"><a href="{{library.sample.get_absolute_url}}">{{library.sample}}</a></td></tr>
+        {% for field, value in library.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th id="thid">Project:</th>
+            <td id="tdid">{{library.projects.all|join:", "}}</td>
+    </table>
 </div><br>
 <!-- end of Meta Information -->
         
@@ -37,24 +29,14 @@ Library Details
 <div class="container">
     <h4>Library Sample Detail</h4>
     {% if library.has_library_sample_detail %}
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for field in library.librarysampledetail.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for value in library.librarysampledetail.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        {% for field, value in library.librarysampledetail.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
     {% else %}
     <h5><i class="text-warning">There is no library sample detail for this library!</i></h5>
     {% endif %}
@@ -65,24 +47,14 @@ Library Details
 <div class="container">
     <h4>Library Construction Information</h4>
     {% if library.has_library_construction_information %}
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for field in library.libraryconstructioninformation.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for value in library.libraryconstructioninformation.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        {% for field, value in library.libraryconstructioninformation.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
     {% else %}
     <h5><i class="text-warning">There is no library construction information for this library!</i></h5>
     {% endif %}
@@ -93,24 +65,14 @@ Library Details
 <div class="container">
     <h4>Library Quantification and Storage</h4>
     {% if library.has_library_quantification_and_storage %}
-    <div class="container" style="float:left; width:35%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for field in library.libraryquantificationandstorage.get_fields %}
-                <tr><b>{{field}}:</b></tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container" style="float:left; width:65%; padding:0">
-        <table class="table-striped">
-            <tbody>
-                {% for value in library.libraryquantificationandstorage.get_values %}
-                <tr>{{value}}</tr><br>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-condensed">
+        {% for field, value in library.libraryquantificationandstorage.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
     {% else %}
     <h5><i class="text-warning">There is no library quantification and storage for this library!</i></h5>
     {% endif %}
