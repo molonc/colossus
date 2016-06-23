@@ -5,6 +5,7 @@ Created on May 16, 2016
 """
 
 from __future__ import unicode_literals
+from collections import OrderedDict
 
 #============================
 # Django imports
@@ -21,6 +22,26 @@ from taggit.managers import TaggableManager
 #============================
 # helpers
 #----------------------------
+gsc_required_fields = [
+    "taxonomy_id",
+    "library_type",
+    "library_construction_method",
+    "quantification_method",
+    "dna_concentration_nm",
+    "storage_medium",
+    "size_range",
+    "average_size",
+    ]
+
+library_states = [
+    "not_ready",
+    "submission_ready",
+    "submitted",
+    "sequenced",
+    "resubmitted",
+    ]
+
+
 def create_chrfield(name, max_length=50, blank=True, null=True, **kwargs):
     """wrap models.CharField for ease of use."""
     return models.CharField(
@@ -30,7 +51,6 @@ def create_chrfield(name, max_length=50, blank=True, null=True, **kwargs):
         null=null,
         **kwargs
         )
-
 
 
 def create_textfield(name, max_length=200, blank=True, null=True, **kwargs):
@@ -57,7 +77,7 @@ def create_intfield(name, blank=True, null=True, **kwargs):
 class FieldValue(object):
     fields_to_exclude = ['ID']
     values_to_exclude = ['id']
-    model = models.Model
+    # model = models.Model
 
     def get_fields(self):
         """get verbose names of all the fields."""
@@ -77,6 +97,21 @@ class FieldValue(object):
                 else:
                     values.append(getattr(self, f))
         return values
+
+    def get_field_values(self):
+        """return a dict of key:values."""
+        res = OrderedDict()
+        for field in self._meta.fields:
+            field_verbose_name = field.verbose_name
+            field_name = field.name
+            if field_verbose_name not in self.fields_to_exclude:
+                a = "get_%s_display" % (field_name)
+                if hasattr(self, a):
+                    value = getattr(self, a)()
+                else:
+                    value = getattr(self, field_name)
+                res[field_verbose_name] = value
+        return res
 
 
 #============================
