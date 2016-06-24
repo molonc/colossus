@@ -6,7 +6,7 @@ Create Sample
 {% endblock %}
 
 {% block body %}
-<div class="container" style="background-color:#F5F5F5;">
+<div class="container graybg">
     <form action="{% url 'core:sample_create' %}" method="POST">
         {% csrf_token %}
         <fieldset>

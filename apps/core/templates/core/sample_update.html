@@ -6,11 +6,11 @@ Edit Sample
 {% endblock %}
 
 {% block body %}
-<div class="container" style="background-color:#F5F5F5;">
+<div class="container graybg">
 	<form action="{% url 'core:sample_update' pk=pk %}" method="POST">
 		{% csrf_token %}
          <fieldset>
-            <legend style="color:#5D4037">Sample Information</legend>
+            <legend>Sample Information</legend>
             <table class="table-condensed">
                 <thead>
                 {{form}}
@@ -18,7 +18,7 @@ Edit Sample
             </table>
          </fieldset>
          <fieldset>
-            <legend style="color:#5D4037">Additional Sample Information</legend>
+            <legend>Additional Sample Information</legend>
             <table class="table-condensed">
                 <thead>
                 {{formset}}

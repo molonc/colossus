@@ -6,11 +6,11 @@ Create Sequencing
 {% endblock %}
 
 {% block body %}
-<div class="container" style="background-color:#F5F5F5;">
+<div class="container graybg">
     <form action="{% url 'core:sequencing_create' %}" method="POST">
         {% csrf_token %}
         <fieldset>
-            <legend style="color:#5D4037">Sequencing Information</legend>
+            <legend>Sequencing Information</legend>
             <table class="table-condensed">
                 <thead>
                 {{form}}
@@ -18,7 +18,7 @@ Create Sequencing
             </table>
          </fieldset><br>
         <fieldset>
-            <legend style="color:#5D4037">Sequencing Details</legend>
+            <legend>Sequencing Details</legend>
             <table class="table-condensed">
                 <thead>
                 {{seqdetail_formset}}

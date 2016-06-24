@@ -6,11 +6,11 @@ Create Library
 {% endblock %}
 
 {% block body %}
-<div class="container" style="background-color:#F5F5F5;">
+<div class="container graybg">
     <form action="{% url 'core:library_create' %}" method="POST", enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset>
-            <legend style="color:#5D4037">Library Information</legend>
+            <legend>Library Information</legend>
             <table class="table-condensed">
                 <thead>
                 {% for field in form %} 
@@ -48,7 +48,7 @@ Create Library
             </table>
          </fieldset><br>
          <fieldset>
-            <legend style="color:#5D4037">Sublibrary Information</legend>
+            <legend>Sublibrary Information</legend>
             Select a SmartChipApp result file to upload:
             <table class="table-condensed">
                 <thead>
@@ -57,7 +57,7 @@ Create Library
             </table>
          </fieldset><br>
          <fieldset>
-            <legend style="color:#5D4037">Library Sample Details</legend>
+            <legend>Library Sample Details</legend>
             <table class="table-condensed">
                 <thead>
                 {{libdetail_formset}}
@@ -65,7 +65,7 @@ Create Library
             </table>
          </fieldset><br>
          <fieldset>
-            <legend style="color:#5D4037">Library Construction Information</legend>
+            <legend>Library Construction Information</legend>
             <table class="table-condensed">
                 <thead>
                 {{libcons_formset}}
@@ -73,7 +73,7 @@ Create Library
             </table>
          </fieldset><br>
          <fieldset>
-            <legend style="color:#5D4037">Library Quantification and Storage</legend>
+            <legend>Library Quantification and Storage</legend>
             <table class="table-condensed">
                 <thead>
                 {{libqs_formset}}

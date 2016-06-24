@@ -6,7 +6,7 @@ Edit Project
 {% endblock %}
 
 {% block body %}
-<div class="container" style="background-color:#F5F5F5;">
+<div class="container graybg">
     <form action="{% url 'core:project_update' pk=pk %}" method="POST">
         {% csrf_token %}
         <table class="table-condensed">
