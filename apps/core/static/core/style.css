@@ -67,12 +67,13 @@ td, th {
 }
 
 .emph {
-    font-size: 15px;
+    font-size: 13px;
     color: #FF3D00;
     background-color: #FFF3E0;
-    border: solid 1px #FF3D00;
+    border: solid 1px #757575;
     padding-left: 5px;
     padding-right: 5px;
+    font-style: normal;
 }
 
 .graybg {

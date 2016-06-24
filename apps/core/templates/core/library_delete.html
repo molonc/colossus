@@ -13,9 +13,9 @@ Delete Library
     {% for sequencing in library.sequencing_set.all %}
     <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
     {% endfor %}
-    </ul>
+    </ul><br>
     {% else %}
-    <h5><i class="text-warning">There are no related items to this object!</i></h5>
+    <h5><i class="text-warning">There are no related items to this object!</i></h5><br>
     {% endif %}
     <form action="{% url 'core:library_delete' pk=pk %}" method="POST">
         {% csrf_token %}

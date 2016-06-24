@@ -22,7 +22,7 @@ Delete Sample
     {% endfor %}
     </ul><br>
     {% else %}
-    <h5><i class="text-warning">There are no related items to this object!</i></h5>
+    <h5><i class="text-warning">There are no related items to this object!</i></h5><br>
     {% endif %}
     <form action="{% url 'core:sample_delete' pk=pk %}" method="POST">
         {% csrf_token %}
