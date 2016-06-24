@@ -22,24 +22,13 @@ from taggit.managers import TaggableManager
 #============================
 # helpers
 #----------------------------
-gsc_required_fields = [
-    "taxonomy_id",
-    "library_type",
-    "library_construction_method",
-    "quantification_method",
-    "dna_concentration_nm",
-    "storage_medium",
-    "size_range",
-    "average_size",
-    ]
-
-library_states = [
-    "not_ready",
-    "submission_ready",
-    "submitted",
-    "sequenced",
-    "resubmitted",
-    ]
+# library_states = [
+#     "not_ready",
+#     "submission_ready",
+#     "submitted",
+#     "sequenced",
+#     "resubmitted",
+#     ]
 
 
 def create_chrfield(name, max_length=50, blank=True, null=True, **kwargs):
@@ -114,6 +103,96 @@ class FieldValue(object):
         return res
 
 
+class LibraryAssistant(object):
+    gsc_required_fields = [
+        (
+            "sample",
+            "Sample",
+            "taxonomy_id",
+            "Taxonomy ID",
+            ),
+        (
+            "libraryconstructioninformation",
+            "Library Construction Information",
+            "library_type",
+            "Library type",
+            ),
+        (
+            "libraryconstructioninformation",
+            "Library Construction Information",
+            "library_construction_method",
+            "Library construction method",
+            ),
+        (
+            "libraryquantificationandstorage",
+            "Library Quantification and Storage",
+            "quantification_method",
+            "Quantification method",
+            ),
+        (
+            "libraryquantificationandstorage",
+            "Library Quantification and Storage",
+            "dna_concentration_nm",
+            "DNA concentration (nM)",
+            ),
+        (
+            "libraryquantificationandstorage",
+            "Library Quantification and Storage",
+            "storage_medium",
+            "Storage medium",
+            ),
+        (
+            "libraryquantificationandstorage",
+            "Library Quantification and Storage",
+            "size_range",
+            "Size range",
+            ),
+        (
+            "libraryquantificationandstorage",
+            "Library Quantification and Storage",
+            "average_size",
+            "Average size",
+            ),
+        ]
+
+    def has_library_sample_detail(self):
+        return hasattr(self,
+            'librarysampledetail')
+
+    def has_library_construction_information(self):
+        return hasattr(self,
+            'libraryconstructioninformation'
+            )
+
+    def has_library_quantification_and_storage(self):
+        return hasattr(self,
+            'libraryquantificationandstorage'
+            )
+
+    def get_missing_gsc_required_fields(self):
+        missing_required_fields = []
+        get_value = lambda related_obj, field: getattr(
+            getattr(self, related_obj), field
+            )
+        for i in self.gsc_required_fields:
+            related_obj = i[0]
+            obj_verbose_name = i[1]
+            field = i[2]
+            field_verbose_name = i[3]
+            try:
+                value = get_value(related_obj, field)
+            ## self might not have the related_obj yet.
+            except:
+                missing_required_fields.append(
+                    (obj_verbose_name, field_verbose_name)
+                    )
+            if not value:
+                missing_required_fields.append(
+                    (obj_verbose_name, field_verbose_name)
+                    )
+        return missing_required_fields
+
+
 #============================
 # Sample models
 #----------------------------
@@ -140,11 +219,11 @@ class Sample(models.Model, FieldValue):
         default="9606"
         )
     sample_type = create_chrfield(
-        "Sample Type",
+        "Sample type",
         choices=sample_type_choices
         )
-    anonymous_patient_id = create_chrfield("Anonymous Patient ID")
-    cell_line_id = create_chrfield("Cell Line ID")
+    anonymous_patient_id = create_chrfield("Anonymous patient ID")
+    cell_line_id = create_chrfield("Cell line ID")
     xenograft_id = create_chrfield("Xenograft ID")
     xenograft_recipient_taxonomy_id = create_chrfield(
         "Xenograft recipient taxonomy ID",
@@ -242,7 +321,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
 
     ## fields
     disease_condition_health_status = create_chrfield(
-        "Disease Condition/Health Status",
+        "Disease condition/health status",
         # choices=disease_condition_health_status_choices,
         )
     sex = create_chrfield(
@@ -254,30 +333,30 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         null=True,
         blank=True,
         )
-    anatomic_site = create_chrfield("Anatomic Site")
-    anatomic_sub_site = create_chrfield("Anatomic Sub-Site")
-    developmental_stage = create_chrfield("Developmental Stage")
+    anatomic_site = create_chrfield("Anatomic site")
+    anatomic_sub_site = create_chrfield("Anatomic sub-site")
+    developmental_stage = create_chrfield("Developmental stage")
     tissue_type = create_chrfield(
-        "Tissue Type",
+        "Tissue type",
         choices=tissue_type_choises
         )
-    cell_type = create_chrfield("Cell Type")
-    pathology_disease_name = create_chrfield("Pathology/Disease Name")
+    cell_type = create_chrfield("Cell type")
+    pathology_disease_name = create_chrfield("Pathology/disease name")
     additional_pathology_info = create_chrfield(
-        "Additional Pathology Information"
+        "Additional pathology information"
         )
     grade = create_chrfield("Grade")
     stage = create_chrfield("Stage")
     tumour_content = create_chrfield("Tumor content (%)")
     pathology_occurrence = create_chrfield(
-        "Pathology Occurrence",
+        "Pathology occurrence",
         choices=pathology_occurrence_choices
         )
     treatment_status = create_chrfield(
-        "Treatment Status",
+        "Treatment status",
         choices=treatment_status_choices
         )
-    family_information = create_chrfield("Family Information")
+    family_information = create_chrfield("Family information")
 
     def __str__(self):
         res = '_'.join([
@@ -290,7 +369,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
 #============================
 # Library models
 #----------------------------
-class Library(models.Model, FieldValue):
+class Library(models.Model, FieldValue, LibraryAssistant):
 
     """
     Library contains several Cell objects.
@@ -315,23 +394,9 @@ class Library(models.Model, FieldValue):
 
     # sample_id = create_chrfield("Sample ID", blank=False)
     pool_id = create_chrfield("Pool ID", blank=False)
-    jira_ticket = create_chrfield("Jira Ticket", blank=False)
-    num_sublibraries = create_intfield("Number of Sublibraries", default=0)
+    jira_ticket = create_chrfield("Jira ticket", blank=False)
+    num_sublibraries = create_intfield("Number of sublibraries", default=0)
     description = create_textfield("Description")
-
-    def has_library_sample_detail(self):
-        return hasattr(self,
-            'librarysampledetail')
-
-    def has_library_construction_information(self):
-        return hasattr(self,
-            'libraryconstructioninformation'
-            )
-
-    def has_library_quantification_and_storage(self):
-        return hasattr(self,
-            'libraryquantificationandstorage'
-            )
 
     def get_absolute_url(self):
         return reverse("core:library_detail", kwargs={"pk": self.pk})
@@ -340,7 +405,7 @@ class Library(models.Model, FieldValue):
         return '_'.join([self.sample.sample_id, self.pool_id])
 
     def __str__(self):
-        return self.get_library_id()
+        return 'LIB_' + self.get_library_id()
 
 
 class SublibraryInformation(models.Model, FieldValue):
@@ -483,11 +548,11 @@ class LibraryConstructionInformation(models.Model, FieldValue):
         default="W"
         )
     library_construction_method = create_chrfield(
-        "Library Construction Method",
+        "Library construction method",
         default="Nextera (Illumina)"
         )
     library_type = create_chrfield(
-        "Library Type",
+        "Library type",
         default="genome"
         )
     library_notes = create_textfield(
@@ -600,15 +665,15 @@ class Sequencing(models.Model, FieldValue):
         default="fastq"
         )
     index_read_type = create_chrfield(
-        "Index Read Type",
+        "Index read type",
         default="on 2nd and 3rd index-specific read"
         )
     index_read1_length = create_intfield(
-        "Index Read1 Length",
+        "Index read1 length",
         default=6
         )
     index_read2_length = create_intfield(
-        "Index Read2 Length",
+        "Index read2 length",
         default=6
         )
     read_type = create_chrfield(
@@ -617,14 +682,14 @@ class Sequencing(models.Model, FieldValue):
         default="P"
         )
     read1_length = create_intfield(
-        "Read1 Length",
+        "Read1 length",
         default=125,
         )
     read2_length = create_intfield(
-        "Read2 Length",
+        "Read2 length",
         default=125
         )
-    sequencing_goal = create_chrfield("Sequencing Goal (# lanes)")
+    sequencing_goal = create_chrfield("Sequencing goal (# lanes)")
     sequencing_instrument = create_chrfield(
         "Sequencing instrument",
         choices=sequencing_instrument_choices,
@@ -648,7 +713,7 @@ class Sequencing(models.Model, FieldValue):
         return reverse("core:sequencing_detail", kwargs={"pk": self.pk})
 
     def __str__(self):
-        return self.library.get_library_id()
+        return 'SEQ_' + self.library.get_library_id()
 
 
 class SequencingDetail(models.Model, FieldValue):
