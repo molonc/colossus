@@ -6,12 +6,28 @@ Delete Sample
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <h3>Do you want to detete sample <i>{{sample.sample_id}}</i>?</h3>
+<div class="container graybg">
+    <h5>Are you sure you want to detete sample <i class="emph">{{sample.sample_id}}</i>? All of the following related items will be deleted too:</h5>
+    {% if sample.library_set.all %}
+    <ul style="list-style-type:square">
+    {% for library in sample.library_set.all %}
+        <li><a href="{{library.get_absolute_url}}">{{library}}</a></li>
+        {% if library.sequencing_set.all %}
+        <ul style="list-style-type:disc">
+        {% for sequencing in library.sequencing_set.all %}
+        <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    {% endfor %}
+    </ul><br>
+    {% else %}
+    <h5><i class="text-warning">There are no related items to this object!</i></h5>
+    {% endif %}
     <form action="{% url 'core:sample_delete' pk=pk %}" method="POST">
-    	{% csrf_token %}
-        <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Delete">
+        {% csrf_token %}
+        <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
         <a class="btn btn-default btn-sm" href="{% url 'core:sample_list' %}">Cancel</a>
-    </form>
+    </form><br>
 </div>
 {% endblock %}

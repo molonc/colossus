@@ -66,6 +66,18 @@ td, th {
     width: 70%;
 }
 
+.emph {
+    font-size: 15px;
+    color: #FF3D00;
+    background-color: #FFF3E0;
+    border: solid 1px #FF3D00;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.graybg {
+    background-color: #F5F5F5;
+}
 a:hover {
     color: #FF5722;
 }
