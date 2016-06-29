@@ -13,7 +13,6 @@ Edit Library
             <legend>Library Information</legend>
             <table class="table-condensed">
                 <thead>
-                <!-- {{form}} -->
                 {% for field in form %} 
                 <tr>
                     {% if field.name == "projects" %}
@@ -31,9 +30,6 @@ Edit Library
                         {% endif %}
                         {% endfor %}
                     </select>
-                    <!-- {% if field.help_text %}
-                        <p class="helptext">{{ field.help_text }}</p>
-                    {% endif %} -->
                     </td>
                     {% else %}
                     <th>
@@ -49,6 +45,23 @@ Edit Library
                     {% endif %}
                 </tr>
                 {% endfor %}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend>Sublibrary Information</legend>
+            Select a SmartChipApp result file to upload:
+            <table class="table-condensed">
+                <thead>
+                {{sublib_form}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend>Library Sample Details</legend>
+            <table class="table-condensed">
+                <thead>
+                {{libdetail_formset}}
                 </thead>
             </table>
          </fieldset><br>
