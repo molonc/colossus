@@ -109,10 +109,12 @@ def sample_create(request):
             if additional_info_formset.is_valid():
                 additional_info_formset.save()
 
-            msg = "Successfully created Sample."
+            msg = "Successfully created the Sample."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
+            msg = "Failed to create the sample. Please fix the errors below."
+            messages.error(request, msg)
             formset = AdditionalSampleInfoInlineFormset()
     
     else:
@@ -143,10 +145,12 @@ def sample_update(request, pk):
             if additional_info_formset.is_valid():
                 additional_info_formset.save()
 
-            msg = "Successfully updated Sample."
+            msg = "Successfully updated the Sample."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
+            msg = "Failed to update the sample. Please fix the errors below."
+            messages.error(request, msg)
             formset = AdditionalSampleInfoInlineFormset(instance=sample)
 
     else:
@@ -168,9 +172,9 @@ def sample_delete(request, pk):
 
     if request.method == 'POST':
         sample.delete()
-        msg = "Successfully deleted Sample."
+        msg = "Successfully deleted the Sample."
         messages.success(request, msg)
-        return HttpResponseRedirect(reverse("core:sample_list"))    
+        return HttpResponseRedirect(reverse('core:sample_list'))
 
     context = {
         'sample': sample,
@@ -263,10 +267,12 @@ def library_create(request):
             if libqs_formset.is_valid():
                 libqs_formset.save()
 
-            msg = "Successfully created Library."
+            msg = "Successfully created the Library."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
+            msg = "Failed to create the library. Please fix the errors below."
+            messages.error(request, msg)
             sublib_form = SublibraryForm()
             libdetail_formset = LibrarySampleDetailInlineFormset()
             libcons_formset = LibraryConstructionInfoInlineFormset()
@@ -338,11 +344,13 @@ def library_update(request, pk):
             if libqs_formset.is_valid():
                 libqs_formset.save()
 
-            msg = "Successfully updated Library."
+            msg = "Successfully updated the Library."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
 
         else:
+            msg = "Failed to update the library. Please fix the errors below."
+            messages.error(request, msg)
             sublib_form = SublibraryForm()
             libdetail_formset = LibrarySampleDetailInlineFormset(
                 instance=library
@@ -389,9 +397,9 @@ def library_delete(request, pk):
 
     if request.method == 'POST':
         library.delete()
-        msg = "Successfully deleted Library."
+        msg = "Successfully deleted the Library."
         messages.success(request, msg)
-        return HttpResponseRedirect(reverse("core:library_list"))    
+        return HttpResponseRedirect(reverse('core:library_list'))
 
     context = {
         'library': library,
@@ -418,9 +426,9 @@ def project_delete(request, pk):
 
     if request.method == 'POST':
         project.delete()
-        msg = "Successfully deleted Project."
+        msg = "Successfully deleted the Project."
         messages.success(request, msg)
-        return HttpResponseRedirect(reverse("core:project_list"))
+        return HttpResponseRedirect(reverse('core:project_list'))
 
     context = {
         'project': project,
@@ -437,9 +445,9 @@ def project_update(request, pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            msg = "Successfully updated Project."
+            msg = "Successfully updated the Project."
             messages.success(request, msg)
-            return HttpResponseRedirect(reverse("core:project_list"))
+            return HttpResponseRedirect(reverse('core:project_list'))
     
     else:
         form = ProjectForm(instance=project)
@@ -484,10 +492,12 @@ def sequencing_create(request):
             if seqdetail_formset.is_valid():
                 seqdetail_formset.save()
 
-            msg = "Successfully created Sequencing."
+            msg = "Successfully created the Sequencing."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
+            msg = "Failed to create the sequencing. Please fix the errors below."
+            messages.error(request, msg)
             seqdetail_formset = SequencingDetailInlineFormset()
     
     else:
@@ -517,10 +527,12 @@ def sequencing_update(request, pk):
             if seqdetail_formset.is_valid():
                 seqdetail_formset.save()
 
-            msg = "Successfully updated Sequencing."
+            msg = "Successfully updated the Sequencing."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
+            msg = "Failed to update the sequencing. Please fix the errors below."
+            messages.error(request, msg)
             seqdetail_formset = SequencingDetailInlineFormset(
                 instance=sequencing
                 )
@@ -548,9 +560,9 @@ def sequencing_delete(request, pk):
 
     if request.method == 'POST':
         sequencing.delete()
-        msg = "Successfully deleted Sequencing."
+        msg = "Successfully deleted the Sequencing."
         messages.success(request, msg)
-        return HttpResponseRedirect(reverse("core:sequencing_list"))    
+        return HttpResponseRedirect(reverse('core:sequencing_list'))
 
     context = {
         'sequencing': sequencing,
@@ -582,4 +594,4 @@ def search_view(request):
     else:
         msg = "Sorry, no match found."
         messages.warning(request, msg)
-        return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse('index'))
