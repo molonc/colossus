@@ -24,7 +24,7 @@
     </head>
     <body>
         <!-- Header -->
-        <nav class="navbar navbar-default" style="background-color:#424242;" >
+        <nav class="navbar navbar-default header" >
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
@@ -61,6 +61,8 @@
         <div class="container" id="welcome">
             {% if user.is_authenticated %}
             <span>Welcome, <b>{{user.username}}</b></span>
+            <span> / </span>
+            <a href="{% url 'account:password_update' %}">Change Password</a>
             <span> / </span>
             <a href="{% url 'account:logout' %}">Logout</a>
             {% else %}
