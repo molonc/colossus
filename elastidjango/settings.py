@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'core.apps.CoreConfig', 
+    'account.apps.AccountConfig', 
     'taggit',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -155,4 +156,4 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "uploads")
 
 # Login url
-LOGIN_URL = '/login/'
+LOGIN_URL = '/apps/account/login/'
