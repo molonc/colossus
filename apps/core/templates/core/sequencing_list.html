@@ -17,6 +17,7 @@ List of Sequencings
                 <tr>
                     <th>Sample ID</th>
                     <th>Pool ID</th>
+                    <th>Submission date</th>
                     <th></th>
                 </tr>
             </thead>
@@ -25,6 +26,7 @@ List of Sequencings
                 <tr>
                     <td><a href="{% url 'core:sequencing_detail' pk=sequencing.pk %}">{{sequencing.library.sample.sample_id}}</a></td>
                     <td>{{sequencing.library.pool_id}}</td>
+                    <td>{{sequencing.submission_date}}</td>
                     <td>
                         <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;" "></i> edit</a>
                         <a href="{% url 'core:sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
