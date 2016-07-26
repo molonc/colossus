@@ -29,7 +29,7 @@ sys.path.append(os.path.join(BASE_DIR, 'apps'))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'bb%@)-1@itqoog@id-s+6)n@b&$2ifp&ns9n66oa2oo8bzn)v0'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -99,11 +99,11 @@ DATABASES = {
     'default': {
         # for older django versions use ".postgresql_psycopg2"
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'singlecell',
-        'USER': 'jtaghiyar',
+        'NAME': '',
+        'USER': '',
         'PASSWORD': '',
         'HOST': '',
-        'PORT': '5432',
+        'PORT': '',
     }
 }
 
