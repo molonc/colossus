@@ -648,6 +648,12 @@ class Sequencing(models.Model, FieldValue):
         ('O','other'),
         )
 
+    sequencing_output_mode_choices = (
+        ('L','Low'),
+        ('M','Medium'),
+        ('H','High'),
+        )
+
     read_type_choices = (
         ('P', 'PET'),
         ('S', 'SET')
@@ -694,6 +700,11 @@ class Sequencing(models.Model, FieldValue):
         "Sequencing instrument",
         choices=sequencing_instrument_choices,
         default="H2500"
+        )
+    sequencing_output_mode = create_chrfield(
+        "Sequencing output mode",
+        choices=sequencing_output_mode_choices,
+        # default="Low"
         )
     short_description_of_submission = create_chrfield(
         "Short description of submission",
