@@ -12,11 +12,17 @@ from .models import LibraryConstructionInformation
 from .models import LibraryQuantificationAndStorage
 from .models import Sequencing, SequencingDetail
 
+## third-party apps
+from simple_history.admin import SimpleHistoryAdmin
+from taggit.models import Tag
+from taggit.admin import TagAdmin
+
+
 ## Sample information
 class AdditionalSampleInformationInline(admin.StackedInline):
     model = AdditionalSampleInformation
 
-class SampleAdmin(admin.ModelAdmin):
+class SampleAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     inlines = [AdditionalSampleInformationInline]
     list_display = ['sample_id', 'sample_type']
     list_filter = ['sample_type']
@@ -37,7 +43,7 @@ class LibraryConstructionInformationInline(admin.StackedInline):
 class LibraryQuantificationAndStorageInline(admin.StackedInline):
     model = LibraryQuantificationAndStorage
 
-class LibraryAdmin(admin.ModelAdmin):
+class LibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     fieldsets = [
       (
         '',
@@ -67,18 +73,28 @@ class LibraryAdmin(admin.ModelAdmin):
 class SequencingDetailInline(admin.StackedInline):
     model = SequencingDetail
 
-class SequencingAdmin(admin.ModelAdmin):
+class SequencingAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     inlines = [SequencingDetailInline]
+
+
+## Tag information (Project information)
+class CustomTagAdmin(SimpleHistoryAdmin, TagAdmin):
+    list_display = ['name', 'slug']
 
 
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(Library, LibraryAdmin)
 admin.site.register(Sequencing, SequencingAdmin)
 
-# extra admin only information
+## extra admin only information
 admin.site.register(AdditionalSampleInformation)
 admin.site.register(SublibraryInformation)
 admin.site.register(LibrarySampleDetail)
 admin.site.register(LibraryConstructionInformation)
 admin.site.register(LibraryQuantificationAndStorage)
 admin.site.register(SequencingDetail)
+
+## register Taggit
+admin.site.unregister(Tag)
+admin.site.register(Tag, CustomTagAdmin)
+

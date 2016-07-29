@@ -17,7 +17,12 @@ from django.db import models
 # 3rd-party app imports
 #----------------------------
 from taggit.managers import TaggableManager
+from taggit.models import Tag
+from simple_history.models import HistoricalRecords
+from simple_history import register
 
+## register taggit for tracking its history
+register(Tag)
 
 #============================
 # helpers
@@ -29,7 +34,6 @@ from taggit.managers import TaggableManager
 #     "sequenced",
 #     "resubmitted",
 #     ]
-
 
 def create_chrfield(name, max_length=50, blank=True, null=True, **kwargs):
     """wrap models.CharField for ease of use."""
@@ -202,6 +206,11 @@ class Sample(models.Model, FieldValue):
     Base class of different sample types.
     """
 
+    ## track history
+    history = HistoricalRecords(
+        table_name='history_sample'
+        )
+
     ## choices
     sample_type_choices = (
         ('P','Patient'),
@@ -262,6 +271,11 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     """
     Additional sample information.
     """
+
+    ## track history
+    # history = HistoricalRecords(
+    #     table_name='history_additional_sample_information'
+    #     )
 
     ## database relationships
     sample = models.OneToOneField(
@@ -378,6 +392,11 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     fields_to_exclude = ['ID', 'Sample']
     values_to_exclude = ['id', 'sample']
 
+    ## track history
+    history = HistoricalRecords(
+        table_name='history_library'
+        )
+
     ## Taggit
     projects = TaggableManager(
         verbose_name="Project",
@@ -417,6 +436,11 @@ class SublibraryInformation(models.Model, FieldValue):
 
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
+
+    ## track history
+    # history = HistoricalRecords(
+    #     table_name='history_sublibrary_information'
+    #     )
 
     ## database relationships
     library = models.ForeignKey(
@@ -472,6 +496,11 @@ class LibrarySampleDetail(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
+    ## track history
+    # history = HistoricalRecords(
+    #     table_name='history_library_sample_detail'
+    #     )
+
     ## database relationships
     library = models.OneToOneField(
         Library,
@@ -523,6 +552,11 @@ class LibraryConstructionInformation(models.Model, FieldValue):
 
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
+
+    ## track history
+    # history = HistoricalRecords(
+    #     table_name='history_library_construction_information'
+    #     )
 
     ## database relationships
     library = models.OneToOneField(
@@ -588,6 +622,11 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
+    ## track history
+    # history = HistoricalRecords(
+    #     table_name='history_library_quantification_and_storage'
+    #     )
+
     ## database relationships
     library = models.OneToOneField(
         Library,
@@ -631,6 +670,11 @@ class Sequencing(models.Model, FieldValue):
 
     fields_to_exclude = ['ID', 'Library', 'Pool ID']
     values_to_exclude = ['id', 'library', 'pool_id']
+
+    ## track history
+    history = HistoricalRecords(
+        table_name='history_sequencing'
+        )
 
     ## database relationships
     library = models.ForeignKey(
@@ -736,6 +780,11 @@ class SequencingDetail(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Sequencing']
     values_to_exclude = ['id', 'sequencing']
 
+    ## track history
+    # history = HistoricalRecords(
+    #     table_name='history_sequencing_detail'
+    #     )
+
     ## database relationships
     sequencing = models.OneToOneField(
         Sequencing,
@@ -758,125 +807,3 @@ class SequencingDetail(models.Model, FieldValue):
         default="BCCAGSC"
         )
     sequencer_notes = create_textfield("Sequencing notes")
-
-
-#============================
-# Project tag model
-#----------------------------
-# class Project(models.Model, FieldValue):
-
-#     """
-#     Project tag.
-#     """
-
-#     ## database relationships
-#     libraries = models.ManyToManyField(
-#         Library,
-#         verbose_name="Library",
-#         related_name="projects"
-#         )
-
-#     ## fields
-#     project_name = create_chrfield("Project")
-
-#     # def get_absolute_url(self):
-#     #     return reverse("core:project_detail", kwargs={"pk": self.pk})
-
-#     def __str__(self):
-#         return self.project_name
-
-
-#============================
-# Other models
-#----------------------------
-# class Patient(models.Model, FieldValue):
-
-#     """
-#     Patient sample type.
-#     """
-
-#     # database relationships
-#     sample = models.ForeignKey(
-#         Sample,
-#         verbose_name="Sample",
-#         on_delete=models.CASCADE
-#         )
-
-#     library = models.OneToOneField(
-#         Library,
-#         verbose_name="Library",
-#         on_delete=models.CASCADE,
-#         null=True,
-#         blank=True
-#         )
-
-#     additional_pathology_info = create_chrfield(
-#         "Additional Pathology Information"
-#         )
-#     pathology_occurrence = create_chrfield("Pathology Occurrence")
-#     pathology_disease_name = create_chrfield("Pathology/Disease Name")
-#     stage = create_chrfield("Stage")
-#     grade = create_chrfield("Grade")
-#     tumour_content = create_chrfield("Tumor content (%)")
-
-#     def __str__(self):
-#         return self.sample.sample_id
-
-
-# class CellLine(models.Model, FieldValue):
-
-#     """
-#     CellLine sample type.
-#     """
-
-#     # database relationships
-#     sample = models.ForeignKey(
-#         Sample,
-#         verbose_name="Sample",
-#         on_delete=models.CASCADE
-#         )
-
-#     additional_pathology_info = create_chrfield(
-#         "Additional Pathology Information"
-#         )
-#     pathology_occurrence = create_chrfield("Pathology Occurrence")
-#     pathology_disease_name = create_chrfield("Pathology/Disease Name")
-#     stage = create_chrfield("Stage")
-#     grade = create_chrfield("Grade")
-#     tumour_content = create_chrfield("Tumor content (%)")
-
-#     def __str__(self):
-#         return self.sample.sample_id
-
-# class Xenograft(models.Model, FieldValue):
-
-#     """
-#     Xenograft sample type.
-#     """
-
-#     # database relationships
-#     sample = models.ForeignKey(
-#         Sample,
-#         verbose_name="Sample",
-#         on_delete=models.CASCADE
-#         )
-
-#     def __str__(self):
-#         return self.sample.sample_id
-
-# class UST(models.Model, FieldValue):
-
-#     """
-#     Undefined Sample type.
-#     """
-
-#     # database relationships
-#     sample = models.ForeignKey(
-#         Sample,
-#         verbose_name="Sample",
-#         on_delete=models.CASCADE
-#         )
-
-#     def __str__(self):
-#         return self.samle.sample_id
-

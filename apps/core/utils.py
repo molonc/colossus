@@ -42,3 +42,30 @@ def bulk_create_sublibrary(library, csv_infile):
 
     library.sublibraryinformation_set.bulk_create(instances)
     return num_sublibraries
+
+
+class HistoryManager(object):
+
+    """
+    An api for simple_history app.
+    """
+
+    @staticmethod
+    def print_history(object, history_type=None):
+        print '=' * 100
+        print "Object\tID\tDate\tAction\tUser"
+        print '=' * 100
+        if history_type is None:
+            histories = object.history.all()
+        else:
+            histories = object.history.filter(history_type=history_type)
+
+        for h in histories:
+            print "\t".join([
+                str(h.instance),
+                str(h.instance.id),
+                str(h.history_date),
+                h.get_history_type_display(),
+                str(h.history_user),
+                ])
+            print '-' * 100
