@@ -1,0 +1,82 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Create Library
+{% endblock %}
+
+{% block body %}
+<div class="container graybg">
+    <form action="{% url 'core:library_create' %}" method="POST", enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Library Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {% for field in form %} 
+                <tr>
+                    <th>
+                    {{field.label_tag}}
+                    </th>
+                    <td>
+                    {{ field.errors }}
+                    {% if field.name == "projects" %}
+                        <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
+                            {% for project in projects %}
+                            <option>{{project}}</option>
+                            {% endfor %}
+                        </select>
+                    {% elif field.name == "sample" and sample_id %}
+                        <select id="id_sample" name="sample">
+                            <option value="{{sample_id}}" selected="selected">{{sample}}</option>
+                        </select>
+                    {% else %}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="helptext">{{ field.help_text }}</p>
+                        {% endif %}
+                    {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend>Sublibrary Information</legend>
+            Select a SmartChipApp result file to upload:
+            <table class="table-condensed">
+                <thead>
+                {{sublib_form}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend>Library Sample Details</legend>
+            <table class="table-condensed">
+                <thead>
+                {{libdetail_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend>Library Construction Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {{libcons_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+         <fieldset>
+            <legend>Library Quantification and Storage</legend>
+            <table class="table-condensed">
+                <thead>
+                {{libqs_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+        <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" href="{% url 'core:library_list' %}">Cancel</a>
+    </form><br>
+</div>
+{% endblock %}

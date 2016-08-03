@@ -18,6 +18,7 @@ urlpatterns = [
                url(r'^library/(?P<pk>\d+)$', views.library_detail, name='library_detail'),
                url(r'^library/list$', views.library_list, name='library_list'),
                url(r'^library/create/$', views.library_create, name='library_create'),
+               url(r'^library/create/(?P<from_sample>\d+)$', views.library_create_from_sample, name='library_create_from_sample'),
                url(r'^library/update/(?P<pk>\d+)$', views.library_update, name='library_update'),
                url(r'^library/delete/(?P<pk>\d+)$', views.library_delete, name='library_delete'),
                url(r'^sequensing/(?P<pk>\d+)$', views.sequencing_detail, name='sequencing_detail'),

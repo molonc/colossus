@@ -64,7 +64,7 @@ Sample Details
     {% else %}
     <h5><i class="text-warning">There is no library information for this sample!</i></h5>
     {% endif %}
-    <a href="{% url 'core:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Library</a></p>
+    <a href="{% url 'core:library_create_from_sample' from_sample=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Library</a></p>
 </div><br>
 <!-- end of Library Information -->
 

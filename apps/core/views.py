@@ -300,6 +300,84 @@ def library_create(request):
         }
     return context
 
+@Render("core/library_create_from_sample.html")
+@login_required()
+def library_create_from_sample(request, from_sample):
+    """library create page."""
+    sample = get_object_or_404(Sample, pk=from_sample)
+    if request.method == 'POST':
+        ## this is becaues of this django feature:
+        ## https://code.djangoproject.com/ticket/1130
+        request.POST['projects'] = ','.join(request.POST.getlist('projects'))
+
+        form = LibraryForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            ## save instace with its ManyToMany relation.
+            instance.save()
+            form.save_m2m()
+
+            sublib_form = SublibraryForm(
+                request.POST,
+                request.FILES,
+                )
+            libdetail_formset = LibrarySampleDetailInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libcons_formset = LibraryConstructionInfoInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            if sublib_form.is_valid():
+                num_sublibraries = bulk_create_sublibrary(
+                    instance,
+                    request.FILES['smartchipapp_file']
+                    )
+                instance.num_sublibraries = num_sublibraries
+                instance.save()
+            if libdetail_formset.is_valid():
+                libdetail_formset.save()
+            if libcons_formset.is_valid():
+                libcons_formset.save()
+            if libqs_formset.is_valid():
+                libqs_formset.save()
+
+            msg = "Successfully created the Library."
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.get_absolute_url())
+        else:
+            msg = "Failed to create the library. Please fix the errors below."
+            messages.error(request, msg)
+            sublib_form = SublibraryForm()
+            libdetail_formset = LibrarySampleDetailInlineFormset()
+            libcons_formset = LibraryConstructionInfoInlineFormset()
+            libqs_formset = LibraryQuantificationAndStorageInlineFormset()
+    
+    else:
+        form = LibraryForm()
+        sublib_form = SublibraryForm()        
+        libdetail_formset = LibrarySampleDetailInlineFormset()
+        libcons_formset = LibraryConstructionInfoInlineFormset()
+        libqs_formset = LibraryQuantificationAndStorageInlineFormset()
+
+    projects = [t.name for t in Tag.objects.all()]
+    context = {
+        'form': form,
+        'sublib_form': sublib_form,
+        'libdetail_formset': libdetail_formset,
+        'libcons_formset': libcons_formset,
+        'libqs_formset': libqs_formset,
+        'projects': projects,
+        'sample': str(sample),
+        'sample_id': from_sample,
+        }
+    return context
+
 @Render("core/library_update.html")
 @login_required()
 def library_update(request, pk):
