@@ -32,9 +32,9 @@ Create Library
                         </select>
                     {% else %}
                         {{ field }}
-                        {% if field.help_text %}
-                            <p class="helptext">{{ field.help_text }}</p>
-                        {% endif %}
+                    {% endif %}
+                    {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text }}</p>
                     {% endif %}
                     </td>
                 </tr>
