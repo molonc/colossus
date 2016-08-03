@@ -1,0 +1,51 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Create Sequencing
+{% endblock %}
+
+{% block body %}
+<div class="container graybg">
+    <form action="{% url 'core:sequencing_create' %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Sequencing Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {% for field in form %} 
+                <tr>
+                    <th>
+                    {{field.label_tag}}
+                    </th>
+                    <td>
+                    {{ field.errors }}
+                    {% if field.name == "library" and library_id %}
+                        <select id="id_library" name="library">
+                            <option value="{{library_id}}" selected="selected">{{library}}</option>
+                        </select>
+                    {% else %}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </thead>
+            </table>
+         </fieldset><br>
+        <fieldset>
+            <legend>Sequencing Details</legend>
+            <table class="table-condensed">
+                <thead>
+                {{seqdetail_formset}}
+                </thead>
+            </table>
+         </fieldset><br>
+        <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_list' %}">Cancel</a>
+    </form><br>
+</div>
+{% endblock %}

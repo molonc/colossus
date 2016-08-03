@@ -142,7 +142,7 @@ Library Details
     {% else %}
     <h5><i class="text-warning">There is no sequencing information for this library!</i></h5>
     {% endif %}
-    <a href="{% url 'core:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Sequencing</a></p>
+    <a href="{% url 'core:sequencing_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Sequencing</a></p>
 </div><br>
 <!-- end of Sequencing Information -->
 
