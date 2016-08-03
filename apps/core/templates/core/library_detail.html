@@ -132,7 +132,7 @@ Library Details
                     <td><a href="{{sequencing.get_absolute_url}}">{{sequencing.library.sample.sample_id}}</a></td>
                     <td>{{sequencing.library.pool_id}}</td>
                     <td>{{sequencing.adapter}}</td>
-                    <td>{{sequencing.sequencing_instrument}}</td>
+                    <td>{{sequencing.get_sequencing_instrument_display}}</td>
                     <td>{{sequencing.submission_date}}</td>
                 </tr>
                 {% endfor %}
