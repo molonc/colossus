@@ -25,12 +25,12 @@ Create Sequencing
                             <option value="{{library_id}}" selected="selected">{{library}}</option>
                         </select>
                     {% else %}
-                    {{ field }}
+                        {{ field }}
+                    {% endif %}
                     {% if field.help_text %}
                         <p class="helptext">{{ field.help_text|safe }}</p>
                     {% endif %}
                     </td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
                 </thead>

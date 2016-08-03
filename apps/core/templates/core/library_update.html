@@ -15,34 +15,28 @@ Edit Library
                 <thead>
                 {% for field in form %} 
                 <tr>
-                    {% if field.name == "projects" %}
                     <th>
                     {{field.label_tag}}
                     </th>
                     <td>
                     {{ field.errors }}
-                    <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
-                        {% for project in projects %}
-                        {% if project in selected_projects %}
-                        <option selected="{{project}}">{{project}}</option>
-                        {% else %}
-                        <option>{{project}}</option>
-                        {% endif %}
-                        {% endfor %}
-                    </select>
-                    </td>
+                    {% if field.name == "projects" %}
+                        <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
+                            {% for project in projects %}
+                            {% if project in selected_projects %}
+                            <option selected="{{project}}">{{project}}</option>
+                            {% else %}
+                            <option>{{project}}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
                     {% else %}
-                    <th>
-                    {{ field.label_tag}}
-                    </th>
-                    <td>
-                    {{ field.errors }}
-                    {{ field }}
+                        {{ field }}
+                    {% endif %}
                     {% if field.help_text %}
                         <p class="helptext">{{ field.help_text }}</p>
                     {% endif %}
                     </td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
                 </thead>
