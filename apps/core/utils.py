@@ -6,8 +6,12 @@ Created on June 6, 2016
 
 import os, sys
 import pandas as pd 
+from string import Template
 from .models import SublibraryInformation
 
+#==================================================
+# upload, parse and populate Sublibrary Information
+#--------------------------------------------------
 def parse_smartchipapp_file(csv_infile):
     """parse the result file of SmartChipApp."""
     df = pd.read_excel(csv_infile, sheetname=0)
@@ -44,6 +48,9 @@ def bulk_create_sublibrary(library, csv_infile):
     return num_sublibraries
 
 
+#=================
+# history manager
+#-----------------
 class HistoryManager(object):
 
     """
@@ -69,3 +76,87 @@ class HistoryManager(object):
                 str(h.history_user),
                 ])
             print '-' * 100
+
+#======================
+# generate sample sheet
+#----------------------
+def generate_samplesheet(sequencing, ofilename):
+    """generate samplesheet for the given Sequencing using template in SC-180."""
+    # generate header section
+    with open('templates/template_samplesheet.html', 'r') as tempstr:
+        s = Template(tempstr.read())
+        d = {
+        'sequencing_instrument': sequencing.sequencing_instrument,
+        'submission_date': sequencing.submission_date,
+        'pool_id': sequencing.library.pool_id,
+        'read1_length': sequencing.read1_length,
+        'read2_length': sequencing.read2_length,
+        }
+
+        # Sequencing may have no SequencingDetail
+        try:
+            d['flow_cell_id'] = sequencing.sequencingdetail.flow_cell_id
+        except:
+            d['flow_cell_id'] = None
+
+        s = s.safe_substitute(**d)
+        ofile = open(ofilename, 'w')
+        ofile.write(s)
+        ofile.close()
+
+    # generate [Data] section
+    data_table = reorder_colnames(mk_data_table(sequencing))
+    data_table.to_csv(ofilename, mode='a', index=False)
+    return os.path.abspath(ofilename)
+
+def mk_data_table(sequencing):
+    """make [Data] section of the samplesheet template."""
+    def _map_to_template(s):
+        d = s.to_dict()
+        # This is the relation between columns in the template samplesheet
+        # and the actual columns in df from LIMS.
+        res = {
+        'Sample_ID': '-'.join([
+        str(sequencing.library.sample),
+        str(sequencing.library.pool_id),
+        'R'+ str(d['row']),
+        'C'+ str(d['column'])
+        ]),
+        'Sample_Name': d['sample'],
+        'Sample_Plate': 'R' + str(d['row']) + '_C' + str(d['column']),
+        'Sample_Well': 'R' + str(d['row']) + '_C' + str(d['img_col']),
+        'I7_Index_ID': d['index_i7'],
+        'index': d['primer_i7'],
+        'I5_Index_ID': d['index_i5'],
+        'index2': d['primer_i5'],
+        #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
+        'Description': d['pick_met'],
+        }
+        return res
+
+    sample_project = ','.join(sequencing.library.projects.names())
+    newl = []
+    oldl = list(sequencing.library.sublibraryinformation_set.values())
+    df = pd.DataFrame(oldl)
+    for d in df.apply(_map_to_template, axis=1):
+        d['Sample_Project'] = sample_project
+        newl.append(d)
+    return pd.DataFrame(newl)
+
+def reorder_colnames(df):
+    # reorder the columns to match those of samplesheet template.
+    if df.empty:
+        return df
+    colnames = [
+    'Sample_ID',
+    'Sample_Name',
+    'Sample_Plate',
+    'Sample_Well',
+    'I7_Index_ID',
+    'index',
+    'I5_Index_ID',
+    'index2',
+    'Sample_Project',
+    'Description'
+    ]
+    return df[colnames]

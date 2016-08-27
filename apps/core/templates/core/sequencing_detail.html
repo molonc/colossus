@@ -45,6 +45,7 @@ Sequencing Details
 <div class="container" style="margin-bottom:5px;">
     <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url 'core:sequencing_update' pk=sequencing.pk %}">Edit</a>
     <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url 'core:sequencing_delete' pk=sequencing.pk %}">Delete</a>
+    <a class="btn btn-primary btn-sm" style="float:left; margin-top:5px;" href="{% url 'core:sequencing_get_samplesheet' pk=sequencing.pk %}">Get Samplesheet</a>
     <a style="float:right; margin:5px;" href="{% url 'core:sequencing_list' %}">List of sequencings</a>
 </div><br>
 <!-- end of footer bottons -->

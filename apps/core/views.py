@@ -4,6 +4,7 @@ Created on May 16, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 """
 
+import os
 #============================
 # Django imports
 #----------------------------
@@ -37,7 +38,7 @@ from .forms import (
     SequencingDetailInlineFormset,
     ProjectForm
     )
-from .utils import bulk_create_sublibrary
+from .utils import bulk_create_sublibrary, generate_samplesheet
 
 #============================
 # 3rd-party app imports
@@ -688,6 +689,19 @@ def sequencing_delete(request, pk):
         'pk': pk
     }
     return context
+
+def sequencing_get_samplesheet(request, pk):
+    """generate downloadable samplesheet."""
+    sequencing = get_object_or_404(Sequencing, pk=pk)
+    ofilename = str(sequencing) + '_samplesheet.csv'
+    ofilepath = generate_samplesheet(sequencing, ofilename)
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
+    ofile = open(ofilepath, 'r')
+    response.write(ofile.read())
+    ofile.close()
+    os.remove(ofilepath)
+    return response
 
 
 #============================
