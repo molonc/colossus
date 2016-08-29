@@ -542,6 +542,11 @@ class LibrarySampleDetail(models.Model, FieldValue):
         max_length=1000
         )
     sample_preservation_method = create_chrfield("Sample preservation method")
+    sample_spot_date = models.DateField(
+        "Sample spot date",
+        null=True,
+        blank=True,
+        )
 
 
 class LibraryConstructionInformation(models.Model, FieldValue):
@@ -605,11 +610,6 @@ class LibraryConstructionInformation(models.Model, FieldValue):
     protocol = create_textfield(
         "Protocol",
         max_length=1000
-        )
-    sample_spot_date = models.DateField(
-        "Sample spot date",
-        null=True,
-        blank=True,
         )
 
 

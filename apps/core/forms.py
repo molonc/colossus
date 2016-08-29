@@ -119,7 +119,10 @@ LibrarySampleDetailInlineFormset = inlineformset_factory(
     Library,
     LibrarySampleDetail,
     # exclude = ['delete'],
-    fields = "__all__"
+    fields = "__all__",
+    help_texts = {
+        'sample_spot_date': ('yyyy-mm-dd.')
+    }
     )
 
 LibraryConstructionInfoInlineFormset =  inlineformset_factory(
@@ -129,7 +132,6 @@ LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     fields = "__all__",
     help_texts = {
         'library_prep_date': ('yyyy-mm-dd.'),
-        'sample_spot_date': ('yyyy-mm-dd.')
     }
     )
 
