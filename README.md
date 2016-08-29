@@ -4,5 +4,4 @@ A system for tracking the single cell samples and library information in Aparici
 
 ## Change log
 
-### 1.0.0
-* initial release.
+Please see "releases".
