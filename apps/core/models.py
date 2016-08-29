@@ -657,20 +657,6 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         "Storage medium", 
         default="TE 10:0.1"
         )
-    agilent_bioanalyzer_xad = models.FileField(
-        "Agilent bioanalyzer xad file",
-        upload_to='xad/',
-        max_length=200,
-        null=True,
-        blank=True
-        )
-    agilent_bioanalyzer_png = models.FileField(
-        "Agilent bioanalyzer png file",
-        upload_to='png/',
-        max_length=200,
-        null=True,
-        blank=True
-        )
 
 
 #============================
