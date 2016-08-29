@@ -26,7 +26,7 @@ Edit Sequencing
             </table>
          </fieldset><br>
         <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
-        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_list' %}">Cancel</a>
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=pk %}">Cancel</a>
     </form><br>
 </div>
 {% endblock %}
