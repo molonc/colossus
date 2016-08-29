@@ -85,12 +85,12 @@ class LibraryForm(ModelForm):
         # exclude = ['projects']
         help_texts = {
             'sample': ('Sequencing ID (usually SA ID).'),
-            'pool_id': ('Pool ID.'),
+            'pool_id': ('Chip ID.'),
             'jira_ticket': ('Jira Ticket.'),
             }
         labels = {
             'sample': ('*Sample'),
-            'pool_id': ('*Pool ID'),
+            'pool_id': ('*Chip ID'),
             'jira_ticket': ('*Jira Ticket'),
             }
 
@@ -100,7 +100,7 @@ class LibraryForm(ModelForm):
             cleaned_data = super(LibraryForm, self).clean()
             pool_id = cleaned_data.get("pool_id")
             if len(Library.objects.filter(pool_id=pool_id)):
-                msg = "Pool ID already exists."
+                msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
 
 

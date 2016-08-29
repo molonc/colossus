@@ -412,7 +412,7 @@ class Library(models.Model, FieldValue, LibraryAssistant):
         )
 
     # sample_id = create_chrfield("Sample ID", blank=False)
-    pool_id = create_chrfield("Pool ID", blank=False)
+    pool_id = create_chrfield("Chip ID", blank=False)
     jira_ticket = create_chrfield("Jira ticket", blank=False)
     num_sublibraries = create_intfield("Number of sublibraries", default=0)
     description = create_textfield("Description")
@@ -657,6 +657,20 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         "Storage medium", 
         default="TE 10:0.1"
         )
+    agilent_bioanalyzer_xad = models.FileField(
+        "Agilent bioanalyzer xad file",
+        upload_to='xad/',
+        max_length=200,
+        null=True,
+        blank=True
+        )
+    agilent_bioanalyzer_png = models.FileField(
+        "Agilent bioanalyzer png file",
+        upload_to='png/',
+        max_length=200,
+        null=True,
+        blank=True
+        )
 
 
 #============================
@@ -668,7 +682,7 @@ class Sequencing(models.Model, FieldValue):
     Sequencing information.
     """
 
-    fields_to_exclude = ['ID', 'Library', 'Pool ID']
+    fields_to_exclude = ['ID', 'Library', 'Chip ID']
     values_to_exclude = ['id', 'library', 'pool_id']
 
     ## track history
@@ -704,7 +718,7 @@ class Sequencing(models.Model, FieldValue):
         )
 
     ## fields
-    pool_id = create_chrfield("Pool ID")
+    pool_id = create_chrfield("Chip ID")
 
     adapter = create_chrfield(
         "Adapter",
