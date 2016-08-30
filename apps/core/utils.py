@@ -8,6 +8,7 @@ import os, sys
 import pandas as pd 
 from string import Template
 from .models import SublibraryInformation
+from django.conf import settings
 
 #==================================================
 # upload, parse and populate Sublibrary Information
@@ -83,7 +84,10 @@ class HistoryManager(object):
 def generate_samplesheet(sequencing, ofilename):
     """generate samplesheet for the given Sequencing using template in SC-180."""
     # generate header section
-    with open('templates/template_samplesheet.html', 'r') as tempstr:
+    template_samplesheet = os.path.join(
+        settings.BASE_DIR, "templates/template_samplesheet.html")
+    ofilename = os.path.join(settings.MEDIA_ROOT, ofilename)
+    with open(template_samplesheet, 'r') as tempstr:
         s = Template(tempstr.read())
         d = {
         'sequencing_instrument': sequencing.get_sequencing_instrument_display(),
