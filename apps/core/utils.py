@@ -86,7 +86,7 @@ def generate_samplesheet(sequencing, ofilename):
     with open('templates/template_samplesheet.html', 'r') as tempstr:
         s = Template(tempstr.read())
         d = {
-        'sequencing_instrument': sequencing.sequencing_instrument,
+        'sequencing_instrument': sequencing.get_sequencing_instrument_display(),
         'submission_date': sequencing.submission_date,
         'pool_id': sequencing.library.pool_id,
         'read1_length': sequencing.read1_length,
@@ -130,7 +130,7 @@ def mk_data_table(sequencing):
         'I5_Index_ID': d['index_i5'],
         'index2': d['primer_i5'],
         #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
-        'Description': d['pick_met'],
+        'Description': 'CC=' + d['pick_met'] + ';' + 'EC=',
         }
         return res
 
