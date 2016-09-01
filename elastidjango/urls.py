@@ -18,7 +18,8 @@ Created on May 16, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 """
 
-from django.conf.urls import url, include
+from django.conf import settings
+from django.conf.urls import url, include, static
 from django.contrib import admin
 from core import views 
 
@@ -29,3 +30,8 @@ urlpatterns = [
     url(r'^apps/core/', include('core.urls')),
     url(r'^apps/account/', include('account.urls')),
 ]
+
+
+urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

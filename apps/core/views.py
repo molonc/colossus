@@ -13,7 +13,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required #, permission_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView
 
 #============================
@@ -209,97 +209,92 @@ def library_detail(request, pk):
     }
     return context
             
-# class LibrarCreate(TemplateView):
+class LibraryCreate(TemplateView):
 
-#     """
-#     Library create page.
-#     """
+    """
+    Library create page.
+    """
 
-#     template_name = "core/library_create.html"
+    template_name = "core/library_create.html"
+    projects = [t.name for t in Tag.objects.all()]
 
-#     def _save_formset(self, formset):
-#         pass
+    def get_context_data(self):
+        context = {
+        'lib_form': LibraryForm(),
+        'sublib_form': SublibraryForm(),
+        'libdetail_formset': LibrarySampleDetailInlineFormset(),
+        'libcons_formset': LibraryConstructionInfoInlineFormset(),
+        'libqs_formset': LibraryQuantificationAndStorageInlineFormset(),
+        'projects': self.projects
+        }
+        return context
 
-#     def _uploaded_file_handler(self):
-#         pass
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
 
-#     def get_context_data(self):
-#         pass
-
-@Render("core/library_create.html")
-@login_required()
-def library_create(request):
-    """library create page."""
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data()
         ## this is becaues of this django feature:
         ## https://code.djangoproject.com/ticket/1130
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
 
-        form = LibraryForm(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            ## save instace with its ManyToMany relation.
-            instance.save()
-            form.save_m2m()
-
-            sublib_form = SublibraryForm(
-                request.POST,
-                request.FILES,
-                )
-            libdetail_formset = LibrarySampleDetailInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            libcons_formset = LibraryConstructionInfoInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            if sublib_form.is_valid():
-                num_sublibraries = bulk_create_sublibrary(
-                    instance,
-                    request.FILES['smartchipapp_file']
-                    )
-                instance.num_sublibraries = num_sublibraries
+        lib_form = LibraryForm(request.POST)
+        sublib_form = SublibraryForm(request.POST, request.FILES or None)
+        context['lib_form'] = lib_form
+        context['sublib_form'] = sublib_form
+        if lib_form.is_valid() and sublib_form.is_valid():
+            # if 'commit=True' when saving lib_form, then it strangely
+            # raises the following error when trying to save the
+            # ManyToMany 'Projects' field:
+            # 'LibraryForm' object has no attribute 'save_m2m'.
+            instance = lib_form.save(commit=False)
+            all_valid, formsets = self._validate_formsets(request, instance)
+            context.update(formsets)
+            if all_valid:
                 instance.save()
-            if libdetail_formset.is_valid():
-                libdetail_formset.save()
-            if libcons_formset.is_valid():
-                libcons_formset.save()
-            if libqs_formset.is_valid():
-                libqs_formset.save()
+                # save the ManyToMany field.
+                lib_form.save_m2m()
+                # parse/load the SmartChipApp result file if provided.
+                smartchipapp_file = request.FILES.get('smartchipapp_file')
+                if smartchipapp_file:
+                    num_sublibraries = bulk_create_sublibrary(
+                        instance,
+                        smartchipapp_file
+                        )
+                    instance.num_sublibraries = num_sublibraries
+                    instance.save()
+                # save the formsets.
+                [formset.save() for formset in formsets.values()]
+                msg = "Successfully created the Library."
+                messages.success(request, msg)
+                return HttpResponseRedirect(instance.get_absolute_url())
 
-            msg = "Successfully created the Library."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
-        else:
-            msg = "Failed to create the library. Please fix the errors below."
-            messages.error(request, msg)
-            sublib_form = SublibraryForm()
-            libdetail_formset = LibrarySampleDetailInlineFormset()
-            libcons_formset = LibraryConstructionInfoInlineFormset()
-            libqs_formset = LibraryQuantificationAndStorageInlineFormset()
-    
-    else:
-        form = LibraryForm()
-        sublib_form = SublibraryForm()        
-        libdetail_formset = LibrarySampleDetailInlineFormset()
-        libcons_formset = LibraryConstructionInfoInlineFormset()
-        libqs_formset = LibraryQuantificationAndStorageInlineFormset()
+        msg = "Failed to create the library. Please fix the errors below."
+        messages.error(request, msg)
+        return render(request, self.template_name, context)
 
-    projects = [t.name for t in Tag.objects.all()]
-    context = {
-        'form': form,
-        'sublib_form': sublib_form,
-        'libdetail_formset': libdetail_formset,
-        'libcons_formset': libcons_formset,
-        'libqs_formset': libqs_formset,
-        'projects': projects,
+    def _validate_formsets(self, request, instance):
+        all_valid = True
+        formsets = {
+        'libdetail_formset': LibrarySampleDetailInlineFormset(
+            request.POST,
+            instance=instance
+            ),
+        'libcons_formset': LibraryConstructionInfoInlineFormset(
+            request.POST,
+            instance=instance
+            ),
+        'libqs_formset': LibraryQuantificationAndStorageInlineFormset(
+            request.POST,
+            request.FILES or None,
+            instance=instance
+            )
         }
-    return context
+        for k, formset in formsets.items():
+            if not formset.is_valid():
+                all_valid = False
+            formsets[k] = formset
+        return all_valid, formsets
 
 @Render("core/library_create_from_sample.html")
 @login_required()
@@ -335,12 +330,14 @@ def library_create_from_sample(request, from_sample):
                 instance=instance
                 )
             if sublib_form.is_valid():
-                num_sublibraries = bulk_create_sublibrary(
-                    instance,
-                    request.FILES['smartchipapp_file']
-                    )
-                instance.num_sublibraries = num_sublibraries
-                instance.save()
+                smartchipapp_file = request.FILES.get('smartchipapp_file')
+                if smartchipapp_file:
+                    num_sublibraries = bulk_create_sublibrary(
+                        instance,
+                        smartchipapp_file
+                        )
+                    instance.num_sublibraries = num_sublibraries
+                    instance.save()
             if libdetail_formset.is_valid():
                 libdetail_formset.save()
             if libcons_formset.is_valid():
@@ -411,15 +408,18 @@ def library_update(request, pk):
                 )
             libqs_formset = LibraryQuantificationAndStorageInlineFormset(
                 request.POST,
+                request.FILES or None,
                 instance=instance
                 )
             if sublib_form.is_valid():
-                num_sublibraries = bulk_create_sublibrary(
-                    instance,
-                    request.FILES['smartchipapp_file']
-                    )
-                instance.num_sublibraries = num_sublibraries
-                instance.save()
+                smartchipapp_file = request.FILES.get('smartchipapp_file')
+                if smartchipapp_file:
+                    num_sublibraries = bulk_create_sublibrary(
+                        instance,
+                        smartchipapp_file
+                        )
+                    instance.num_sublibraries = num_sublibraries
+                    instance.save()
             if libdetail_formset.is_valid():
                 libdetail_formset.save()
             if libcons_formset.is_valid():

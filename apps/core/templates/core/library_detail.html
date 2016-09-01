@@ -68,8 +68,24 @@ Library Details
     <table class="table-condensed">
         {% for field, value in library.libraryquantificationandstorage.get_field_values.items %}
         <tr>
+            {% if field == "Agilent bioanalyzer xad file" and value %}
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">
+                <a href="{{library.libraryquantificationandstorage.agilent_bioanalyzer_xad.url}}">
+                    {{value}}
+                </a>
+            </td>
+            {% elif field == "Agilent bioanalyzer png file" and value %}
+            <th id="thid">{{field}}:</th>
+            <td id="tdid">
+                <a href="{{library.libraryquantificationandstorage.agilent_bioanalyzer_png.url}}">
+                    {{value}}
+                </a>
+            </td>
+            {% else %}
             <th id="thid">{{field}}:</th>
             <td id="tdid">{{value}}</td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>

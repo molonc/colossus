@@ -4,11 +4,19 @@ Created on May 24, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 """
 
+import os
+
 #===========================
 # Django imports
 #---------------------------
-from django.forms import ModelForm, Form, FileField
-from django.forms import inlineformset_factory
+from django.forms import (
+    ModelForm,
+    Form,
+    FileField,
+    ValidationError,
+    inlineformset_factory,
+    BaseInlineFormSet
+    )
 
 #===========================
 # App imports
@@ -103,22 +111,50 @@ class LibraryForm(ModelForm):
                 msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
 
-
 class SublibraryForm(Form):
     ## File field
-    smartchipapp_file = FileField(label="File")
+    smartchipapp_file = FileField(
+        label="File",
+        required=False,
+        )
 
-# SublibraryInfoInlineFormset =  inlineformset_factory(
-#     Library,
-#     SublibraryInformation,
-#     # exclude = ['delete'],
-#     fields = "__all__"
-#         )
+class LibraryQuantificationAndStorageForm(ModelForm):
+
+    """
+    Clean uploaded files.
+    """
+
+    class Meta:
+        model = LibraryQuantificationAndStorage
+        fields = "__all__"
+        # exclude = ['library']
+
+    def clean_agilent_bioanalyzer_xad(self):
+        """check if it's a right filetype."""
+        file = self.cleaned_data['agilent_bioanalyzer_xad']
+        if file:
+            _, ext = os.path.splitext(file.name)
+            if ext != '.xad':
+                msg = "file not supported with extension: %s" % ext
+                self.add_error('agilent_bioanalyzer_xad', msg)
+                # raise Exception(msg)
+                print msg
+        return file
+
+    def clean_agilent_bioanalyzer_png(self):
+        """check if it's a right filetype."""
+        file = self.cleaned_data['agilent_bioanalyzer_png']
+        if file:
+            _, ext = os.path.splitext(file.name)
+            if ext != '.png':
+                msg = "file not supported with extension: %s" % ext
+                self.add_error('agilent_bioanalyzer_png', msg)
+                print msg
+        return file
 
 LibrarySampleDetailInlineFormset = inlineformset_factory(
     Library,
     LibrarySampleDetail,
-    # exclude = ['delete'],
     fields = "__all__",
     help_texts = {
         'sample_spot_date': ('yyyy-mm-dd.')
@@ -128,7 +164,6 @@ LibrarySampleDetailInlineFormset = inlineformset_factory(
 LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     Library,
     LibraryConstructionInformation,
-    # exclude = ['delete'],
     fields = "__all__",
     help_texts = {
         'library_prep_date': ('yyyy-mm-dd.'),
@@ -138,9 +173,13 @@ LibraryConstructionInfoInlineFormset =  inlineformset_factory(
 LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     Library,
     LibraryQuantificationAndStorage,
-    # exclude = ['delete'],
-    fields = "__all__"
-        )
+    form = LibraryQuantificationAndStorageForm,
+    fields = "__all__",
+    help_texts = {
+        'agilent_bioanalyzer_xad': ('Select a .xad file to upload.'),
+        'agilent_bioanalyzer_png': ('Select a .png file to upload.'),
+    }
+    )
 
 
 #===========================
@@ -171,6 +210,5 @@ class SequencingForm(ModelForm):
 SequencingDetailInlineFormset = inlineformset_factory(
     Sequencing,
     SequencingDetail,
-    # exclude = ['delete'],
     fields = "__all__"
     )

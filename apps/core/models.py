@@ -67,6 +67,15 @@ def create_intfield(name, blank=True, null=True, **kwargs):
         )
 
 
+def upload_path(instance, filename):
+    """make a proper /path/to/filename for uploaded files."""
+    return "{0}/{1}/{2}".format(
+        'library',
+        instance.library.id,
+        filename
+        )
+
+
 class FieldValue(object):
     fields_to_exclude = ['ID']
     values_to_exclude = ['id']
@@ -656,6 +665,20 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
     storage_medium = create_chrfield(
         "Storage medium", 
         default="TE 10:0.1"
+        )
+    agilent_bioanalyzer_xad = models.FileField(
+        "Agilent bioanalyzer xad file",
+        upload_to=upload_path,
+        max_length=200,
+        null=True,
+        blank=True
+        )
+    agilent_bioanalyzer_png = models.FileField(
+        "Agilent bioanalyzer png file",
+        upload_to=upload_path,
+        max_length=200,
+        null=True,
+        blank=True
         )
 
 
