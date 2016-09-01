@@ -208,6 +208,24 @@ def library_detail(request, pk):
     'sublibinfo_fields': sublibinfo.get_fields()
     }
     return context
+
+@Render("core/library_delete.html")
+@login_required()
+def library_delete(request, pk):
+    """library delete page."""
+    library = get_object_or_404(Library, pk=pk)
+
+    if request.method == 'POST':
+        library.delete()
+        msg = "Successfully deleted the Library."
+        messages.success(request, msg)
+        return HttpResponseRedirect(reverse('core:library_list'))
+
+    context = {
+        'library': library,
+        'pk': pk
+    }
+    return context
             
 class LibraryCreate(TemplateView):
 
@@ -303,85 +321,6 @@ class LibraryCreate(TemplateView):
             formsets[k] = formset
         return all_valid, formsets
 
-@Render("core/library_create_from_sample.html")
-@login_required()
-def library_create_from_sample(request, from_sample):
-    """library create page."""
-    sample = get_object_or_404(Sample, pk=from_sample)
-    if request.method == 'POST':
-        ## this is becaues of this django feature:
-        ## https://code.djangoproject.com/ticket/1130
-        request.POST['projects'] = ','.join(request.POST.getlist('projects'))
-
-        form = LibraryForm(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            ## save instace with its ManyToMany relation.
-            instance.save()
-            form.save_m2m()
-
-            sublib_form = SublibraryForm(
-                request.POST,
-                request.FILES,
-                )
-            libdetail_formset = LibrarySampleDetailInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            libcons_formset = LibraryConstructionInfoInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            if sublib_form.is_valid():
-                smartchipapp_file = request.FILES.get('smartchipapp_file')
-                if smartchipapp_file:
-                    num_sublibraries = bulk_create_sublibrary(
-                        instance,
-                        smartchipapp_file
-                        )
-                    instance.num_sublibraries = num_sublibraries
-                    instance.save()
-            if libdetail_formset.is_valid():
-                libdetail_formset.save()
-            if libcons_formset.is_valid():
-                libcons_formset.save()
-            if libqs_formset.is_valid():
-                libqs_formset.save()
-
-            msg = "Successfully created the Library."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
-        else:
-            msg = "Failed to create the library. Please fix the errors below."
-            messages.error(request, msg)
-            sublib_form = SublibraryForm()
-            libdetail_formset = LibrarySampleDetailInlineFormset()
-            libcons_formset = LibraryConstructionInfoInlineFormset()
-            libqs_formset = LibraryQuantificationAndStorageInlineFormset()
-    
-    else:
-        form = LibraryForm()
-        sublib_form = SublibraryForm()        
-        libdetail_formset = LibrarySampleDetailInlineFormset()
-        libcons_formset = LibraryConstructionInfoInlineFormset()
-        libqs_formset = LibraryQuantificationAndStorageInlineFormset()
-
-    projects = [t.name for t in Tag.objects.all()]
-    context = {
-        'form': form,
-        'sublib_form': sublib_form,
-        'libdetail_formset': libdetail_formset,
-        'libcons_formset': libcons_formset,
-        'libqs_formset': libqs_formset,
-        'projects': projects,
-        'sample': str(sample),
-        'sample_id': from_sample,
-        }
-    return context
 
 @Render("core/library_update.html")
 @login_required()
@@ -477,24 +416,6 @@ def library_update(request, pk):
         'projects': projects,
         'selected_projects': selected_projects,
         }
-    return context
-
-@Render("core/library_delete.html")
-@login_required()
-def library_delete(request, pk):
-    """library delete page."""
-    library = get_object_or_404(Library, pk=pk)
-
-    if request.method == 'POST':
-        library.delete()
-        msg = "Successfully deleted the Library."
-        messages.success(request, msg)
-        return HttpResponseRedirect(reverse('core:library_list'))
-
-    context = {
-        'library': library,
-        'pk': pk
-    }
     return context
 
 
