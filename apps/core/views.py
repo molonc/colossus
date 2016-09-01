@@ -218,22 +218,29 @@ class LibraryCreate(TemplateView):
     template_name = "core/library_create.html"
     projects = [t.name for t in Tag.objects.all()]
 
-    def get_context_data(self):
+    def get_context_data(self, from_sample=None):
+        if from_sample:
+            sample = get_object_or_404(Sample, pk=from_sample)
+        else:
+            sample = None
         context = {
         'lib_form': LibraryForm(),
         'sublib_form': SublibraryForm(),
         'libdetail_formset': LibrarySampleDetailInlineFormset(),
         'libcons_formset': LibraryConstructionInfoInlineFormset(),
         'libqs_formset': LibraryQuantificationAndStorageInlineFormset(),
-        'projects': self.projects
+        'projects': self.projects,
+        'sample': str(sample),
+        'sample_id': from_sample
         }
         return context
 
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, self.get_context_data())
+    def get(self, request, from_sample=None, *args, **kwargs):
+        context = self.get_context_data(from_sample)
+        return render(request, self.template_name, context)
 
-    def post(self, request, *args, **kwargs):
-        context = self.get_context_data()
+    def post(self, request, from_sample=None, *args, **kwargs):
+        context = self.get_context_data(from_sample)
         ## this is becaues of this django feature:
         ## https://code.djangoproject.com/ticket/1130
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))

@@ -26,6 +26,10 @@ Create Library
                             <option>{{project}}</option>
                             {% endfor %}
                         </select>
+                    {% elif field.name == "sample" and sample_id %}
+                        <select id="id_sample" name="sample">
+                            <option value="{{sample_id}}" selected="selected">{{sample}}</option>
+                        </select>
                     {% else %}
                         {{ field }}
                     {% endif %}
