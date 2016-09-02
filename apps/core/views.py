@@ -279,12 +279,14 @@ class LibraryCreate(TemplateView):
                 # save the ManyToMany field.
                 lib_form.save_m2m()
                 # Populate the SmartChipApp result file in SublibraryForm.
-                num_sublibraries = bulk_create_sublibrary(
-                    instance,
-                    sublib_form.cleaned_data.get('smartchipapp_df')
-                    )
-                instance.num_sublibraries = num_sublibraries
-                instance.save()
+                df = sublib_form.cleaned_data.get('smartchipapp_df')
+                if df:
+                    num_sublibraries = bulk_create_sublibrary(
+                        instance,
+                        df
+                        )
+                    instance.num_sublibraries = num_sublibraries
+                    instance.save()
                 # save the formsets.
                 [formset.save() for formset in formsets.values()]
                 msg = "Successfully created the Library."
@@ -376,12 +378,14 @@ class LibraryUpdate(LibraryCreate):
                 # save the ManyToMany field.
                 lib_form.save_m2m()
                 # Populate the SmartChipApp result file in SublibraryForm.
-                num_sublibraries = bulk_create_sublibrary(
-                    instance,
-                    sublib_form.cleaned_data.get('smartchipapp_df')
-                    )
-                instance.num_sublibraries = num_sublibraries
-                instance.save()
+                df = sublib_form.cleaned_data.get('smartchipapp_df')
+                if df:
+                    num_sublibraries = bulk_create_sublibrary(
+                        instance,
+                        df
+                        )
+                    instance.num_sublibraries = num_sublibraries
+                    instance.save()
                 # save the formsets.
                 [formset.save() for formset in formsets.values()]
                 msg = "Successfully created the Library."
