@@ -32,6 +32,7 @@ from .models import (
     Sequencing,
     SequencingDetail
     )
+from .utils import parse_smartchipapp_file
 
 #===========================
 # 3rd-party app imports
@@ -74,7 +75,6 @@ class SampleForm(ModelForm):
 AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     Sample,
     AdditionalSampleInformation,
-    # exclude = ['delete'],
     fields = "__all__",
     help_texts = {
         'patient_biopsy_date': ('yyyy-mm-dd.')
@@ -118,6 +118,16 @@ class SublibraryForm(Form):
         required=False,
         )
 
+    def clean_smartchipapp_file(self):
+        file = self.cleaned_data['smartchipapp_file']
+        if file:
+            try:
+                df = parse_smartchipapp_file(file)
+                self.cleaned_data['smartchipapp_df'] = df
+            except:
+                msg = "failed to parse the file."
+                self.add_error('smartchipapp_file', msg)
+
 class LibraryQuantificationAndStorageForm(ModelForm):
 
     """
@@ -137,8 +147,6 @@ class LibraryQuantificationAndStorageForm(ModelForm):
             if ext != '.xad':
                 msg = "file not supported with extension: %s" % ext
                 self.add_error('agilent_bioanalyzer_xad', msg)
-                # raise Exception(msg)
-                print msg
         return file
 
     def clean_agilent_bioanalyzer_png(self):
@@ -149,7 +157,6 @@ class LibraryQuantificationAndStorageForm(ModelForm):
             if ext != '.png':
                 msg = "file not supported with extension: %s" % ext
                 self.add_error('agilent_bioanalyzer_png', msg)
-                print msg
         return file
 
 LibrarySampleDetailInlineFormset = inlineformset_factory(

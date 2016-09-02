@@ -278,15 +278,13 @@ class LibraryCreate(TemplateView):
                 instance.save()
                 # save the ManyToMany field.
                 lib_form.save_m2m()
-                # parse/load the SmartChipApp result file if provided.
-                smartchipapp_file = request.FILES.get('smartchipapp_file')
-                if smartchipapp_file:
-                    num_sublibraries = bulk_create_sublibrary(
-                        instance,
-                        smartchipapp_file
-                        )
-                    instance.num_sublibraries = num_sublibraries
-                    instance.save()
+                # Populate the SmartChipApp result file in SublibraryForm.
+                num_sublibraries = bulk_create_sublibrary(
+                    instance,
+                    sublib_form.cleaned_data.get('smartchipapp_df')
+                    )
+                instance.num_sublibraries = num_sublibraries
+                instance.save()
                 # save the formsets.
                 [formset.save() for formset in formsets.values()]
                 msg = "Successfully created the Library."
@@ -377,15 +375,13 @@ class LibraryUpdate(LibraryCreate):
                 instance.save()
                 # save the ManyToMany field.
                 lib_form.save_m2m()
-                # parse/load the SmartChipApp result file if provided.
-                smartchipapp_file = request.FILES.get('smartchipapp_file')
-                if smartchipapp_file:
-                    num_sublibraries = bulk_create_sublibrary(
-                        instance,
-                        smartchipapp_file
-                        )
-                    instance.num_sublibraries = num_sublibraries
-                    instance.save()
+                # Populate the SmartChipApp result file in SublibraryForm.
+                num_sublibraries = bulk_create_sublibrary(
+                    instance,
+                    sublib_form.cleaned_data.get('smartchipapp_df')
+                    )
+                instance.num_sublibraries = num_sublibraries
+                instance.save()
                 # save the formsets.
                 [formset.save() for formset in formsets.values()]
                 msg = "Successfully created the Library."
