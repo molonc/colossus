@@ -12,7 +12,7 @@ Sample Details
         {% for field, value in sample.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
     </table>
@@ -27,7 +27,7 @@ Sample Details
         {% for field, value in sample.additionalsampleinformation.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
     </table>

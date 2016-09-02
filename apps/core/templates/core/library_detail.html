@@ -11,16 +11,16 @@ Library Details
     <table class="table-condensed">
         <tr>
             <th id="thid"> Sample:</th>
-            <td id="tdid"><a href="{{library.sample.get_absolute_url}}">{{library.sample}}</a></td></tr>
+            <td id="tdid" class="notes"><a href="{{library.sample.get_absolute_url}}">{{library.sample}}</a></td></tr>
         {% for field, value in library.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
         <tr>
             <th id="thid">Project:</th>
-            <td id="tdid">{{library.projects.all|join:", "}}</td>
+            <td id="tdid" class="notes">{{library.projects.all|join:", "}}</td>
     </table>
 </div><br>
 <!-- end of Meta Information -->
@@ -33,7 +33,7 @@ Library Details
         {% for field, value in library.librarysampledetail.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
     </table>
@@ -51,7 +51,7 @@ Library Details
         {% for field, value in library.libraryconstructioninformation.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
     </table>
@@ -69,7 +69,7 @@ Library Details
         {% for field, value in library.libraryquantificationandstorage.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
     </table>
