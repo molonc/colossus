@@ -234,7 +234,6 @@ class LibraryCreate(TemplateView):
     """
 
     template_name = "core/library_create.html"
-    projects = [t.name for t in Tag.objects.all()]
 
     def get_context_data(self, from_sample=None):
         if from_sample:
@@ -247,7 +246,7 @@ class LibraryCreate(TemplateView):
         'libdetail_formset': LibrarySampleDetailInlineFormset(),
         'libcons_formset': LibraryConstructionInfoInlineFormset(),
         'libqs_formset': LibraryQuantificationAndStorageInlineFormset(),
-        'projects': self.projects,
+        'projects': [t.name for t in Tag.objects.all()],
         'sample': str(sample),
         'sample_id': from_sample
         }
@@ -322,42 +321,63 @@ class LibraryCreate(TemplateView):
         return all_valid, formsets
 
 
-@Render("core/library_update.html")
-@login_required()
-def library_update(request, pk):
-    """library update page."""
-    library = get_object_or_404(Library, pk=pk)
-    if request.method == 'POST':
+class LibraryUpdate(LibraryCreate):
+
+    """
+    Library update page.
+    """
+
+    template_name = "core/library_update.html"
+
+    def get_context_data(self, pk):
+        library = get_object_or_404(Library, pk=pk)
+        selected_projects = library.projects.names()
+        context = {
+        'pk': pk,
+        'lib_form': LibraryForm(instance=library),
+        'sublib_form': SublibraryForm(),
+        'libdetail_formset': LibrarySampleDetailInlineFormset(
+            instance=library
+            ),
+        'libcons_formset': LibraryConstructionInfoInlineFormset(
+            instance=library
+            ),
+        'libqs_formset': LibraryQuantificationAndStorageInlineFormset(
+            instance=library
+            ),
+        'projects': [t.name for t in Tag.objects.all()],
+        'selected_projects': selected_projects,
+        }
+        return context
+
+    def get(self, request, pk, *args, **kwargs):
+        context = self.get_context_data(pk)
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk, *args, **kwargs):
+        context = self.get_context_data(pk)
         ## this is becaues of this django feature:
         ## https://code.djangoproject.com/ticket/1130
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
 
-        form = LibraryForm(request.POST, instance=library)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            
-            # save project tags
-            form.save_m2m()
-
-            sublib_form = SublibraryForm(
-                request.POST,
-                request.FILES,
-                )
-            libdetail_formset = LibrarySampleDetailInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            libcons_formset = LibraryConstructionInfoInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
-                request.POST,
-                request.FILES or None,
-                instance=instance
-                )
-            if sublib_form.is_valid():
+        library = get_object_or_404(Library, pk=pk)
+        lib_form = LibraryForm(request.POST, instance=library)
+        sublib_form = SublibraryForm(request.POST, request.FILES or None)
+        context['lib_form'] = lib_form
+        context['sublib_form'] = sublib_form
+        if lib_form.is_valid() and sublib_form.is_valid():
+            # if 'commit=True' when saving lib_form, then it strangely
+            # raises the following error when trying to save the
+            # ManyToMany 'Projects' field:
+            # 'LibraryForm' object has no attribute 'save_m2m'.
+            instance = lib_form.save(commit=False)
+            all_valid, formsets = self._validate_formsets(request, instance)
+            context.update(formsets)
+            if all_valid:
+                instance.save()
+                # save the ManyToMany field.
+                lib_form.save_m2m()
+                # parse/load the SmartChipApp result file if provided.
                 smartchipapp_file = request.FILES.get('smartchipapp_file')
                 if smartchipapp_file:
                     num_sublibraries = bulk_create_sublibrary(
@@ -366,57 +386,15 @@ def library_update(request, pk):
                         )
                     instance.num_sublibraries = num_sublibraries
                     instance.save()
-            if libdetail_formset.is_valid():
-                libdetail_formset.save()
-            if libcons_formset.is_valid():
-                libcons_formset.save()
-            if libqs_formset.is_valid():
-                libqs_formset.save()
+                # save the formsets.
+                [formset.save() for formset in formsets.values()]
+                msg = "Successfully created the Library."
+                messages.success(request, msg)
+                return HttpResponseRedirect(instance.get_absolute_url())
 
-            msg = "Successfully updated the Library."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
-
-        else:
-            msg = "Failed to update the library. Please fix the errors below."
-            messages.error(request, msg)
-            sublib_form = SublibraryForm()
-            libdetail_formset = LibrarySampleDetailInlineFormset(
-                instance=library
-                )
-            libcons_formset = LibraryConstructionInfoInlineFormset(
-                instance=library
-                )
-            libqs_formset = LibraryQuantificationAndStorageInlineFormset(
-                instance=library
-                )
-    
-    else:
-        form = LibraryForm(instance=library)
-        sublib_form = SublibraryForm()
-        libdetail_formset = LibrarySampleDetailInlineFormset(
-            instance=library
-            )
-        libcons_formset = LibraryConstructionInfoInlineFormset(
-            instance=library
-            )
-        libqs_formset = LibraryQuantificationAndStorageInlineFormset(
-            instance=library
-            )
-
-    selected_projects = library.projects.names()
-    projects = [t.name for t in Tag.objects.all()]
-    context = {
-        'pk': pk,
-        'form': form,
-        'sublib_form': sublib_form,
-        'libdetail_formset': libdetail_formset,
-        'libcons_formset': libcons_formset,
-        'libqs_formset': libqs_formset,
-        'projects': projects,
-        'selected_projects': selected_projects,
-        }
-    return context
+        msg = "Failed to create the library. Please fix the errors below."
+        messages.error(request, msg)
+        return render(request, self.template_name, context)
 
 
 #============================
