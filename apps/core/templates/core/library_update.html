@@ -30,6 +30,16 @@ Edit Library
                             {% endif %}
                             {% endfor %}
                         </select>
+                    {% elif field.name == "relates_to" %}
+                        <select class="selectpicker" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
+                            {% for lib in related_libs %}
+                            {% if lib in selected_related_libs %}
+                            <option value={{lib.id}} selected="{{lib}}">{{lib}}</option>
+                            {% else %}
+                            <option value={{lib.id}}>{{lib}}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
                     {% else %}
                         {{ field }}
                     {% endif %}

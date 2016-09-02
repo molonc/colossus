@@ -13,7 +13,28 @@ Create Sequencing
             <legend>Sequencing Information</legend>
             <table class="table-condensed">
                 <thead>
-                {{form}}
+                {% for field in form %}
+                <tr>
+                    <th>
+                    {{field.label_tag}}
+                    </th>
+                    <td>
+                    {{ field.errors }}
+                    {% if field.name == "relates_to" %}
+                        <select class="selectpicker" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
+                            {% for seq in related_seqs %}
+                            <option value={{seq.id}}>{{seq}}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text }}</p>
+                    {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
                 </thead>
             </table>
          </fieldset><br>

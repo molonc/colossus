@@ -19,6 +19,14 @@ Sequencing Details
             <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
+        <tr>
+            <th id="thid">Relates to:</th>
+            <td id="tdid">
+            {% for seq in sequencing.relates_to.only %}
+                <a href="{{seq.get_absolute_url}}">{{seq}}</a><br>
+            {% endfor %}
+            </td>
+        </tr>
     </table>
 </div><br>
 <!-- end of Meta Information -->

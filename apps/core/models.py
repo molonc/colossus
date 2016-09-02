@@ -416,6 +416,12 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     jira_ticket = create_chrfield("Jira ticket", blank=False)
     num_sublibraries = create_intfield("Number of sublibraries", default=0)
     description = create_textfield("Description")
+    relates_to = models.ManyToManyField(
+        "self",
+        verbose_name="Relates to",
+        null=True,
+        blank=True,
+        )
 
     def get_absolute_url(self):
         return reverse("core:library_detail", kwargs={"pk": self.pk})
@@ -756,6 +762,12 @@ class Sequencing(models.Model, FieldValue):
         )
     submission_date = models.DateField(
         "Submission date",
+        null=True,
+        blank=True,
+        )
+    relates_to = models.ManyToManyField(
+        "self",
+        verbose_name="Relates to",
         null=True,
         blank=True,
         )
