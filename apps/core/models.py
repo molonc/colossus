@@ -794,9 +794,9 @@ class SequencingDetail(models.Model, FieldValue):
         )
 
     ## fields
-    flow_cell_id = create_chrfield("Flow cell ID")
+    flow_cell_id = create_chrfield("Flow cell/Lane ID")
     gsc_library_id = create_chrfield("GSC library ID")
-    lane_id = create_chrfield("Lane ID")
+    # lane_id = create_chrfield("Lane ID")
     path_to_archive = create_chrfield(
         "Path to archive",
         max_length=150
