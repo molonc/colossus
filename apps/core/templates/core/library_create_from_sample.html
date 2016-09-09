@@ -13,7 +13,7 @@ Create Library
             <legend>Library Information</legend>
             <table class="table-condensed">
                 <thead>
-                {% for field in lib_form %}
+                {% for field in form %} 
                 <tr>
                     <th>
                     {{field.label_tag}}
@@ -29,6 +29,7 @@ Create Library
                     {% elif field.name == "sample" and sample_id %}
                         <select id="id_sample" name="sample">
                             <option value="{{sample_id}}" selected="selected">{{sample}}</option>
+                        </select>
                     {% elif field.name == "relates_to" %}
                         <select class="selectpicker" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
                             {% for lib in related_libs %}

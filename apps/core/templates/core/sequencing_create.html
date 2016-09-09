@@ -23,6 +23,11 @@ Create Sequencing
                     {% if field.name == "library" and library_id %}
                         <select id="id_library" name="library">
                             <option value="{{library_id}}" selected="selected">{{library}}</option>
+                    {% elif field.name == "relates_to" %}
+                        <select class="selectpicker" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
+                            {% for seq in related_seqs %}
+                            <option value={{seq.id}}>{{seq}}</option>
+                            {% endfor %}
                         </select>
                     {% else %}
                         {{ field }}

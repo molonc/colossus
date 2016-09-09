@@ -11,14 +11,22 @@ Sequencing Details
     <table class="table-condensed">
         <tr>
             <th id="thid">Library:</th>
-            <td id="tdid"><a href="{{sequencing.library.get_absolute_url}}">{{sequencing.library}}</a></td>
+            <td id="tdid" class="notes"><a href="{{sequencing.library.get_absolute_url}}">{{sequencing.library}}</a></td>
         </tr>
         {% for field, value in sequencing.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
+        <tr>
+            <th id="thid">Relates to:</th>
+            <td id="tdid">
+            {% for seq in sequencing.relates_to.only %}
+                <a href="{{seq.get_absolute_url}}">{{seq}}</a><br>
+            {% endfor %}
+            </td>
+        </tr>
     </table>
 </div><br>
 <!-- end of Meta Information -->
@@ -31,7 +39,7 @@ Sequencing Details
         {% for field, value in sequencing.sequencingdetail.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
-            <td id="tdid">{{value}}</td>
+            <td id="tdid" class="notes">{{value}}</td>
         </tr>
         {% endfor %}
     </table>

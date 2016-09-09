@@ -66,6 +66,11 @@ td, th {
     width: 70%;
 }
 
+/*translate new lines to <br> */
+.notes {
+    white-space: pre-line;
+}
+
 .emph {
     font-size: 13px;
     color: #FF3D00;

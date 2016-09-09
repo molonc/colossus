@@ -2,32 +2,32 @@
 {% load staticfiles %}
 
 {% block title %}
-Edit Sequencing
+Create Sequencing
 {% endblock %}
 
 {% block body %}
 <div class="container graybg">
-    <form action="{% url 'core:sequencing_update' pk=pk %}" method="POST">
+    <form action="{% url 'core:sequencing_create' %}" method="POST">
         {% csrf_token %}
         <fieldset>
             <legend>Sequencing Information</legend>
             <table class="table-condensed">
                 <thead>
-                {% for field in form %}
+                {% for field in form %} 
                 <tr>
                     <th>
                     {{field.label_tag}}
                     </th>
                     <td>
                     {{ field.errors }}
-                    {% if field.name == "relates_to" %}
+                    {% if field.name == "library" and library_id %}
+                        <select id="id_library" name="library">
+                            <option value="{{library_id}}" selected="selected">{{library}}</option>
+                        </select>
+                    {% elif field.name == "relates_to" %}
                         <select class="selectpicker" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
                             {% for seq in related_seqs %}
-                            {% if seq in selected_related_seqs %}
-                            <option value={{seq.id}} selected="{{seq}}">{{seq}}</option>
-                            {% else %}
                             <option value={{seq.id}}>{{seq}}</option>
-                            {% endif %}
                             {% endfor %}
                         </select>
                     {% else %}
@@ -50,8 +50,8 @@ Edit Sequencing
                 </thead>
             </table>
          </fieldset><br>
-        <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
-        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=pk %}">Cancel</a>
+        <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_list' %}">Cancel</a>
     </form><br>
 </div>
 {% endblock %}

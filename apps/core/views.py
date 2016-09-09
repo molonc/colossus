@@ -248,7 +248,8 @@ class LibraryCreate(TemplateView):
         'libqs_formset': LibraryQuantificationAndStorageInlineFormset(),
         'projects': [t.name for t in Tag.objects.all()],
         'sample': str(sample),
-        'sample_id': from_sample
+        'sample_id': from_sample,
+        'related_libs': Library.objects.all()
         }
         return context
 
@@ -332,6 +333,7 @@ class LibraryUpdate(LibraryCreate):
     def get_context_data(self, pk):
         library = get_object_or_404(Library, pk=pk)
         selected_projects = library.projects.names()
+        selected_related_libs = library.relates_to.only()
         context = {
         'pk': pk,
         'lib_form': LibraryForm(instance=library),
@@ -347,6 +349,8 @@ class LibraryUpdate(LibraryCreate):
             ),
         'projects': [t.name for t in Tag.objects.all()],
         'selected_projects': selected_projects,
+        'related_libs': Library.objects.all(),
+        'selected_related_libs': selected_related_libs
         }
         return context
 
@@ -473,12 +477,12 @@ def sequencing_create(request, from_library=None):
         library = get_object_or_404(Library, pk=from_library)
     else:
         library = None
-
     if request.method == 'POST':
         form = SequencingForm(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
+            form.save_m2m()
             seqdetail_formset = SequencingDetailInlineFormset(
                 request.POST,
                 instance=instance
@@ -503,6 +507,7 @@ def sequencing_create(request, from_library=None):
         'seqdetail_formset': seqdetail_formset,
         'library': str(library),
         'library_id': from_library,
+        'related_seqs': Sequencing.objects.all()
         }
     return context
 
@@ -516,6 +521,7 @@ def sequencing_update(request, pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
+            form.save_m2m()
             seqdetail_formset = SequencingDetailInlineFormset(
                 request.POST,
                 instance=instance
@@ -541,10 +547,13 @@ def sequencing_update(request, pk):
             instance=sequencing
             )
 
+    selected_related_seqs = sequencing.relates_to.only()
     context = {
         'pk': pk,
         'form': form,
         'seqdetail_formset': seqdetail_formset,
+        'related_seqs': Sequencing.objects.all(),
+        'selected_related_seqs': selected_related_seqs
         }
     return context
 

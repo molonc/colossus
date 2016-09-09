@@ -425,6 +425,12 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     jira_ticket = create_chrfield("Jira ticket", blank=False)
     num_sublibraries = create_intfield("Number of sublibraries", default=0)
     description = create_textfield("Description")
+    relates_to = models.ManyToManyField(
+        "self",
+        verbose_name="Relates to",
+        null=True,
+        blank=True,
+        )
 
     def get_absolute_url(self):
         return reverse("core:library_detail", kwargs={"pk": self.pk})
@@ -782,6 +788,12 @@ class Sequencing(models.Model, FieldValue):
         null=True,
         blank=True,
         )
+    relates_to = models.ManyToManyField(
+        "self",
+        verbose_name="Relates to",
+        null=True,
+        blank=True,
+        )
 
     def has_sequencing_detail(self):
         return hasattr(self,
@@ -817,9 +829,9 @@ class SequencingDetail(models.Model, FieldValue):
         )
 
     ## fields
-    flow_cell_id = create_chrfield("Flow cell ID")
+    flow_cell_id = create_chrfield("Flow cell/Lane ID")
     gsc_library_id = create_chrfield("GSC library ID")
-    lane_id = create_chrfield("Lane ID")
+    # lane_id = create_chrfield("Lane ID")
     path_to_archive = create_chrfield(
         "Path to archive",
         max_length=150
