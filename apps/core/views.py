@@ -467,43 +467,13 @@ def sequencing_detail(request, pk):
             
 @Render("core/sequencing_create.html")
 @login_required()
-def sequencing_create(request):
+def sequencing_create(request, from_library=None):
     """sequencing create page."""
-    if request.method == 'POST':
-        form = SequencingForm(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            seqdetail_formset = SequencingDetailInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            if seqdetail_formset.is_valid():
-                seqdetail_formset.save()
-
-            msg = "Successfully created the Sequencing."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
-        else:
-            msg = "Failed to create the sequencing. Please fix the errors below."
-            messages.error(request, msg)
-            seqdetail_formset = SequencingDetailInlineFormset()
-    
+    if from_library:
+        library = get_object_or_404(Library, pk=from_library)
     else:
-        form = SequencingForm()
-        seqdetail_formset = SequencingDetailInlineFormset()
+        library = None
 
-    context = {
-        'form': form,
-        'seqdetail_formset': seqdetail_formset,
-        }
-    return context
-
-@Render("core/sequencing_create_from_library.html")
-@login_required()
-def sequencing_create_from_library(request, from_library):
-    """sequencing create page."""
-    library = get_object_or_404(Library, pk=from_library)
     if request.method == 'POST':
         form = SequencingForm(request.POST)
         if form.is_valid():
