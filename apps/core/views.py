@@ -281,7 +281,7 @@ class LibraryCreate(TemplateView):
                 lib_form.save_m2m()
                 # Populate the SmartChipApp result file in SublibraryForm.
                 df = sublib_form.cleaned_data.get('smartchipapp_df')
-                if not df.empty:
+                if df is not None and not df.empty:
                     num_sublibraries = bulk_create_sublibrary(
                         instance,
                         df
@@ -383,7 +383,7 @@ class LibraryUpdate(LibraryCreate):
                 lib_form.save_m2m()
                 # Populate the SmartChipApp result file in SublibraryForm.
                 df = sublib_form.cleaned_data.get('smartchipapp_df')
-                if not df.empty:
+                if df is not None and not df.empty:
                     num_sublibraries = bulk_create_sublibrary(
                         instance,
                         df
