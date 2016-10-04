@@ -84,5 +84,25 @@
         </div>
  -->        <!-- end of Footer -->
     
+    <!-- back to top link -->
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('body').prepend('<a href="#" class="back-to-top">Back to Top</a>');
+            $('a.back-to-top').click(function() {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 400);
+                return false;
+            });
+            $(window).scroll(function() {
+                if ( $(window).scrollTop() > 300 ) {
+                    $('a.back-to-top').fadeIn('slow');
+                } else {
+                    $('a.back-to-top').fadeOut('slow');
+                }
+            });
+        });
+    </script>
+
     </body>
 </html>
