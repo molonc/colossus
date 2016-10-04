@@ -73,12 +73,21 @@ td, th {
 
 .emph {
     font-size: 13px;
+    font-style: normal;
     color: #FF3D00;
     background-color: #FFF3E0;
     border: solid 1px #757575;
     padding-left: 5px;
     padding-right: 5px;
-    font-style: normal;
+}
+
+.counter {
+  font-size: 11px;
+  font-style: normal;
+  color: #212121;
+  background-color: #DCE775;
+  padding: 0 6px;
+  border-radius: 9px;
 }
 
 .graybg {
@@ -157,4 +166,20 @@ a:hover {
     z-index: 10;
     height: 3em;
     margin-top: -3em;
+}
+
+/* back to top class */
+a.back-to-top {
+    display: none;
+    width: 40px;
+    height: 40px;
+    text-indent: -9999px;
+    position: fixed;
+    z-index: 999;
+    right: 20px;
+    bottom: 20px;
+    background: #C5E1A5 url("up-arrow.png") no-repeat center 50%;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
 }

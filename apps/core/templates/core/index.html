@@ -10,21 +10,21 @@ List of Tables
         <table class="table-striped" style="width:100%;">
             <tbody>
                 <tr>
-                    <td><a href="{% url 'core:sample_list' %}">Samples</a></td>
+                    <td><a href="{% url 'core:sample_list' %}">Samples</a> <i class="counter">{{sample_size}}</i></td>
                     <td>
                         <p style="float:right;">
                         <a href="{% url 'core:sample_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="{% url 'core:library_list' %}">Libraries</a></td>
+                    <td><a href="{% url 'core:library_list' %}">Libraries</a> <i class="counter">{{library_size}}</i></td>
                     <td>
                         <p style="float:right;">
                         <a href="{% url 'core:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="{% url 'core:sequencing_list' %}">Sequencings</a></td>
+                    <td><a href="{% url 'core:sequencing_list' %}">Sequencings</a> <i class="counter">{{sequencing_size}}</i></td>
                     <td>
                         <p style="float:right;">
                         <a href="{% url 'core:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
