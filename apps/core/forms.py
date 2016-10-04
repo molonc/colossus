@@ -17,6 +17,7 @@ from django.forms import (
     inlineformset_factory,
     BaseInlineFormSet
     )
+from django.forms.extras.widgets import SelectDateWidget
 
 #===========================
 # App imports
@@ -47,21 +48,19 @@ class SampleForm(ModelForm):
     class Meta:
         model = Sample
         fields = "__all__"
-        # widgets = {
-        #     'collect_date': DateWidget(
-        #         attrs = {'id':'id_dateTimeField'},
-        #         bootstrap_version=3,
-        #         usel10n=True
-        #         )
-        #     }
-        help_texts = {
-            'sample_id': ('Sequencing ID (usually SA ID).'),
-            'anonymous_patient_id': ('Original/clinical patient ID.'),
-            'xenograft_biopsy_date': ('yyyy-mm-dd.')
-            }
+        widgets = {
+        'xenograft_biopsy_date': SelectDateWidget(
+            years=range(2000, 2020)
+            )
+        }
         labels = {
             'sample_id': ('*Sample ID'),
         }
+        help_texts = {
+            'sample_id': ('Sequencing ID (usually SA ID).'),
+            'anonymous_patient_id': ('Original/clinical patient ID.'),
+            # 'xenograft_biopsy_date': ('yyyy-mm-dd.')
+            }
 
     def clean(self):
         ## if it's a new instance, the sample_id should not exist.
@@ -75,11 +74,17 @@ class SampleForm(ModelForm):
 AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     Sample,
     AdditionalSampleInformation,
+    # exclude = ['delete'],
     fields = "__all__",
-    help_texts = {
-        'patient_biopsy_date': ('yyyy-mm-dd.')
+    widgets = {
+    'patient_biopsy_date': SelectDateWidget(
+        years=range(2000, 2020)
+        )
     }
     # can_delete = True,
+    # help_texts = {
+    #     'patient_biopsy_date': ('yyyy-mm-dd.')
+    # },
     )
 
 
@@ -91,15 +96,15 @@ class LibraryForm(ModelForm):
         model = Library
         fields = "__all__"
         # exclude = ['projects']
-        help_texts = {
-            'sample': ('Sequencing ID (usually SA ID).'),
-            'pool_id': ('Chip ID.'),
-            'jira_ticket': ('Jira Ticket.'),
-            }
         labels = {
             'sample': ('*Sample'),
             'pool_id': ('*Chip ID'),
             'jira_ticket': ('*Jira Ticket'),
+            }
+        help_texts = {
+            'sample': ('Sequencing ID (usually SA ID).'),
+            'pool_id': ('Chip ID.'),
+            'jira_ticket': ('Jira Ticket.'),
             }
 
     def clean(self):
@@ -163,18 +168,26 @@ LibrarySampleDetailInlineFormset = inlineformset_factory(
     Library,
     LibrarySampleDetail,
     fields = "__all__",
-    help_texts = {
-        'sample_spot_date': ('yyyy-mm-dd.')
+    widgets = {
+    'sample_spot_date': SelectDateWidget(
+        years=range(2000,2020))
     }
+    # help_texts = {
+    #     'sample_spot_date': ('yyyy-mm-dd.')
+    # }
     )
 
 LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     Library,
     LibraryConstructionInformation,
     fields = "__all__",
-    help_texts = {
-        'library_prep_date': ('yyyy-mm-dd.'),
+    widgets = {
+    'library_prep_date': SelectDateWidget(
+        years=range(2000,2020))
     }
+    # help_texts = {
+    #     'library_prep_date': ('yyyy-mm-dd.'),
+    # }
     )
 
 LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
@@ -206,12 +219,16 @@ class SequencingForm(ModelForm):
         model = Sequencing
         # fields = "__all__"
         exclude = ['pool_id']
-        help_texts = {
-            'library': ('Select a library.'),
-            'submission_date': ('yyyy-mm-dd.')
-            }
+        widgets = {
+            'submission_date': SelectDateWidget(
+                years=range(2000,2020))
+        }
         labels = {
             'library': ('*Library'),
+            }
+        help_texts = {
+            'library': ('Select a library.'),
+            # 'submission_date': ('yyyy-mm-dd.')
             }
 
 SequencingDetailInlineFormset = inlineformset_factory(
