@@ -161,7 +161,7 @@ class LibraryQuantificationAndStorageForm(ModelForm):
         file = self.cleaned_data['agilent_bioanalyzer_png']
         if file:
             _, ext = os.path.splitext(file.name)
-            if ext != '.png':
+            if ext.lower() != '.png':
                 msg = "file not supported with extension: %s" % ext
                 self.add_error('agilent_bioanalyzer_png', msg)
         return file
