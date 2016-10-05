@@ -29,7 +29,7 @@ List of Libraries
                 <tr>
                     <td><a href="{% url 'core:library_detail' pk=library.pk %}">{{library.sample.sample_id}}</a></td>
                     <td>{{library.pool_id}}</td>
-                    <td>{{library.jira_ticket}}</td>
+                    <td><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{library.jira_ticket}}</a></td>
                     <td>
                         {% for project in library.projects.all %}
                         {{project}}<br>

@@ -15,7 +15,11 @@ Library Details
         {% for field, value in library.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
+            {% if field == "Jira ticket" %}
+            <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{value}}">{{value}}</a></td>
+            {% else %}
             <td id="tdid" class="notes">{{value}}</td>
+            {% endif %}
         </tr>
         {% endfor %}
         <tr>
