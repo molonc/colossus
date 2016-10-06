@@ -39,11 +39,11 @@ List of Libraries
                     </td>
                     <td style="text-align:center;">{{library.num_sublibraries}}</td>
                     {% if library.is_sequenced %}
-                    <td style="text-align:center;"><i class="fa fa-check" aria-hidden="true" style="color:green;"></i></td>
+                    <td style="text-align:center;"><i class="fa fa-check" aria-hidden="true" style="color:green;" title="Sequenced"></i></td>
                     {% elif library.libraryquantificationandstorage.qc_check == 'P' %}
-                    <td style="text-align:center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:orange"></td>
+                    <td style="text-align:center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:orange" title="Will sequence"></td>
                     {% elif library.libraryquantificationandstorage.qc_check == 'N' %}
-                    <td style="text-align:center"><i class="fa fa-times" aria-hidden="true" style="color:red"></td>
+                    <td style="text-align:center"><i class="fa fa-times" aria-hidden="true" style="color:red" title="Will not sequence"></td>
                     {% else %}
                     <td style="text-align:center"></td>
                     {% endif %}
