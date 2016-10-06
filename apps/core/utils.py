@@ -16,8 +16,8 @@ from django.conf import settings
 def parse_smartchipapp_file(csv_infile):
     """parse the result file of SmartChipApp."""
     df = pd.read_excel(csv_infile, sheetname=0)
-    ## filter out the cells whose Pick_Met value is not NaN
-    df = df[~df['Pick_Met'].isnull()]
+    ## filter out the cells whose Spot_Well value is not NaN
+    df = df[~df['Spot_Well'].isnull()]
     ## change the column names to match the filed names of the model
     df.columns = [c.lower() for c in df.columns]
     return df
