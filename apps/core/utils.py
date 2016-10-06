@@ -131,7 +131,7 @@ def mk_data_table(sequencing):
         'I5_Index_ID': d['index_i5'],
         'index2': d['primer_i5'],
         #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
-        'Description': 'CC=' + d['pick_met'] + ';' + 'EC=',
+        'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['spot_class'],
         }
         return res
 
