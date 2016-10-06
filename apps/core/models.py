@@ -205,6 +205,9 @@ class LibraryAssistant(object):
                     )
         return missing_required_fields
 
+    def is_sequenced(self):
+        return any([s.sequencingdetail.path_to_archive
+            for s in self.sequencing_set.all()])
 
 #============================
 # Sample models
