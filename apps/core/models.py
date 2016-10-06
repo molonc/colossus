@@ -651,6 +651,12 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         blank=True
         )
 
+    ## choices
+    qc_check_choices = (
+        ('P','Will sequence'),
+        ('N','Will not sequence'),
+        )
+
     ## fields
     average_size = create_intfield("Average size (bp)")
     dna_concentration_nm = create_intfield("DNA concentration (nM)")
@@ -658,6 +664,10 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
     dna_volumne = create_chrfield("DNA volume (uL)")
     library_location = create_chrfield("Library location")
     library_tube_label = create_chrfield("Library tube label")
+    qc_check = create_chrfield(
+        "QC check",
+        choices=qc_check_choices
+        )
     qc_notes = create_textfield("QC notes")
     quantification_method = create_chrfield(
         "Quantification method",
