@@ -123,7 +123,7 @@ def mk_data_table(sequencing):
         'R'+ str(d['row']),
         'C'+ str(d['column'])
         ]),
-        'Sample_Name': d['sample'],
+        'Sample_Name': '',
         'Sample_Plate': 'R' + str(d['row']) + '_C' + str(d['column']),
         'Sample_Well': 'R' + str(d['row']) + '_C' + str(d['img_col']),
         'I7_Index_ID': d['index_i7'],
@@ -135,7 +135,7 @@ def mk_data_table(sequencing):
         }
         return res
 
-    sample_project = ','.join(sequencing.library.projects.names())
+    sample_project = '' #','.join(sequencing.library.projects.names())
     newl = []
     oldl = list(sequencing.library.sublibraryinformation_set.values())
     df = pd.DataFrame(oldl)
