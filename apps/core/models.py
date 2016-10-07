@@ -536,6 +536,12 @@ class LibrarySampleDetail(models.Model, FieldValue):
         ('U','Unknown'),
         )
 
+    spotting_location_choices = (
+        ('A','Aparicio Lab'),
+        ('H','Huntsman Lab'),
+        ('G','GSC'),
+        )
+
     ## fields
     cell_state = create_chrfield(
         "Cell state",
@@ -564,6 +570,10 @@ class LibrarySampleDetail(models.Model, FieldValue):
         "Sample spot date",
         null=True,
         blank=True,
+        )
+    spotting_location = create_chrfield(
+        "Spotting location",
+        choices=spotting_location_choices
         )
 
 
@@ -598,6 +608,12 @@ class LibraryConstructionInformation(models.Model, FieldValue):
         ('O','Other'),
         )
 
+    spotting_location_choices = (
+        ('A','Aparicio Lab'),
+        ('H','Huntsman Lab'),
+        ('G','GSC'),
+        )
+
     ## fields
     chip_format = create_chrfield(
         "Chip format",
@@ -628,6 +644,10 @@ class LibraryConstructionInformation(models.Model, FieldValue):
     protocol = create_textfield(
         "Protocol",
         max_length=1000
+        )
+    spotting_location = create_chrfield(
+        "Spotting location",
+        choices=spotting_location_choices
         )
 
 
