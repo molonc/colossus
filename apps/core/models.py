@@ -492,11 +492,14 @@ class SublibraryInformation(models.Model, FieldValue):
     num_drops = create_intfield("Num_Drops")
 
     def get_sublibrary_id(self):
+        #add leading zero to one digit row/col
+        row = str(self.row) if self.row > 9 else '0' + str(self.row)
+        col = str(self.column) if self.column > 9 else '0' + str(self.column)
         res = '_'.join(
             [
                 self.library.sample.sample_id,
                 self.library.pool_id,
-                str(self.row) + str(self.column),
+                row + col,
             ]
             )
         return res
