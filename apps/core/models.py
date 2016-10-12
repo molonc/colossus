@@ -683,12 +683,23 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         ('N','Will not sequence'),
         )
 
+    library_location_choices = (
+        ('C', 'CRC UL1 Rack 6-2'),
+        ('G', 'GSC'),
+        ('U', 'UBC')
+        )
+
     ## fields
     average_size = create_intfield("Average size (bp)")
     dna_concentration_nm = create_intfield("DNA concentration (nM)")
     dna_concentration_ngul = create_intfield("DNA concentration (ng/uL)")
     dna_volumne = create_chrfield("DNA volume (uL)")
-    library_location = create_chrfield("Library location")
+    library_location = create_chrfield(
+        "Library location",
+        choices=library_location_choices
+        )
+    box = create_intfield("Box")
+    box_location = create_intfield("Box location")
     library_tube_label = create_chrfield("Library tube label")
     qc_check = create_chrfield(
         "QC check",
