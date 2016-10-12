@@ -96,8 +96,8 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 class LibraryForm(ModelForm):
     class Meta:
         model = Library
-        fields = "__all__"
-        # exclude = ['projects']
+        # fields = "__all__"
+        exclude = ['num_sublibraries']
         labels = {
             'sample': ('*Sample'),
             'pool_id': ('*Chip ID'),
