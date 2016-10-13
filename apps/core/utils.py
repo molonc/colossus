@@ -18,6 +18,7 @@ def parse_smartchipapp_file(csv_infile):
     df = pd.read_excel(csv_infile, sheetname=0)
     ## filter out the cells whose Spot_Well value is not NaN
     df = df[~df['Spot_Well'].isnull()]
+    df = df.sort_values(by='Sample')
     ## change the column names to match the filed names of the model
     df.columns = [c.lower() for c in df.columns]
     return df
