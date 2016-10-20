@@ -19,7 +19,7 @@ from django.views.generic.base import TemplateView
 #============================
 # App imports
 #----------------------------
-from .decorators import Render
+from .helpers import Render
 from .models import (
     Sample,
     Library,
