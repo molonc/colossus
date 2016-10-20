@@ -66,6 +66,17 @@ def create_intfield(name, blank=True, null=True, **kwargs):
         )
 
 
+def create_pathfield(name, max_length=250, blank=True, null=True, **kwargs):
+    """wrap models.CharField for ease of use."""
+    return models.CharField(
+        name,
+        max_length=max_length,
+        blank=blank,
+        null=null,
+        **kwargs
+        )
+
+
 def upload_path(instance, filename):
     """make a proper /path/to/filename for uploaded files."""
     return "{0}/{1}/{2}".format(
