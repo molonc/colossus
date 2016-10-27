@@ -61,9 +61,9 @@ Tag.get_libraries = get_libraries
 @Render("core/index.html")
 def index_view(request):
     context = {
-    'sample_size': len(Sample.objects.all()),
-    'library_size': len(Library.objects.all()),
-    'sequencing_size': len(Sequencing.objects.all())
+    'sample_size': Sample.objects.count(),
+    'library_size': Library.objects.count(),
+    'sequencing_size': Sequencing.objects.count()
     }
     return context
 
