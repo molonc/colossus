@@ -8,11 +8,12 @@ List of Projects
 {% block body %}
 <div class="container" style="background-color:#F5F5F5;">
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table id="datatable" class="table table-striped">
             <thead>
                 <th>Project</th>
                 <th>Libraries</th>
                 <th>Number of Libraries</th>
+                <th></th>
             </thead>
             <tbody>
             {% for project in projects%}

@@ -16,6 +16,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/i18n/defaults-*.min.js"></script>
         <!-- end of Bootstrap-select assets -->
 
+        <!-- DataTable -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css"/>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.12/datatables.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+        <!-- end of DataTable -->
+
         <link rel="stylesheet" href="{% static 'core/style.css' %}" />
         <!-- <script scr="{% static 'core/scripts.js' %}"></script> -->
 
@@ -87,6 +93,7 @@
     <!-- back to top link -->
     <script type="text/javascript">
         $(document).ready(function(){
+            $("#datatable").DataTable();
             $('body').prepend('<a href="#" class="back-to-top">Back to Top</a>');
             $('a.back-to-top').click(function() {
                 $('html, body').animate({
