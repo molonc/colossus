@@ -52,6 +52,9 @@ class Sample(models.Model, FieldValue):
     Base class of different sample types.
     """
 
+    class Meta:
+        ordering = ('sample_id',)
+
     ## track history
     history = HistoricalRecords(
         table_name='history_sample'
@@ -234,6 +237,9 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     """
     Library contains several Cell objects.
     """
+
+    class Meta:
+        ordering = ('sample', 'pool_id')
 
     fields_to_exclude = ['ID', 'Sample']
     values_to_exclude = ['id', 'sample']
