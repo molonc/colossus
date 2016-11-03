@@ -11,6 +11,7 @@ import os
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required #, permission_required
+from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
@@ -227,6 +228,7 @@ def library_delete(request, pk):
     }
     return context
             
+@method_decorator(login_required, name='dispatch')
 class LibraryCreate(TemplateView):
 
     """
