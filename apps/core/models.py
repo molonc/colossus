@@ -42,6 +42,12 @@ register(Tag)
 #     "resubmitted",
 #     ]
 
+class SequencingManager(models.Manager):
+    def with_data(self):
+        return [obj for obj in self.get_queryset()
+        if obj.has_sequencing_detail() and
+        obj.sequencingdetail.path_to_archive]
+
 
 #============================
 # Sample models
@@ -681,6 +687,8 @@ class Sequencing(models.Model, FieldValue):
         null=True,
         blank=True,
         )
+
+    objects = SequencingManager()
 
     def has_sequencing_detail(self):
         return hasattr(self,
