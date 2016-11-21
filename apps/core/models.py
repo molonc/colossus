@@ -537,8 +537,20 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
 
     ## fields
     average_size = create_intfield("Average size (bp)")
-    dna_concentration_nm = create_intfield("DNA concentration (nM)")
-    dna_concentration_ngul = create_intfield("DNA concentration (ng/uL)")
+    dna_concentration_nm = models.DecimalField(
+        "DNA concentration (nM)",
+        max_digits=6,
+        decimal_places=3,
+        null=True,
+        blank=True
+        )
+    dna_concentration_ngul = models.DecimalField(
+        "DNA concentration (ng/uL)",
+        max_digits=6,
+        decimal_places=3,
+        null=True,
+        blank=True
+        )
     dna_volumne = create_chrfield("DNA volume (uL)")
     library_location = create_chrfield(
         "Library location",
