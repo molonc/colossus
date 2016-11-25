@@ -40,6 +40,20 @@ from .utils import parse_smartchipapp_file
 #---------------------------
 from taggit.models import Tag
 
+#===========================
+# Helpers
+#---------------------------
+class SaveDefault(ModelForm):
+
+    """
+    Save the default values all the time.
+    """
+
+    def has_changed(self):
+        """ Should returns True if data differs from initial.
+        By always returning true even unchanged inlines will
+        get validated and saved."""
+        return True
 
 #===========================
 # Sample forms
@@ -75,6 +89,7 @@ class SampleForm(ModelForm):
 AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     Sample,
     AdditionalSampleInformation,
+    form = SaveDefault,
     # exclude = ['delete'],
     fields = "__all__",
     widgets = {
@@ -166,9 +181,16 @@ class LibraryQuantificationAndStorageForm(ModelForm):
                 self.add_error('agilent_bioanalyzer_png', msg)
         return file
 
+    def has_changed(self):
+        """ Should returns True if data differs from initial.
+        By always returning true even unchanged inlines will
+        get validated and saved."""
+        return True
+
 LibrarySampleDetailInlineFormset = inlineformset_factory(
     Library,
     LibrarySampleDetail,
+    form = SaveDefault,
     fields = "__all__",
     widgets = {
     'sample_spot_date': SelectDateWidget(
@@ -184,6 +206,7 @@ LibrarySampleDetailInlineFormset = inlineformset_factory(
 LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     Library,
     LibraryConstructionInformation,
+    form = SaveDefault,
     fields = "__all__",
     widgets = {
     'library_prep_date': SelectDateWidget(
@@ -242,5 +265,6 @@ class SequencingForm(ModelForm):
 SequencingDetailInlineFormset = inlineformset_factory(
     Sequencing,
     SequencingDetail,
+    form = SaveDefault,
     fields = "__all__"
     )
