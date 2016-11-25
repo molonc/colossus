@@ -39,7 +39,11 @@ from .forms import (
     SequencingDetailInlineFormset,
     ProjectForm
     )
-from .utils import bulk_create_sublibrary, generate_samplesheet
+from .utils import (
+    bulk_create_sublibrary,
+    generate_samplesheet,
+    generate_gsc_form,
+    )
 
 #============================
 # 3rd-party app imports
@@ -453,7 +457,6 @@ def project_update(request, pk):
         }
     return context
 
-
 #============================
 # Sequencing views
 #----------------------------
@@ -579,9 +582,18 @@ def sequencing_delete(request, pk):
 
 def sequencing_get_samplesheet(request, pk):
     """generate downloadable samplesheet."""
-    sequencing = get_object_or_404(Sequencing, pk=pk)
-    ofilename = str(sequencing) + '_samplesheet.csv'
-    ofilepath = generate_samplesheet(sequencing, ofilename)
+    ofilename, ofilepath = generate_samplesheet(pk)
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
+    ofile = open(ofilepath, 'r')
+    response.write(ofile.read())
+    ofile.close()
+    os.remove(ofilepath)
+    return response
+
+def sequencing_get_gsc_form(request, pk):
+    """generate downloadable GSC submission form."""
+    ofilename, ofilepath = generate_gsc_form(pk)
     response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
     ofile = open(ofilepath, 'r')
