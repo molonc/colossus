@@ -345,7 +345,8 @@ class SublibraryInformation(models.Model, FieldValue):
             [
                 self.library.sample.sample_id,
                 self.library.pool_id,
-                row + col,
+                'R' + row,
+                'C' + col,
             ]
             )
         return res
