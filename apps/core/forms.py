@@ -12,7 +12,12 @@ import os
 from django.forms import (
     ModelForm,
     Form,
+    CharField,
     FileField,
+    EmailField,
+    DateField,
+    BooleanField,
+    ChoiceField,
     ValidationError,
     inlineformset_factory,
     BaseInlineFormSet
@@ -232,7 +237,7 @@ LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
 
 
 #===========================
-# Sequencing forms
+# Project forms
 #---------------------------
 class ProjectForm(ModelForm):
     class Meta:
@@ -268,3 +273,85 @@ SequencingDetailInlineFormset = inlineformset_factory(
     form = SaveDefault,
     fields = "__all__"
     )
+
+class GSCFormDeliveryInfo(Form):
+
+    """
+    Delivery information section of GSC submission form.
+    """
+
+    # fields
+    name = CharField(label="Name", max_length=100)
+    org = CharField(
+        label="Organization",
+        max_length=100,
+        initial="Biospecimen Core\n Genome Sciences Centre\n BC Cancer Agency"
+        )
+    addr = CharField(
+        label="Address",
+        max_length=100,
+        initial="Suite 100, 570 West 7th Avenue\n Vancouver, BC  V5Z 4S6\n Canada"
+        )
+    email = EmailField(
+        label="Email",
+        )
+    tel = CharField(label="Phone", max_length=100)
+
+class GSCFormSampleInfo(Form):
+
+    """
+    Delivery information section of GSC submission form.
+    """
+
+    #choices
+    at_completion_choices = (
+        ('R', 'Return unused sample'),
+        ('D', 'Destroy unused sample')
+        )
+
+    # fields
+    submitter_name = CharField(
+        label="*Name of Submitter",
+        max_length=100
+        )
+    submitter_email = EmailField(
+        label="*Submitter's email"
+        )
+    org = CharField(
+        label="Submitting Organization",
+        max_length=100,
+        initial="BCCRC/ UBC"
+        )
+    pi_name = CharField(
+        label="Name of Principal Investigator",
+        max_length=100,
+        initial="Sam Aparicio/ Carl Hansen"
+        )
+    pi_email = EmailField(
+        label="Principal Investigator's email",
+        initial="saparicio@bccrc.ca"
+        )
+    submission_date = DateField(
+        label="Submission Date",
+        widget=SelectDateWidget
+        )
+    project_name = CharField(
+        label="Project Name",
+        max_length=100,
+        initial="Single cell indexing"
+        )
+    sow = CharField(
+        label="Statement of Work (SOW) #",
+        max_length=100,
+        initial="GSC-0297"
+        )
+    nextera_compatible = BooleanField(label="Nextera compatible")
+    truseq_compatible = BooleanField(label="TruSeq compatible")
+    custom = BooleanField(label="Custom")
+    is_this_pbal_library = BooleanField(label="Is this PBAL library")
+    at_completion = ChoiceField(
+        label="At completion of project",
+        choices=at_completion_choices,
+        initial='R'
+        )
+

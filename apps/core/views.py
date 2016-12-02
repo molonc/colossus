@@ -37,6 +37,8 @@ from .forms import (
     SublibraryForm,
     SequencingForm,
     SequencingDetailInlineFormset,
+    GSCFormDeliveryInfo,
+    GSCFormSampleInfo,
     ProjectForm
     )
 from .utils import (
@@ -591,16 +593,46 @@ def sequencing_get_samplesheet(request, pk):
     os.remove(ofilepath)
     return response
 
-def sequencing_get_gsc_form(request, pk):
-    """generate downloadable GSC submission form."""
-    ofilename, ofilepath = generate_gsc_form(pk)
-    response = HttpResponse(content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
-    ofile = open(ofilepath, 'r')
-    response.write(ofile.read())
-    ofile.close()
-    os.remove(ofilepath)
-    return response
+@method_decorator(login_required, name='dispatch')
+class SequencingGSCForm(TemplateView):
+
+    """
+    Sequencing GSC submission form.
+    """
+
+    template_name = "core/sequencing_gsc_form.html"
+
+    def get_context_data(self, pk):
+        sequencing = get_object_or_404(Sequencing, pk=pk)
+        context = {
+        'sequencing': sequencing,
+        'delivery_form': GSCFormDeliveryInfo(),
+        'sample_form': GSCFormSampleInfo(),
+        }
+        return context
+
+    def get(self, request, pk):
+        context = self.get_context_data(pk)
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk):
+        # context = self.get_context_data(pk)
+        return self._sequencing_get_gsc_form(request, pk)
+        # msg = "Successfully created the GSC submission from."
+        # messages.success(request, msg)
+        # return HttpResponseRedirect(context['sequencing'].get_absolute_url())
+
+
+    def _sequencing_get_gsc_form(self, request, pk):
+        """generate downloadable GSC submission form."""
+        ofilename, ofilepath = generate_gsc_form(pk)
+        response = HttpResponse(content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
+        ofile = open(ofilepath, 'r')
+        response.write(ofile.read())
+        ofile.close()
+        os.remove(ofilepath)
+        return response
 
 
 #============================
