@@ -9,11 +9,20 @@ Sequencing Details
 <!-- Meta Information -->
 <div class="container" style="background-color:#FFF3E0;">
     <div style="float:right; margin-top:5px;">
+        {% if not sequencing.library.has_sublibrary_info %}
+        <h5><i class="text-warning">No Sublibrary Information available!</i></h5>
+        {% endif %}
         <select class="selectpicker" id="action">
+        <option value="#" disabled selected>--select an action--</option>
+        {% if sequencing.library.has_sublibrary_info %}
         <option value="{% url 'core:sequencing_get_samplesheet' pk=sequencing.pk %}">Download SampleSheet</option>
         <option value="{% url 'core:sequencing_get_gsc_form' pk=sequencing.pk %}">Create GSC submission form</option>
-      </select>
-      <button class="btn btn-primary btn-sm" onclick="window.location.href=document.getElementById('action').value" class="btn btn-default">Go</button>
+        {% else %}
+        <option disabled>Download SampleSheet</option>
+        <option disabled>Create GSC submission form</option>
+        {% endif %}
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="window.location.href=document.getElementById('action').value" class="btn btn-default">Go</button>
     </div>
     <table class="table-condensed">
         <tr>

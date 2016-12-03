@@ -13,17 +13,17 @@ GSC submission Form
         <fieldset>
             <legend>Delivery Information</legend>
             <table class="table-condensed">
-                {{ delivery_form }}
+                {{ delivery_info_form }}
             </table>
         </fieldset><br>
         <fieldset>
             <legend>Sample Information</legend>
             <table class="table-condensed">
-                {{ sample_form }}
+                {{ submitter_info_form }}
             </table>
         </fieldset><br>
         <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
-        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=sequencing.pk%}">Cancel</a>
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=pk%}">Back</a>
     </form>
 </div><br>
 <!-- end of Meta Information -->

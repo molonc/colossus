@@ -287,6 +287,9 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     def get_library_id(self):
         return '_'.join([self.sample.sample_id, self.pool_id])
 
+    def has_sublibrary_info(self):
+        return self.sublibraryinformation_set.exists()
+
     def __str__(self):
         return 'LIB_' + self.get_library_id()
 

@@ -194,7 +194,7 @@ class SampleSheet(object):
 #=============================
 # generate GSC submission form
 #-----------------------------
-def generate_gsc_form(pk):
+def generate_gsc_form(pk, metadata):
     """generate the GSC submission form for the given library."""
     gsc_form = GSCForm(pk)
     pool_df = gsc_form.meta_df
@@ -206,7 +206,7 @@ def generate_gsc_form(pk):
 
     workbook = Submission(pool_df, sample_df, ofilename)
     workbook.set_column_width()
-    workbook.write_address_box()
+    workbook.write_address_box(metadata)
     workbook.write_pool_header(header1)
     workbook.write_sample_header(header2)
     workbook.close()
@@ -518,24 +518,26 @@ class Submission(object):
         self.worksheet.set_column('C:AS', 15)
         return self.worksheet
 
-    def write_address_box(self):
+    def write_address_box(self, info_dict):
+        ## updated by jtaghiyar
         HEADER = ["Deliver/ship samples on dry ice or ice pack to:",
-                  "{NAME}",
-                  "{ORGANIZATION}",
-                  "{ORGANIZATION}",
-                  "{ADDRESS}",
-                  "{CITY}{POSTAL CODE}",
-                  "{COUNTRY}",
+                  "%s" % info_dict['name'],
+                  "%s" % info_dict['org'],
+                  "%s" % info_dict['addr'],
                   "",
                   "",
-                  "Email: {email_address}",
-                  "Tel: {contact_number}"
+                  "Email: %s" % info_dict['email'],
+                  "Tel: %s" % info_dict['tel']
                   ]
 
         row = len(HEADER) + 2
         column_span = 7
 
         input_cell = "{column}{row}"
+        nextera_compatible = "Yes" if info_dict.get('nextera_compatible') else "No"
+        truseq_compatible = "Yes" if info_dict.get('truseq_compatible') else "No"
+        custom = "Yes" if info_dict.get('custom') else "No"
+        pbal_library = "Yes" if info_dict.get('is_this_pbal_library') else "No"
 
         # FORMATS
         bold = self.workbook.add_format({'bold':True})
@@ -549,6 +551,7 @@ class Submission(object):
         lower_right_border = self.workbook.add_format({'font_color':'black', 'pattern': True, 'bg_color':'white', 'bottom':6, 'right':6})
         inner_format = self.workbook.add_format({'font_color':'black', 'pattern':True, 'bg_color':'white'})
         right_align = self.workbook.add_format({'align':'right', 'bold':True})
+        left_align = self.workbook.add_format({'align':'left', 'bold':True})
         yellow = self.workbook.add_format({'pattern':True, 'bg_color':'yellow', 'bold': True, 'border':2})
         light_green = self.workbook.add_format({'pattern':True, 'bold':True, 'align':'right','bg_color':'#E5F6D9', 'border':1})
         dark_green = self.workbook.add_format({'pattern':True, 'bold':True, 'bg_color':'#73A94F','border':2})
@@ -573,24 +576,48 @@ class Submission(object):
 
 
         self.worksheet.write(input_cell.format(column="A", row=row+2), "PLEASE PROVIDE COMPLETE INFORMATION FOR YOUR SAMPLES IN THE FIELDS BELOW.  ENTER \"N/A\" IN FIELDS THAT DO NOT APPLY TO YOUR SAMPLES.", red)
+
         self.worksheet.write(input_cell.format(column="A", row=row+4), "Submitting Organization:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+4), info_dict['submitting_org'], left_align)
+
         self.worksheet.write(input_cell.format(column="A", row=row+5), "Name of Principal Investigator:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+5), info_dict['pi_name'], left_align)
+
         self.worksheet.write(input_cell.format(column="A", row=row+6), "Principal Investigator's email:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+6), info_dict['pi_email'], left_align)
+
         self.worksheet.write(input_cell.format(column="A", row=row+7), "Name of Submitter:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+7), info_dict['submitter_name'], left_align)
+
         self.worksheet.write(input_cell.format(column="A", row=row+8), "Submitter's email:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+8), info_dict['submitter_email'], left_align)
+
         self.worksheet.write(input_cell.format(column="A", row=row+9), "Submission Date:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+9), info_dict['submission_date'], left_align)
+
         self.worksheet.write(input_cell.format(column="A", row=row+10), "Project Name:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+10), info_dict['project_name'], left_align)
+
         self.worksheet.write(input_cell.format(column="A", row=row+11), "Statement of Work (SOW) #:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row+11), info_dict['sow'], left_align)
 
         self.worksheet.write(input_cell.format(column="A", row=row+14), "**Mandatory** Library Info:", yellow)
+
         self.worksheet.write(input_cell.format(column="A", row=row+15), "Nextera Compatible", light_green)
-        self.worksheet.data_validation(input_cell.format(column="B", row=row+15), {'validate':'list', 'source':['YES','NO']})
+        self.worksheet.write(input_cell.format(column="B", row=row+15), nextera_compatible)
+        # self.worksheet.data_validation(input_cell.format(column="B", row=row+15), {'validate':'list', 'source':['YES','NO']})
+
         self.worksheet.write(input_cell.format(column="A", row=row+16), "TruSeq Compatible", light_green)
-        self.worksheet.data_validation(input_cell.format(column="B", row=row+16), {'validate':'list', 'source':['YES','NO']})
+        self.worksheet.write(input_cell.format(column="B", row=row+16), truseq_compatible)
+        # self.worksheet.data_validation(input_cell.format(column="B", row=row+16), {'validate':'list', 'source':['YES','NO']})
+
         self.worksheet.write(input_cell.format(column="A", row=row+17), "Custom", light_green)
-        self.worksheet.data_validation(input_cell.format(column="B", row=row+17), {'validate':'list', 'source':['YES','NO']})
+        self.worksheet.write(input_cell.format(column="B", row=row+17), custom)
+        # self.worksheet.data_validation(input_cell.format(column="B", row=row+17), {'validate':'list', 'source':['YES','NO']})
+
         self.worksheet.write(input_cell.format(column="A", row=row+19), "Is this is PBAL Library?", peach)
-        self.worksheet.data_validation(input_cell.format(column="B", row=row+19), {'validate':'list', 'source':['YES','NO']})
+        self.worksheet.write(input_cell.format(column="B", row=row+19), pbal_library)
+        # self.worksheet.data_validation(input_cell.format(column="B", row=row+19), {'validate':'list', 'source':['YES','NO']})
 
         self.worksheet.write(input_cell.format(column="A", row=row+21), "For Custom Library Info only:", dark_green)
         self.worksheet.write(input_cell.format(column="A", row=row+22), "Primer 1 Name:", light_green)

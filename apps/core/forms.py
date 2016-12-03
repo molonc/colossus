@@ -274,6 +274,10 @@ SequencingDetailInlineFormset = inlineformset_factory(
     fields = "__all__"
     )
 
+
+#===========================
+# GSC submission forms
+#---------------------------
 class GSCFormDeliveryInfo(Form):
 
     """
@@ -281,23 +285,31 @@ class GSCFormDeliveryInfo(Form):
     """
 
     # fields
-    name = CharField(label="Name", max_length=100)
+    name = CharField(
+        label="Name",
+        max_length=100,
+        initial="Andy Mungall, Room 508"
+        )
     org = CharField(
         label="Organization",
         max_length=100,
-        initial="Biospecimen Core\n Genome Sciences Centre\n BC Cancer Agency"
+        initial="Biospecimen Core, Genome Sciences Centre, BC Cancer Agency"
         )
     addr = CharField(
         label="Address",
         max_length=100,
-        initial="Suite 100, 570 West 7th Avenue\n Vancouver, BC  V5Z 4S6\n Canada"
+        initial="Suite 100, 570 West 7th Avenue, Vancouver, BC  V5Z 4S6, Canada"
         )
     email = EmailField(
         label="Email",
+        initial="amungall@bcgsc.ca"
         )
-    tel = CharField(label="Phone", max_length=100)
+    tel = CharField(
+        label="Tel",
+        max_length=100,
+        initial="604-707-5900 ext 673251")
 
-class GSCFormSampleInfo(Form):
+class GSCFormSubmitterInfo(Form):
 
     """
     Delivery information section of GSC submission form.
@@ -311,13 +323,18 @@ class GSCFormSampleInfo(Form):
 
     # fields
     submitter_name = CharField(
-        label="*Name of Submitter",
-        max_length=100
+        label="Name of Submitter",
+        max_length=100,
         )
     submitter_email = EmailField(
-        label="*Submitter's email"
+        label="Submitter's email",
         )
-    org = CharField(
+    submission_date = DateField(
+        label="Submission Date",
+        help_text = 'yyyy-mm-dd',
+        # widget=SelectDateWidget
+        )
+    submitting_org = CharField(
         label="Submitting Organization",
         max_length=100,
         initial="BCCRC/ UBC"
@@ -331,10 +348,6 @@ class GSCFormSampleInfo(Form):
         label="Principal Investigator's email",
         initial="saparicio@bccrc.ca"
         )
-    submission_date = DateField(
-        label="Submission Date",
-        widget=SelectDateWidget
-        )
     project_name = CharField(
         label="Project Name",
         max_length=100,
@@ -345,10 +358,23 @@ class GSCFormSampleInfo(Form):
         max_length=100,
         initial="GSC-0297"
         )
-    nextera_compatible = BooleanField(label="Nextera compatible")
-    truseq_compatible = BooleanField(label="TruSeq compatible")
-    custom = BooleanField(label="Custom")
-    is_this_pbal_library = BooleanField(label="Is this PBAL library")
+    nextera_compatible = BooleanField(
+        label="Nextera compatible",
+        required=False,
+        initial=True,
+        )
+    truseq_compatible = BooleanField(
+        label="TruSeq compatible",
+        required=False,
+        )
+    custom = BooleanField(
+        label="Custom",
+        required=False,
+        )
+    is_this_pbal_library = BooleanField(
+        label="Is this PBAL library",
+        required=False,
+        )
     at_completion = ChoiceField(
         label="At completion of project",
         choices=at_completion_choices,
