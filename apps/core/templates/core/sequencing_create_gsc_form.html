@@ -1,0 +1,31 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+GSC submission Form
+{% endblock %}
+
+{% block body %}
+<!-- Meta Information -->
+<div class="container graybg">
+    <form action="{% url 'core:sequencing_create_gsc_form' pk=pk %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Delivery Information</legend>
+            <table class="table-condensed">
+                {{ delivery_info_form }}
+            </table>
+        </fieldset><br>
+        <fieldset>
+            <legend>Sample Information</legend>
+            <table class="table-condensed">
+                {{ submitter_info_form }}
+            </table>
+        </fieldset><br>
+        <input class="btn btn-primary btn-sm" type="submit" name="download" value="Download">
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=pk %}">Cancel</a>
+    </form>
+</div><br>
+<!-- end of Meta Information -->
+
+{% endblock %}

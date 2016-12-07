@@ -538,6 +538,7 @@ class Submission(object):
         truseq_compatible = "Yes" if info_dict.get('truseq_compatible') else "No"
         custom = "Yes" if info_dict.get('custom') else "No"
         pbal_library = "Yes" if info_dict.get('is_this_pbal_library') else "No"
+        at_completion = "Return unused sample" if info_dict['at_completion']=="R" else "Destroy unused sample"
 
         # FORMATS
         bold = self.workbook.add_format({'bold':True})
@@ -630,7 +631,9 @@ class Submission(object):
         self.worksheet.write(input_cell.format(column="A", row=row+29), "Adaptor 2 Sequence (with 5' and 3'):", light_green)
 
         self.worksheet.write(input_cell.format(column="A", row=row+31), "At completion of project (choose one):", right_align)
-        self.worksheet.data_validation(input_cell.format(column="B", row=row+31), {'validate':'list', 'source':['Return Unused Sample', 'Destroy Unused Sample']})
+        self.worksheet.write(input_cell.format(column="B", row=row+31), at_completion)
+        # self.worksheet.data_validation(input_cell.format(column="B", row=row+31), {'validate':'list', 'source':['Return Unused Sample', 'Destroy Unused Sample']})
+
         self.worksheet.write(input_cell.format(column="C", row=row+31), "=IF(EXACT(B45, \"Destroy Unused Sample\"), \"GSC will destroy any remaining sample at completion of project\", IF(EXACT(B45,\"Return Unused Sample\"), \"GSC will return any residual sample at Submitter's expense\",\"\"))", bold)
         #self.worksheet.conditional_format(input_cell.format(column="C", row=row+31), {'type':'text', 'criteria':'containsText'})
 
