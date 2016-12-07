@@ -101,7 +101,9 @@ class SampleSheet(object):
 
     def __init__(self, pk):
         self._sequencing = get_object_or_404(Sequencing, pk=pk)
-        self._sheet_name = str(self._sequencing) + '_samplesheet.csv'
+        self._sheet_name = 'SampleSheet_' +\
+        str(self._sequencing.sequencingdetail.flow_cell_id) +\
+        '.csv'
         self._header = os.path.join(settings.BASE_DIR,
             "templates/template_samplesheet_header.html")
         self._colnames = [
