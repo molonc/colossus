@@ -343,7 +343,7 @@ class GSCForm(object):
         self._sequencing.get_read_type_display(),
         self._sequencing.read1_length,
         self._sequencing.sequencing_goal,
-        "",
+        "N/A",
         self._sequencing.format_for_data_submission,
         "",
         ]
