@@ -1,31 +1,31 @@
 Sample Information:
     Sub-Library ID: ["This should be a unique identifier referring to the actual sample being submitted. We prefer a name that helps distinguish your samples from other samples.  If you submit 2 or more identical samples, please indicate that they are identical by using the same Sample ID. NOTE, You will receive your data back linked to the Sample ID.", True]
-    Tube Label\n(label on tubes;N/A if you are submitting a pool): ["Complete this field if the samples will be submitted in tubes. Enter the label as it is written on the tube(s) (this can be the same as the Sample ID).  If the samples are submitted in a plate, complete the 'Plate ID' field above.", True]
-    Taxonomy ID\n(e.g. 9606 for human): ["This is as per the NCBI Taxonomy. The link is above (*).\nSome Taxonomy IDs are,  human = 9606; house mouse = 10090, caenorhabditis elegans = 6239. If the sample is a mixture (i.e. mixture of bacteria samples)), enter the best fit for the mixture", True]
-    Anonymous Patient ID\n(min 6 characters): ["Mandatory for patient/human samples. Identifier must have a minimum of 6 characters. This is used as a common identifier in our database to link all samples received from the same patient. This facilitates sequence QC processes as well as downstream analysis. It must be de-identified.  We do not want any identifiers that might directly link back to the actual patient. Please ensure it is sufficiently complex as to be unique (a number like \"10\" is not sufficiently complex).  If 2 or more samples are from the same patient, they must have the same Anonymous Patient ID.", False]
+    "Tube Label\n(label on tubes; N/A if you are submitting a pool)": ["Complete this field if the samples will be submitted in tubes. Enter the label as it is written on the tube(s) (this can be the same as the Sample ID).  If the samples are submitted in a plate, complete the 'Plate ID' field above.", True]
+    "Taxonomy ID\n(e.g. 9606 for human)": ["This is as per the NCBI Taxonomy. The link is above (*).\nSome Taxonomy IDs are,  human = 9606; house mouse = 10090, caenorhabditis elegans = 6239. If the sample is a mixture (i.e. mixture of bacteria samples)), enter the best fit for the mixture", True]
+    "Anonymous Patient ID\n(min 6 characters)": ["Mandatory for patient/human samples. Identifier must have a minimum of 6 characters. This is used as a common identifier in our database to link all samples received from the same patient. This facilitates sequence QC processes as well as downstream analysis. It must be de-identified.  We do not want any identifiers that might directly link back to the actual patient. Please ensure it is sufficiently complex as to be unique (a number like \"10\" is not sufficiently complex).  If 2 or more samples are from the same patient, they must have the same Anonymous Patient ID.", False]
     Strain: ["Enter the strain if applicable (e.g. mouse strain)", False]
     Disease Condition/Health Status: ["Enter the disease/health status of the patient (e.g. healthy, cystic fibrosis, breast cancer).  This information can help us track the disease status of the patient separatley from the sample.  For example, if you are submitting a 'normal blood sample' from a patient with breast cancer, the sample is normal but the health status of the patient records that the patient has breast cancer.", False]
-    Sex\n(select from drop-down menu): ["Select from the drop down menu.  This information is helpful for QC processes and downstream analysis.", False]
-    Sample Collection Date\n(yyyy-mm-dd): ["The date that your sample was collected (e.g. date of patient blood draw or date that a sample was collected in the field).", False]
+    "Sex\n(select from drop-down menu)": ["Select from the drop down menu.  This information is helpful for QC processes and downstream analysis.", False]
+    "Sample Collection Date\n(yyyy-mm-dd)": ["The date that your sample was collected (e.g. date of patient blood draw or date that a sample was collected in the field).", False]
 
 Tissue Information:
     Anatomic Site: ["Site from which the sample you are submitting was derived. For example, peripheral blood, liver etc.  If the entire organism was used for the sample, enter \"whole organism\".For cell line, enter the site from which the cell line was derived (e.g. for a cell line derived from peripheral blood, enter \"peripheral blood\")", True]
     Anatomic Sub-Site: ["Enter the relevant sub-site of the sample/tissue, if applicable. For example, a specific component of the blood, or a specific region of the brain, or lobe of lung, kidney, etc", False]
     Developmental Stage: ["Enter the developmental stage of the tissue/sample being submitted  (e.g. larvae, adult, embryo).", False]
-    Tissue Type\n(select from drop-down menu): ["Select from the drop-down menu to select, normal, benign (e.g. benign tumour)), pre-malignant, malignant, non-neoplastic disease (not cancer)), hyperplasia, dysplasia, metaplasia, undetermined.", True]
+    "Tissue Type\n(select from drop-down menu)": ["Select from the drop-down menu to select, normal, benign (e.g. benign tumour)), pre-malignant, malignant, non-neoplastic disease (not cancer)), hyperplasia, dysplasia, metaplasia, undetermined.", True]
     Cell Type: ["If a specific cell type has been used, specify the cell type here. For example, if B-cells were sorted from the lymph node, the anatomic site = lymph node and the cell type = B-cells.", False]
     Cell Line ID: ["Mandatory field if sample is a cell line and for RNA/DNA isolated from a cell line.  If the cell line was made in-house, enter the ID used in your lab.", False]
 
 Pathology Information:
     Pathology/Disease Name (for diseased sample only): ["For diseased samples, please provide the pathology/disease name, including those for non-neoplastic diseases (i.e. breast adenocarcinoma, lupus, hereditary gastric cancer etc).", True]
-    Additional Pathology Information\n(e.g.Subtype/Subgroup): ["For diseased samples, if applicable please enter the pathology subtype/subgroup information such as molecular subgroup", False]
+    "Additional Pathology Information\n(e.g.Subtype/Subgroup)": ["For diseased samples, if applicable please enter the pathology subtype/subgroup information such as molecular subgroup", False]
     Grade: ["For tumour samples, enter the grade if known (e.g. Grade 1, Grade 2, Grade 3 or Grade 4)", False]
     Stage: ["For tumour samples, enter the stage if known (e.g. stage II)", False]
     Tumor content (%): ["For tumour samples, enter percent tumor content of the sample, if known. Can be a specific number (e.g. 90) or general (e.g. >60) or a range (e.g. 30-60).  Please do not enter \"%\".", False]
-    Pathology Occurrence\n(select from drop-down menu): ["For tumour samples, please select from the drop down menu, primary, recurrent or relapse, metastatic, remission, undetermined, unspecified.", False]
+    "Pathology Occurrence\n(select from drop-down menu)": ["For tumour samples, please select from the drop down menu, primary, recurrent or relapse, metastatic, remission, undetermined, unspecified.", False]
 
 Treatment:
-    Treatment Status\n(select from drop-down menu): ["Treatment status at the time your sample was collected.  Select from the drop-down menu, pre-treatment, in-treatment (during treatment)), post-treatment, unknown, N/A.", False]
+    "Treatment Status\n(select from drop-down menu)": ["Treatment status at the time your sample was collected.  Select from the drop-down menu, pre-treatment, in-treatment (during treatment)), post-treatment, unknown, N/A.", False]
 
 Family Information:
     Family Information: ["If applicable, please enter any relevant family information such as a family history of disease or a specific family relationship to other samples being submitted.", False]
@@ -33,15 +33,15 @@ Family Information:
 Analyte Information (For unpooled Libraries only):
     DNA Volume (uL): ["Mandatory Field. The volume of DNA that you are submitting, in uL.", False]
     DNA Concentration (nM): ["Mandatory Field. Total amount of DNA you are submitting, in nM.", False]
-    Storage Medium\n(for TE, specify 10,1 or 10,0.1): ["Enter the solution in which the sample is stored/resuspended. If it is TE please specify the molarity (10,1 or 10,0.1, typically).", False]
+    "Storage Medium\n(for TE, specify 10,1 or 10,0.1)": ["Enter the solution in which the sample is stored/resuspended. If it is TE please specify the molarity (10,1 or 10,0.1, typically).", False]
     Quantification Method: ["Enter the method used to quantify your sample. For example, Nanodrop, UV Spec, Pico Green, Qubit etc.  NOTE,  Qubit is the prefer quantification method.", False]
 
 Library Information:
-    Library Type\n(e.g. Genome, exome, transcriptome amplicon, ChIP, etc.): ["Enter the type of library that you are submitting e.g. genome, exome, transcriptome, ChIP etc.", False]
+    "Library Type\n(e.g. Genome, exome, transcriptome amplicon, ChIP, etc.)": ["Enter the type of library that you are submitting e.g. genome, exome, transcriptome, ChIP etc.", False]
     Library Construction Method: ["Enter the method you used to construct the library.", False]
     Size Range (bp): ["Enter the size range in bp.", False]
     Average Size (bp): ["None", False]
-    Indexed?\nIf the libraries are indexed, provide the index sequence from 5\' to 3\': ["Please provide the sequence of the index read, from 5 to 3.\nFor dual indices, please write out ALL combinations used, in the order they are used. For example, if first index is AAAAA second index BBBBB, or CCCCC, please write out the combinations used, in the order they are used,\nAAAAABBBBB\nAAAAACCCCC\nNOT BBBBBAAAAA\nAnd also not AAAAA;BBBBB/CCCCC", True]
+    "Indexed?\nIf the libraries are indexed, provide the index sequence from 5' to 3'": ["Please provide the sequence of the index read, from 5 to 3.\nFor dual indices, please write out ALL combinations used, in the order they are used. For example, if first index is AAAAA second index BBBBB, or CCCCC, please write out the combinations used, in the order they are used,\nAAAAABBBBB\nAAAAACCCCC\nNOT BBBBBAAAAA\nAnd also not AAAAA;BBBBB/CCCCC", True]
     Index Read Type (select from drop down list): ["Indicate if the index read is generated from a 3rd, index-specific read, or if it is on the forward or reverse read (e.g. index is XXXXXX, read 1 is XXXXXACCGTATAT...)", True]
     Dual Indices for LIMS Upload: ["None", True]
 
