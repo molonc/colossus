@@ -85,11 +85,14 @@ class HistoryManager(object):
 #======================
 # generate sample sheet
 #----------------------
-def generate_samplesheet(pk):
-    """generate samplesheet for the given Sequencing using template in SC-180."""
+def generate_samplesheet(pk, wdir=None):
+    """generate samplesheet for the given Sequencing."""
     samplesheet = SampleSheet(pk)
     sheet_name = samplesheet.sheet_name
-    ofilename = os.path.join(settings.MEDIA_ROOT, sheet_name)
+    if wdir:
+        ofilename = os.path.join(wdir, sheet_name)
+    else:
+        ofilename = os.path.join(settings.MEDIA_ROOT, sheet_name)
     samplesheet.write_header(ofilename)
     samplesheet.write_data(ofilename)
     return sheet_name, os.path.abspath(ofilename)
@@ -102,6 +105,7 @@ class SampleSheet(object):
 
     def __init__(self, pk):
         self._sequencing = get_object_or_404(Sequencing, pk=pk)
+        self._si = self._sequencing.sequencing_instrument
         self._header = os.path.join(settings.BASE_DIR,
             "templates/template_samplesheet_header.html")
         self._colnames = [
@@ -175,9 +179,9 @@ class SampleSheet(object):
             'Sample_Plate': 'R' + str(d['row']) + '_C' + str(d['column']),
             'Sample_Well': 'R' + str(d['row']) + '_C' + str(d['img_col']),
             'I7_Index_ID': d['index_i7'],
-            'index': d['primer_i7'],
+            'index': d['primer_i7'] if self._si != "N550" else self._rc(d['primer_i7']),
             'I5_Index_ID': d['index_i5'],
-            'index2': d['primer_i5'],
+            'index2': d['primer_i5'] if self._si != "N550" else self._rc(d['primer_i5']),
             #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
             'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['spot_class'],
             }
@@ -192,6 +196,14 @@ class SampleSheet(object):
             newl.append(d)
         return pd.DataFrame(newl)
 
+    def _rc(self, primer):
+        "reverse complement given primer string."
+        d = {'A':'T', 'C':'G', 'G':'C', 'T':'A'}
+        try:
+            res = ''.join([d[p] for p in primer])
+        except:
+            raise Exception("invalid index: %s" % primer)
+        return res[::-1]
 
 #=============================
 # generate GSC submission form
