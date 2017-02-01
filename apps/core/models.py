@@ -391,7 +391,7 @@ class LibrarySampleDetail(models.Model, FieldValue):
 
     spotting_location_choices = (
         ('A','Aparicio Lab'),
-        ('H','Huntsman Lab'),
+        ('H','Hansen Lab'),
         ('G','GSC'),
         )
 
@@ -457,7 +457,7 @@ class LibraryConstructionInformation(models.Model, FieldValue):
 
     spotting_location_choices = (
         ('A','Aparicio Lab'),
-        ('H','Huntsman Lab'),
+        ('H','Hansen Lab'),
         ('G','GSC'),
         )
 
