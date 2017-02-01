@@ -410,14 +410,8 @@ class LibrarySampleDetail(models.Model, FieldValue):
         "Original storage temperature (C)",
         )
     passage_of_cell_line  = create_intfield("Passage")
-    sample_notes = create_textfield(
-        "Sample notes",
-        max_length=1000
-        )
-    sample_preparation_method = create_textfield(
-        "Sample preparation method",
-        max_length=1000
-        )
+    sample_notes = create_textfield("Sample notes")
+    sample_preparation_method = create_textfield("Sample preparation method")
     sample_preservation_method = create_chrfield("Sample preservation method")
     sample_spot_date = models.DateField(
         "Sample spot date",
@@ -481,10 +475,7 @@ class LibraryConstructionInformation(models.Model, FieldValue):
         "Library type",
         default="genome"
         )
-    library_notes = create_textfield(
-        "Library notes",
-        max_length=1000
-        )
+    library_notes = create_textfield("Library notes")
     library_prep_date = models.DateField(
         "Library prep date",
         null=True,
@@ -494,10 +485,7 @@ class LibraryConstructionInformation(models.Model, FieldValue):
         "Number of PCR cycles",
         default=11
         )
-    protocol = create_textfield(
-        "Protocol",
-        max_length=1000
-        )
+    protocol = create_textfield("Protocol")
     spotting_location = create_chrfield(
         "Spotting location",
         choices=spotting_location_choices

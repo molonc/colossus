@@ -45,7 +45,7 @@ def create_chrfield(name, max_length=50, blank=True, null=True, **kwargs):
         )
 
 
-def create_textfield(name, max_length=200, blank=True, null=True, **kwargs):
+def create_textfield(name, max_length=5000, blank=True, null=True, **kwargs):
     """wrap models.TextField for ease of use."""
     return models.TextField(
         name,
