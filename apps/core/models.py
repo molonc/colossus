@@ -576,8 +576,8 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         null=True,
         blank=True
         )
-    agilent_bioanalyzer_png = models.FileField(
-        "Agilent bioanalyzer png file",
+    agilent_bioanalyzer_image = models.FileField(
+        "Agilent bioanalyzer image file",
         upload_to=upload_path,
         max_length=200,
         null=True,

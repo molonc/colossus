@@ -176,14 +176,14 @@ class LibraryQuantificationAndStorageForm(ModelForm):
                 self.add_error('agilent_bioanalyzer_xad', msg)
         return file
 
-    def clean_agilent_bioanalyzer_png(self):
+    def clean_agilent_bioanalyzer_image(self):
         """check if it's a right filetype."""
-        file = self.cleaned_data['agilent_bioanalyzer_png']
+        file = self.cleaned_data['agilent_bioanalyzer_image']
         if file:
             _, ext = os.path.splitext(file.name)
-            if ext.lower() != '.png':
+            if ext.lower() not in ('.png', '.jpg', '.jpeg', '.bmp'):
                 msg = "file not supported with extension: %s" % ext
-                self.add_error('agilent_bioanalyzer_png', msg)
+                self.add_error('agilent_bioanalyzer_image', msg)
         return file
 
     def has_changed(self):
@@ -230,8 +230,8 @@ LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     form = LibraryQuantificationAndStorageForm,
     fields = "__all__",
     help_texts = {
-        'agilent_bioanalyzer_xad': ('Select a .xad file to upload.'),
-        'agilent_bioanalyzer_png': ('Select a .png file to upload.'),
+        'agilent_bioanalyzer_xad': ('Select a xad file to upload.'),
+        'agilent_bioanalyzer_png': ('Supported formats: png, jpg, jpeg, bmp.'),
     }
     )
 
