@@ -498,8 +498,25 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
     Library quantification and storage.
     """
 
-    fields_to_exclude = ['ID', 'Library']
-    values_to_exclude = ['id', 'library']
+    fields_to_exclude = [
+    'ID',
+    'Library',
+    'Freezer',
+    'Rack',
+    'Shelf',
+    'Box',
+    'Position in box'
+    ]
+
+    values_to_exclude = [
+    'id',
+    'library',
+    'freezer',
+    'rack',
+    'shelf',
+    'box',
+    'position_in_box'
+    ]
 
     ## track history
     # history = HistoricalRecords(
@@ -521,12 +538,6 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         ('N','Will not sequence'),
         )
 
-    library_location_choices = (
-        ('C', 'CRC UL1 Rack 6-2'),
-        ('G', 'GSC'),
-        ('U', 'UBC')
-        )
-
     ## fields
     average_size = create_intfield("Average size (bp)")
     dna_concentration_nm = models.DecimalField(
@@ -544,12 +555,14 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         blank=True
         )
     dna_volume = create_chrfield("DNA volume (uL)")
-    library_location = create_chrfield(
-        "Library location",
-        choices=library_location_choices
+    freezer = create_chrfield(
+        "Freezer",
+        # default="UL1",
         )
+    rack = create_intfield("Rack")
+    shelf = create_intfield("Shelf")
     box = create_intfield("Box")
-    box_location = create_intfield("Box location")
+    position_in_box = create_intfield("Position in box")
     library_tube_label = create_chrfield("Library tube label")
     qc_check = create_chrfield(
         "QC check",
@@ -584,6 +597,16 @@ class LibraryQuantificationAndStorage(models.Model, FieldValue):
         blank=True
         )
 
+    def library_location(self):
+        loc = None
+        if self.freezer:
+            loc = '_'.join([
+                'CRC',
+                self.freezer,
+                str(self.rack) + ':' + str(self.shelf),
+                str(self.box) + ':' + str(self.position_in_box),
+                ])
+        return loc
 
 #============================
 # Sequencing models

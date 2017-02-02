@@ -166,6 +166,28 @@ class LibraryQuantificationAndStorageForm(ModelForm):
         fields = "__all__"
         # exclude = ['library']
 
+    def clean(self):
+        """if Freezer specified, so should Rack,Shelf,Box,Positoin in box."""
+        cleaned_data = super(LibraryQuantificationAndStorageForm, self).clean()
+        freezer = cleaned_data.get('freezer')
+        if freezer != '':
+            if cleaned_data.get('rack') is None:
+                msg = "Rack is required when specifying the Freezer."
+                self.add_error('rack', msg)
+
+            if cleaned_data.get('shelf') is None:
+                msg = "Shelf is required when specifying the Freezer."
+                self.add_error('shelf', msg)
+
+            if cleaned_data.get('box') is None:
+                msg = "Box is required when specifying the Freezer."
+                self.add_error('box', msg)
+
+            if cleaned_data.get('position_in_box') is None:
+                msg = "Position in box is required when specifying the Freezer."
+                self.add_error('position_in_box', msg)
+        return cleaned_data
+
     def clean_agilent_bioanalyzer_xad(self):
         """check if it's a right filetype."""
         file = self.cleaned_data['agilent_bioanalyzer_xad']

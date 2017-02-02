@@ -79,6 +79,10 @@ Library Details
     <h4>Library Quantification and Storage</h4>
     {% if library.has_library_quantification_and_storage %}
     <table class="table-condensed">
+        <tr>
+            <th id="thid">Library location:</th>
+            <td id="tdid">{{library.libraryquantificationandstorage.library_location}}</td>
+        </tr>
         {% for field, value in library.libraryquantificationandstorage.get_field_values.items %}
         <tr>
             {% if field == "Agilent bioanalyzer xad file" and value %}
