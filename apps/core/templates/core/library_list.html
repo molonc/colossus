@@ -23,6 +23,7 @@ List of Libraries
                     <th>Library Location</th>
                     <th>#Sublibraries</th>
                     <th>Sequenced</th>
+                    <th>Result</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,6 +53,7 @@ List of Libraries
                         <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:library_update' pk=library.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;" "></i> edit</a>
                         <a href="{% url 'core:library_delete' pk=library.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
                     </td> -->
+                    <td>{{library.result}}</td>
                 </tr>
                 {% endfor %}
             </tbody>

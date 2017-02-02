@@ -274,6 +274,7 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     jira_ticket = create_chrfield("Jira ticket", blank=False)
     num_sublibraries = create_intfield("Number of sublibraries", default=0)
     description = create_textfield("Description")
+    result = create_textfield("Result")
     relates_to = models.ManyToManyField(
         "self",
         verbose_name="Relates to",
