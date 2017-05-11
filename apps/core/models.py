@@ -666,7 +666,7 @@ class Sequencing(models.Model, FieldValue):
         )
     index_read_type = create_chrfield(
         "Index read type",
-        default="on 2nd and 3rd index-specific read"
+        default="Dual Index (i7 and i5)"
         )
     index_read1_length = create_intfield(
         "Index read1 length",

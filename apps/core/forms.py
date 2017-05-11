@@ -389,6 +389,10 @@ class GSCFormSubmitterInfo(Form):
         label="TruSeq compatible",
         required=False,
         )
+    bsgsc_standard = BooleanField(
+        label='BC GSC Standard',
+        required=False,
+    )
     custom = BooleanField(
         label="Custom",
         required=False,
@@ -397,6 +401,11 @@ class GSCFormSubmitterInfo(Form):
         label="Is this PBAL library",
         required=False,
         )
+
+    is_this_chromium_library = BooleanField(
+        label="Is this Chromium library",
+        required=False,
+    )
     at_completion = ChoiceField(
         label="At completion of project",
         choices=at_completion_choices,

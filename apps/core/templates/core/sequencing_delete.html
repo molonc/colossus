@@ -7,7 +7,7 @@ Delete sequencing
 
 {% block body %}
 <div class="container graybg">
-    <h5>Are you sure you want to detete sequencing <i class="emph">{{sequencing}}</i>?</h5><br> 
+    <h5>Are you sure you want to delete sequencing <i class="emph">{{sequencing}}</i>?</h5><br>
     <form action="{% url 'core:sequencing_delete' pk=pk %}" method="POST">
         {% csrf_token %}
         <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">

@@ -629,7 +629,7 @@ class SequencingCreateGSCFormView(TemplateView):
         if delivery_info_form.is_valid() and submitter_info_form.is_valid():
             key = "gsc_form_metadata_%s" % pk
             request.session[key] = request.POST
-            msg = "Successfully started downloding the GSC submission form."
+            msg = "Successfully started downloading the GSC submission form."
             messages.success(request, msg)
             return HttpResponseRedirect(sequencing.get_absolute_url())
         else:

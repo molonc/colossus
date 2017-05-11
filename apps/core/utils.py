@@ -5,7 +5,7 @@ Created on June 6, 2016
 """
 
 import os, sys
-import pandas as pd 
+import pandas as pd
 import yaml
 from string import Template
 from collections import OrderedDict
@@ -179,9 +179,9 @@ class SampleSheet(object):
             'Sample_Plate': 'R' + str(d['row']) + '_C' + str(d['column']),
             'Sample_Well': 'R' + str(d['row']) + '_C' + str(d['img_col']),
             'I7_Index_ID': d['index_i7'],
-            'index': d['primer_i7'] if self._si != "N550" else self._rc(d['primer_i7']),
+            'index': d['primer_i7'] if self._si != "N550" else _rc(d['primer_i7']),
             'I5_Index_ID': d['index_i5'],
-            'index2': d['primer_i5'] if self._si != "N550" else self._rc(d['primer_i5']),
+            'index2': d['primer_i5'] if self._si != "N550" else _rc(d['primer_i5']),
             #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
             'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['spot_class'],
             }
@@ -196,14 +196,14 @@ class SampleSheet(object):
             newl.append(d)
         return pd.DataFrame(newl)
 
-    def _rc(self, primer):
-        "reverse complement given primer string."
-        d = {'A':'T', 'C':'G', 'G':'C', 'T':'A'}
-        try:
-            res = ''.join([d[p] for p in primer])
-        except:
-            raise Exception("invalid index: %s" % primer)
-        return res[::-1]
+def _rc(primer):
+    "reverse complement given primer string."
+    d = {'A':'T', 'C':'G', 'G':'C', 'T':'A'}
+    try:
+        res = ''.join([d[p] for p in primer])
+    except:
+        raise Exception("invalid index: %s" % primer)
+    return res[::-1]
 
 #=============================
 # generate GSC submission form
@@ -259,10 +259,13 @@ class GSCForm(object):
         'Read Type',
         'Read Length',
         'Sequencing Goal',
-        'Reference genome for alignment',
+        'Sequencer',
         'Format for data dissemination',
+        'Reference genome for alignment',
         'Additional comments',
         ]
+
+        #Pre May 2017 columns are commented, in case bugs are found with column order.
         self._data_colnames = [
         'Sub-Library ID',
         'Tube Label',
@@ -276,7 +279,7 @@ class GSCForm(object):
         'Anatomic Sub-Site',
         'Developmental Stage',
         'Tissue Type',
-        'Cell Type',
+        'Cell Type (if sorted)',
         'Cell Line ID',
         'Pathology/Disease Name (for diseased sample only)',
         'Additional Pathology Information',
@@ -294,9 +297,9 @@ class GSCForm(object):
         'Library Construction Method',
         'Size Range (bp)',
         'Average Size (bp)',
-        "Indexed? If the libraries are indexed, provide the index sequence from 5' to 3'",
+        'Chromium Sample Index Name', # Replaced from "Indexed? If the libraries are indexed, provide the index sequence from 5' to 3'"
         'Index Read Type (select from drop down list)',
-        'Dual Indices for LIMS Upload',
+        'Index Sequence', # Renamed from 'Dual Indices for LIMS Upload',
         'No. of cells/IP',
         'Crosslinking Method',
         'Crosslinking Time',
@@ -305,10 +308,10 @@ class GSCForm(object):
         'Antibody catalogue #',
         'Antibody Vendor',
         'Amount of Antibody Used',
-        'I7_Index_ID',
-        'index',
-        'I5_Index_ID',
-        'index2'
+        # 'I7_Index_ID',
+        # 'index',
+        # 'I5_Index_ID',
+        # 'index2'
         ]
         self._meta_df = self._get_meta_df()
         self._data_df = self._get_data_df()
@@ -364,8 +367,9 @@ class GSCForm(object):
         self._sequencing.get_read_type_display(),
         self._sequencing.read1_length,
         self._sequencing.sequencing_goal,
-        "N/A",
+        self._sequencing.get_sequencing_instrument_display(),
         self._sequencing.format_for_data_submission,
+        "N/A",
         "",
         ]
 
@@ -379,7 +383,8 @@ class GSCForm(object):
         return df
 
     def _get_data_df(self):
-        """return a dataframe of sublibrary information for the given library."""
+        """return a dataframe of sublibrary information for the given library.
+           NOTE: MUST use the same key values as seen in _data_colnames. """
         sample_columns = {
         'Taxonomy ID': self._sample.taxonomy_id,
         'Anonymous Patient ID': self._sample.anonymous_patient_id,
@@ -390,7 +395,7 @@ class GSCForm(object):
         'Anatomic Sub-Site': self._sample_addinfo.anatomic_sub_site,
         'Developmental Stage':self._sample_addinfo.developmental_stage,
         'Tissue Type': self._sample_addinfo.get_tissue_type_display(),
-        'Cell Type': self._sample_addinfo.cell_type,
+        'Cell Type (if sorted)': self._sample_addinfo.cell_type,
         'Cell Line ID': self._sample.cell_line_id,
         'Pathology/Disease Name (for diseased sample only)': self._sample_addinfo.pathology_disease_name,
         'Additional Pathology Information': self._sample_addinfo.additional_pathology_info,
@@ -413,6 +418,7 @@ class GSCForm(object):
         'Library Construction Method': self._libconst.library_construction_method,
         'Size Range (bp)': self._libquant.size_range,
         'Average Size (bp)': self._libquant.average_size,
+        'Chromium Sample Index Name': "",
         }
 
         sequencing_columns = {
@@ -432,17 +438,17 @@ class GSCForm(object):
 
         res = []
         sublib_set = self._library.sublibraryinformation_set.all()
-        index = lambda sl: sl.primer_i7 + sl.primer_i5 
-        dual_index = lambda sl: sl.primer_i7 + '-' + sl.primer_i5
+        # index = lambda sl: sl.primer_i7 + sl.primer_i5 # no longer need this
+        dual_index = lambda sl: _rc(sl.primer_i7) + '-' + sl.primer_i5
         for sl in sublib_set:
             d = {
             'Sub-Library ID': sl.get_sublibrary_id(),
-            "Indexed? If the libraries are indexed, provide the index sequence from 5' to 3'": index(sl),
-            'Dual Indices for LIMS Upload': dual_index(sl),
-            'I7_Index_ID': sl.index_i7,
-            'index': sl.primer_i7,
-            'I5_Index_ID': sl.index_i5,
-            'index2': sl.primer_i5,
+            'Index Sequence': dual_index(sl),
+            # "Indexed? If the libraries are indexed, provide the index sequence from 5' to 3'": index(sl), #no longer need this
+            # 'I7_Index_ID': sl.index_i7, # no longer need this
+            # 'index': sl.primer_i7, # no longer need this
+            # 'I5_Index_ID': sl.index_i5, # no longer need this
+            # 'index2': sl.primer_i5, # no longer need this
             }
             d.update(sample_columns)
             d.update(library_columns)
@@ -504,11 +510,12 @@ class Submission(object):
 
     """
     @author: Jamie Xu
+    Updated by Jessica Ngo for new GSC form as of May 2017
     """
 
     def __init__(self, df_pool, df_samples, output):
 
-        self.pool_start = 58
+        self.pool_start = 63
         self.sample_start = self.pool_start + len(df_pool) + 10
 
         self.writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -536,11 +543,13 @@ class Submission(object):
     def set_column_width(self):
         self.worksheet.set_column('A:A', 45)
         self.worksheet.set_column('B:B', 45)
-        self.worksheet.set_column('C:AS', 15)
+        self.worksheet.set_column('C:AO', 15)
         return self.worksheet
 
     def write_address_box(self, info_dict):
         ## updated by jtaghiyar
+        # refactored to use relative spacing instead of hard coded spacing for ease if the GSC updates their form again..
+
         HEADER = ["Deliver/ship samples on dry ice or ice pack to:",
                   "%s" % info_dict['name'],
                   "%s" % info_dict['org'],
@@ -548,7 +557,9 @@ class Submission(object):
                   "",
                   "",
                   "Email: %s" % info_dict['email'],
-                  "Tel: %s" % info_dict['tel']
+                  "Tel: %s" % info_dict['tel'],
+                  "",
+                  "",
                   ]
 
         row = len(HEADER) + 2
@@ -557,8 +568,10 @@ class Submission(object):
         input_cell = "{column}{row}"
         nextera_compatible = "Yes" if info_dict.get('nextera_compatible') else "No"
         truseq_compatible = "Yes" if info_dict.get('truseq_compatible') else "No"
+        bcgsc_standard = "Yes" if info_dict.get('bcgsc_standard') else "No"
         custom = "Yes" if info_dict.get('custom') else "No"
         pbal_library = "Yes" if info_dict.get('is_this_pbal_library') else "No"
+        chromium_library = "Yes" if info_dict.get('is_this_chromium_library') else "No"
         at_completion = "Return unused sample" if info_dict['at_completion']=="R" else "Destroy unused sample"
 
         # FORMATS
@@ -578,7 +591,9 @@ class Submission(object):
         light_green = self.workbook.add_format({'pattern':True, 'bold':True, 'align':'right','bg_color':'#E5F6D9', 'border':1})
         dark_green = self.workbook.add_format({'pattern':True, 'bold':True, 'bg_color':'#73A94F','border':2})
         peach = self.workbook.add_format({'pattern':True, 'bold':True, 'align':'right','bg_color':'#F7C876', 'border':2})
+        teal = self.workbook.add_format({'pattern':True, 'bold':True, 'align':'right', 'bg_color':'#B7DBE7', 'border':1})
 
+        # setting up header box border
         for x in range(0,column_span):
             for y in range(1,row):
                 if x == column_span - 1 and y == row - 1:
@@ -590,6 +605,7 @@ class Submission(object):
                 else:
                     self.worksheet.write(input_cell.format(column=self.columns[x], row=y), "", inner_format)
 
+        # writing header box text
         for x in range(0,len(HEADER)):
             if x == 0:
                 self.worksheet.write(input_cell.format(column="A", row=x+1), HEADER[x], header)
@@ -597,87 +613,129 @@ class Submission(object):
                 self.worksheet.write(input_cell.format(column="A", row=x+1), HEADER[x], text)
 
 
-        self.worksheet.write(input_cell.format(column="A", row=row+2), "PLEASE PROVIDE COMPLETE INFORMATION FOR YOUR SAMPLES IN THE FIELDS BELOW.  ENTER \"N/A\" IN FIELDS THAT DO NOT APPLY TO YOUR SAMPLES.", red)
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "PLEASE PROVIDE COMPLETE INFORMATION FOR YOUR SAMPLES IN THE FIELDS BELOW.  ENTER \"N/A\" IN FIELDS THAT DO NOT APPLY TO YOUR SAMPLES.", red)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+4), "Submitting Organization:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+4), info_dict['submitting_org'], left_align)
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "Submitting Organization:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['submitting_org'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+5), "Name of Principal Investigator:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+5), info_dict['pi_name'], left_align)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Name of Principal Investigator:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['pi_name'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+6), "Principal Investigator's email:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+6), info_dict['pi_email'], left_align)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Principal Investigator's email:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['pi_email'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+7), "Name of Submitter:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+7), info_dict['submitter_name'], left_align)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Name of Submitter:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['submitter_name'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+8), "Submitter's email:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+8), info_dict['submitter_email'], left_align)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Submitter's email:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['submitter_email'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+9), "Submission Date:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+9), info_dict['submission_date'], left_align)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Submission Date:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['submission_date'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+10), "Project Name:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+10), info_dict['project_name'], left_align)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Project Name:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['project_name'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+11), "Statement of Work (SOW) #:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+11), info_dict['sow'], left_align)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Statement of Work (SOW) #:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), info_dict['sow'], left_align)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+14), "**Mandatory** Library Info:", yellow)
+        row += 3
+        self.worksheet.write(input_cell.format(column="A", row=row), "**Mandatory** Library Info:", yellow)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+15), "Nextera Compatible", light_green)
-        self.worksheet.write(input_cell.format(column="B", row=row+15), nextera_compatible)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Nextera Compatible", light_green)
+        self.worksheet.write(input_cell.format(column="B", row=row), nextera_compatible)
         # self.worksheet.data_validation(input_cell.format(column="B", row=row+15), {'validate':'list', 'source':['YES','NO']})
 
-        self.worksheet.write(input_cell.format(column="A", row=row+16), "TruSeq Compatible", light_green)
-        self.worksheet.write(input_cell.format(column="B", row=row+16), truseq_compatible)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "TruSeq Compatible", light_green)
+        self.worksheet.write(input_cell.format(column="B", row=row), truseq_compatible)
         # self.worksheet.data_validation(input_cell.format(column="B", row=row+16), {'validate':'list', 'source':['YES','NO']})
 
-        self.worksheet.write(input_cell.format(column="A", row=row+17), "Custom", light_green)
-        self.worksheet.write(input_cell.format(column="B", row=row+17), custom)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "BC Genome Science Centre Standard", light_green)
+        self.worksheet.write(input_cell.format(column="B", row=row), bcgsc_standard)
+
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Custom", light_green)
+        self.worksheet.write(input_cell.format(column="B", row=row), custom)
         # self.worksheet.data_validation(input_cell.format(column="B", row=row+17), {'validate':'list', 'source':['YES','NO']})
 
-        self.worksheet.write(input_cell.format(column="A", row=row+19), "Is this is PBAL Library?", peach)
-        self.worksheet.write(input_cell.format(column="B", row=row+19), pbal_library)
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "Is this is PBAL Library?", peach)
+        self.worksheet.write(input_cell.format(column="B", row=row), pbal_library)
         # self.worksheet.data_validation(input_cell.format(column="B", row=row+19), {'validate':'list', 'source':['YES','NO']})
 
-        self.worksheet.write(input_cell.format(column="A", row=row+21), "For Custom Library Info only:", dark_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+22), "Primer 1 Name:", light_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+23), "Primer 1 Sequence (with 5' and 3'):", light_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+24), "Primer 2 Name:", light_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+25), "Primer 2 Sequence (with 5' and 3'):", light_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+26), "Adaptor 1 Name:", light_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+27), "Adaptor 1 Sequence (with 5' and 3'):", light_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+28), "Adaptor 2 Name:", light_green)
-        self.worksheet.write(input_cell.format(column="A", row=row+29), "Adaptor 2 Sequence (with 5' and 3'):", light_green)
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "Is this Chromium library?", self.workbook.add_format({'pattern':True, 'bold':True, 'align':'right', 'bg_color':'#B7DBE7', 'border':2}))
+        self.worksheet.write(input_cell.format(column="B", row=row), chromium_library)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+31), "At completion of project (choose one):", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+31), at_completion)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "PLEASE NOTE:", self.workbook.add_format(
+            {'pattern': True, 'bold': True, 'align': 'right', 'bg_color': '#B7DBE7', 'font_color':'red', 'border':1}))
+        self.worksheet.write(input_cell.format(column="B", row=row), "If yes, please provide specific chromium sample index name in Column AE. Here are some helpful links:",
+                             self.workbook.add_format({'bold': True, 'font_color':'red', 'align':'left'}))
+
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Single cell:", teal)
+        self.worksheet.write(input_cell.format(column="B", row=row), "http://support.10xgenomics.com/single-cell/sequencing/doc/specifications-sample-index-sets-for-single-cell-3")
+
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Genome/Exome:", teal)
+        self.worksheet.write(input_cell.format(column="B", row=row), "http://support.10xgenomics.com/genome-exome/sequencing/doc/specifications-sample-index-sets-for-genome-and-exome")
+
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "For Custom Library Info only:", dark_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Primer 1 Name:", light_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Primer 1 Sequence (with 5' and 3'):", light_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Primer 2 Name:", light_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Primer 2 Sequence (with 5' and 3'):", light_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Adaptor 1 Name:", light_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Adaptor 1 Sequence (with 5' and 3'):", light_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Adaptor 2 Name:", light_green); row+=1
+        self.worksheet.write(input_cell.format(column="A", row=row), "Adaptor 2 Sequence (with 5' and 3'):", light_green); row+=2
+
+        self.worksheet.write(input_cell.format(column="A", row=row), "At completion of project (choose one):", right_align);
+        self.worksheet.write(input_cell.format(column="B", row=row), at_completion);
         # self.worksheet.data_validation(input_cell.format(column="B", row=row+31), {'validate':'list', 'source':['Return Unused Sample', 'Destroy Unused Sample']})
-
-        self.worksheet.write(input_cell.format(column="C", row=row+31), "=IF(EXACT(B45, \"Destroy Unused Sample\"), \"GSC will destroy any remaining sample at completion of project\", IF(EXACT(B45,\"Return Unused Sample\"), \"GSC will return any residual sample at Submitter's expense\",\"\"))", bold)
+        self.worksheet.write(input_cell.format(column="C", row=row), "=IF(EXACT(B45, \"Destroy Unused Sample\"), \"GSC will destroy any remaining sample at completion of project\", IF(EXACT(B45,\"Return Unused Sample\"), \"GSC will return any residual sample at Submitter's expense\",\"\"))", bold)
         #self.worksheet.conditional_format(input_cell.format(column="C", row=row+31), {'type':'text', 'criteria':'containsText'})
 
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "Sample Requirements (Volume & Amounts):", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), "http://www.bcgsc.ca/services/sequencing-libraries-faq")
 
-        self.worksheet.write(input_cell.format(column="A", row=row+34), "Sample Requirements (Volume & Amounts):", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+34), "http://www.bcgsc.ca/services/sequencing-libraries-faq")
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "*NCBI Taxonomy link:", right_align)
+        self.worksheet.write(input_cell.format(column="B", row=row), "http://www.ncbi.nlm.nih.gov/Taxonomy/")
 
-        self.worksheet.write(input_cell.format(column="A", row=row+35), "*NCBI Taxonomy link:", right_align)
-        self.worksheet.write(input_cell.format(column="B", row=row+35), "http://www.ncbi.nlm.nih.gov/Taxonomy/")
+        row += 2
+        self.worksheet.write(input_cell.format(column="A", row=row), "PLEASE NOTE", self.workbook.add_format({'bold':True, 'font_color':'red', 'pattern':True, 'bg_color':'#F7C876', 'align':'right'}))
+        self.worksheet.write(input_cell.format(column="B", row=row), "If indices are supplied, the reads will automatically be split by index.", bold)
 
-        self.worksheet.write(input_cell.format(column="A", row=row+37), "PLEASE NOTE", self.workbook.add_format({'bold':True, 'font_color':'red', 'pattern':True, 'bg_color':'#F7C876'}))
-        self.worksheet.write(input_cell.format(column="B", row=row+37), "If indices are supplied, the reads will automatically be split by index.", bold)
-        self.worksheet.write(input_cell.format(column="A", row=row+38), "", self.workbook.add_format({'bold':True, 'font_color':'red', 'pattern':True, 'bg_color':'#F7C876'}))
-        self.worksheet.write(input_cell.format(column="B", row=row+38), "If the reads require splitting by index, but indices are not supplied or are incorrect, there will be a 1-2 week delay in the data processing.", bold)
+        row += 1
+        self.worksheet.write(input_cell.format(column="A", row=row), "", self.workbook.add_format({'bold':True, 'font_color':'red', 'pattern':True, 'bg_color':'#F7C876'}))
+        self.worksheet.write(input_cell.format(column="B", row=row), "If the reads require splitting by index, but indices are not supplied or are incorrect, there will be a 1-2 week delay in the data processing.", bold)
 
-        self.worksheet.write_rich_string(input_cell.format(column="A", row=row+40),
+        row += 2
+        self.worksheet.write_rich_string(input_cell.format(column="A", row=row),
                                          bold, 'Mandatory Fields in ',
                                          red, 'RED',
                                          bold, ', Optional Fields in ',
                                          blue, 'BLUE',
                                          yellow_fill)
 
-        self.worksheet.write_rich_string(input_cell.format(column="A", row=row+41),
+        row += 2
+        self.worksheet.write_rich_string(input_cell.format(column="A", row=row),
                                          bold, 'Enter POOL details below',
                                          yellow_fill)
 

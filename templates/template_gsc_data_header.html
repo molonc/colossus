@@ -41,9 +41,9 @@ Library Information:
     Library Construction Method: ["Enter the method you used to construct the library.", False]
     Size Range (bp): ["Enter the size range in bp.", False]
     Average Size (bp): ["None", False]
-    "Indexed?\nIf the libraries are indexed, provide the index sequence from 5' to 3'": ["Please provide the sequence of the index read, from 5 to 3.\nFor dual indices, please write out ALL combinations used, in the order they are used. For example, if first index is AAAAA second index BBBBB, or CCCCC, please write out the combinations used, in the order they are used,\nAAAAABBBBB\nAAAAACCCCC\nNOT BBBBBAAAAA\nAnd also not AAAAA;BBBBB/CCCCC", True]
+    Chromium Sample Index Name: ["Please refer to the links provided in Rows 36-37.", True]
     Index Read Type (select from drop down list): ["Indicate if the index read is generated from a 3rd, index-specific read, or if it is on the forward or reverse read (e.g. index is XXXXXX, read 1 is XXXXXACCGTATAT...)", True]
-    Dual Indices for LIMS Upload: ["None", True]
+    Index Sequence: ["Please provide the expected index primer sequence read(s).  For dual index samples separate the first index (i7) and the second index (i5) with a \"-\".  For example ACGTCATC-TCAGCTAG.  Note that the i7 index is read as the reverse complement of the adapter, and the i5 index is read as contained in the adapter", True]
 
 Additional Information for ChIP Constructed Libraries:
     No. of cells/IP: ["If your library is a ChIP constructed library, enter the number of cells/IP.", False]
@@ -54,9 +54,3 @@ Additional Information for ChIP Constructed Libraries:
     Antibody catalogue Number: ["If your library is a ChIP constructed library, enter the catalogue # of the antibody that was used.", False]
     Antibody Vendor: ["If your library is a ChIP constructed library, enter the name of the vendor from whom you purchased the antibody.", False]
     Amount of Antibody Used: ["If your library is a ChIP constructed library, enter the amount of antibody used including the units.", False]
-
-Additional index information:
-    I7_Index_ID: ["None", False]
-    index: ["None", False]
-    I5_Index_ID: ["None", False]
-    index2: ["None", False]
