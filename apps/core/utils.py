@@ -168,12 +168,17 @@ class SampleSheet(object):
             d = s.to_dict()
             # This is the relation between columns in the template samplesheet
             # and the actual columns in df from LIMS.
+
+            # for leading 0s in samplesheet
+            row = str(d['row']) if d['row'] > 9 else '0' + str(d['row'])
+            col = str(d['column']) if d['column'] > 9 else '0' + str(d['column'])
+
             res = {
             'Sample_ID': '-'.join([
             str(self._sequencing.library.sample),
             str(self._sequencing.library.pool_id),
-            'R'+ str(d['row']),
-            'C'+ str(d['column'])
+            'R' + row,
+            'C' + col
             ]),
             'Sample_Name': '',
             'Sample_Plate': 'R' + str(d['row']) + '_C' + str(d['column']),
