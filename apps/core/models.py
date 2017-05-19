@@ -484,7 +484,6 @@ class LibraryConstructionInformation(models.Model, FieldValue):
         )
     number_of_pcr_cycles = create_intfield(
         "Number of PCR cycles",
-        default=11
         )
     protocol = create_textfield("Protocol")
     spotting_location = create_chrfield(
