@@ -184,8 +184,10 @@ class SampleSheet(object):
             'Sample_Plate': 'R' + str(d['row']) + '_C' + str(d['column']),
             'Sample_Well': 'R' + str(d['row']) + '_C' + str(d['img_col']),
             'I7_Index_ID': d['index_i7'],
-            'index': d['primer_i7'] if self._si != "N550" else _rc(d['primer_i7']),
+            # All the sequencing machines listed in the models need i7 to be reverse complemented
+            'index': d['primer_i7'] if self._si != "O" else _rc(d['primer_i7']),
             'I5_Index_ID': d['index_i5'],
+            # Only the NextSeq requires the i5 to be reverse complemented
             'index2': d['primer_i5'] if self._si != "N550" else _rc(d['primer_i5']),
             #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
             'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['spot_class'],
@@ -270,7 +272,6 @@ class GSCForm(object):
         'Additional comments',
         ]
 
-        #Pre May 2017 columns are commented, in case bugs are found with column order.
         self._data_colnames = [
         'Sub-Library ID',
         'Tube Label',
@@ -313,10 +314,6 @@ class GSCForm(object):
         'Antibody catalogue #',
         'Antibody Vendor',
         'Amount of Antibody Used',
-        # 'I7_Index_ID',
-        # 'index',
-        # 'I5_Index_ID',
-        # 'index2'
         ]
         self._meta_df = self._get_meta_df()
         self._data_df = self._get_data_df()
@@ -443,17 +440,11 @@ class GSCForm(object):
 
         res = []
         sublib_set = self._library.sublibraryinformation_set.all()
-        # index = lambda sl: sl.primer_i7 + sl.primer_i5 # no longer need this
         dual_index = lambda sl: _rc(sl.primer_i7) + '-' + sl.primer_i5
         for sl in sublib_set:
             d = {
             'Sub-Library ID': sl.get_sublibrary_id(),
             'Index Sequence': dual_index(sl),
-            # "Indexed? If the libraries are indexed, provide the index sequence from 5' to 3'": index(sl), #no longer need this
-            # 'I7_Index_ID': sl.index_i7, # no longer need this
-            # 'index': sl.primer_i7, # no longer need this
-            # 'I5_Index_ID': sl.index_i5, # no longer need this
-            # 'index2': sl.primer_i5, # no longer need this
             }
             d.update(sample_columns)
             d.update(library_columns)
@@ -553,7 +544,6 @@ class Submission(object):
 
     def write_address_box(self, info_dict):
         ## updated by jtaghiyar
-        # refactored to use relative spacing instead of hard coded spacing for ease if the GSC updates their form again..
 
         HEADER = ["Deliver/ship samples on dry ice or ice pack to:",
                   "%s" % info_dict['name'],
@@ -659,12 +649,10 @@ class Submission(object):
         row += 1
         self.worksheet.write(input_cell.format(column="A", row=row), "Nextera Compatible", light_green)
         self.worksheet.write(input_cell.format(column="B", row=row), nextera_compatible)
-        # self.worksheet.data_validation(input_cell.format(column="B", row=row+15), {'validate':'list', 'source':['YES','NO']})
 
         row += 1
         self.worksheet.write(input_cell.format(column="A", row=row), "TruSeq Compatible", light_green)
         self.worksheet.write(input_cell.format(column="B", row=row), truseq_compatible)
-        # self.worksheet.data_validation(input_cell.format(column="B", row=row+16), {'validate':'list', 'source':['YES','NO']})
 
         row += 1
         self.worksheet.write(input_cell.format(column="A", row=row), "BC Genome Science Centre Standard", light_green)
@@ -673,12 +661,10 @@ class Submission(object):
         row += 1
         self.worksheet.write(input_cell.format(column="A", row=row), "Custom", light_green)
         self.worksheet.write(input_cell.format(column="B", row=row), custom)
-        # self.worksheet.data_validation(input_cell.format(column="B", row=row+17), {'validate':'list', 'source':['YES','NO']})
 
         row += 2
         self.worksheet.write(input_cell.format(column="A", row=row), "Is this is PBAL Library?", peach)
         self.worksheet.write(input_cell.format(column="B", row=row), pbal_library)
-        # self.worksheet.data_validation(input_cell.format(column="B", row=row+19), {'validate':'list', 'source':['YES','NO']})
 
         row += 2
         self.worksheet.write(input_cell.format(column="A", row=row), "Is this Chromium library?", self.workbook.add_format({'pattern':True, 'bold':True, 'align':'right', 'bg_color':'#B7DBE7', 'border':2}))
@@ -711,9 +697,7 @@ class Submission(object):
 
         self.worksheet.write(input_cell.format(column="A", row=row), "At completion of project (choose one):", right_align);
         self.worksheet.write(input_cell.format(column="B", row=row), at_completion);
-        # self.worksheet.data_validation(input_cell.format(column="B", row=row+31), {'validate':'list', 'source':['Return Unused Sample', 'Destroy Unused Sample']})
         self.worksheet.write(input_cell.format(column="C", row=row), "=IF(EXACT(B45, \"Destroy Unused Sample\"), \"GSC will destroy any remaining sample at completion of project\", IF(EXACT(B45,\"Return Unused Sample\"), \"GSC will return any residual sample at Submitter's expense\",\"\"))", bold)
-        #self.worksheet.conditional_format(input_cell.format(column="C", row=row+31), {'type':'text', 'criteria':'containsText'})
 
         row += 2
         self.worksheet.write(input_cell.format(column="A", row=row), "Sample Requirements (Volume & Amounts):", right_align)
