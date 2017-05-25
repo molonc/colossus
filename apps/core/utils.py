@@ -185,7 +185,7 @@ class SampleSheet(object):
             'Sample_Well': 'R' + str(d['row']) + '_C' + str(d['img_col']),
             'I7_Index_ID': d['index_i7'],
             # All the sequencing machines listed in the models need i7 to be reverse complemented
-            'index': d['primer_i7'] if self._si != "O" else _rc(d['primer_i7']),
+            'index': d['primer_i7'] if self._si == "O" else _rc(d['primer_i7']),
             'I5_Index_ID': d['index_i5'],
             # Only the NextSeq requires the i5 to be reverse complemented
             'index2': d['primer_i5'] if self._si != "N550" else _rc(d['primer_i5']),
