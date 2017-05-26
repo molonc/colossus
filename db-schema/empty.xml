@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="empty" type="PostgreSQL - 10devel">
+   <tables>
+      <table name="auth_group" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('auth_group_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="group_id" foreignKey="auth_group_permissions_group_id_b120cbf9_fk_auth_group_id" implied="false" onDeleteCascade="false" table="auth_group_permissions"/>
+            <child column="group_id" foreignKey="auth_user_groups_group_id_97559544_fk_auth_group_id" implied="false" onDeleteCascade="false" table="auth_user_groups"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="80" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="auth_group_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="auth_group_name_a6ea08ec_like" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="auth_group_name_key" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="auth_group_permissions" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('auth_group_permissions_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="group_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="auth_group_permissions_group_id_b120cbf9_fk_auth_group_id" implied="false" onDeleteCascade="false" table="auth_group"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="permission_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="auth_group_permissio_permission_id_84c5c92e_fk_auth_perm" implied="false" onDeleteCascade="false" table="auth_permission"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="auth_group_permissions_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="auth_group_permissions_group_id_b120cbf9" unique="false">
+            <column ascending="true" name="group_id"/>
+         </index>
+         <index name="auth_group_permissions_group_id_permission_id_0cd325b0_uniq" unique="true">
+            <column ascending="true" name="group_id"/>
+            <column ascending="true" name="permission_id"/>
+         </index>
+         <index name="auth_group_permissions_permission_id_84c5c92e" unique="false">
+            <column ascending="true" name="permission_id"/>
+         </index>
+      </table>
+      <table name="auth_permission" numRows="63" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('auth_permission_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="permission_id" foreignKey="auth_group_permissio_permission_id_84c5c92e_fk_auth_perm" implied="false" onDeleteCascade="false" table="auth_group_permissions"/>
+            <child column="permission_id" foreignKey="auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm" implied="false" onDeleteCascade="false" table="auth_user_user_permissions"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="content_type_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="auth_permission_content_type_id_2f476e4b_fk_django_co" implied="false" onDeleteCascade="false" table="django_content_type"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="codename" nullable="false" remarks="" size="100" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="auth_permission_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="auth_permission_content_type_id_2f476e4b" unique="false">
+            <column ascending="true" name="content_type_id"/>
+         </index>
+         <index name="auth_permission_content_type_id_codename_01ab375a_uniq" unique="true">
+            <column ascending="true" name="content_type_id"/>
+            <column ascending="true" name="codename"/>
+         </index>
+      </table>
+      <table name="auth_user" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('auth_user_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="user_id" foreignKey="auth_user_groups_user_id_6a12ed8b_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user_groups"/>
+            <child column="user_id" foreignKey="auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user_user_permissions"/>
+            <child column="user_id" foreignKey="django_admin_log_user_id_c564eba6_fk_auth_user_id" implied="false" onDeleteCascade="false" table="django_admin_log"/>
+            <child column="history_user_id" foreignKey="history_library_history_user_id_f3ddd9f4_fk_auth_user_id" implied="false" onDeleteCascade="false" table="history_library"/>
+            <child column="history_user_id" foreignKey="history_sample_history_user_id_0159746e_fk_auth_user_id" implied="false" onDeleteCascade="false" table="history_sample"/>
+            <child column="history_user_id" foreignKey="history_sequencing_history_user_id_35179a9a_fk_auth_user_id" implied="false" onDeleteCascade="false" table="history_sequencing"/>
+            <child column="history_user_id" foreignKey="taggit_historicaltag_history_user_id_f7226dd9_fk_auth_user_id" implied="false" onDeleteCascade="false" table="taggit_historicaltag"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="password" nullable="false" remarks="" size="128" type="varchar"/>
+         <column autoUpdated="false" digits="6" id="2" name="last_login" nullable="true" remarks="" size="35" type="timestamptz"/>
+         <column autoUpdated="false" digits="0" id="3" name="is_superuser" nullable="false" remarks="" size="1" type="bool"/>
+         <column autoUpdated="false" digits="0" id="4" name="username" nullable="false" remarks="" size="150" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="first_name" nullable="false" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="last_name" nullable="false" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="7" name="email" nullable="false" remarks="" size="254" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="is_staff" nullable="false" remarks="" size="1" type="bool"/>
+         <column autoUpdated="false" digits="0" id="9" name="is_active" nullable="false" remarks="" size="1" type="bool"/>
+         <column autoUpdated="false" digits="6" id="10" name="date_joined" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="auth_user_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="auth_user_username_6821ab7c_like" unique="false">
+            <column ascending="true" name="username"/>
+         </index>
+         <index name="auth_user_username_key" unique="true">
+            <column ascending="true" name="username"/>
+         </index>
+      </table>
+      <table name="auth_user_groups" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('auth_user_groups_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="user_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="auth_user_groups_user_id_6a12ed8b_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="group_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="auth_user_groups_group_id_97559544_fk_auth_group_id" implied="false" onDeleteCascade="false" table="auth_group"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="auth_user_groups_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="auth_user_groups_group_id_97559544" unique="false">
+            <column ascending="true" name="group_id"/>
+         </index>
+         <index name="auth_user_groups_user_id_6a12ed8b" unique="false">
+            <column ascending="true" name="user_id"/>
+         </index>
+         <index name="auth_user_groups_user_id_group_id_94350c0c_uniq" unique="true">
+            <column ascending="true" name="user_id"/>
+            <column ascending="true" name="group_id"/>
+         </index>
+      </table>
+      <table name="auth_user_user_permissions" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('auth_user_user_permissions_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="user_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="permission_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm" implied="false" onDeleteCascade="false" table="auth_permission"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="auth_user_user_permissions_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="auth_user_user_permissions_permission_id_1fbb5f2c" unique="false">
+            <column ascending="true" name="permission_id"/>
+         </index>
+         <index name="auth_user_user_permissions_user_id_a95ead1b" unique="false">
+            <column ascending="true" name="user_id"/>
+         </index>
+         <index name="auth_user_user_permissions_user_id_permission_id_14a6b632_uniq" unique="true">
+            <column ascending="true" name="user_id"/>
+            <column ascending="true" name="permission_id"/>
+         </index>
+      </table>
+      <table name="core_additionalsampleinformation" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_additionalsampleinformation_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="disease_condition_health_status" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="sex" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="patient_biopsy_date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="false" digits="0" id="4" name="anatomic_site" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="anatomic_sub_site" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="developmental_stage" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="7" name="tissue_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="cell_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="pathology_disease_name" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="10" name="additional_pathology_info" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="11" name="grade" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="12" name="stage" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="13" name="tumour_content" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="14" name="pathology_occurrence" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="15" name="treatment_status" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="16" name="family_information" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="17" name="sample_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_additionalsampl_sample_id_763aa026_fk_core_samp" implied="false" onDeleteCascade="false" table="core_sample"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_additionalsampleinformation_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_additionalsampleinformation_sample_id_key" unique="true">
+            <column ascending="true" name="sample_id"/>
+         </index>
+      </table>
+      <table name="core_library" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_library_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="from_library_id" foreignKey="core_library_relates_from_library_id_f4044058_fk_core_libr" implied="false" onDeleteCascade="false" table="core_library_relates_to"/>
+            <child column="to_library_id" foreignKey="core_library_relates_to_library_id_abc09c89_fk_core_libr" implied="false" onDeleteCascade="false" table="core_library_relates_to"/>
+            <child column="library_id" foreignKey="core_libraryconstruc_library_id_4928bcc9_fk_core_libr" implied="false" onDeleteCascade="false" table="core_libraryconstructioninformation"/>
+            <child column="library_id" foreignKey="core_libraryquantifi_library_id_4a7340fd_fk_core_libr" implied="false" onDeleteCascade="false" table="core_libraryquantificationandstorage"/>
+            <child column="library_id" foreignKey="core_librarysampledetail_library_id_3c7222d3_fk_core_library_id" implied="false" onDeleteCascade="false" table="core_librarysampledetail"/>
+            <child column="library_id" foreignKey="core_sequencing_library_id_27885a62_fk_core_library_id" implied="false" onDeleteCascade="false" table="core_sequencing"/>
+            <child column="library_id" foreignKey="core_sublibraryinfor_library_id_c34cbe7e_fk_core_libr" implied="false" onDeleteCascade="false" table="core_sublibraryinformation"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="pool_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="jira_ticket" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="num_sublibraries" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="4" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="5" name="result" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="6" name="sample_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_library_sample_id_5e34f6ec_fk_core_sample_id" implied="false" onDeleteCascade="false" table="core_sample"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_library_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_library_sample_id_5e34f6ec" unique="false">
+            <column ascending="true" name="sample_id"/>
+         </index>
+      </table>
+      <table name="core_library_relates_to" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_library_relates_to_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="from_library_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_library_relates_from_library_id_f4044058_fk_core_libr" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="to_library_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_library_relates_to_library_id_abc09c89_fk_core_libr" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_library_relates_to_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_library_relates_to_from_library_id_f4044058" unique="false">
+            <column ascending="true" name="from_library_id"/>
+         </index>
+         <index name="core_library_relates_to_from_library_id_to_libra_4321f312_uniq" unique="true">
+            <column ascending="true" name="from_library_id"/>
+            <column ascending="true" name="to_library_id"/>
+         </index>
+         <index name="core_library_relates_to_to_library_id_abc09c89" unique="false">
+            <column ascending="true" name="to_library_id"/>
+         </index>
+      </table>
+      <table name="core_libraryconstructioninformation" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_libraryconstructioninformation_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="chip_format" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="library_construction_method" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="library_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="library_notes" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="5" name="library_prep_date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="false" digits="0" id="6" name="number_of_pcr_cycles" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="7" name="protocol" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="8" name="spotting_location" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="library_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_libraryconstruc_library_id_4928bcc9_fk_core_libr" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_libraryconstructioninformation_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_libraryconstructioninformation_library_id_key" unique="true">
+            <column ascending="true" name="library_id"/>
+         </index>
+      </table>
+      <table name="core_libraryquantificationandstorage" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_libraryquantificationandstorage_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="average_size" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="3" id="2" name="dna_concentration_nm" nullable="true" remarks="" size="6" type="numeric"/>
+         <column autoUpdated="false" digits="3" id="3" name="dna_concentration_ngul" nullable="true" remarks="" size="6" type="numeric"/>
+         <column autoUpdated="false" digits="0" id="4" name="dna_volume" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="freezer" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="rack" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="7" name="shelf" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="8" name="box" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="9" name="position_in_box" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="10" name="library_tube_label" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="11" name="qc_check" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="12" name="qc_notes" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="13" name="quantification_method" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="14" name="size_range" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="15" name="size_selection_method" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="16" name="storage_medium" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="17" name="agilent_bioanalyzer_xad" nullable="true" remarks="" size="200" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="18" name="agilent_bioanalyzer_image" nullable="true" remarks="" size="200" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="19" name="library_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_libraryquantifi_library_id_4a7340fd_fk_core_libr" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_libraryquantificationandstorage_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_libraryquantificationandstorage_library_id_key" unique="true">
+            <column ascending="true" name="library_id"/>
+         </index>
+      </table>
+      <table name="core_librarysampledetail" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_librarysampledetail_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_state" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="estimated_percent_viability" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="3" name="label_of_original_sample_vial" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="original_storage_temperature" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="5" name="passage_of_cell_line" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="6" name="sample_notes" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="7" name="sample_preparation_method" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="8" name="sample_preservation_method" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="sample_spot_date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="false" digits="0" id="10" name="spotting_location" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="11" name="library_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_librarysampledetail_library_id_3c7222d3_fk_core_library_id" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_librarysampledetail_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_librarysampledetail_library_id_key" unique="true">
+            <column ascending="true" name="library_id"/>
+         </index>
+      </table>
+      <table name="core_sample" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_sample_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="sample_id" foreignKey="core_additionalsampl_sample_id_763aa026_fk_core_samp" implied="false" onDeleteCascade="false" table="core_additionalsampleinformation"/>
+            <child column="sample_id" foreignKey="core_library_sample_id_5e34f6ec_fk_core_sample_id" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="sample_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="anonymous_patient_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="cell_line_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="sample_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="strain" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="taxonomy_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="7" name="xenograft_biopsy_date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="false" digits="0" id="8" name="xenograft_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="xenograft_recipient_taxonomy_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_sample_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="core_sequencing" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_sequencing_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="from_sequencing_id" foreignKey="core_sequencing_rela_from_sequencing_id_4fbdf448_fk_core_sequ" implied="false" onDeleteCascade="false" table="core_sequencing_relates_to"/>
+            <child column="to_sequencing_id" foreignKey="core_sequencing_rela_to_sequencing_id_49ed0060_fk_core_sequ" implied="false" onDeleteCascade="false" table="core_sequencing_relates_to"/>
+            <child column="sequencing_id" foreignKey="core_sequencingdetai_sequencing_id_ca8325f7_fk_core_sequ" implied="false" onDeleteCascade="false" table="core_sequencingdetail"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="pool_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="adapter" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="format_for_data_submission" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="index_read_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="index_read1_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="6" name="index_read2_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="7" name="read_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="read1_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="9" name="read2_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="10" name="sequencing_goal" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="11" name="sequencing_instrument" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="12" name="sequencing_output_mode" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="13" name="short_description_of_submission" nullable="true" remarks="" size="150" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="14" name="submission_date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="false" digits="0" id="15" name="library_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_sequencing_library_id_27885a62_fk_core_library_id" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_sequencing_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_sequencing_library_id_27885a62" unique="false">
+            <column ascending="true" name="library_id"/>
+         </index>
+      </table>
+      <table name="core_sequencing_relates_to" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_sequencing_relates_to_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="from_sequencing_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_sequencing_rela_from_sequencing_id_4fbdf448_fk_core_sequ" implied="false" onDeleteCascade="false" table="core_sequencing"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="to_sequencing_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_sequencing_rela_to_sequencing_id_49ed0060_fk_core_sequ" implied="false" onDeleteCascade="false" table="core_sequencing"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_sequencing_relates_to_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_sequencing_relates__from_sequencing_id_to_se_9f89af4e_uniq" unique="true">
+            <column ascending="true" name="from_sequencing_id"/>
+            <column ascending="true" name="to_sequencing_id"/>
+         </index>
+         <index name="core_sequencing_relates_to_from_sequencing_id_4fbdf448" unique="false">
+            <column ascending="true" name="from_sequencing_id"/>
+         </index>
+         <index name="core_sequencing_relates_to_to_sequencing_id_49ed0060" unique="false">
+            <column ascending="true" name="to_sequencing_id"/>
+         </index>
+      </table>
+      <table name="core_sequencingdetail" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_sequencingdetail_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="flow_cell_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="gsc_library_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="path_to_archive" nullable="true" remarks="" size="150" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="sequencer_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="sequencing_center" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="sequencer_notes" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="7" name="sequencing_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_sequencingdetai_sequencing_id_ca8325f7_fk_core_sequ" implied="false" onDeleteCascade="false" table="core_sequencing"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_sequencingdetail_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_sequencingdetail_sequencing_id_key" unique="true">
+            <column ascending="true" name="sequencing_id"/>
+         </index>
+      </table>
+      <table name="core_sublibraryinformation" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('core_sublibraryinformation_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="sample" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="row" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="3" name="column" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="4" name="img_col" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="5" name="file_ch1" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="file_ch2" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="7" name="fld_section" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="fld_index" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="num_live" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="10" name="num_dead" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="11" name="num_other" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="12" name="rev_live" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="13" name="rev_dead" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="14" name="rev_other" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="15" name="spot_class" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="16" name="index_i7" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="17" name="primer_i7" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="18" name="index_i5" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="19" name="primer_i5" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="20" name="pick_met" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="21" name="spot_well" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="22" name="num_drops" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="23" name="library_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="core_sublibraryinfor_library_id_c34cbe7e_fk_core_libr" implied="false" onDeleteCascade="false" table="core_library"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="core_sublibraryinformation_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="core_sublibraryinformation_library_id_c34cbe7e" unique="false">
+            <column ascending="true" name="library_id"/>
+         </index>
+      </table>
+      <table name="django_admin_log" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('django_admin_log_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="6" id="1" name="action_time" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <column autoUpdated="false" digits="0" id="2" name="object_id" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="3" name="object_repr" nullable="false" remarks="" size="200" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="action_flag" nullable="false" remarks="" size="5" type="int2"/>
+         <column autoUpdated="false" digits="0" id="5" name="change_message" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="6" name="content_type_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="django_admin_log_content_type_id_c4bce8eb_fk_django_co" implied="false" onDeleteCascade="false" table="django_content_type"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="7" name="user_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="django_admin_log_user_id_c564eba6_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="django_admin_log_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="django_admin_log_content_type_id_c4bce8eb" unique="false">
+            <column ascending="true" name="content_type_id"/>
+         </index>
+         <index name="django_admin_log_user_id_c564eba6" unique="false">
+            <column ascending="true" name="user_id"/>
+         </index>
+      </table>
+      <table name="django_content_type" numRows="21" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('django_content_type_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="content_type_id" foreignKey="auth_permission_content_type_id_2f476e4b_fk_django_co" implied="false" onDeleteCascade="false" table="auth_permission"/>
+            <child column="content_type_id" foreignKey="django_admin_log_content_type_id_c4bce8eb_fk_django_co" implied="false" onDeleteCascade="false" table="django_admin_log"/>
+            <child column="content_type_id" foreignKey="taggit_taggeditem_content_type_id_9957a03c_fk_django_co" implied="false" onDeleteCascade="false" table="taggit_taggeditem"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="app_label" nullable="false" remarks="" size="100" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="model" nullable="false" remarks="" size="100" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="django_content_type_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="django_content_type_app_label_model_76bd3d3b_uniq" unique="true">
+            <column ascending="true" name="app_label"/>
+            <column ascending="true" name="model"/>
+         </index>
+      </table>
+      <table name="django_migrations" numRows="19" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('django_migrations_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="app" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="6" id="3" name="applied" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="django_migrations_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="django_session" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="session_key" nullable="false" remarks="" size="40" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="1" name="session_data" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="6" id="2" name="expire_date" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="session_key" sequenceNumberInPK="1"/>
+         <index name="django_session_pkey" unique="true">
+            <column ascending="true" name="session_key"/>
+         </index>
+         <index name="django_session_expire_date_a5c62663" unique="false">
+            <column ascending="true" name="expire_date"/>
+         </index>
+         <index name="django_session_session_key_c0390e0f_like" unique="false">
+            <column ascending="true" name="session_key"/>
+         </index>
+      </table>
+      <table name="history_library" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="1" name="pool_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="jira_ticket" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="num_sublibraries" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="4" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="5" name="result" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="true" defaultValue="nextval('history_library_history_id_seq'::regclass)" digits="0" id="6" name="history_id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="6" id="7" name="history_date" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <column autoUpdated="false" digits="0" id="8" name="history_type" nullable="false" remarks="" size="1" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="history_user_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="history_library_history_user_id_f3ddd9f4_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="10" name="sample_id" nullable="true" remarks="" size="10" type="int4"/>
+         <primaryKey column="history_id" sequenceNumberInPK="1"/>
+         <index name="history_library_pkey" unique="true">
+            <column ascending="true" name="history_id"/>
+         </index>
+         <index name="history_library_history_user_id_f3ddd9f4" unique="false">
+            <column ascending="true" name="history_user_id"/>
+         </index>
+         <index name="history_library_id_9d4733ff" unique="false">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="history_library_sample_id_92334e0e" unique="false">
+            <column ascending="true" name="sample_id"/>
+         </index>
+      </table>
+      <table name="history_sample" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="1" name="sample_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="taxonomy_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="sample_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="anonymous_patient_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="cell_line_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="xenograft_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="7" name="xenograft_recipient_taxonomy_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="strain" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="xenograft_biopsy_date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="true" defaultValue="nextval('history_sample_history_id_seq'::regclass)" digits="0" id="10" name="history_id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="6" id="11" name="history_date" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <column autoUpdated="false" digits="0" id="12" name="history_type" nullable="false" remarks="" size="1" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="13" name="history_user_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="history_sample_history_user_id_0159746e_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user"/>
+         </column>
+         <primaryKey column="history_id" sequenceNumberInPK="1"/>
+         <index name="history_sample_pkey" unique="true">
+            <column ascending="true" name="history_id"/>
+         </index>
+         <index name="history_sample_history_user_id_0159746e" unique="false">
+            <column ascending="true" name="history_user_id"/>
+         </index>
+         <index name="history_sample_id_3604b556" unique="false">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="history_sequencing" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="1" name="pool_id" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="adapter" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="format_for_data_submission" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="index_read_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="index_read1_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="6" name="index_read2_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="7" name="read_type" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="read1_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="9" name="read2_length" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="10" name="sequencing_goal" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="11" name="sequencing_instrument" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="12" name="sequencing_output_mode" nullable="true" remarks="" size="50" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="13" name="short_description_of_submission" nullable="true" remarks="" size="150" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="14" name="submission_date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="true" defaultValue="nextval('history_sequencing_history_id_seq'::regclass)" digits="0" id="15" name="history_id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="6" id="16" name="history_date" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <column autoUpdated="false" digits="0" id="17" name="history_type" nullable="false" remarks="" size="1" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="18" name="history_user_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="history_sequencing_history_user_id_35179a9a_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="19" name="library_id" nullable="true" remarks="" size="10" type="int4"/>
+         <primaryKey column="history_id" sequenceNumberInPK="1"/>
+         <index name="history_sequencing_pkey" unique="true">
+            <column ascending="true" name="history_id"/>
+         </index>
+         <index name="history_sequencing_history_user_id_35179a9a" unique="false">
+            <column ascending="true" name="history_user_id"/>
+         </index>
+         <index name="history_sequencing_id_df5aa072" unique="false">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="history_sequencing_library_id_bc9b17f6" unique="false">
+            <column ascending="true" name="library_id"/>
+         </index>
+      </table>
+      <table name="taggit_historicaltag" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="100" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="slug" nullable="false" remarks="" size="100" type="varchar"/>
+         <column autoUpdated="true" defaultValue="nextval('taggit_historicaltag_history_id_seq'::regclass)" digits="0" id="3" name="history_id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="6" id="4" name="history_date" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <column autoUpdated="false" digits="0" id="5" name="history_type" nullable="false" remarks="" size="1" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="history_user_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="taggit_historicaltag_history_user_id_f7226dd9_fk_auth_user_id" implied="false" onDeleteCascade="false" table="auth_user"/>
+         </column>
+         <primaryKey column="history_id" sequenceNumberInPK="1"/>
+         <index name="taggit_historicaltag_pkey" unique="true">
+            <column ascending="true" name="history_id"/>
+         </index>
+         <index name="taggit_historicaltag_history_user_id_f7226dd9" unique="false">
+            <column ascending="true" name="history_user_id"/>
+         </index>
+         <index name="taggit_historicaltag_id_5b61dc26" unique="false">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="taggit_historicaltag_name_01a65eaa" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="taggit_historicaltag_name_01a65eaa_like" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="taggit_historicaltag_slug_8aa086b4" unique="false">
+            <column ascending="true" name="slug"/>
+         </index>
+         <index name="taggit_historicaltag_slug_8aa086b4_like" unique="false">
+            <column ascending="true" name="slug"/>
+         </index>
+      </table>
+      <table name="taggit_tag" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('taggit_tag_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="tag_id" foreignKey="taggit_taggeditem_tag_id_f4f5b767_fk_taggit_tag_id" implied="false" onDeleteCascade="false" table="taggit_taggeditem"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="100" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="slug" nullable="false" remarks="" size="100" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="taggit_tag_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="taggit_tag_name_58eb2ed9_like" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="taggit_tag_name_key" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="taggit_tag_slug_6be58b2c_like" unique="false">
+            <column ascending="true" name="slug"/>
+         </index>
+         <index name="taggit_tag_slug_key" unique="true">
+            <column ascending="true" name="slug"/>
+         </index>
+      </table>
+      <table name="taggit_taggeditem" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('taggit_taggeditem_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="object_id" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="2" name="content_type_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="taggit_taggeditem_content_type_id_9957a03c_fk_django_co" implied="false" onDeleteCascade="false" table="django_content_type"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="tag_id" nullable="false" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="taggit_taggeditem_tag_id_f4f5b767_fk_taggit_tag_id" implied="false" onDeleteCascade="false" table="taggit_tag"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="taggit_taggeditem_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="taggit_taggeditem_content_type_id_9957a03c" unique="false">
+            <column ascending="true" name="content_type_id"/>
+         </index>
+         <index name="taggit_taggeditem_content_type_id_object_id_196cc965_idx" unique="false">
+            <column ascending="true" name="content_type_id"/>
+            <column ascending="true" name="object_id"/>
+         </index>
+         <index name="taggit_taggeditem_object_id_e2d7d1df" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+         <index name="taggit_taggeditem_tag_id_f4f5b767" unique="false">
+            <column ascending="true" name="tag_id"/>
+         </index>
+      </table>
+   </tables>
+</database>
