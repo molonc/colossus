@@ -279,6 +279,7 @@ class LibraryCreate(TemplateView):
             # raises the following error when trying to save the
             # ManyToMany 'Projects' field:
             # 'LibraryForm' object has no attribute 'save_m2m'.
+            # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
             instance = lib_form.save(commit=False)
             all_valid, formsets = self._validate_formsets(request, instance)
             context.update(formsets)
@@ -685,24 +686,15 @@ def summary_view(request):
     library_per_sample_count = {s.sample_id : s.library_set.count()
                     for s in Sample.objects.all()}
 
-    total_sublib_count = 0
-    sublibrary_per_sample_count = {}
-    samples = {}
-
-    for s in Sample.objects.all().order_by('sample_id'):
-        samples[s.sample_id] = get_object_or_404(Sample, pk=s.pk)
-        sublibrary_per_sample_count[s.sample_id] = 0
-        for l in s.library_set.all():
-            sublibrary_per_sample_count[s.sample_id] =  sublibrary_per_sample_count[s.sample_id] \
-                                                        + l.sublibraryinformation_set.count()
-        total_sublib_count = total_sublib_count + sublibrary_per_sample_count[s.sample_id]
+    sublibrary_per_sample_count = { s.sample_id : s.sublibraryinformation_set.count()
+                                   for s in Sample.objects.all()}
 
     context ={
         'library_per_sample': library_per_sample_count,
         'sublibrary_per_sample': sublibrary_per_sample_count,
         'total_sublibs': SublibraryInformation.objects.count(),
         'total_libs': Library.objects.count(),
-        'samples':samples
+        'samples':Sample.objects.all().order_by('sample_id')
     }
 
     return context

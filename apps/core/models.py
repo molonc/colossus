@@ -302,8 +302,8 @@ class SublibraryInformation(models.Model, FieldValue):
     It's technically a table of cell information.
     """
 
-    fields_to_exclude = ['ID', 'Library']
-    values_to_exclude = ['id', 'library']
+    fields_to_exclude = ['ID', 'Library', 'Sample_ID']
+    values_to_exclude = ['id', 'library', 'sample_id']
 
     ## track history
     # history = HistoricalRecords(
@@ -316,6 +316,17 @@ class SublibraryInformation(models.Model, FieldValue):
         verbose_name="Library",
         on_delete=models.CASCADE
         )
+
+    ## database relationships
+    # this sample_id is different from the field sample below
+    # sample below refers to column from SmartChipApp output, an
+    # incrementing integer id assigned to each sub library
+    sample_id = models.ForeignKey(
+        Sample,
+        verbose_name="Sample_ID",
+        on_delete=models.CASCADE,
+        null=True,
+    )
 
     ## fields
     sample = create_chrfield("Sample")
@@ -347,7 +358,7 @@ class SublibraryInformation(models.Model, FieldValue):
         col = str(self.column) if self.column > 9 else '0' + str(self.column)
         res = '_'.join(
             [
-                self.library.sample.sample_id,
+                self.sample_id.sample_id,
                 self.library.pool_id,
                 'R' + row,
                 'C' + col,

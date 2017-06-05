@@ -220,10 +220,3 @@ class LibraryAssistant(object):
         return any([s.sequencingdetail.path_to_archive
             for s in self.sequencing_set.all()])
 
-@register.filter
-def get_sample_pk_from_sample_dict(dictionary, key):
-    """ to enable dictionary lookups for sample pk by key in a loop
-        see https://code.djangoproject.com/ticket/3371 and
-        https://stackoverflow.com/questions/8000022/django-template-how-to-look-up-a-dictionary-value-with-a-variable
-        """
-    return dictionary.get(key).pk

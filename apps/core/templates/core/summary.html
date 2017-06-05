@@ -16,9 +16,13 @@ Summary Statistics
         </tr>
         <tr>
             <th id="thid"> Total number of sublibraries/wells sequenced: </th>
-            <td id="tdid">{{total_sublibs}}</td>
+            <td id="tdid">{{total_sublibs}}**</td>
         </tr>
+
     </table>
+    <br />
+    **Note: This number may not be fully accurate, does not yet account for wells that are chosed to not be sequenced, and should also not be interpreted as the number of cells sequenced, since this number does not account for whether the well
+            actually contain a single, live, cell.
     <br>
 </div><br>
 
@@ -38,11 +42,10 @@ Summary Statistics
                         <th id="thid"><u>Number of Libraries</u></th>
                         <th><br><th/>
                     </tr>
-                    {% for field, value in library_per_sample.items %}
+                    {% for s in samples %}
                     <tr>
-                        {# see get_item_pk in helpers.py for information on pk access here #}
-                        <th id="thid"><a href="{% url 'core:sample_detail' pk=samples|get_sample_pk_from_sample_dict:field %}">{{field}}:</a> </th>
-                        <td id="tdid">{{value}}</td>
+                        <th id="thid"><a href="{% url 'core:sample_detail' pk=s.pk %}">{{s.sample_id}}:</a> </th>
+                        <td id="tdid">{{s.library_set.count}}</td>
                     </tr>
                     {% endfor %}
                 </table><br>
@@ -64,18 +67,17 @@ Summary Statistics
                         <th id="thid"><u>Number of Sublibraries</u></th>
                         <th><br><th/>
                     </tr>
-                    {% for field, value in sublibrary_per_sample.items %}
+                    {% for s in samples %}
                     <tr>
-                        {# see get_item_pk in helpers.py for information on pk access here #}
-                        <th id="thid"><a href="{% url 'core:sample_detail' pk=samples|get_sample_pk_from_sample_dict:field %}">{{field}}:</a> </th>
-                        <td id="tdid">{{value}}</td>
+                        <th id="thid"><a href="{% url 'core:sample_detail' pk=s.pk %}">{{s.sample_id}}:</a> </th>
+                        <td id="tdid">{{s.sublibraryinformation_set.count}}</td>
                     </tr>
                     {% endfor %}
                 </table><br>
             </div>
         </div>
     </div>
-</div>
 
+</div>
 
 {% endblock %}

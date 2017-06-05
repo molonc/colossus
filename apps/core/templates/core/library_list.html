@@ -15,8 +15,8 @@ List of Libraries
         <table id="datatable" class="table table-striped">
             <thead>
                 <tr>
-                    <th>Primary Sample ID</th>
                     <th>Chip ID</th>
+                    <th>Primary Sample ID</th>
                     <th>Description</th>
                     <th>JIRA Ticket</th>
                     <th>Project</th>
@@ -29,8 +29,8 @@ List of Libraries
             <tbody>
                 {% for library in libraries %}
                 <tr>
-                    <td><a href="{% url 'core:library_detail' pk=library.pk %}">{{library.sample.sample_id}}</a></td>
-                    <td>{{library.pool_id}}</td>
+                    <td><a href="{% url 'core:library_detail' pk=library.pk %}">{{library.pool_id}}</a></td>
+                    <td>{{library.sample.sample_id}}</td>
                     <td>{{library.description}}</td>
                     <td><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{library.jira_ticket}}</a></td>
                     <td>
