@@ -52,7 +52,6 @@ from .utils import (
 #----------------------------
 from taggit.models import Tag
 
-
 #============================
 # Helpers
 #----------------------------
@@ -676,3 +675,34 @@ def search_view(request):
         msg = "Sorry, no match found."
         messages.warning(request, msg)
         return HttpResponseRedirect(reverse('index'))
+
+#============================
+# Summary view
+#----------------------------
+@Render("core/summary.html")
+def summary_view(request):
+
+    library_per_sample_count = {s.sample_id : s.library_set.count()
+                    for s in Sample.objects.all()}
+
+    total_sublib_count = 0
+    sublibrary_per_sample_count = {}
+    samples = {}
+
+    for s in Sample.objects.all().order_by('sample_id'):
+        samples[s.sample_id] = get_object_or_404(Sample, pk=s.pk)
+        sublibrary_per_sample_count[s.sample_id] = 0
+        for l in s.library_set.all():
+            sublibrary_per_sample_count[s.sample_id] =  sublibrary_per_sample_count[s.sample_id] \
+                                                        + l.sublibraryinformation_set.count()
+        total_sublib_count = total_sublib_count + sublibrary_per_sample_count[s.sample_id]
+
+    context ={
+        'library_per_sample': library_per_sample_count,
+        'sublibrary_per_sample': sublibrary_per_sample_count,
+        'total_sublibs': SublibraryInformation.objects.count(),
+        'total_libs': Library.objects.count(),
+        'samples':samples
+    }
+
+    return context

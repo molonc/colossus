@@ -33,5 +33,6 @@ url(r'^sequencing/gsc_form/download/(?P<pk>\d+)$', views.sequencing_get_gsc_form
 url(r'^project/list$', views.project_list, name='project_list'),
 url(r'^project/update/(?P<pk>\d+)$', views.project_update, name='project_update'),
 url(r'^project/delete/(?P<pk>\d+)$', views.project_delete, name='project_delete'),
+url(r'^summary$', views.summary_view, name='summary'),
 ]
 

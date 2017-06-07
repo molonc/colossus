@@ -1,0 +1,81 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Summary Statistics
+{% endblock %}
+
+{% block body %}
+<br>
+<div class="container" style="background-color:#FFF3E0;">
+    <h4> Overall Summary </h4>
+    <table class="table-condensed">
+        <tr>
+            <th id="thid"> Total number of libraries: </th>
+            <td id="tdid">{{total_libs}}</td>
+        </tr>
+        <tr>
+            <th id="thid"> Total number of sublibraries/wells sequenced: </th>
+            <td id="tdid">{{total_sublibs}}</td>
+        </tr>
+    </table>
+    <br>
+</div><br>
+
+<div class="container" style="background-color:#FFF3E0;">
+    <h4> Counts per Sample </h4>
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#lib_count"> Library Counts per Sample </a>
+                </h4>
+            </div>
+            <div class="panel-collapse collapse panel-body" id="lib_count">
+                <table class="table-condensed">
+                    <tr>
+                        <th id="thid"><u>Sample ID</u></th>
+                        <th id="thid"><u>Number of Libraries</u></th>
+                        <th><br><th/>
+                    </tr>
+                    {% for field, value in library_per_sample.items %}
+                    <tr>
+                        {# see get_item_pk in helpers.py for information on pk access here #}
+                        <th id="thid"><a href="{% url 'core:sample_detail' pk=samples|get_sample_pk_from_sample_dict:field %}">{{field}}:</a> </th>
+                        <td id="tdid">{{value}}</td>
+                    </tr>
+                    {% endfor %}
+                </table><br>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#sublib_count"> Sublibrary Counts per Sample </a>
+                </h4>
+            </div>
+            <div class="panel-collapse collapse panel-body" id="sublib_count">
+                <table class="table-condensed">
+                    <tr>
+                        <th id="thid"><u>Sample ID</u></th>
+                        <th id="thid"><u>Number of Sublibraries</u></th>
+                        <th><br><th/>
+                    </tr>
+                    {% for field, value in sublibrary_per_sample.items %}
+                    <tr>
+                        {# see get_item_pk in helpers.py for information on pk access here #}
+                        <th id="thid"><a href="{% url 'core:sample_detail' pk=samples|get_sample_pk_from_sample_dict:field %}">{{field}}:</a> </th>
+                        <td id="tdid">{{value}}</td>
+                    </tr>
+                    {% endfor %}
+                </table><br>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
