@@ -187,8 +187,8 @@ class SampleSheet(object):
             # All the sequencing machines listed in the models need i7 to be reverse complemented
             'index': d['primer_i7'] if self._si == "O" else _rc(d['primer_i7']),
             'I5_Index_ID': d['index_i5'],
-            # Only the NextSeq requires the i5 to be reverse complemented
-            'index2': d['primer_i5'] if self._si != "N550" else _rc(d['primer_i5']),
+            # Only the NextSeq & HX requires the i5 to be reverse complemented
+            'index2': d['primer_i5'] if (self._si != "N550") and (self._si!='HX')  else _rc(d['primer_i5']),
             #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
             'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['spot_class'],
             }
