@@ -119,12 +119,12 @@ class LibraryForm(ModelForm):
         # fields = "__all__"
         exclude = ['num_sublibraries']
         labels = {
-            'sample': ('*Sample'),
+            'primary sample': ('*Sample'),
             'pool_id': ('*Chip ID'),
             'jira_ticket': ('*Jira Ticket'),
             }
         help_texts = {
-            'sample': ('Sequencing ID (usually SA ID).'),
+            'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
             'pool_id': ('Chip ID.'),
             'jira_ticket': ('Jira Ticket.'),
             }

@@ -247,8 +247,8 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     class Meta:
         ordering = ('sample', 'pool_id')
 
-    fields_to_exclude = ['ID', 'Sample']
-    values_to_exclude = ['id', 'sample']
+    fields_to_exclude = ['ID', 'Primary Sample']
+    values_to_exclude = ['id', 'primary sample']
 
     ## track history
     history = HistoricalRecords(
@@ -265,7 +265,7 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     ## database relationships
     sample = models.ForeignKey(
         Sample,
-        verbose_name="Sample",
+        verbose_name="Primary Sample",
         on_delete=models.CASCADE
         )
 
