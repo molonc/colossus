@@ -23,16 +23,20 @@ VERSION = "1.0.0"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Export apps to PYTHONPATH
-sys.path.append(os.path.join(BASE_DIR, 'apps'))
+PATH=os.path.join(BASE_DIR, 'apps')
+if (PATH not in sys.path):
+    sys.path.append(PATH)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+# SECRET_KEY = ''
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = bool( os.environ.get('DJANGO_DEBUG', False) )
 
 ALLOWED_HOSTS = []
 
@@ -162,3 +166,8 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "uploads")
 
 # Login url
 LOGIN_URL = '/apps/account/login/'
+
+# Enabled security settings
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = "DENY"
