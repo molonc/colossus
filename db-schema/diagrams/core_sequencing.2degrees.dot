@@ -19,6 +19,7 @@ digraph "twoDegreesRelationshipsDiagram" {
   edge [
     arrowsize="0.8"
   ];
+  "core_chipregion":"elipses":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_library":"sample_id":w -> "core_sample":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_library_relates_to":"elipses":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_library_relates_to":"elipses":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
@@ -29,7 +30,19 @@ digraph "twoDegreesRelationshipsDiagram" {
   "core_sequencing_relates_to":"from_sequencing_id":w -> "core_sequencing":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_sequencing_relates_to":"to_sequencing_id":w -> "core_sequencing":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_sequencingdetail":"sequencing_id":w -> "core_sequencing":"id.type":e [arrowhead=none dir=back arrowtail=teeodot];
+  "core_sublibraryinformation":"elipses":w -> "core_chipregion":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_sublibraryinformation":"elipses":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
+  "core_sublibraryinformation":"elipses":w -> "core_sample":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
+  "core_chipregion" [
+    label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
+      <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_chipregion</TD></TR>
+      <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
+    </TABLE>>
+    URL="core_chipregion.html"
+    tooltip="core_chipregion"
+  ];
   "core_library" [
     label=<
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
@@ -39,9 +52,9 @@ digraph "twoDegreesRelationshipsDiagram" {
       <TR><TD PORT="jira_ticket" COLSPAN="3" ALIGN="LEFT">jira_ticket</TD></TR>
       <TR><TD PORT="num_sublibraries" COLSPAN="3" ALIGN="LEFT">num_sublibraries</TD></TR>
       <TR><TD PORT="description" COLSPAN="3" ALIGN="LEFT">description</TD></TR>
-      <TR><TD PORT="result" COLSPAN="3" ALIGN="LEFT">result</TD></TR>
       <TR><TD PORT="sample_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">sample_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">7 &gt;</TD></TR>
+      <TR><TD PORT="result" COLSPAN="3" ALIGN="LEFT">result</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">8 &gt;</TD></TR>
     </TABLE>>
     URL="core_library.html"
     tooltip="core_library"
@@ -51,7 +64,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_library_relates_to</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">241 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_library_relates_to.html"
     tooltip="core_library_relates_to"
@@ -61,7 +74,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_libraryconstructioninformation</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_libraryconstructioninformation.html"
     tooltip="core_libraryconstructioninformation"
@@ -71,7 +84,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_libraryquantificationandstorage</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_libraryquantificationandstorage.html"
     tooltip="core_libraryquantificationandstorage"
@@ -81,7 +94,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_librarysampledetail</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_librarysampledetail.html"
     tooltip="core_librarysampledetail"
@@ -91,7 +104,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_sample</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">20 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="core_sample.html"
     tooltip="core_sample"
@@ -112,11 +125,11 @@ digraph "twoDegreesRelationshipsDiagram" {
       <TR><TD PORT="read2_length" COLSPAN="2" ALIGN="LEFT">read2_length</TD><TD PORT="read2_length.type" ALIGN="LEFT">int4[10]</TD></TR>
       <TR><TD PORT="sequencing_goal" COLSPAN="2" ALIGN="LEFT">sequencing_goal</TD><TD PORT="sequencing_goal.type" ALIGN="LEFT">varchar[50]</TD></TR>
       <TR><TD PORT="sequencing_instrument" COLSPAN="2" ALIGN="LEFT">sequencing_instrument</TD><TD PORT="sequencing_instrument.type" ALIGN="LEFT">varchar[50]</TD></TR>
-      <TR><TD PORT="sequencing_output_mode" COLSPAN="2" ALIGN="LEFT">sequencing_output_mode</TD><TD PORT="sequencing_output_mode.type" ALIGN="LEFT">varchar[50]</TD></TR>
       <TR><TD PORT="short_description_of_submission" COLSPAN="2" ALIGN="LEFT">short_description_of_submission</TD><TD PORT="short_description_of_submission.type" ALIGN="LEFT">varchar[150]</TD></TR>
       <TR><TD PORT="submission_date" COLSPAN="2" ALIGN="LEFT">submission_date</TD><TD PORT="submission_date.type" ALIGN="LEFT">date[13]</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="2" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD><TD PORT="library_id.type" ALIGN="LEFT">int4[10]</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
+      <TR><TD PORT="sequencing_output_mode" COLSPAN="2" ALIGN="LEFT">sequencing_output_mode</TD><TD PORT="sequencing_output_mode.type" ALIGN="LEFT">varchar[50]</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="core_sequencing.html"
     tooltip="core_sequencing"
@@ -128,7 +141,7 @@ digraph "twoDegreesRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="from_sequencing_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">from_sequencing_id</TD></TR>
       <TR><TD PORT="to_sequencing_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">to_sequencing_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">36 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_sequencing_relates_to.html"
     tooltip="core_sequencing_relates_to"
@@ -145,7 +158,7 @@ digraph "twoDegreesRelationshipsDiagram" {
       <TR><TD PORT="sequencing_center" COLSPAN="3" ALIGN="LEFT">sequencing_center</TD></TR>
       <TR><TD PORT="sequencer_notes" COLSPAN="3" ALIGN="LEFT">sequencer_notes</TD></TR>
       <TR><TD PORT="sequencing_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">sequencing_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_sequencingdetail.html"
     tooltip="core_sequencingdetail"
@@ -155,7 +168,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_sublibraryinformation</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 3</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">85,146 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_sublibraryinformation.html"
     tooltip="core_sublibraryinformation"

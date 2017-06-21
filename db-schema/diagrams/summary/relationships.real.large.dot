@@ -25,7 +25,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">auth_group</TD></TR>
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="name" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">name</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">1 row</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
     </TABLE>>
     URL="tables/auth_group.html"
     tooltip="auth_group"
@@ -37,7 +37,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="group_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">group_id</TD></TR>
       <TR><TD PORT="permission_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">permission_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">33 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/auth_group_permissions.html"
     tooltip="auth_group_permissions"
@@ -50,7 +50,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="name" COLSPAN="3" ALIGN="LEFT">name</TD></TR>
       <TR><TD PORT="content_type_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">content_type_id</TD></TR>
       <TR><TD PORT="codename" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">codename</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">63 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">69 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
     </TABLE>>
     URL="tables/auth_permission.html"
     tooltip="auth_permission"
@@ -70,7 +70,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="is_staff" COLSPAN="3" ALIGN="LEFT">is_staff</TD></TR>
       <TR><TD PORT="is_active" COLSPAN="3" ALIGN="LEFT">is_active</TD></TR>
       <TR><TD PORT="date_joined" COLSPAN="3" ALIGN="LEFT">date_joined</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">7 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">10 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">7 &gt;</TD></TR>
     </TABLE>>
     URL="tables/auth_user.html"
     tooltip="auth_user"
@@ -82,7 +82,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="user_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">user_id</TD></TR>
       <TR><TD PORT="group_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">group_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">9 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/auth_user_groups.html"
     tooltip="auth_user_groups"
@@ -121,10 +121,35 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="treatment_status" COLSPAN="3" ALIGN="LEFT">treatment_status</TD></TR>
       <TR><TD PORT="family_information" COLSPAN="3" ALIGN="LEFT">family_information</TD></TR>
       <TR><TD PORT="sample_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">sample_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">20 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_additionalsampleinformation.html"
     tooltip="core_additionalsampleinformation"
+  ];
+  "core_chipregion" [
+    label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
+      <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_chipregion</TD></TR>
+      <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
+      <TR><TD PORT="region_code" COLSPAN="3" ALIGN="LEFT">region_code</TD></TR>
+      <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
+    </TABLE>>
+    URL="tables/core_chipregion.html"
+    tooltip="core_chipregion"
+  ];
+  "core_chipregionmetadata" [
+    label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
+      <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_chipregionmetadata</TD></TR>
+      <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
+      <TR><TD PORT="metadata_field" COLSPAN="3" ALIGN="LEFT">metadata_field</TD></TR>
+      <TR><TD PORT="metadata_value" COLSPAN="3" ALIGN="LEFT">metadata_value</TD></TR>
+      <TR><TD PORT="chip_region_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">chip_region_id</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">540 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+    </TABLE>>
+    URL="tables/core_chipregionmetadata.html"
+    tooltip="core_chipregionmetadata"
   ];
   "core_library" [
     label=<
@@ -135,9 +160,9 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="jira_ticket" COLSPAN="3" ALIGN="LEFT">jira_ticket</TD></TR>
       <TR><TD PORT="num_sublibraries" COLSPAN="3" ALIGN="LEFT">num_sublibraries</TD></TR>
       <TR><TD PORT="description" COLSPAN="3" ALIGN="LEFT">description</TD></TR>
-      <TR><TD PORT="result" COLSPAN="3" ALIGN="LEFT">result</TD></TR>
       <TR><TD PORT="sample_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">sample_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">7 &gt;</TD></TR>
+      <TR><TD PORT="result" COLSPAN="3" ALIGN="LEFT">result</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">8 &gt;</TD></TR>
     </TABLE>>
     URL="tables/core_library.html"
     tooltip="core_library"
@@ -149,7 +174,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="from_library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">from_library_id</TD></TR>
       <TR><TD PORT="to_library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">to_library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">241 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_library_relates_to.html"
     tooltip="core_library_relates_to"
@@ -166,9 +191,9 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="library_prep_date" COLSPAN="3" ALIGN="LEFT">library_prep_date</TD></TR>
       <TR><TD PORT="number_of_pcr_cycles" COLSPAN="3" ALIGN="LEFT">number_of_pcr_cycles</TD></TR>
       <TR><TD PORT="protocol" COLSPAN="3" ALIGN="LEFT">protocol</TD></TR>
-      <TR><TD PORT="spotting_location" COLSPAN="3" ALIGN="LEFT">spotting_location</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD PORT="spotting_location" COLSPAN="3" ALIGN="LEFT">spotting_location</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_libraryconstructioninformation.html"
     tooltip="core_libraryconstructioninformation"
@@ -182,22 +207,22 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="dna_concentration_nm" COLSPAN="3" ALIGN="LEFT">dna_concentration_nm</TD></TR>
       <TR><TD PORT="dna_concentration_ngul" COLSPAN="3" ALIGN="LEFT">dna_concentration_ngul</TD></TR>
       <TR><TD PORT="dna_volume" COLSPAN="3" ALIGN="LEFT">dna_volume</TD></TR>
-      <TR><TD PORT="freezer" COLSPAN="3" ALIGN="LEFT">freezer</TD></TR>
-      <TR><TD PORT="rack" COLSPAN="3" ALIGN="LEFT">rack</TD></TR>
-      <TR><TD PORT="shelf" COLSPAN="3" ALIGN="LEFT">shelf</TD></TR>
-      <TR><TD PORT="box" COLSPAN="3" ALIGN="LEFT">box</TD></TR>
-      <TR><TD PORT="position_in_box" COLSPAN="3" ALIGN="LEFT">position_in_box</TD></TR>
       <TR><TD PORT="library_tube_label" COLSPAN="3" ALIGN="LEFT">library_tube_label</TD></TR>
-      <TR><TD PORT="qc_check" COLSPAN="3" ALIGN="LEFT">qc_check</TD></TR>
       <TR><TD PORT="qc_notes" COLSPAN="3" ALIGN="LEFT">qc_notes</TD></TR>
       <TR><TD PORT="quantification_method" COLSPAN="3" ALIGN="LEFT">quantification_method</TD></TR>
       <TR><TD PORT="size_range" COLSPAN="3" ALIGN="LEFT">size_range</TD></TR>
       <TR><TD PORT="size_selection_method" COLSPAN="3" ALIGN="LEFT">size_selection_method</TD></TR>
       <TR><TD PORT="storage_medium" COLSPAN="3" ALIGN="LEFT">storage_medium</TD></TR>
-      <TR><TD PORT="agilent_bioanalyzer_xad" COLSPAN="3" ALIGN="LEFT">agilent_bioanalyzer_xad</TD></TR>
-      <TR><TD PORT="agilent_bioanalyzer_image" COLSPAN="3" ALIGN="LEFT">agilent_bioanalyzer_image</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD PORT="agilent_bioanalyzer_xad" COLSPAN="3" ALIGN="LEFT">agilent_bioanalyzer_xad</TD></TR>
+      <TR><TD PORT="box" COLSPAN="3" ALIGN="LEFT">box</TD></TR>
+      <TR><TD PORT="qc_check" COLSPAN="3" ALIGN="LEFT">qc_check</TD></TR>
+      <TR><TD PORT="agilent_bioanalyzer_image" COLSPAN="3" ALIGN="LEFT">agilent_bioanalyzer_image</TD></TR>
+      <TR><TD PORT="freezer" COLSPAN="3" ALIGN="LEFT">freezer</TD></TR>
+      <TR><TD PORT="position_in_box" COLSPAN="3" ALIGN="LEFT">position_in_box</TD></TR>
+      <TR><TD PORT="rack" COLSPAN="3" ALIGN="LEFT">rack</TD></TR>
+      <TR><TD PORT="shelf" COLSPAN="3" ALIGN="LEFT">shelf</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_libraryquantificationandstorage.html"
     tooltip="core_libraryquantificationandstorage"
@@ -215,10 +240,10 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="sample_notes" COLSPAN="3" ALIGN="LEFT">sample_notes</TD></TR>
       <TR><TD PORT="sample_preparation_method" COLSPAN="3" ALIGN="LEFT">sample_preparation_method</TD></TR>
       <TR><TD PORT="sample_preservation_method" COLSPAN="3" ALIGN="LEFT">sample_preservation_method</TD></TR>
+      <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
       <TR><TD PORT="sample_spot_date" COLSPAN="3" ALIGN="LEFT">sample_spot_date</TD></TR>
       <TR><TD PORT="spotting_location" COLSPAN="3" ALIGN="LEFT">spotting_location</TD></TR>
-      <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_librarysampledetail.html"
     tooltip="core_librarysampledetail"
@@ -237,7 +262,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="xenograft_biopsy_date" COLSPAN="3" ALIGN="LEFT">xenograft_biopsy_date</TD></TR>
       <TR><TD PORT="xenograft_id" COLSPAN="3" ALIGN="LEFT">xenograft_id</TD></TR>
       <TR><TD PORT="xenograft_recipient_taxonomy_id" COLSPAN="3" ALIGN="LEFT">xenograft_recipient_taxonomy_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">20 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="tables/core_sample.html"
     tooltip="core_sample"
@@ -258,11 +283,11 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="read2_length" COLSPAN="3" ALIGN="LEFT">read2_length</TD></TR>
       <TR><TD PORT="sequencing_goal" COLSPAN="3" ALIGN="LEFT">sequencing_goal</TD></TR>
       <TR><TD PORT="sequencing_instrument" COLSPAN="3" ALIGN="LEFT">sequencing_instrument</TD></TR>
-      <TR><TD PORT="sequencing_output_mode" COLSPAN="3" ALIGN="LEFT">sequencing_output_mode</TD></TR>
       <TR><TD PORT="short_description_of_submission" COLSPAN="3" ALIGN="LEFT">short_description_of_submission</TD></TR>
       <TR><TD PORT="submission_date" COLSPAN="3" ALIGN="LEFT">submission_date</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
+      <TR><TD PORT="sequencing_output_mode" COLSPAN="3" ALIGN="LEFT">sequencing_output_mode</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="tables/core_sequencing.html"
     tooltip="core_sequencing"
@@ -274,7 +299,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="from_sequencing_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">from_sequencing_id</TD></TR>
       <TR><TD PORT="to_sequencing_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">to_sequencing_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">36 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_sequencing_relates_to.html"
     tooltip="core_sequencing_relates_to"
@@ -291,7 +316,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="sequencing_center" COLSPAN="3" ALIGN="LEFT">sequencing_center</TD></TR>
       <TR><TD PORT="sequencer_notes" COLSPAN="3" ALIGN="LEFT">sequencer_notes</TD></TR>
       <TR><TD PORT="sequencing_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">sequencing_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_sequencingdetail.html"
     tooltip="core_sequencingdetail"
@@ -324,7 +349,9 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="spot_well" COLSPAN="3" ALIGN="LEFT">spot_well</TD></TR>
       <TR><TD PORT="num_drops" COLSPAN="3" ALIGN="LEFT">num_drops</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD PORT="sample_id_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">sample_id_id</TD></TR>
+      <TR><TD PORT="chip_region_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">chip_region_id</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 3</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">85,146 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/core_sublibraryinformation.html"
     tooltip="core_sublibraryinformation"
@@ -341,7 +368,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="change_message" COLSPAN="3" ALIGN="LEFT">change_message</TD></TR>
       <TR><TD PORT="content_type_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">content_type_id</TD></TR>
       <TR><TD PORT="user_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">user_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">33 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/django_admin_log.html"
     tooltip="django_admin_log"
@@ -353,7 +380,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="app_label" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">app_label</TD></TR>
       <TR><TD PORT="model" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">model</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">21 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">23 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="tables/django_content_type.html"
     tooltip="django_content_type"
@@ -367,13 +394,13 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="jira_ticket" COLSPAN="3" ALIGN="LEFT">jira_ticket</TD></TR>
       <TR><TD PORT="num_sublibraries" COLSPAN="3" ALIGN="LEFT">num_sublibraries</TD></TR>
       <TR><TD PORT="description" COLSPAN="3" ALIGN="LEFT">description</TD></TR>
-      <TR><TD PORT="result" COLSPAN="3" ALIGN="LEFT">result</TD></TR>
       <TR><TD PORT="history_id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">history_id</TD></TR>
       <TR><TD PORT="history_date" COLSPAN="3" ALIGN="LEFT">history_date</TD></TR>
       <TR><TD PORT="history_type" COLSPAN="3" ALIGN="LEFT">history_type</TD></TR>
       <TR><TD PORT="history_user_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">history_user_id</TD></TR>
       <TR><TD PORT="sample_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">sample_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD PORT="result" COLSPAN="3" ALIGN="LEFT">result</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">1,224 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/history_library.html"
     tooltip="history_library"
@@ -396,7 +423,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="history_date" COLSPAN="3" ALIGN="LEFT">history_date</TD></TR>
       <TR><TD PORT="history_type" COLSPAN="3" ALIGN="LEFT">history_type</TD></TR>
       <TR><TD PORT="history_user_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">history_user_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">46 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/history_sample.html"
     tooltip="history_sample"
@@ -425,7 +452,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="history_type" COLSPAN="3" ALIGN="LEFT">history_type</TD></TR>
       <TR><TD PORT="history_user_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">history_user_id</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">215 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/history_sequencing.html"
     tooltip="history_sequencing"
@@ -441,7 +468,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="history_date" COLSPAN="3" ALIGN="LEFT">history_date</TD></TR>
       <TR><TD PORT="history_type" COLSPAN="3" ALIGN="LEFT">history_type</TD></TR>
       <TR><TD PORT="history_user_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">history_user_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/taggit_historicaltag.html"
     tooltip="taggit_historicaltag"
@@ -453,7 +480,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="name" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">name</TD></TR>
       <TR><TD PORT="slug" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">slug</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">1 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">2 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">1 &gt;</TD></TR>
     </TABLE>>
     URL="tables/taggit_tag.html"
     tooltip="taggit_tag"
@@ -466,7 +493,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD PORT="object_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">object_id</TD></TR>
       <TR><TD PORT="content_type_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">content_type_id</TD></TR>
       <TR><TD PORT="tag_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">tag_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">99 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/taggit_taggeditem.html"
     tooltip="taggit_taggeditem"
@@ -479,6 +506,8 @@ digraph "largeRelationshipsDiagram" {
   "auth_user_user_permissions":"permission_id":w -> "auth_permission":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "auth_user_user_permissions":"user_id":w -> "auth_user":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_additionalsampleinformation":"sample_id":w -> "core_sample":"id":e [arrowhead=none dir=back arrowtail=teeodot];
+  "core_chipregion":"library_id":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
+  "core_chipregionmetadata":"chip_region_id":w -> "core_chipregion":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_library":"sample_id":w -> "core_sample":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_library_relates_to":"from_library_id":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_library_relates_to":"to_library_id":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
@@ -489,7 +518,9 @@ digraph "largeRelationshipsDiagram" {
   "core_sequencing_relates_to":"from_sequencing_id":w -> "core_sequencing":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_sequencing_relates_to":"to_sequencing_id":w -> "core_sequencing":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_sequencingdetail":"sequencing_id":w -> "core_sequencing":"id":e [arrowhead=none dir=back arrowtail=teeodot];
+  "core_sublibraryinformation":"chip_region_id":w -> "core_chipregion":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "core_sublibraryinformation":"library_id":w -> "core_library":"id":e [arrowhead=none dir=back arrowtail=crowodot];
+  "core_sublibraryinformation":"sample_id_id":w -> "core_sample":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "django_admin_log":"content_type_id":w -> "django_content_type":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "django_admin_log":"user_id":w -> "auth_user":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "history_library":"history_user_id":w -> "auth_user":"id":e [arrowhead=none dir=back arrowtail=crowodot];

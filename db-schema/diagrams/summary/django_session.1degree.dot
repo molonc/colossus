@@ -24,7 +24,7 @@ digraph "django_session" {
       <TR><TD PORT="session_key" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">session_key</TD></TR>
       <TR><TD PORT="session_data" COLSPAN="3" ALIGN="LEFT">session_data</TD></TR>
       <TR><TD PORT="expire_date" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">expire_date</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">121 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/django_session.html"
     tooltip="django_session"

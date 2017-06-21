@@ -1,17 +1,18 @@
 auth_user
+core_sample
 django_content_type
 auth_group
-core_sample
 taggit_tag
 core_library
 core_sequencing
 auth_permission
+core_chipregion
 core_additionalsampleinformation
+core_chipregionmetadata
 core_libraryconstructioninformation
 core_libraryquantificationandstorage
 core_librarysampledetail
 core_sequencingdetail
-core_sublibraryinformation
 history_library
 history_sample
 history_sequencing
@@ -23,5 +24,6 @@ core_library_relates_to
 core_sequencing_relates_to
 django_admin_log
 taggit_taggeditem
+core_sublibraryinformation
 django_migrations
 django_session

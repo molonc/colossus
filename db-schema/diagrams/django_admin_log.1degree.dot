@@ -36,7 +36,7 @@ digraph "oneDegreeRelationshipsDiagram" {
       <TR><TD PORT="is_staff" COLSPAN="3" ALIGN="LEFT">is_staff</TD></TR>
       <TR><TD PORT="is_active" COLSPAN="3" ALIGN="LEFT">is_active</TD></TR>
       <TR><TD PORT="date_joined" COLSPAN="3" ALIGN="LEFT">date_joined</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">7 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">10 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">7 &gt;</TD></TR>
     </TABLE>>
     URL="auth_user.html"
     tooltip="auth_user"
@@ -53,7 +53,7 @@ digraph "oneDegreeRelationshipsDiagram" {
       <TR><TD PORT="change_message" COLSPAN="2" ALIGN="LEFT">change_message</TD><TD PORT="change_message.type" ALIGN="LEFT">text[2147483647]</TD></TR>
       <TR><TD PORT="content_type_id" COLSPAN="2" BGCOLOR="#f4f7da" ALIGN="LEFT">content_type_id</TD><TD PORT="content_type_id.type" ALIGN="LEFT">int4[10]</TD></TR>
       <TR><TD PORT="user_id" COLSPAN="2" BGCOLOR="#f4f7da" ALIGN="LEFT">user_id</TD><TD PORT="user_id.type" ALIGN="LEFT">int4[10]</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">33 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 &gt;</TD></TR>
     </TABLE>>
     URL="django_admin_log.html"
     tooltip="django_admin_log"
@@ -65,7 +65,7 @@ digraph "oneDegreeRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD></TR>
       <TR><TD PORT="app_label" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">app_label</TD></TR>
       <TR><TD PORT="model" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">model</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">21 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">23 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="django_content_type.html"
     tooltip="django_content_type"

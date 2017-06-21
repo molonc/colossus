@@ -1,5 +1,6 @@
 django_session
 django_migrations
+core_sublibraryinformation
 taggit_taggeditem
 django_admin_log
 core_sequencing_relates_to
@@ -11,17 +12,18 @@ taggit_historicaltag
 history_sequencing
 history_sample
 history_library
-core_sublibraryinformation
 core_sequencingdetail
 core_librarysampledetail
 core_libraryquantificationandstorage
 core_libraryconstructioninformation
+core_chipregionmetadata
 core_additionalsampleinformation
+core_chipregion
 auth_permission
 core_sequencing
 core_library
 taggit_tag
-core_sample
 auth_group
 django_content_type
+core_sample
 auth_user

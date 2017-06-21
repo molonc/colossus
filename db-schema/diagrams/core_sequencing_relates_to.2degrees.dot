@@ -28,7 +28,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_library</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">7 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">108 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">8 &gt;</TD></TR>
     </TABLE>>
     URL="core_library.html"
     tooltip="core_library"
@@ -49,11 +49,11 @@ digraph "twoDegreesRelationshipsDiagram" {
       <TR><TD PORT="read2_length" COLSPAN="3" ALIGN="LEFT">read2_length</TD></TR>
       <TR><TD PORT="sequencing_goal" COLSPAN="3" ALIGN="LEFT">sequencing_goal</TD></TR>
       <TR><TD PORT="sequencing_instrument" COLSPAN="3" ALIGN="LEFT">sequencing_instrument</TD></TR>
-      <TR><TD PORT="sequencing_output_mode" COLSPAN="3" ALIGN="LEFT">sequencing_output_mode</TD></TR>
       <TR><TD PORT="short_description_of_submission" COLSPAN="3" ALIGN="LEFT">short_description_of_submission</TD></TR>
       <TR><TD PORT="submission_date" COLSPAN="3" ALIGN="LEFT">submission_date</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
+      <TR><TD PORT="sequencing_output_mode" COLSPAN="3" ALIGN="LEFT">sequencing_output_mode</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="core_sequencing.html"
     tooltip="core_sequencing"
@@ -65,7 +65,7 @@ digraph "twoDegreesRelationshipsDiagram" {
       <TR><TD PORT="id" COLSPAN="2" BGCOLOR="#bed1b8" ALIGN="LEFT">id</TD><TD PORT="id.type" ALIGN="LEFT">serial[10]</TD></TR>
       <TR><TD PORT="from_sequencing_id" COLSPAN="2" BGCOLOR="#f4f7da" ALIGN="LEFT">from_sequencing_id</TD><TD PORT="from_sequencing_id.type" ALIGN="LEFT">int4[10]</TD></TR>
       <TR><TD PORT="to_sequencing_id" COLSPAN="2" BGCOLOR="#f4f7da" ALIGN="LEFT">to_sequencing_id</TD><TD PORT="to_sequencing_id.type" ALIGN="LEFT">int4[10]</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">36 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 &gt;</TD></TR>
     </TABLE>>
     URL="core_sequencing_relates_to.html"
     tooltip="core_sequencing_relates_to"
@@ -75,7 +75,7 @@ digraph "twoDegreesRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">core_sequencingdetail</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="core_sequencingdetail.html"
     tooltip="core_sequencingdetail"

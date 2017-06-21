@@ -36,11 +36,11 @@ digraph "oneDegreeRelationshipsDiagram" {
       <TR><TD PORT="read2_length" COLSPAN="3" ALIGN="LEFT">read2_length</TD></TR>
       <TR><TD PORT="sequencing_goal" COLSPAN="3" ALIGN="LEFT">sequencing_goal</TD></TR>
       <TR><TD PORT="sequencing_instrument" COLSPAN="3" ALIGN="LEFT">sequencing_instrument</TD></TR>
-      <TR><TD PORT="sequencing_output_mode" COLSPAN="3" ALIGN="LEFT">sequencing_output_mode</TD></TR>
       <TR><TD PORT="short_description_of_submission" COLSPAN="3" ALIGN="LEFT">short_description_of_submission</TD></TR>
       <TR><TD PORT="submission_date" COLSPAN="3" ALIGN="LEFT">submission_date</TD></TR>
       <TR><TD PORT="library_id" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">library_id</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
+      <TR><TD PORT="sequencing_output_mode" COLSPAN="3" ALIGN="LEFT">sequencing_output_mode</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">3 &gt;</TD></TR>
     </TABLE>>
     URL="core_sequencing.html"
     tooltip="core_sequencing"
@@ -57,7 +57,7 @@ digraph "oneDegreeRelationshipsDiagram" {
       <TR><TD PORT="sequencing_center" COLSPAN="2" ALIGN="LEFT">sequencing_center</TD><TD PORT="sequencing_center.type" ALIGN="LEFT">varchar[50]</TD></TR>
       <TR><TD PORT="sequencer_notes" COLSPAN="2" ALIGN="LEFT">sequencer_notes</TD><TD PORT="sequencer_notes.type" ALIGN="LEFT">text[2147483647]</TD></TR>
       <TR><TD PORT="sequencing_id" COLSPAN="2" BGCOLOR="#f4f7da" ALIGN="LEFT">sequencing_id</TD><TD PORT="sequencing_id.type" ALIGN="LEFT">int4[10]</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 &gt;</TD></TR>
     </TABLE>>
     URL="core_sequencingdetail.html"
     tooltip="core_sequencingdetail"
