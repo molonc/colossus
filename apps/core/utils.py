@@ -220,8 +220,14 @@ class SampleSheet(object):
         data_table = self._mk_data_table()
 
         # reorder the columns
-        data_table = data_table[self._colnames]
-        data_table.to_csv(ofilename, mode='a', index=False)
+        if (len(data_table.columns)!=0):
+            data_table = data_table[self._colnames]
+            data_table.to_csv(ofilename, mode='a', index=False)
+        else:
+            ofile = open(ofilename,'w')
+            ofile.write("ERROR")
+            ofile.write("\nNo sublibrary data, cannot generate samplesheet\n")
+            ofile.close()
 
     def _mk_data_table(self):
         """make data table for data section of the samplesheet template."""

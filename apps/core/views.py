@@ -571,6 +571,18 @@ def sequencing_get_samplesheet(request, pk):
     os.remove(ofilepath)
     return response
 
+def sequencing_get_queried_samplesheet(request, pool_id, flowcell):
+    """ make downloading samplesheets from flowcell possible """
+
+    try:
+        pk = Sequencing.objects.get(sequencingdetail__flow_cell_id=flowcell, library__pool_id=pool_id).pk
+        return sequencing_get_samplesheet(request, pk)
+    except Sequencing.DoesNotExist:
+        msg = "Sorry, no sequencing with flowcell {} and chip id {} found.".format(flowcell, pool_id)
+        messages.warning(request, msg)
+        return HttpResponseRedirect(reverse('index'))
+
+
 @method_decorator(login_required, name='dispatch')
 class SequencingCreateGSCFormView(TemplateView):
 
