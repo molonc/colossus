@@ -266,11 +266,14 @@ class LibraryCreate(TemplateView):
 
     def post(self, request, from_sample=None, *args, **kwargs):
         context = self.get_context_data(from_sample)
+        return self._post(request, context, *args, **kwargs)
+
+    def _post(self, request, context, *args, **kwargs):
         ## this is becaues of this django feature:
         ## https://code.djangoproject.com/ticket/1130
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
 
-        lib_form = LibraryForm(request.POST)
+        lib_form = LibraryForm(request.POST, instance=kwargs.get('library', None))
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
@@ -368,45 +371,8 @@ class LibraryUpdate(LibraryCreate):
 
     def post(self, request, pk, *args, **kwargs):
         context = self.get_context_data(pk)
-        ## this is becaues of this django feature:
-        ## https://code.djangoproject.com/ticket/1130
-        request.POST['projects'] = ','.join(request.POST.getlist('projects'))
-
         library = get_object_or_404(Library, pk=pk)
-        lib_form = LibraryForm(request.POST, instance=library)
-        sublib_form = SublibraryForm(request.POST, request.FILES or None)
-        context['lib_form'] = lib_form
-        context['sublib_form'] = sublib_form
-        if lib_form.is_valid() and sublib_form.is_valid():
-            # if 'commit=True' when saving lib_form, then it strangely
-            # raises the following error when trying to save the
-            # ManyToMany 'Projects' field:
-            # 'LibraryForm' object has no attribute 'save_m2m'.
-            instance = lib_form.save(commit=False)
-            all_valid, formsets = self._validate_formsets(request, instance)
-            context.update(formsets)
-            if all_valid:
-                instance.save()
-                # save the ManyToMany field.
-                lib_form.save_m2m()
-                # Populate the SmartChipApp result file in SublibraryForm.
-                df = sublib_form.cleaned_data.get('smartchipapp_df')
-                if df is not None and not df.empty:
-                    num_sublibraries = bulk_create_sublibrary(
-                        instance,
-                        df
-                        )
-                    instance.num_sublibraries = num_sublibraries
-                    instance.save()
-                # save the formsets.
-                [formset.save() for formset in formsets.values()]
-                msg = "Successfully created the Library."
-                messages.success(request, msg)
-                return HttpResponseRedirect(instance.get_absolute_url())
-
-        msg = "Failed to create the library. Please fix the errors below."
-        messages.error(request, msg)
-        return render(request, self.template_name, context)
+        return self._post(request, context, *args, library=library, **kwargs)
 
 
 #============================
