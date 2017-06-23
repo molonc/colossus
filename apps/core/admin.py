@@ -11,6 +11,7 @@ from .models import Library, SublibraryInformation, LibrarySampleDetail
 from .models import LibraryConstructionInformation
 from .models import LibraryQuantificationAndStorage
 from .models import Sequencing, SequencingDetail
+from .models import ChipRegion, ChipRegionMetadata
 
 ## third-party apps
 from simple_history.admin import SimpleHistoryAdmin
@@ -93,6 +94,8 @@ admin.site.register(LibrarySampleDetail)
 admin.site.register(LibraryConstructionInformation)
 admin.site.register(LibraryQuantificationAndStorage)
 admin.site.register(SequencingDetail)
+admin.site.register(ChipRegion)
+admin.site.register(ChipRegionMetadata)
 
 ## register Taggit
 admin.site.unregister(Tag)

@@ -294,6 +294,24 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     def __str__(self):
         return 'LIB_' + self.get_library_id()
 
+class ChipRegion(models.Model, FieldValue):
+
+    """
+    Region code for a sublibrary
+    """
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
+    ## database relationships
+    library = models.ForeignKey(
+        Library,
+        verbose_name='Library',
+        on_delete=models.CASCADE,
+    )
+
+    ## fields
+    region_code = create_chrfield("region_code")
 
 class SublibraryInformation(models.Model, FieldValue):
 
@@ -302,8 +320,8 @@ class SublibraryInformation(models.Model, FieldValue):
     It's technically a table of cell information.
     """
 
-    fields_to_exclude = ['ID', 'Library', 'Sample_ID']
-    values_to_exclude = ['id', 'library', 'sample_id']
+    fields_to_exclude = ['ID', 'Library', 'Sample_ID', 'Chip_Region']
+    values_to_exclude = ['id', 'library', 'sample_id', 'chip_region']
 
     ## track history
     # history = HistoricalRecords(
@@ -316,6 +334,13 @@ class SublibraryInformation(models.Model, FieldValue):
         verbose_name="Library",
         on_delete=models.CASCADE
         )
+
+    chip_region = models.ForeignKey(
+        ChipRegion,
+        verbose_name="Chip_Region",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     ## database relationships
     # this sample_id is different from the field sample below
@@ -368,6 +393,28 @@ class SublibraryInformation(models.Model, FieldValue):
 
     def __str__(self):
         return self.get_sublibrary_id()
+
+class ChipRegionMetadata(models.Model, FieldValue):
+
+    """
+    Library/Sublibrary Metadata
+    """
+
+    fields_to_exclude = ['ID', 'Chip_Region']
+    values_to_exclude = ['id', 'chip_region']
+
+    ## database relationships
+
+    chip_region = models.ForeignKey(
+        ChipRegion,
+        verbose_name="Chip_Region",
+        null=True,
+        on_delete=models.CASCADE,
+    )
+
+    ## fields
+    metadata_field = create_chrfield("Metadata key")
+    metadata_value = create_chrfield("Metadata value")
 
 
 class LibrarySampleDetail(models.Model, FieldValue):

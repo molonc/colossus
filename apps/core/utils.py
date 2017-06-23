@@ -14,44 +14,105 @@ from datetime import date
 #===============
 # Django imports
 #---------------
-from .models import Sequencing, SublibraryInformation
+from .models import Sample, Sequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 #==================================================
 # upload, parse and populate Sublibrary Information
 #--------------------------------------------------
-def parse_smartchipapp_file(csv_infile):
-    """parse the result file of SmartChipApp."""
-    df = pd.read_excel(csv_infile, sheetname=0)
+def read_excel_sheets(filename, sheetnames):
+    """ Read the excel sheet.
+    """
+    try:
+        data = pd.read_excel(filename, sheetname=None)
+    except IOError:
+        raise ValueError('unable to find file', filename)
+    for sheetname in sheetnames:
+        if sheetname not in data:
+            raise ValueError('unable to read sheet(s)', sheetname)
+        yield data[sheetname]
+
+def parse_smartchipapp_input_file(filename):
+    """ Parse the input file of SmartChipApp.
+    """
+    region_codes, region_metadata = read_excel_sheets(filename, ['Region Codes', 'Region Meta Data'])
+
+    # Stack to create row, column, code table
+    region_codes.index.name = 'row'
+    region_codes.columns.name = 'column'
+    region_codes = region_codes.stack().rename('region_code').reset_index()
+
+    # Filter empty spots
+    region_codes = region_codes[
+        (region_codes['region_code'] != '~') &
+        (region_codes['region_code'].notnull())]
+
+    # Lower case metadata field names
+    region_metadata.columns = [c.lower() for c in region_metadata.columns]
+
+    region_metadata.columns.name = 'metadata_field'
+    region_metadata.rename(columns={'region': 'region_code'}, inplace=True)
+    region_metadata = region_metadata.set_index('region_code').stack().rename('metadata_value').reset_index()
+
+    return region_codes, region_metadata
+
+def parse_smartchipapp_results_file(filename):
+    """ Parse the result file of SmartChipApp.
+    """
+    results, = read_excel_sheets(filename, ['Summary'])
+
     ## filter out the cells whose Spot_Well value is not NaN
-    df = df[~df['Spot_Well'].isnull()]
-    df = df.sort_values(by='Sample')
+    results = results[~results['Spot_Well'].isnull()]
+    results = results.sort_values(by='Sample')
+
     ## change the column names to match the filed names of the model
-    df.columns = [c.lower() for c in df.columns]
-    return df
+    results.columns = [c.lower() for c in results.columns]
+    return results
 
-def create_sublibrary_information(s):
-    """create SublibraryInformation instance from given pandas Series."""
-    d = s.to_dict()
-    instance = SublibraryInformation(**d)
-    return instance
+def create_sublibrary_models(library, sublib_results, region_codes, region_metadata):
+    """ Create sublibrary models from SmartChipApp Tables
+    """
 
-def bulk_create_sublibrary(library, df):
-    """add sublirary information in df for given library instance."""
-    num_sublibraries = df.size/len(df.columns)
-
-    ## delete previous sublibraryinformation_set
-    library.sublibraryinformation_set.all().delete()
-
-    instances = []
-    for instance in df.apply(create_sublibrary_information, axis=1):
-        instance.library_id = library.pk
-        instances.append(instance)
-
-    library.sublibraryinformation_set.bulk_create(instances)
-    return num_sublibraries
-
+    # Populate the ChipRegion and ChipRegionMetadata from the SmartChipApp input
+    chip_spot_region_id = {}
+    chip_spot_sample_id = {}
+    region_codes = region_codes.set_index('region_code')
+    for code, metadata in region_metadata.groupby('region_code'):
+        chip_region = ChipRegion(region_code=code)
+        chip_region.library_id = library.pk
+        chip_region.save()
+        sample_id = None
+        for idx, row in metadata.iterrows():
+            chip_region_metadata = ChipRegionMetadata(
+                metadata_field=row['metadata_field'],
+                metadata_value=row['metadata_value'])
+            chip_region_metadata.chip_region_id = chip_region.id
+            chip_region_metadata.save()
+            if row['metadata_field'] == 'sample_id':
+                sample_id = row['metadata_value']
+        if sample_id is None:
+            raise ValueError('No sample id for region {}'.format(code))
+        try:
+            sample = Sample.objects.get(sample_id=sample_id)
+        except Sample.DoesNotExist:
+            raise ValueError('Unrecognized sample {}'.format(sample_id))
+        for idx, row in region_codes.loc[code].iterrows():
+            chip_spot_region_id[(row['row'], row['column'])] = chip_region.id
+            chip_spot_sample_id[(row['row'], row['column'])] = sample
+    # Populate the Sublibrary from the SmartChipApp input and results
+    for idx, row in sublib_results.iterrows():
+        row = row.drop('sample_type')
+        sublib = SublibraryInformation(**row.to_dict())
+        sublib.library_id = library.pk
+        try:
+            sublib.chip_region_id = chip_spot_region_id[(row['row'], row['column'])]
+            sublib.sample_id = chip_spot_sample_id[(row['row'], row['column'])]
+            sublib.save()
+        except KeyError:
+            raise ValueError('No region code for row, column: {}, {}'.format(row['row'], row['column']))
+    library.num_sublibraries = len(sublib_results.index)
+    library.save()
 
 #=================
 # history manager

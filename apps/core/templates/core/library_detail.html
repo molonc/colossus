@@ -121,6 +121,7 @@ Library Details
             <thead>
                 <tr>
                     <th>Sublibrary ID</th>
+                    <th>Region Code</th>
                     {% for field in  sublibinfo_fields %}
                     <th>{{field}}</th>
                     {% endfor %}
@@ -130,6 +131,7 @@ Library Details
                 {% for sublibinfo in library.sublibraryinformation_set.all %}
                 <tr>
                     <td>{{sublibinfo.get_sublibrary_id}}</td>
+                    <td>{{sublibinfo.chip_region.region_code}}</td>
                     {% for value in sublibinfo.get_values %}
                     <td>{{value}}</td>
                     {% endfor %}

@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView
+from django.db import transaction
 
 #============================
 # App imports
@@ -25,7 +26,9 @@ from .models import (
     Sample,
     Library,
     Sequencing,
-    SublibraryInformation
+    SublibraryInformation,
+    ChipRegion,
+    ChipRegionMetadata,
     )
 from .forms import (
     SampleForm, 
@@ -42,7 +45,7 @@ from .forms import (
     ProjectForm
     )
 from .utils import (
-    bulk_create_sublibrary,
+    create_sublibrary_models,
     generate_samplesheet,
     generate_gsc_form,
     )
@@ -277,36 +280,38 @@ class LibraryCreate(TemplateView):
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
-        if lib_form.is_valid() and sublib_form.is_valid():
-            # if 'commit=True' when saving lib_form, then it strangely
-            # raises the following error when trying to save the
-            # ManyToMany 'Projects' field:
-            # 'LibraryForm' object has no attribute 'save_m2m'.
-            # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
-            instance = lib_form.save(commit=False)
-            all_valid, formsets = self._validate_formsets(request, instance)
-            context.update(formsets)
-            if all_valid:
-                instance.save()
-                # save the ManyToMany field.
-                lib_form.save_m2m()
-                # Populate the SmartChipApp result file in SublibraryForm.
-                df = sublib_form.cleaned_data.get('smartchipapp_df')
-                if df is not None and not df.empty:
-                    num_sublibraries = bulk_create_sublibrary(
-                        instance,
-                        df
-                        )
-                    instance.num_sublibraries = num_sublibraries
-                    instance.save()
-                # save the formsets.
-                [formset.save() for formset in formsets.values()]
-                msg = "Successfully created the Library."
-                messages.success(request, msg)
-                return HttpResponseRedirect(instance.get_absolute_url())
 
-        msg = "Failed to create the library. Please fix the errors below."
-        messages.error(request, msg)
+        error_message = ''
+        try:
+            with transaction.atomic():
+                if lib_form.is_valid() and sublib_form.is_valid():
+                    # if 'commit=True' when saving lib_form, then it strangely
+                    # raises the following error when trying to save the
+                    # ManyToMany 'Projects' field:
+                    # 'LibraryForm' object has no attribute 'save_m2m'.
+                    # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
+                    instance = lib_form.save(commit=False)
+                    all_valid, formsets = self._validate_formsets(request, instance)
+                    context.update(formsets)
+                    if all_valid:
+                        instance.save()
+                        # save the ManyToMany field.
+                        lib_form.save_m2m()
+                        # Add information from SmartChipApp files
+                        region_codes = sublib_form.cleaned_data.get('smartchipapp_region_codes')
+                        region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
+                        sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                        if region_codes is not None and region_metadata is not None and sublib_results is not None:
+                            create_sublibrary_models(instance, sublib_results, region_codes, region_metadata)
+                        # save the formsets.
+                        [formset.save() for formset in formsets.values()]
+                        messages.success(request, "Successfully created the Library.")
+                        return HttpResponseRedirect(instance.get_absolute_url())
+        except ValueError as e:
+            error_message = ' '.join(e.args)
+
+        error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
+        messages.error(request, error_message)
         return render(request, self.template_name, context)
 
     def _validate_formsets(self, request, instance):
