@@ -107,76 +107,71 @@ def sample_detail(request, pk):
     return context
             
 
-@Render("core/sample_create.html")
-@login_required()
-def sample_create(request):
-    """sample create page."""
-    if request.method == 'POST':
-        form = SampleForm(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            additional_info_formset = AdditionalSampleInfoInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            if additional_info_formset.is_valid():
-                additional_info_formset.save()
+@method_decorator(login_required, name='dispatch')
+class SampleCreate(TemplateView):
 
+    """"
+    Sample create page.
+    """
+
+    template_name="core/sample_create.html"
+
+    def get_context_and_render(self, request, form, formset, pk=None):
+        context = {
+            'pk':pk,
+            'form': form,
+            'formset': formset
+        }
+        return render(request, self.template_name, context)
+
+    def get(self, request, *args, **kwargs):
+        form = SampleForm()
+        formset = AdditionalSampleInfoInlineFormset()
+        return self.get_context_and_render(request, form, formset)
+
+    def post(self, request, *args, **kwargs):
+        form = SampleForm(request.POST)
+        formset = AdditionalSampleInfoInlineFormset(request.POST)
+        if form.is_valid() and formset.is_valid():
+            instance = form.save(commit=False)
+            formset.instance = instance
+            instance.save()
+            formset.save()
             msg = "Successfully created the Sample."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
-        else:
-            msg = "Failed to create the sample. Please fix the errors below."
-            messages.error(request, msg)
-            formset = AdditionalSampleInfoInlineFormset()
-    
-    else:
-        form = SampleForm()
-        formset = AdditionalSampleInfoInlineFormset()
-    
-    context = {
-        'form': form,
-        'formset': formset
-        }
-    return context
 
+        msg = "Failed to create the sample. Please fix the errors below."
+        messages.error(request, msg)
+        return self.get_context_and_render(request, form, formset)
 
-@Render("core/sample_update.html")
-@login_required()
-def sample_update(request, pk):
-    """sample update page."""
-    sample = get_object_or_404(Sample, pk=pk)
-    if request.method == 'POST':
+class SampleUpdate(SampleCreate):
+    """
+    Sample update page.
+    """
+
+    template_name = "core/sample_update.html"
+
+    def get(self, request, pk, *args, **kwargs):
+        sample = get_object_or_404(Sample, pk=pk)
+        form=SampleForm(instance=sample)
+        formset=AdditionalSampleInfoInlineFormset(instance=sample)
+        return self.get_context_and_render(request, form, formset, pk=pk)
+
+    def post(self, request, pk, *args, **kwargs):
+        sample = get_object_or_404(Sample, pk=pk)
         form = SampleForm(request.POST, instance=sample)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            additional_info_formset = AdditionalSampleInfoInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            if additional_info_formset.is_valid():
-                additional_info_formset.save()
-
+        formset = AdditionalSampleInfoInlineFormset(request.POST, instance=sample)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
             msg = "Successfully updated the Sample."
             messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
-        else:
-            msg = "Failed to update the sample. Please fix the errors below."
-            messages.error(request, msg)
-            formset = AdditionalSampleInfoInlineFormset(instance=sample)
+            return HttpResponseRedirect(sample.get_absolute_url())
 
-    else:
-        form = SampleForm(instance=sample)
-        formset = AdditionalSampleInfoInlineFormset(instance=sample)
-
-    context = {
-        'form': form,
-        'formset': formset,
-        'pk': pk,
-    }
-    return context
+        msg = "Failed to update the sample. Please fix the errors below."
+        messages.error(request, msg)
+        return self.get_context_and_render(request, form, formset, pk=pk)
 
 @Render("core/sample_delete.html")
 @login_required()
@@ -195,7 +190,6 @@ def sample_delete(request, pk):
         'pk': pk
     }
     return context
-
 
 #============================
 # Library views
