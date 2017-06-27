@@ -168,7 +168,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         ('U', 'Unknown')
         )
 
-    tissue_type_choises = (
+    tissue_type_choices = (
         ('N', 'Normal'),
         ('B', 'Benign'),
         ('PM', 'Pre-malignant'),
@@ -202,12 +202,13 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         null=True,
         blank=True,
         )
-    anatomic_site = create_chrfield("Anatomic site")
+    anatomic_site = create_chrfield("Anatomic site", blank=False)
     anatomic_sub_site = create_chrfield("Anatomic sub-site")
     developmental_stage = create_chrfield("Developmental stage")
     tissue_type = create_chrfield(
         "Tissue type",
-        choices=tissue_type_choises
+        choices=tissue_type_choices,
+        blank=False,
         )
     cell_type = create_chrfield("Cell type")
     pathology_disease_name = create_chrfield("Pathology/disease name")

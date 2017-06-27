@@ -102,7 +102,11 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
         years=range(2000, 2020),
         empty_label=('year', 'month', 'day')
         )
-    }
+    },
+    labels = {
+        'tissue_type':('*Tissue type'),
+        'anatomic_site':('*Anatomic site'),
+    },
     # can_delete = True,
     # help_texts = {
     #     'patient_biopsy_date': ('yyyy-mm-dd.')
