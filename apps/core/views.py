@@ -637,15 +637,16 @@ def search_view(request):
     instance = None
 
     ## search for samples
-    qs = Sample.objects.filter(sample_id=query_str)
-    if qs:
-        instance = qs[0]
+    if Sample.objects.filter(sample_id=query_str):
+        instance = Sample.objects.filter(sample_id=query_str)[0]
 
     ## search for libraries
-    else:
-        qs = Library.objects.filter(pool_id=query_str)
-        if qs:
-            instance = qs[0]
+    elif Library.objects.filter(pool_id=query_str):
+        instance = Library.objects.filter(pool_id=query_str)[0]
+
+    ## search for Jira Ticket
+    elif Library.objects.filter(jira_ticket=query_str):
+        instance = Library.objects.filter(jira_ticket=query_str)[0]
 
     if instance:
         return HttpResponseRedirect(instance.get_absolute_url())
