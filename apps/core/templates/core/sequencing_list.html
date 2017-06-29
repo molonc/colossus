@@ -16,10 +16,10 @@ List of Sequencings
             <thead>
                 <tr>
                     <th>Flow cell/Lane ID</th>
-                    <th>Chip ID</th>
+                    <th>Library Information</th>
                     <th>Sample ID</th>
                     <th>GSC library ID</th>
-                    <th>Library Jira Ticket</th>
+                    <th>Jira Ticket</th>
                     <th>Submission date</th>
                     <th></th>
                 </tr>
@@ -35,13 +35,18 @@ List of Sequencings
                          # No flow cell ID
                         {% endif %}
                     </a></td>
-                    <td><a href="{% url 'core:library_detail' pk=sequencing.library.pk %}">{{sequencing.library.pool_id}}</a></td>
+                    <td width="300px">
+                            <a href="{% url 'core:library_detail' pk=sequencing.library.pk %}">{{sequencing.library.pool_id}}</a>
+                            <br/>
+                            {{sequencing.library.description}}
+
+                    </td>
                     <td><a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">{{sequencing.library.sample.sample_id}}</td>
                     <td>{{sequencing.sequencingdetail.gsc_library_id}}</td>
                     <td><a href="https://www.bcgsc.ca/jira/browse/{{sequencing.library.jira_ticket}}">{{sequencing.library.jira_ticket}}</a></td>
                     <td>{{sequencing.submission_date}}</td>
                     <td>
-                        <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;"></i> edit</a>
+                        <p class="libdesc" style="float:right;"><a style="margin-right:2px;" href="{% url 'core:sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;"></i> edit</a>
                         <a href="{% url 'core:sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
                     </td>
                 </tr>
