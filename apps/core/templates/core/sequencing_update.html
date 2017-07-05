@@ -21,7 +21,7 @@ Edit Sequencing
                     <td>
                     {{ field.errors }}
                     {% if field.name == "relates_to" %}
-                        <select class="selectpicker" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
+                        <select class="selectpicker" data-live-search="True" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
                             {% for seq in related_seqs %}
                             {% if seq in selected_related_seqs %}
                             <option value={{seq.id}} selected="{{seq}}">{{seq}}</option>
