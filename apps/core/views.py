@@ -296,6 +296,7 @@ class LibraryCreate(TemplateView):
                         region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                         sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
                         if region_codes is not None and region_metadata is not None and sublib_results is not None:
+                            instance.sublibraryinformation_set.all().delete()
                             create_sublibrary_models(instance, sublib_results, region_codes, region_metadata)
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
