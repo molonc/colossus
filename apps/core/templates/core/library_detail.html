@@ -212,6 +212,41 @@ Library Details
     {% endif %}
     <a href="{% url 'core:sequencing_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Sequencing</a></p>
 </div><br>
+<!-- Analysis Information -->
+<div class="container">
+    <h4>Analysis Information</h4>
+    {% if analyses %}
+          <div class="table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Analysis ID</th>
+                            <th>Priority Level</th>
+                            <th>Jira ticket:</th>
+                            <th>Pipeline version</th>
+                            <th>Analysis run status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for analysis in analyses %}
+                        <tr>
+                            <td><a href="{{analysis.get_absolute_url}}">{{analysis}}</a></td>
+                            <td>{{analysis.get_priority_level_display}}</td>
+                            <td><a href="https://www.bcgsc.ca/jira/browse/{{analysis.analysis_jira_ticket}}">{{analysis.analysis_jira_ticket}}</a></td>
+                            <td>{{analysis.version.version}}</td>
+                            <td>{{analysis.analysisrun.get_run_status_display}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    {% else %}
+          <h5><i class="text-warning">There is no Analysis information for this library!</i></h5>
+    {% endif %}
+    <a href="{% url 'sisyphus:analysisinformation_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Analysis </a></p>
+</div>
+<!-- end of Analysis Information -->
+
 <!-- end of Sequencing Information -->
 
 <!-- footer bottons -->

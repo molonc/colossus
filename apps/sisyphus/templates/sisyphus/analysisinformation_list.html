@@ -1,0 +1,37 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    List of Analyses
+{% endblock %}
+
+{% block body %}
+<div class="container" style="padding:0; margin-bottom:5px;">
+    <h4 style="float:left;">Select an Analysis to view its details</h4>
+    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url 'sisyphus:analysisinformation_create_choose_library' %}">Add Analysis</a>
+</div>
+
+<div class="container" style="background-color:#F5F5F5;">
+    <br/>
+    <table id="datatable" class="display">
+        <thead>
+            <tr>
+                <th>Analysis ID</th>
+                <th>Jira Ticket</th>
+                <th>Priority</th>
+                <th>Sequences Analyzed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for analysis in analyses %}
+              <tr>
+                  <td><a href="{% url 'sisyphus:analysisinformation_detail' pk=analysis.pk%}">{{ analysis }}</a></td>
+                  <td><a href="https://www.bcgsc.ca/jira/browse/{{analysis.analysis_jira_ticket}}">{{analysis.analysis_jira_ticket}}</a></td>
+                  <td>{{ analysis.get_priority_level_display }}</td>
+                  <td>{{ analysis.sequencings.all|join:", "}}</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

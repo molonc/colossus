@@ -1,0 +1,37 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Analysis Information
+{% endblock %}
+
+{% block body %}
+<div class="container graybg">
+    <form action="{% url 'sisyphus:analysisinformation_create_from_library' from_library=library.pk %}" method="POST">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Analysis Information</legend>
+        <table class="table-condensed">
+            <thead>
+            {% for field in form %}
+            <tr>
+                <th>
+                {{field.label}}
+                </th>
+                <td>
+                {{ field.errors }}
+                {{ field }}
+                {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text }}</p>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </thead>
+        </table>
+     </fieldset>
+    <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" href="{% url 'sisyphus:analysisinformation_list' %}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

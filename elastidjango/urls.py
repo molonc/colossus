@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^apps/core/', include('core.urls')),
     url(r'^apps/account/', include('account.urls')),
     url(r'^apps/api/', include('api.urls')),
+    url(r'^apps/sisyphus/', include('sisyphus.urls')),
 ]
 
 

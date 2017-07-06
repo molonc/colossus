@@ -46,6 +46,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'core.apps.CoreConfig', 
     'account.apps.AccountConfig',
+    'sisyphus.apps.SisyphusConfig',
     'rest_framework',
     'django_filters', #filtering for rest_framework
     'taggit',

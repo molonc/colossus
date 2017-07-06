@@ -31,6 +31,7 @@ from .models import (
     ChipRegionMetadata,
     MetadataField
     )
+from sisyphus.models import *
 from .forms import (
     SampleForm, 
     AdditionalSampleInfoInlineFormset,
@@ -73,7 +74,9 @@ def index_view(request):
     context = {
     'sample_size': Sample.objects.count(),
     'library_size': Library.objects.count(),
-    'sequencing_size': Sequencing.objects.count()
+    'sequencing_size': Sequencing.objects.count(),
+    'analysisinformation_size':AnalysisInformation.objects.count(),
+    'analysisrun_size':AnalysisRun.objects.count()
     }
     return context
 
@@ -146,6 +149,7 @@ class SampleCreate(TemplateView):
         messages.error(request, msg)
         return self.get_context_and_render(request, form, formset)
 
+
 class SampleUpdate(SampleCreate):
     """
     Sample update page.
@@ -173,6 +177,7 @@ class SampleUpdate(SampleCreate):
         msg = "Failed to update the sample. Please fix the errors below."
         messages.error(request, msg)
         return self.get_context_and_render(request, form, formset, pk=pk)
+
 
 @Render("core/sample_delete.html")
 @login_required()
@@ -206,6 +211,7 @@ def library_list(request):
 def library_detail(request, pk):
     """library detail page."""
     library = get_object_or_404(Library, pk=pk)
+    analyses = AnalysisInformation.objects.filter(sequencings__in=library.sequencing_set.all()).distinct()
     sublibinfo = SublibraryInformation()
     fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
     metadata_dict = {}
@@ -231,6 +237,7 @@ def library_detail(request, pk):
         'sublibinfo_fields': sublibinfo.get_fields(),
         'chip_metadata': metadata_dict,
         'metadata_fields': fields,
+        'analyses':analyses,
     }
     return context
 

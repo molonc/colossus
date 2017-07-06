@@ -1,0 +1,47 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Analysis Information
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="background-color:#FFF3E0;">
+        <table class="table-condensed">
+        <tr>
+            <th id="thid"> Library:</th>
+            <td id="tdid" class="notes"><a href="{{library.get_absolute_url}}">{{ library.pool_id }}</a></td>
+        </tr>
+        <tr>
+            <th id="thid">Analysis ID:</th>
+            <td id="tdid">{{ object }}</td>
+        </tr>
+        {% for field, value in object.get_field_values.items %}
+        <tr>
+            <th id="thid">{{field}}:</th>
+            {% if field == "Jira ticket" %}
+            <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{value}}">{{value}}</a></td>
+            {% else %}
+            <td id="tdid" class="notes">{{value}}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+    <br/>
+    <div class="container">
+        <table class="table-condensed">
+            <tr>
+                <th id="thid">Sequencings Analyzed:</th>
+                <td id="tdid" class="notes">{% for sequencing in object.sequencings.all %}<a href="{% url 'core:sequencing_detail' pk=sequencing.pk %}">{{ sequencing }} - {{ sequencing.sequencingdetail.flow_cell_id }}</a><br/>{% endfor %}</td>
+            </tr>
+        </table>
+    </div>
+    <br/>
+    <br/>
+    <div class="container">
+        <a class="btn btn-warning btn-sm" href="{% url 'sisyphus:analysisinformation_update' library_pk=library.pk analysis_pk=object.pk %}">Edit analysis run</a>
+        <a class="btn btn-danger btn-sm" href="{% url 'sisyphus:analysis_delete' pk=object.pk %}">Delete analysis run</a>
+    </div>
+
+{% endblock %}

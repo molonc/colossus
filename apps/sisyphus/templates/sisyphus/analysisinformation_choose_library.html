@@ -1,0 +1,38 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Analysis Library Selection
+{% endblock %}
+
+{% block body %}
+<div class="container graybg">
+    <form action="{% url 'sisyphus:analysisinformation_create_choose_library' %}" method="POST">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Please choose a library to analyze </legend>
+        <table class="table-condensed">
+            <thead>
+            {% for field in form %}
+            <tr>
+                <th>
+                {{field.label}}
+                </th>
+                <td>
+                {{ field.errors }}
+                {{ field }}
+                {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text }}</p>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </thead>
+        </table>
+     </fieldset>
+    <br/>
+    <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" href="{% url 'sisyphus:analysisinformation_list' %}">Cancel</a>
+    </form>
+</div>
+{% endblock %}
