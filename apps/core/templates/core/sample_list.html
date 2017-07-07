@@ -17,15 +17,20 @@ List of Samples
                 <tr>
                     <th>Primary Sample ID</th>
                     <th>Sample Type</th>
+                    <th>Xenograft ID</th>
+                    <th>Cell Line ID</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
+                <br/>
                 {% for sample in samples %}
                 <tr>
                     <td><a href="{% url 'core:sample_detail' pk=sample.pk %}">{{sample.sample_id}}</a></td>
                     <td>{{sample.get_sample_type_display}}</td>
                     <!-- td><a href="{% url 'core:home' %}admin/core/sample/{{sample.pk}}/change">edit</a></td -->
+                    <td>{{sample.xenograft_id}}</td>
+                    <td>{{sample.cell_line_id}}</td>
                     <td>
                         <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:sample_update' pk=sample.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;"></i> edit</a>
                         <a href="{% url 'core:sample_delete' pk=sample.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
