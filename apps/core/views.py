@@ -206,9 +206,30 @@ def library_detail(request, pk):
     """library detail page."""
     library = get_object_or_404(Library, pk=pk)
     sublibinfo = SublibraryInformation()
+    fields = ChipRegionMetadata.objects.filter(chip_region__library=library).values_list('metadata_field', flat=True).distinct()
+    metadata_dict = {}
+
+    for chip_region in library.chipregion_set.all():
+        metadata_set = chip_region.chipregionmetadata_set.all()
+        d1 = {}
+
+        for metadata in metadata_set:
+            d1[metadata.metadata_field] = metadata.metadata_value
+        row = []
+
+        for field in fields:
+            # Check that columns named in "fields" exist, else populate with "" if no entry in row for that particular metadata column
+            # then adding it to a metadata dictionary with other rows
+            if field not in d1.keys():
+                d1[field] = ""
+            row.append(d1[field])
+        metadata_dict[chip_region.region_code] = row
+
     context = {
-    'library': library,
-    'sublibinfo_fields': sublibinfo.get_fields()
+        'library': library,
+        'sublibinfo_fields': sublibinfo.get_fields(),
+        'chip_metadata': metadata_dict,
+        'metadata_fields': fields,
     }
     return context
 
@@ -292,12 +313,12 @@ class LibraryCreate(TemplateView):
                         # save the ManyToMany field.
                         lib_form.save_m2m()
                         # Add information from SmartChipApp files
-                        region_codes = sublib_form.cleaned_data.get('smartchipapp_region_codes')
                         region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                         sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                        if region_codes is not None and region_metadata is not None and sublib_results is not None:
+                        if region_metadata is not None and sublib_results is not None:
                             instance.sublibraryinformation_set.all().delete()
-                            create_sublibrary_models(instance, sublib_results, region_codes, region_metadata)
+                            instance.chipregion_set.all().delete()
+                            create_sublibrary_models(instance, sublib_results, region_metadata)
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
                         messages.success(request, "Successfully created the Library.")

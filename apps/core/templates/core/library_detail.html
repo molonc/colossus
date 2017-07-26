@@ -112,6 +112,39 @@ Library Details
 </div><br>
 <!-- end of Library Quantification and Storage -->
 
+<!-- Experimental Condition Metadata -->
+<div class="container">
+    <h4>Experimental Condition Metadata</h4>
+        {% if library.chipregion_set.all %}
+    <div class="table-responsive">
+    <table class="table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Region Code</th>
+                        {% for field in metadata_fields %}
+                    <th>{{ field }}</th>
+                        {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                    {% for code, metadata_row in chip_metadata.items %}
+                <tr>
+                <td>{{ code }}</td>
+                    {% for data in metadata_row %}
+                <td>{{ data }}</td>
+                    {% endfor %}
+                </tr>
+                    {% endfor %}
+            </tbody>
+    </table>
+    </div>
+        {% else %}
+    <h5><i class="text-warning">There is no condition metadata for library!</i></h5>
+        {% endif %}
+</div><br>
+<!-- endof Experimental Condition Metadata -->
+
+
 <!-- Sublibrary Information -->
 <div class="container">
     <h4>Sublibrary Information</h4>
@@ -121,7 +154,7 @@ Library Details
             <thead>
                 <tr>
                     <th>Sublibrary ID</th>
-                    <th>Region Code</th>
+                    <th>Condition</th>
                     {% for field in  sublibinfo_fields %}
                     <th>{{field}}</th>
                     {% endfor %}

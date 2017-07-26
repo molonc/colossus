@@ -38,7 +38,7 @@ from .models import (
     Sequencing,
     SequencingDetail
     )
-from .utils import parse_smartchipapp_input_file, parse_smartchipapp_results_file
+from .utils import parse_smartchipapp_results_file
 
 #===========================
 # 3rd-party app imports
@@ -143,40 +143,22 @@ class LibraryForm(ModelForm):
                 self.add_error('pool_id', msg)
 
 class SublibraryForm(Form):
-    ## SmartChipApp input file
-    smartchipapp_input_file = FileField(
-        label="SmartChipApp input:",
-        required=False,
-        )
-
     ## SmartChipApp results file
     smartchipapp_results_file = FileField(
         label="SmartChipApp results:",
         required=False,
         )
 
-    def clean_smartchipapp_input_file(self):
-        filename = self.cleaned_data['smartchipapp_input_file']
-        if filename:
-            try:
-                region_codes, region_metadata = parse_smartchipapp_input_file(filename)
-                self.cleaned_data['smartchipapp_region_codes'] = region_codes
-                self.cleaned_data['smartchipapp_region_metadata'] = region_metadata
-            except ValueError as e:
-                self.add_error('smartchipapp_input_file', ' '.join(e.args))
-            except Exception as e:
-                self.add_error('smartchipapp_input_file', 'failed to parse the file.')
-
     def clean_smartchipapp_results_file(self):
         filename = self.cleaned_data['smartchipapp_results_file']
         if filename:
             try:
-                results = parse_smartchipapp_results_file(filename)
+                results, region_metadata = parse_smartchipapp_results_file(filename)
                 self.cleaned_data['smartchipapp_results'] = results
+                self.cleaned_data['smartchipapp_region_metadata'] = region_metadata
             except ValueError as e:
-                self.add_error('smartchipapp_input_file', ' '.join(e.args))
+                self.add_error('smartchipapp_results_file', ' '.join(e.args))
             except Exception as e:
-                print str(e)
                 self.add_error('smartchipapp_results_file', 'failed to parse the file.')
 
 class LibraryQuantificationAndStorageForm(ModelForm):

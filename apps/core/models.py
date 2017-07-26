@@ -369,7 +369,7 @@ class SublibraryInformation(models.Model, FieldValue):
     rev_live = create_intfield("Rev_Live")
     rev_dead = create_intfield("Rev_Dead")
     rev_other = create_intfield("Rev_Other")
-    spot_class = create_chrfield("Spot_Class")
+    condition = create_chrfield("Condition")
     index_i7 = create_chrfield("Index_I7")
     primer_i7 = create_chrfield("Primer_I7")
     index_i5 = create_chrfield("Index_I5")

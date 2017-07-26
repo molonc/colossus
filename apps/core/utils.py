@@ -33,20 +33,17 @@ def read_excel_sheets(filename, sheetnames):
             raise ValueError('unable to read sheet(s)', sheetname)
         yield data[sheetname]
 
-def parse_smartchipapp_input_file(filename):
-    """ Parse the input file of SmartChipApp.
+def parse_smartchipapp_results_file(filename):
+    """ Parse the result file of SmartChipApp.
     """
-    region_codes, region_metadata = read_excel_sheets(filename, ['Region Codes', 'Region Meta Data'])
+    results, region_metadata = read_excel_sheets(filename, ['Summary', 'Region_Meta_Data'])
 
-    # Stack to create row, column, code table
-    region_codes.index.name = 'row'
-    region_codes.columns.name = 'column'
-    region_codes = region_codes.stack().rename('region_code').reset_index()
+    ## filter out the cells whose Spot_Well value is not NaN
+    results = results[~results['Spot_Well'].isnull()]
+    results = results.sort_values(by='Sample')
 
-    # Filter empty spots
-    region_codes = region_codes[
-        (region_codes['region_code'] != '~') &
-        (region_codes['region_code'].notnull())]
+    ## change the column names to match the filed names of the model
+    results.columns = [c.lower() for c in results.columns]
 
     # Lower case metadata field names
     region_metadata.columns = [c.lower() for c in region_metadata.columns]
@@ -55,29 +52,15 @@ def parse_smartchipapp_input_file(filename):
     region_metadata.rename(columns={'region': 'region_code'}, inplace=True)
     region_metadata = region_metadata.set_index('region_code').stack().rename('metadata_value').reset_index()
 
-    return region_codes, region_metadata
+    return results, region_metadata
 
-def parse_smartchipapp_results_file(filename):
-    """ Parse the result file of SmartChipApp.
-    """
-    results, = read_excel_sheets(filename, ['Summary'])
-
-    ## filter out the cells whose Spot_Well value is not NaN
-    results = results[~results['Spot_Well'].isnull()]
-    results = results.sort_values(by='Sample')
-
-    ## change the column names to match the filed names of the model
-    results.columns = [c.lower() for c in results.columns]
-    return results
-
-def create_sublibrary_models(library, sublib_results, region_codes, region_metadata):
+def create_sublibrary_models(library, sublib_results, region_metadata):
     """ Create sublibrary models from SmartChipApp Tables
     """
 
-    # Populate the ChipRegion and ChipRegionMetadata from the SmartChipApp input
+    # Populate the ChipRegion and ChipRegionMetadata from the SmartChipApp results
     chip_spot_region_id = {}
     chip_spot_sample_id = {}
-    region_codes = region_codes.set_index('region_code')
     for code, metadata in region_metadata.groupby('region_code'):
         chip_region = ChipRegion(region_code=code)
         chip_region.library_id = library.pk
@@ -97,12 +80,12 @@ def create_sublibrary_models(library, sublib_results, region_codes, region_metad
             sample = Sample.objects.get(sample_id=sample_id)
         except Sample.DoesNotExist:
             raise ValueError('Unrecognized sample {}'.format(sample_id))
-        for idx, row in region_codes.loc[code].iterrows():
+        for idx, row in sublib_results[sublib_results['condition'] == code].iterrows():
             chip_spot_region_id[(row['row'], row['column'])] = chip_region.id
             chip_spot_sample_id[(row['row'], row['column'])] = sample
     # Populate the Sublibrary from the SmartChipApp input and results
     for idx, row in sublib_results.iterrows():
-        row = row.drop('sample_type')
+        row = row.drop('rev_class')
         sublib = SublibraryInformation(**row.to_dict())
         sublib.library_id = library.pk
         try:
@@ -110,7 +93,7 @@ def create_sublibrary_models(library, sublib_results, region_codes, region_metad
             sublib.sample_id = chip_spot_sample_id[(row['row'], row['column'])]
             sublib.save()
         except KeyError:
-            raise ValueError('No region code for row, column: {}, {}'.format(row['row'], row['column']))
+            raise ValueError('Undefined condition in metadata at row, column: {}, {}'.format(row['row'], row['column']))
     library.num_sublibraries = len(sublib_results.index)
     library.save()
 
@@ -257,7 +240,7 @@ class SampleSheet(object):
             # Only the NextSeq & HX requires the i5 to be reverse complemented
             'index2': d['primer_i5'] if (self._si != "N550") and (self._si!='HX')  else _rc(d['primer_i5']),
             #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
-            'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['spot_class'],
+            'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['condition'],
             }
             return res
 
