@@ -45,7 +45,9 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'core.apps.CoreConfig', 
-    'account.apps.AccountConfig', 
+    'account.apps.AccountConfig',
+    'rest_framework',
+    'django_filters', #filtering for rest_framework
     'taggit',
     'simple_history',
     'django.contrib.admin',
@@ -171,3 +173,12 @@ LOGIN_URL = '/apps/account/login/'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
+
+# Rest Framework Settings
+REST_FRAMEWORK = {
+    # pagination setting
+    # 'PAGE_SIZE': 3,
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+
+}
+

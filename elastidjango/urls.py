@@ -21,7 +21,7 @@ Created on May 16, 2016
 from django.conf import settings
 from django.conf.urls import url, include, static
 from django.contrib import admin
-from core import views 
+from core import views
 
 urlpatterns = [
     url(r'^$', views.index_view, name='index'),    
@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^search/', views.search_view, name='search'),
     url(r'^apps/core/', include('core.urls')),
     url(r'^apps/account/', include('account.urls')),
+    url(r'^apps/api/', include('api.urls')),
 ]
 
 
