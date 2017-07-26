@@ -29,6 +29,7 @@ from .models import (
     SublibraryInformation,
     ChipRegion,
     ChipRegionMetadata,
+    MetadataField
     )
 from .forms import (
     SampleForm, 
@@ -206,7 +207,7 @@ def library_detail(request, pk):
     """library detail page."""
     library = get_object_or_404(Library, pk=pk)
     sublibinfo = SublibraryInformation()
-    fields = ChipRegionMetadata.objects.filter(chip_region__library=library).values_list('metadata_field', flat=True).distinct()
+    fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
     metadata_dict = {}
 
     for chip_region in library.chipregion_set.all():
@@ -214,7 +215,7 @@ def library_detail(request, pk):
         d1 = {}
 
         for metadata in metadata_set:
-            d1[metadata.metadata_field] = metadata.metadata_value
+            d1[metadata.metadata_field.field] = metadata.metadata_value
         row = []
 
         for field in fields:

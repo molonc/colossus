@@ -314,6 +314,9 @@ class ChipRegion(models.Model, FieldValue):
     ## fields
     region_code = create_chrfield("region_code")
 
+    def __str__(self):
+        return "{}".format(self.region_code)
+
 class SublibraryInformation(models.Model, FieldValue):
 
     """
@@ -340,7 +343,7 @@ class SublibraryInformation(models.Model, FieldValue):
         ChipRegion,
         verbose_name="Chip_Region",
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
     )
 
     ## database relationships
@@ -395,6 +398,22 @@ class SublibraryInformation(models.Model, FieldValue):
     def __str__(self):
         return self.get_sublibrary_id()
 
+
+class MetadataField(models.Model):
+    """
+    Keeps track of the metadata fields used, and allows ease of creating but still controlling
+    added new fields in table.
+    """
+    field = create_chrfield(
+        "Metadata key",
+        blank=False,
+        null=False,
+    )
+
+    def __str__(self):
+        return self.field
+
+
 class ChipRegionMetadata(models.Model, FieldValue):
 
     """
@@ -412,10 +431,22 @@ class ChipRegionMetadata(models.Model, FieldValue):
         null=True,
         on_delete=models.CASCADE,
     )
+    metadata_field = models.ForeignKey(
+        MetadataField,
+        verbose_name="Metadata key",
+        on_delete=models.CASCADE,
+    )
 
     ## fields
-    metadata_field = create_chrfield("Metadata key")
     metadata_value = create_chrfield("Metadata value")
+
+    def __str__(self):
+        return "{chip_region_code} - {field}: {value}".\
+            format(
+                chip_region_code = self.chip_region.region_code,
+                field = self.metadata_field.field,
+                value = self.metadata_value
+            )
 
 
 class LibrarySampleDetail(models.Model, FieldValue):

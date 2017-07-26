@@ -14,9 +14,10 @@ from datetime import date
 #===============
 # Django imports
 #---------------
-from .models import Sample, Sequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata
+from .models import Sample, Sequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 #==================================================
 # upload, parse and populate Sublibrary Information
@@ -45,8 +46,13 @@ def parse_smartchipapp_results_file(filename):
     ## change the column names to match the filed names of the model
     results.columns = [c.lower() for c in results.columns]
 
-    # Lower case metadata field names
-    region_metadata.columns = [c.lower() for c in region_metadata.columns]
+    # Lower case metadata field names and check if column exists in metadata fields
+    # region_metadata.columns = [c.lower() for c in region_metadata.columns]
+    for c in region_metadata.columns:
+        c = c.lower()
+        if c not in MetadataField.objects.all().values_list('field', flat=True) and c!= "region":
+            raise ValueError('invalid metadata column: {col_name}'.format(col_name=c))
+
 
     region_metadata.columns.name = 'metadata_field'
     region_metadata.rename(columns={'region': 'region_code'}, inplace=True)
@@ -67,8 +73,9 @@ def create_sublibrary_models(library, sublib_results, region_metadata):
         chip_region.save()
         sample_id = None
         for idx, row in metadata.iterrows():
+            row['metadata_field'] = row['metadata_field'].lower()
             chip_region_metadata = ChipRegionMetadata(
-                metadata_field=row['metadata_field'],
+                metadata_field=MetadataField.objects.get(field=row['metadata_field']),
                 metadata_value=row['metadata_value'])
             chip_region_metadata.chip_region_id = chip_region.id
             chip_region_metadata.save()
