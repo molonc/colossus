@@ -45,14 +45,13 @@ def parse_smartchipapp_results_file(filename):
 
     ## change the column names to match the filed names of the model
     results.columns = [c.lower() for c in results.columns]
+    region_metadata.columns = [c.lower() for c in region_metadata.columns]
 
     # Lower case metadata field names and check if column exists in metadata fields
     # region_metadata.columns = [c.lower() for c in region_metadata.columns]
     for c in region_metadata.columns:
-        c = c.lower()
         if c not in MetadataField.objects.all().values_list('field', flat=True) and c!= "region":
             raise ValueError('invalid metadata column: {col_name}'.format(col_name=c))
-
 
     region_metadata.columns.name = 'metadata_field'
     region_metadata.rename(columns={'region': 'region_code'}, inplace=True)
