@@ -7,6 +7,7 @@ Created on July 25, 2017
 # Django & Django rest framework imports
 #----------------------------
 from rest_framework import pagination, viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 #============================
@@ -44,6 +45,7 @@ class SampleViewSet(viewsets.ModelViewSet):
 
     queryset = Sample.objects.all()
     serializer_class = SampleSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
         'sample_id',
     )
@@ -61,6 +63,7 @@ class SequencingViewSet(viewsets.ModelViewSet):
     """
     queryset = Sequencing.objects.all()
     serializer_class = SequencingSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
         'sequencingdetail__flow_cell_id',
         'sequencingdetail__gsc_library_id'
@@ -81,6 +84,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
 
     queryset = Library.objects.all()
     serializer_class = LibrarySerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
         'pool_id',
         'sample__sample_id',
@@ -100,6 +104,7 @@ class LibraryBriefViewSet(LibraryViewSet):
 
     serializer_class = LibrarySerializerBrief
     pagination_class = SmallResultsSetPagination
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 
