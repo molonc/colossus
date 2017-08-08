@@ -67,9 +67,11 @@ class SequencingDetailSerializer(serializers.ModelSerializer):
 
 class SequencingSerializer(serializers.ModelSerializer):
     sequencingdetail = SequencingDetailSerializer(read_only=True)
+    library = serializers.SlugRelatedField(read_only=True, slug_field='pool_id')
     class Meta:
         model = Sequencing
         fields = (
+            'library',
             'adapter',
             'pool_id',
             'read_type',
