@@ -75,6 +75,7 @@ class SequencingSerializer(serializers.ModelSerializer):
             'adapter',
             'pool_id',
             'read_type',
+            'index_read_type',
             'sequencing_instrument',
             'submission_date',
             'sequencingdetail'
