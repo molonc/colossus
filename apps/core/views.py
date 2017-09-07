@@ -5,6 +5,7 @@ Created on May 16, 2016
 """
 
 import os
+import collections
 #============================
 # Django imports
 #----------------------------
@@ -214,9 +215,9 @@ def library_detail(request, pk):
     analyses = AnalysisInformation.objects.filter(sequencings__in=library.sequencing_set.all()).distinct()
     sublibinfo = SublibraryInformation()
     fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
-    metadata_dict = {}
+    metadata_dict = collections.OrderedDict()
 
-    for chip_region in library.chipregion_set.all():
+    for chip_region in library.chipregion_set.all().order_by('region_code'):
         metadata_set = chip_region.chipregionmetadata_set.all()
         d1 = {}
 
