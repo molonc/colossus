@@ -854,3 +854,21 @@ class SequencingDetail(models.Model, FieldValue):
         default="BCCAGSC"
         )
     sequencer_notes = create_textfield("Sequencing notes")
+
+
+class Lane(models.Model, FieldValue):
+    """
+    Lane information.
+    """
+
+    fields_to_exclude = ['ID', 'Lane']
+    values_to_exclude = ['id', 'lane']
+
+    sequencing = models.ForeignKey(
+        Sequencing,
+        verbose_name="Sequencing",
+        on_delete=models.CASCADE)
+
+    flow_cell_id = create_chrfield("Flow cell/Lane ID")
+
+    path_to_archive = create_chrfield("Path to archive", max_length=150)
