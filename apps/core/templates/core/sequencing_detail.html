@@ -20,18 +20,9 @@ Sequencing Details
     <div style="float:right; margin-top:5px;">
         {% if not sequencing.library.has_sublibrary_info %}
         <h5><i class="text-warning">No Sublibrary Information available!</i></h5>
-        {% endif %}
-        <select class="selectpicker" id="action">
-        <option value="#" disabled selected>--select an action--</option>
-        {% if sequencing.library.has_sublibrary_info %}
-        <option value="{% url 'core:sequencing_get_samplesheet' pk=sequencing.pk %}">Download SampleSheet</option>
-        <option value="{% url 'core:sequencing_create_gsc_form' pk=sequencing.pk %}">Create GSC submission form</option>
         {% else %}
-        <option disabled>Download SampleSheet</option>
-        <option disabled>Create GSC submission form</option>
+        <a class="btn btn-primary btn-sm" href="{% url 'core:sequencing_create_gsc_form' pk=sequencing.pk %}">Create GSC submission form</a>
         {% endif %}
-        </select>
-        <button class="btn btn-primary btn-sm" onclick="window.location.href=document.getElementById('action').value" class="btn btn-default">Go</button>
     </div>
     <!-- end of action list -->
 
@@ -86,13 +77,17 @@ Sequencing Details
                 <tr>
                     <th>Flow Cell ID</th>
                     <th>Path To Archive</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for lane in sequencing.lane_set.all %}
                 <tr>
-                    <td><a href="{{lane.get_absolute_url}}">{{lane.flow_cell_id}}</a></td>
+                    <td>{{lane.flow_cell_id}}</td>
                     <td>{{lane.path_to_archive}}</td>
+                    <td>
+                        <a href="{% url 'core:lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

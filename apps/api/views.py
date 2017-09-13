@@ -16,6 +16,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .serializers import (
     SampleSerializer,
     LibrarySerializer,
+    LaneSerializer,
     SequencingSerializer,
     LibrarySerializerBrief,
     )
@@ -24,6 +25,7 @@ from core.models import (
     Sample,
     Library,
     Sequencing,
+    Lane,
     )
 
 
@@ -51,12 +53,30 @@ class SampleViewSet(viewsets.ModelViewSet):
     )
 
 
+class LaneViewSet(viewsets.ModelViewSet):
+    """
+    View for Lanes.
+
+    Lanes are queryable by its flowcell id.
+    Try adding "?flow_cell_id=HKNHHALXX_8" without the quotes to the end of the url.
+
+    See documentation here:
+    https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
+    """
+    queryset = Lane.objects.all()
+    serializer_class = LaneSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_fields = (
+        'flow_cell_id',
+    )
+
+
 class SequencingViewSet(viewsets.ModelViewSet):
     """
     View for Sequencings.
 
-    Sequencings are queryable by its flowcell id and their GSC library id.
-    Try adding "?sequencingdetail__flow_cell_id=HKNHHALXX_8" or "sequencingdetail__gsc_library_id=PX0566" without the quotes to the end of the url.
+    Sequencings are queryable by GSC library id.
+    Try adding "?sequencingdetail__gsc_library_id=PX0566" without the quotes to the end of the url.
 
     See documentation here:
     https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
@@ -65,10 +85,8 @@ class SequencingViewSet(viewsets.ModelViewSet):
     serializer_class = SequencingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
-        'sequencingdetail__flow_cell_id',
-        'sequencingdetail__gsc_library_id'
+        'sequencingdetail__gsc_library_id',
     )
-
 
 
 class LibraryViewSet(viewsets.ModelViewSet):

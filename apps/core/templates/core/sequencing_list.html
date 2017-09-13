@@ -15,7 +15,7 @@ List of Sequencings
         <table id="datatable" class="table table-striped">
             <thead>
                 <tr>
-                    <th>Flow cell/Lane ID</th>
+                    <th>Sequencing ID</th>
                     <th>Library Information</th>
                     <th>Sample ID</th>
                     <th>GSC library ID</th>
@@ -29,17 +29,12 @@ List of Sequencings
                 {% for sequencing in sequencings %}
                 <tr>
                     <td><a href="{% url 'core:sequencing_detail' pk=sequencing.pk %}">
-                        {% if sequencing.sequencingdetail.flow_cell_id %}
-                        {{sequencing.sequencingdetail.flow_cell_id}}
-                        {% else %}
-                         # No flow cell ID
-                        {% endif %}
+                        {{sequencing.id}}
                     </a></td>
                     <td width="300px">
                             <a href="{% url 'core:library_detail' pk=sequencing.library.pk %}">{{sequencing.library.pool_id}}</a>
                             <br/>
                             {{sequencing.library.description}}
-
                     </td>
                     <td><a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">{{sequencing.library.sample.sample_id}}</td>
                     <td>{{sequencing.sequencingdetail.gsc_library_id}}</td>

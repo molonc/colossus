@@ -36,7 +36,11 @@ Create Lane
             </table>
         </fieldset><br>
         <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        {% if sequencing_id %}
         <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=sequencing_id %}">Cancel</a>
+        {% else %}
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_list'%}">Cancel</a>
+        {% endif %}
     </form><br>
 </div>
 {% endblock %}

@@ -44,9 +44,7 @@ register(Tag)
 
 class SequencingManager(models.Manager):
     def with_data(self):
-        return [obj for obj in self.get_queryset()
-        if obj.has_sequencing_detail() and
-        obj.sequencingdetail.path_to_archive]
+        return [obj for obj in self.get_queryset() if obj.library.is_sequenced()]
 
 
 #============================
@@ -841,13 +839,7 @@ class SequencingDetail(models.Model, FieldValue):
         )
 
     ## fields
-    flow_cell_id = create_chrfield("Flow cell/Lane ID")
     gsc_library_id = create_chrfield("GSC library ID")
-    # lane_id = create_chrfield("Lane ID")
-    path_to_archive = create_chrfield(
-        "Path to archive",
-        max_length=150
-        )
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
         "Sequencing center",
@@ -869,6 +861,6 @@ class Lane(models.Model, FieldValue):
         verbose_name="Sequencing",
         on_delete=models.CASCADE)
 
-    flow_cell_id = create_chrfield("Flow cell/Lane ID")
+    flow_cell_id = create_chrfield("Flow cell/Lane ID", null=False, blank=False)
 
     path_to_archive = create_chrfield("Path to archive", max_length=150)

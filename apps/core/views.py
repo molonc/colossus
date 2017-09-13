@@ -27,6 +27,7 @@ from .models import (
     Sample,
     Library,
     Sequencing,
+    Lane,
     SublibraryInformation,
     ChipRegion,
     ChipRegionMetadata,
@@ -614,6 +615,26 @@ def lane_create(request, from_sequencing=None):
     }
     return context
 
+@Render("core/lane_delete.html")
+@login_required()
+def lane_delete(request, pk):
+    """lane delete page."""
+    lane = get_object_or_404(Lane, pk=pk)
+    sequencing = lane.sequencing
+
+    if request.method == 'POST':
+        lane.delete()
+        msg = "Successfully deleted the Lane."
+        messages.success(request, msg)
+        return HttpResponseRedirect(sequencing.get_absolute_url())
+
+    context = {
+        'lane': lane,
+        'pk': pk,
+        'sequencing_id': sequencing.id
+    }
+    return context
+
 def sequencing_get_samplesheet(request, pk):
     """generate downloadable samplesheet."""
     ofilename, ofilepath = generate_samplesheet(pk)
@@ -629,7 +650,7 @@ def sequencing_get_queried_samplesheet(request, pool_id, flowcell):
     """ make downloading samplesheets from flowcell possible """
 
     try:
-        pk = Sequencing.objects.get(sequencingdetail__flow_cell_id=flowcell, library__pool_id=pool_id).pk
+        pk = Lane.objects.get(flow_cell_id=flowcell, sequencing__library__pool_id=pool_id).pk
         return sequencing_get_samplesheet(request, pk)
     except Sequencing.DoesNotExist:
         msg = "Sorry, no sequencing with flowcell {} and chip id {} found.".format(flowcell, pool_id)

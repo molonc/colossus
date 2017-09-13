@@ -14,7 +14,7 @@ from datetime import date
 #===============
 # Django imports
 #---------------
-from .models import Sample, Sequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField
+from .models import Sample, Sequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, Lane
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
@@ -154,8 +154,8 @@ class SampleSheet(object):
     """
 
     def __init__(self, pk):
-        self._sequencing = get_object_or_404(Sequencing, pk=pk)
-        self._si = self._sequencing.sequencing_instrument
+        self._lane = get_object_or_404(Lane, pk=pk)
+        self._si = self._lane.sequencing.sequencing_instrument
         self._header = os.path.join(settings.BASE_DIR,
             "templates/template_samplesheet_header.html")
         self._colnames = [
@@ -177,7 +177,7 @@ class SampleSheet(object):
 
     @property
     def sheet_name(self):
-        fc_id = self._sequencing.sequencingdetail.flow_cell_id
+        fc_id = self._lane.flow_cell_id
         sheet_name = 'SampleSheet_%s.csv' % fc_id
         return sheet_name
 
@@ -186,16 +186,16 @@ class SampleSheet(object):
         with open(self._header, 'r') as tempstr:
             s = Template(tempstr.read())
             d = {
-            'sequencing_instrument': self._sequencing.get_sequencing_instrument_display(),
-            'submission_date': self._sequencing.submission_date,
-            'pool_id': self._sequencing.library.pool_id,
-            'read1_length': self._sequencing.read1_length,
-            'read2_length': self._sequencing.read2_length,
+            'sequencing_instrument': self._lane.sequencing.get_sequencing_instrument_display(),
+            'submission_date': self._lane.sequencing.submission_date,
+            'pool_id': self._lane.sequencing.library.pool_id,
+            'read1_length': self._lane.sequencing.read1_length,
+            'read2_length': self._lane.sequencing.read2_length,
             }
 
             # Sequencing may have no SequencingDetail
             try:
-                d['flow_cell_id'] = self._sequencing.sequencingdetail.flow_cell_id
+                d['flow_cell_id'] = self._lane.flow_cell_id
             except:
                 d['flow_cell_id'] = None
 
@@ -231,8 +231,8 @@ class SampleSheet(object):
 
             res = {
             'Sample_ID': '-'.join([
-            str(self._sequencing.library.sample),
-            str(self._sequencing.library.pool_id),
+            str(self._lane.sequencing.library.sample),
+            str(self._lane.sequencing.library.pool_id),
             'R' + row,
             'C' + col
             ]),
@@ -252,7 +252,7 @@ class SampleSheet(object):
 
         sample_project = '' #','.join(sequencing.library.projects.names())
         newl = []
-        oldl = list(self._sequencing.library.sublibraryinformation_set.values())
+        oldl = list(self._lane.sequencing.library.sublibraryinformation_set.values())
         df = pd.DataFrame(oldl)
         for d in df.apply(_map_to_template, axis=1):
             d['Sample_Project'] = sample_project

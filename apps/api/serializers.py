@@ -17,7 +17,8 @@ from core.models import (
     Sample,
     SublibraryInformation,
     Sequencing,
-    SequencingDetail
+    SequencingDetail,
+    Lane
 )
 
 #============================
@@ -55,11 +56,20 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
         )
 
 
+class LaneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lane
+        fields = (
+            'sequencing',
+            'flow_cell_id',
+            'path_to_archive',
+        )
+
+
 class SequencingDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = SequencingDetail
         fields = (
-            'flow_cell_id',
             'gsc_library_id',
             'sequencing_center',
         )
@@ -68,6 +78,7 @@ class SequencingDetailSerializer(serializers.ModelSerializer):
 class SequencingSerializer(serializers.ModelSerializer):
     sequencingdetail = SequencingDetailSerializer(read_only=True)
     library = serializers.SlugRelatedField(read_only=True, slug_field='pool_id')
+    lane_set = LaneSerializer(many=True, read_only=True)
     class Meta:
         model = Sequencing
         fields = (
@@ -78,6 +89,7 @@ class SequencingSerializer(serializers.ModelSerializer):
             'index_read_type',
             'sequencing_instrument',
             'submission_date',
+            'lane_set',
             'sequencingdetail'
         )
 
