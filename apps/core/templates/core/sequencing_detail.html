@@ -76,6 +76,35 @@ Sequencing Details
 </div><br>
 <!-- end of Sequencing Detail -->
 
+<!-- Lane Detail -->
+<div class="container">
+    <h4>Lane Details</h4>
+    {% if sequencing.lane_set %}
+    <div class="table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Flow Cell ID</th>
+                    <th>Path To Archive</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lane in sequencing.lane_set.all %}
+                <tr>
+                    <td><a href="{{lane.get_absolute_url}}">{{lane.flow_cell_id}}</a></td>
+                    <td>{{lane.path_to_archive}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+    {% else %}
+    <h5><i class="text-warning">There are no lanes for this sequencing!</i></h5>
+    {% endif %}
+    <a href="{% url 'core:lane_create_from_sequencing' from_sequencing=sequencing.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Lane</a></p>
+</div><br>
+<!-- end of Sequencing Detail -->
+
 <!-- footer bottons -->
 <div class="container" style="margin-bottom:5px;">
     <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url 'core:sequencing_update' pk=sequencing.pk %}">Edit</a>

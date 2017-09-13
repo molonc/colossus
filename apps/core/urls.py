@@ -31,6 +31,8 @@ url(r'^sequencing/samplesheet/download/(?P<pk>\d+)$', views.sequencing_get_sampl
 url(r'^sequencing/samplesheet/query_download/(?P<pool_id>.+)/(?P<flowcell>.+)$', views.sequencing_get_queried_samplesheet, name='sequencing_get_samplesheet'),
 url(r'^sequencing/gsc_form/create/(?P<pk>\d+)$', views.SequencingCreateGSCFormView.as_view(), name='sequencing_create_gsc_form'),
 url(r'^sequencing/gsc_form/download/(?P<pk>\d+)$', views.sequencing_get_gsc_form, name='sequencing_get_gsc_form'),
+url(r'^lane/create/$', views.lane_create, name='lane_create'),
+url(r'^lane/create/(?P<from_sequencing>\d+)$', views.lane_create, name='lane_create_from_sequencing'),
 url(r'^project/list$', views.project_list, name='project_list'),
 url(r'^project/update/(?P<pk>\d+)$', views.project_update, name='project_update'),
 url(r'^project/delete/(?P<pk>\d+)$', views.project_delete, name='project_delete'),

@@ -36,7 +36,8 @@ from .models import (
     LibraryConstructionInformation,
     LibraryQuantificationAndStorage,
     Sequencing,
-    SequencingDetail
+    SequencingDetail,
+    Lane
     )
 from .utils import parse_smartchipapp_results_file
 
@@ -302,6 +303,13 @@ SequencingDetailInlineFormset = inlineformset_factory(
     fields = "__all__"
     )
 
+#===========================
+# Lane form
+#---------------------------
+class LaneForm(ModelForm):
+    class Meta:
+        model = Lane
+        fields = "__all__"
 
 #===========================
 # GSC submission forms

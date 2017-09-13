@@ -43,6 +43,7 @@ from .forms import (
     SublibraryForm,
     SequencingForm,
     SequencingDetailInlineFormset,
+    LaneForm,
     GSCFormDeliveryInfo,
     GSCFormSubmitterInfo,
     ProjectForm
@@ -582,6 +583,34 @@ def sequencing_delete(request, pk):
     context = {
         'sequencing': sequencing,
         'pk': pk
+    }
+    return context
+
+@Render("core/lane_create.html")
+@login_required()
+def lane_create(request, from_sequencing=None):
+    """lane create page."""
+    if from_sequencing:
+        sequencing = get_object_or_404(Sequencing, pk=from_sequencing)
+    else:
+        sequencing = None
+    if request.method == 'POST':
+        form = LaneForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+            msg = "Successfully created the lane."
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.sequencing.get_absolute_url())
+        else:
+            msg = "Failed to create the lane. Please fix the errors below."
+            messages.error(request, msg)
+    else:
+        form = LaneForm()
+
+    context = {
+        'form': form,
+        'sequencing': str(sequencing),
+        'sequencing_id': from_sequencing,
     }
     return context
 
