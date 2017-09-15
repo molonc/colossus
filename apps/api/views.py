@@ -68,6 +68,7 @@ class LaneViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
         'flow_cell_id',
+        'sequencing',
     )
 
 
