@@ -495,6 +495,9 @@ class LibrarySampleDetail(models.Model, FieldValue):
     label_of_original_sample_vial = create_chrfield(
         "Label of original sample vial"
         )
+    lims_vial_barcode = create_chrfield(
+        "LIMS vial barcode"
+    )
     original_storage_temperature = create_intfield(
         "Original storage temperature (C)",
         )
