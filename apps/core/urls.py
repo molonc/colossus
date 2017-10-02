@@ -39,5 +39,6 @@ url(r'^project/list$', views.project_list, name='project_list'),
 url(r'^project/update/(?P<pk>\d+)$', views.project_update, name='project_update'),
 url(r'^project/delete/(?P<pk>\d+)$', views.project_delete, name='project_delete'),
 url(r'^summary$', views.summary_view, name='summary'),
+url(r'summary/graph_cell_counts/$', views.get_cell_graph, name='summary_graph'),
 ]
 

@@ -6,6 +6,7 @@ Created on May 16, 2016
 
 import os
 import collections
+import subprocess
 #============================
 # Django imports
 #----------------------------
@@ -18,6 +19,10 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView
 from django.db import transaction
+
+import pandas as pd
+from django.conf import settings
+from django.utils import timezone
 
 #============================
 # App imports
@@ -788,3 +793,55 @@ def summary_view(request):
     }
 
     return context
+
+
+def get_filtered_sublib_count(sublibs):
+    unfiltered_count = sublibs.count()
+
+    # wells to filter out
+    blankwells_count = sublibs.filter(spot_well='nan').count()
+
+    # final count
+    filtered_count = unfiltered_count - blankwells_count
+    return filtered_count
+
+
+
+def get_cell_graph(request):
+
+    data = []
+    libs = Library.objects.filter(sequencing__isnull=False, sublibraryinformation__isnull=False).distinct()
+
+    for lib in libs:
+        lib_info = {}
+        lib_info['jira_ticket'] = lib.jira_ticket
+        lib_info['pool_id'] = lib.pool_id
+        lib_info['count'] = get_filtered_sublib_count(lib.sublibraryinformation_set)
+        lib_info['id'] = lib.pk
+        for sequencing in lib.sequencing_set.all():
+            lib_info['submission_date'] = sequencing.submission_date
+            data.append(lib_info)
+
+    df = pd.DataFrame(data)
+    # TODO: change time to just only include date
+    today = str(timezone.now().strftime('%b-%d-%Y'))
+    ofilename = os.path.join("cell_count-" + today + ".csv")
+    output_csv_path = os.path.join(settings.MEDIA_ROOT, ofilename)
+    df.to_csv(output_csv_path, index=False)
+
+
+    rscript_path = os.path.join(settings.BASE_DIR, "scripts", "every_cell_count_plot.R")
+    cmd = "Rscript {rscript} {input_csv} output.pdf".format(rscript=rscript_path, input_csv=output_csv_path)
+    subprocess.check_output(cmd, shell=True)
+
+    output_plots_path = os.path.join(settings.BASE_DIR,
+                           "output.pdf")
+
+    with open(output_plots_path, 'r') as plots_pdf:
+
+        response = HttpResponse(plots_pdf, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename=%s' % ("cell_count-" + today)
+    os.remove(output_csv_path)
+    os.remove(output_plots_path)
+
+    return response
