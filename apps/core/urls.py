@@ -33,6 +33,7 @@ url(r'^sequencing/gsc_form/create/(?P<pk>\d+)$', views.SequencingCreateGSCFormVi
 url(r'^sequencing/gsc_form/download/(?P<pk>\d+)$', views.sequencing_get_gsc_form, name='sequencing_get_gsc_form'),
 url(r'^lane/create/$', views.lane_create, name='lane_create'),
 url(r'^lane/create/(?P<from_sequencing>\d+)$', views.lane_create, name='lane_create_from_sequencing'),
+url(r'^lane/update/(?P<pk>\d+)$', views.lane_update, name='lane_update'),
 url(r'^lane/delete/(?P<pk>\d+)$', views.lane_delete, name='lane_delete'),
 url(r'^project/list$', views.project_list, name='project_list'),
 url(r'^project/update/(?P<pk>\d+)$', views.project_update, name='project_update'),

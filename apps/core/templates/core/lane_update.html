@@ -1,0 +1,46 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+Update Lane
+{% endblock %}
+
+{% block body %}
+<div class="container graybg">
+    <form action="{% url 'core:lane_update' pk=pk %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Lane Information</legend>
+            <table class="table-condensed">
+                <thead>
+                {% for field in form %}
+                <tr>
+                    <th>
+                    {{field.label_tag}}
+                    </th>
+                    <td>
+                    {{ field.errors }}
+                    {% if field.name == "sequencing" and sequencing_id %}
+                        <select id="id_sequencing" name="sequencing">
+                            <option value="{{sequencing_id}}" selected="selected">{{sequencing}}</option>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    {% if field.help_text %}
+                        <p class="helptext">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </thead>
+            </table>
+        </fieldset><br>
+        <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
+        {% if sequencing_id %}
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=sequencing_id %}">Cancel</a>
+        {% else %}
+        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_list'%}">Cancel</a>
+        {% endif %}
+    </form><br>
+</div>
+{% endblock %}

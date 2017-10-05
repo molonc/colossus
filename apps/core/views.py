@@ -615,6 +615,36 @@ def lane_create(request, from_sequencing=None):
     }
     return context
 
+
+@Render("core/lane_update.html")
+@login_required()
+def lane_update(request, pk):
+    """lane update page."""
+    lane = get_object_or_404(Lane, pk=pk)
+
+    if request.method == 'POST':
+        form = LaneForm(request.POST, instance=lane)
+        if form.is_valid():
+            instance = form.save()
+            msg = "Successfully updated the lane."
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.sequencing.get_absolute_url())
+        else:
+            msg = "Failed to update the lane. Please fix the errors below."
+            messages.error(request, msg)
+
+    else:
+        form = LaneForm(instance=lane)
+
+    context = {
+        'form': form,
+        'sequencing': lane.sequencing,
+        'sequencing_id': lane.sequencing_id,
+        'pk': pk,
+    }
+    return context
+
+
 @Render("core/lane_delete.html")
 @login_required()
 def lane_delete(request, pk):
@@ -634,6 +664,7 @@ def lane_delete(request, pk):
         'sequencing_id': sequencing.id
     }
     return context
+
 
 def sequencing_get_samplesheet(request, pk):
     """generate downloadable samplesheet."""

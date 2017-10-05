@@ -86,7 +86,8 @@ Sequencing Details
                     <td>{{lane.flow_cell_id}}</td>
                     <td>{{lane.path_to_archive}}</td>
                     <td>
-                        <a href="{% url 'core:lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
+                        <a href="{% url 'core:lane_update' pk=lane.pk %}"><i class="fa fa-pencil" style="color:orange;"></i> update</a>
+                        <a href="{% url 'core:lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a>
                     </td>
                 </tr>
                 {% endfor %}
