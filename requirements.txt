@@ -14,6 +14,7 @@ django-widget-tweaks==1.4.1
 elasticsearch==2.3.0
 functools32==3.2.3.post2
 kombu==4.0.1
+mod-wsgi==4.5.2
 model-mommy==1.2.6
 names==0.3.0
 numpy==1.11.0
