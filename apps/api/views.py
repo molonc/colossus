@@ -107,6 +107,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
     filter_fields = (
         'pool_id',
         'sample__sample_id',
+        'jira_ticket',
     )
 
 class LibraryBriefViewSet(LibraryViewSet):
