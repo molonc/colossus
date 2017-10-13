@@ -831,10 +831,14 @@ def get_cell_graph(request):
 
 
     rscript_path = os.path.join(settings.BASE_DIR, "scripts", "every_cell_count_plot.R")
-    cmd = "Rscript {rscript} {input_csv} output.pdf".format(rscript=rscript_path, input_csv=output_csv_path)
-    subprocess.check_output(cmd, shell=True)
+    cmd = "Rscript {rscript} {input_csv} {media_dir}/output.pdf".format(
+        rscript=rscript_path, input_csv=output_csv_path, media_dir=settings.MEDIA_ROOT)
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    r_stdout, r_stderr = p.communicate()
+    if p.returncode != 0:
+        raise Exception('cmd {} failed\nstdout:\n{}\nstderr:\n{}\n'.format(cmd, r_stdout, r_stderr))
 
-    output_plots_path = os.path.join(settings.BASE_DIR,
+    output_plots_path = os.path.join(settings.MEDIA_ROOT,
                            "output.pdf")
 
     with open(output_plots_path, 'r') as plots_pdf:

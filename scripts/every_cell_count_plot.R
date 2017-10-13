@@ -15,7 +15,8 @@ if (is.na(output)) output <- "output.pdf"
 input$submission_date <- as.Date(input$submission_date)
 input <- input[order(input$submission_date), ]
 
-filtered <- input[grep("ABC", input$pool_id, invert = TRUE), ]
+# filtered <- input[grep("ABC", input$pool_id, invert = TRUE), ]
+filtered <- input
 filtered$cumsum <- cumsum(filtered$count)
 
 # if (is.na(stop)) stop <- max(filtered$submission_date)
