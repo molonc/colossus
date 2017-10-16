@@ -31,12 +31,12 @@ if (PATH not in sys.path):
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get('COLOSSUS_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get('DJANGO_DEBUG', False))
+DEBUG = bool(os.environ.get('COLOSSUS_DEBUG', False))
 
-ALLOWED_HOSTS = [os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1')]
+ALLOWED_HOSTS = [os.environ.get('COLOSSUS_ALLOWED_HOSTS', '127.0.0.1')]
 
 
 # Application definition
