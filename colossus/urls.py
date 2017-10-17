@@ -1,4 +1,4 @@
-"""elastidjango URL Configuration
+"""colossus URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.9/topics/http/urls/
@@ -16,6 +16,8 @@ Including another URLconf
     
 Created on May 16, 2016
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
+
+Updated Oct 17, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 from django.conf import settings
@@ -36,4 +38,3 @@ urlpatterns = [
 
 urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
