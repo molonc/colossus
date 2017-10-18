@@ -2,6 +2,8 @@
 Created on May 16, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
+
+Updated Oct 17, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 from django.conf.urls import url
@@ -9,7 +11,6 @@ from . import views
 
 app_name = 'core'
 urlpatterns = [
-url(r'^$', views.home_view, name='home'),
 url(r'^sample/(?P<pk>\d+)$', views.sample_detail, name='sample_detail'),
 url(r'^sample/list$', views.sample_list, name='sample_list'),
 url(r'^sample/create/$', views.SampleCreate.as_view(), name='sample_create'),

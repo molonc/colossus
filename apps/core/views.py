@@ -90,16 +90,6 @@ def index_view(request):
 
 
 #============================
-# Home page of the app
-#----------------------------
-@Render("core/home.html")
-def home_view(request):
-    """home page of the app."""
-    context = {}
-    return context
-
-
-#============================
 # Sample views
 #----------------------------
 @Render("core/sample_list.html")
