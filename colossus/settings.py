@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 
 Created on May 16, 2016
+
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 
-Updated Oct 17, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
+Updated Oct 19, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 import os
@@ -156,7 +157,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "uploads")
 
 # Login url
-LOGIN_URL = '/apps/account/login/'
+LOGIN_URL = '/account/login/'
 
 # Enabled security settings
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -170,4 +171,3 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 
 }
-

@@ -15,9 +15,10 @@ Including another URLconf
     
     
 Created on May 16, 2016
+
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 
-Updated Oct 17, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
+Updated Oct 19, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 from django.conf import settings
@@ -29,12 +30,11 @@ urlpatterns = [
     url(r'^$', views.index_view, name='index'),    
     url(r'^admin/', admin.site.urls),
     url(r'^search/', views.search_view, name='search'),
-    url(r'^apps/core/', include('core.urls')),
-    url(r'^apps/account/', include('account.urls')),
-    url(r'^apps/api/', include('api.urls')),
-    url(r'^apps/sisyphus/', include('sisyphus.urls')),
+    url(r'^core/', include('core.urls')),
+    url(r'^account/', include('account.urls')),
+    url(r'^api/', include('api.urls')),
+    url(r'^sisyphus/', include('sisyphus.urls')),
 ]
-
 
 urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
