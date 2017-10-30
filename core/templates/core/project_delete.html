@@ -9,9 +9,9 @@ Delete project
 <div class="container graybg">
     <h5>Are you sure you want to detete project <i class="emph">{{project}}</i>?</h5><br> 
     <form action="{% url 'core:project_delete' pk=pk %}" method="POST">
-    	{% csrf_token %}
-        <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
-        <a class="btn btn-default btn-sm" href="{% url 'core:project_list' %}">Cancel</a>
+        {% csrf_token %}
+            <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
+            <a class="btn btn-default btn-sm" href="{% url 'core:project_list' %}">Cancel</a>
     </form><br>
 </div>
 {% endblock %}

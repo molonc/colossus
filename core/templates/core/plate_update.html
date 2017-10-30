@@ -2,15 +2,15 @@
 {% load staticfiles %}
 
 {% block title %}
-Create Lane
+Update Plate
 {% endblock %}
 
 {% block body %}
 <div class="container graybg">
-    <form action="{% url library_type|add:':lane_create' %}" method="POST">
+    <form action="{% url 'pbal:plate_update' pk=pk %}" method="POST">
         {% csrf_token %}
         <fieldset>
-            <legend>Lane Information</legend>
+            <legend>Plate Information</legend>
             <table class="table-condensed">
                 <thead>
                 {% for field in form %}
@@ -20,9 +20,9 @@ Create Lane
                     </th>
                     <td>
                     {{ field.errors }}
-                    {% if field.name == "sequencing" and sequencing_id %}
-                        <select id="id_sequencing" name="sequencing">
-                            <option value="{{sequencing_id}}" selected="selected">{{sequencing}}</option>
+                    {% if field.name == "library" and library_id %}
+                        <select id="id_library" name="library">
+                            <option value="{{library_id}}" selected="selected">{{library}}</option>
                     {% else %}
                         {{ field }}
                     {% endif %}
@@ -35,12 +35,8 @@ Create Lane
                 </thead>
             </table>
         </fieldset><br>
-        <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
-        {% if sequencing_id %}
-        <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_detail' pk=sequencing_id %}">Cancel</a>
-        {% else %}
-        <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_list'%}">Cancel</a>
-        {% endif %}
+        <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
+        <a class="btn btn-default btn-sm" href="{% url 'pbal:library_detail' pk=library_id %}">Cancel</a>
     </form><br>
 </div>
 {% endblock %}

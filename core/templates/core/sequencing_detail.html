@@ -9,7 +9,7 @@ Sequencing Details
 <!-- Download an already made GSC submission form -->
 <!-- <iframe width="1" height="1" frameborder="0" src="[File location]"></iframe> -->
 {% if download %}
-<body onload="window.location.href='{% url "core:sequencing_get_gsc_form" pk=sequencing.pk %}'">
+    <body onload="window.location.href='{% url library_type|add:":sequencing_get_gsc_form" pk=sequencing.pk %}'"> 
 {% endif %}
 <!-- End of Download an already made GSC submission form -->
 
@@ -17,13 +17,15 @@ Sequencing Details
 <div class="container" style="background-color:#FFF3E0;">
 
     <!-- action list -->
+    {% if library_type == 'dlp' %}
     <div style="float:right; margin-top:5px;">
         {% if not sequencing.library.has_sublibrary_info %}
         <h5><i class="text-warning">No Sublibrary Information available!</i></h5>
         {% else %}
-        <a class="btn btn-primary btn-sm" href="{% url 'core:sequencing_create_gsc_form' pk=sequencing.pk %}">Create GSC submission form</a>
+            <a class="btn btn-primary btn-sm" href="{% url library_type|add:':sequencing_create_gsc_form' pk=sequencing.pk %}">Create GSC submission form</a>
         {% endif %}
     </div>
+    {% endif %}
     <!-- end of action list -->
 
     <table class="table-condensed">
@@ -54,12 +56,28 @@ Sequencing Details
     <h4>Sequencing Details</h4>
     {% if sequencing.has_sequencing_detail %}
     <table class="table-condensed">
-        {% for field, value in sequencing.sequencingdetail.get_field_values.items %}
-        <tr>
-            <th id="thid">{{field}}:</th>
-            <td id="tdid" class="notes">{{value}}</td>
-        </tr>
-        {% endfor %}
+        {% if library_type == 'dlp' %}
+            {% for field, value in sequencing.sequencingdetail.get_field_values.items %}
+            <tr>
+                <th id="thid">{{field}}:</th>
+                <td id="tdid" class="notes">{{value}}</td>
+            </tr>
+            {% endfor %}
+        {% elif library_type == 'pbal' %}
+            {% for field, value in sequencing.pbalsequencingdetail.get_field_values.items %}
+            <tr>
+                <th id="thid">{{field}}:</th>
+                <td id="tdid" class="notes">{{value}}</td>
+            </tr>
+            {% endfor %}
+        {% elif library_type == 'tenx' %}
+            {% for field, value in sequencing.tenxsequencingdetail.get_field_values.items %}
+            <tr>
+                <th id="thid">{{field}}:</th>
+                <td id="tdid" class="notes">{{value}}</td>
+            </tr>
+            {% endfor %}
+        {% endif %}
     </table>
     {% else %}
     <h5><i class="text-warning">There is no sequencing details for this library!</i></h5>
@@ -70,7 +88,6 @@ Sequencing Details
 <!-- Lane Detail -->
 <div class="container">
     <h4>Lane Details</h4>
-    {% if sequencing.lane_set %}
     <div class="table">
         <table class="table">
             <thead>
@@ -80,14 +97,45 @@ Sequencing Details
                     <th></th>
                 </tr>
             </thead>
+    {% if sequencing.lane_set %}
             <tbody>
                 {% for lane in sequencing.lane_set.all %}
                 <tr>
                     <td>{{lane.flow_cell_id}}</td>
                     <td>{{lane.path_to_archive}}</td>
                     <td>
-                        <a href="{% url 'core:lane_update' pk=lane.pk %}"><i class="fa fa-pencil" style="color:orange;"></i> update</a>
-                        <a href="{% url 'core:lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a>
+                        <a href="{% url library_type|add:':lane_update' pk=lane.pk %}"><i class="fa fa-pencil" style="color:orange;"></i> update</a>
+                        <a href="{% url library_type|add:':lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div> 
+    {% elif sequencing.pballane_set %}
+            <tbody>
+                {% for lane in sequencing.pballane_set.all %}
+                <tr>
+                    <td>{{lane.flow_cell_id}}</td>
+                    <td>{{lane.path_to_archive}}</td>
+                    <td>
+                        <a href="{% url library_type|add:':lane_update' pk=lane.pk %}"><i class="fa fa-pencil" style="color:orange;"></i> update</a>
+                        <a href="{% url library_type|add:':lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% elif sequencing.tenxlane_set %}
+            <tbody>
+                {% for lane in sequencing.tenxlane_set.all %}
+                <tr>
+                    <td>{{lane.flow_cell_id}}</td>
+                    <td>{{lane.path_to_archive}}</td>
+                    <td>
+                        <a href="{% url library_type|add:':lane_update' pk=lane.pk %}"><i class="fa fa-pencil" style="color:orange;"></i> update</a>
+                        <a href="{% url library_type|add:':lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -97,20 +145,16 @@ Sequencing Details
     {% else %}
     <h5><i class="text-warning">There are no lanes for this sequencing!</i></h5>
     {% endif %}
-    <a href="{% url 'core:lane_create_from_sequencing' from_sequencing=sequencing.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Lane</a></p>
+    <a href="{% url library_type|add:':lane_create_from_sequencing' from_sequencing=sequencing.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Lane</a></p>
 </div><br>
 <!-- end of Sequencing Detail -->
 
 <!-- footer bottons -->
 <div class="container" style="margin-bottom:5px;">
-    <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url 'core:sequencing_update' pk=sequencing.pk %}">Edit</a>
-    <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url 'core:sequencing_delete' pk=sequencing.pk %}">Delete</a>
-    <a style="float:right; margin:5px;" href="{% url 'core:sequencing_list' %}">List of sequencings</a>
+    <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}">Edit</a>
+    <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':sequencing_delete' pk=sequencing.pk %}">Delete</a>
+    <a style="float:right; margin:5px;" href="{% url library_type|add:':sequencing_list' %}">List of sequencings</a>
 </div><br>
 <!-- end of footer bottons -->
 
 {% endblock %}
-
-
-
-    

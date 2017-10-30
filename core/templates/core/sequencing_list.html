@@ -8,7 +8,7 @@ List of Sequencings
 {% block body %}
 <div class="container" style="padding:0; margin-bottom:5px;">
     <h4 style="float:left;">Select a sequencing to view its details</h4>
-    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url 'core:sequencing_create' %}">Add Sequencing</a>
+    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url library_type|add:':sequencing_create' %}">Add Sequencing</a>
 </div>
 <div class="container" style="background-color:#F5F5F5;">
     <div class="table-responsive">
@@ -19,7 +19,9 @@ List of Sequencings
                     <th>Library Information</th>
                     <th>Sample ID</th>
                     <th>GSC library ID</th>
+                    {% if library_type == 'dlp' or library_type == 'tenx' %}
                     <th>Jira Ticket</th>
+                    {% endif %}
                     <th>Submission date</th>
                     <th></th>
                 </tr>
@@ -28,21 +30,36 @@ List of Sequencings
                 <br/>
                 {% for sequencing in sequencings %}
                 <tr>
-                    <td><a href="{% url 'core:sequencing_detail' pk=sequencing.pk %}">
+                    <td><a href="{% url library_type|add:':sequencing_detail' pk=sequencing.pk %}">
                         {{sequencing.id}}
                     </a></td>
                     <td width="300px">
-                            <a href="{% url 'core:library_detail' pk=sequencing.library.pk %}">{{sequencing.library.pool_id}}</a>
-                            <br/>
-                            {{sequencing.library.description}}
+                        <a href="{% url library_type|add:':library_detail' pk=sequencing.library.pk %}">
+                        {% if library_type == 'dlp' %}
+                        {{sequencing.library.pool_id}}
+                        {% else %}
+                        {{sequencing.library}}
+                        {% endif %}
+                        </a><br/>
+                        {{sequencing.library.description}}
                     </td>
                     <td><a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">{{sequencing.library.sample.sample_id}}</td>
-                    <td>{{sequencing.sequencingdetail.gsc_library_id}}</td>
+                    <td>
+                    {% if library_type == 'dlp' %}
+                    {{sequencing.sequencingdetail.gsc_library_id}}
+                    {% elif library_type == 'pbal' %}
+                    {{sequencing.pbalsequencingdetail.gsc_library_id}}
+                    {% elif library_type == 'tenx' %}
+                    {{sequencing.tenxsequencingdetail.gsc_library_id}}
+                    {% endif %}
+                    </td>
+                    {% if library_type == 'dlp' or library_type == 'tenx' %}
                     <td><a href="https://www.bcgsc.ca/jira/browse/{{sequencing.library.jira_ticket}}">{{sequencing.library.jira_ticket}}</a></td>
+                    {% endif %}
                     <td>{{sequencing.submission_date}}</td>
                     <td>
-                        <p class="libdesc" style="float:right;"><a style="margin-right:2px;" href="{% url 'core:sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;"></i> edit</a>
-                        <a href="{% url 'core:sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
+                        <p class="libdesc" style="float:right;"><a style="margin-right:2px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;"></i> edit</a>
+                        <a href="{% url library_type|add:':sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
                     </td>
                 </tr>
                 {% endfor %}

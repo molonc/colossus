@@ -33,7 +33,7 @@
         <table class="table-condensed">
             <tr>
                 <th id="thid">Sequencings Analyzed:</th>
-                <td id="tdid" class="notes">{% for sequencing in object.sequencings.all %}<a href="{% url 'core:sequencing_detail' pk=sequencing.pk %}">{{ sequencing }}</a><br/>{% endfor %}</td>
+                <td id="tdid" class="notes">{% for sequencing in object.sequencings.all %}<a href="{% url 'dlp:sequencing_detail' pk=sequencing.pk %}">{{ sequencing }}</a><br/>{% endfor %}</td>
             </tr>
         </table>
     </div>

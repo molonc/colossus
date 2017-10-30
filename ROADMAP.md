@@ -9,13 +9,17 @@
             models.py 
             urls.py
             views.py
+            other_stuff
         dlp/
+            apps.py
             models.py
             urls.py
         tenx/
+            apps.py
             models.py
             urls.py
         pbal/
+            apps.py
             models.py
             urls.py
         sisyphus/
@@ -48,7 +52,7 @@ Based on this [layout](http://www.revsys.com/blog/2014/nov/21/recommended-django
 
 `core/models.py`: Contains ChipRegion, SubLibraryInformation, MetadataField, ChipRegionMetadataField, Library\*, Sequencing\*, Lane ( which are all inherited by dlp, tenx, pbal). Also whatever helpers etc. that are already present.
 
-`core/urls.py`: Contains Sample and AdditionalSampleInformation views.
+`core/urls.py`: Contains paths to `sample_list`, `sample_detail`, `sample_create`, `sample_update`, and `sample_delete` views.
 
 `core/views.py`: All other `urls.py` files in the project point to this file.
 

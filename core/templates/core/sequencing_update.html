@@ -7,7 +7,7 @@ Edit Sequencing
 
 {% block body %}
 <div class="container graybg">
-    <form action="{% url 'core:sequencing_update' pk=pk %}" method="POST">
+    <form action="{% url library_type|add:':sequencing_update' pk=pk %}" method="POST">
         {% csrf_token %}
         <fieldset>
             <legend>Sequencing Information</legend>
@@ -51,7 +51,7 @@ Edit Sequencing
             </table>
          </fieldset><br>
         <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
-        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=pk %}">Cancel</a>
+        <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_detail' pk=pk %}">Cancel</a>
     </form><br>
 </div>
 {% endblock %}

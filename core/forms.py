@@ -2,6 +2,8 @@
 Created on May 24, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
+
+Updated Nov 3, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 import os
@@ -21,8 +23,9 @@ from django.forms import (
     ValidationError,
     inlineformset_factory,
     BaseInlineFormSet
-    )
+)
 from django.forms.extras.widgets import SelectDateWidget
+
 
 #===========================
 # App imports
@@ -31,20 +34,37 @@ from .models import (
     Sample,
     AdditionalSampleInformation,
     Library,
+    PbalLibrary,
+    TenxLibrary,
     SublibraryInformation,
     LibrarySampleDetail,
     LibraryConstructionInformation,
     LibraryQuantificationAndStorage,
+    PbalLibrarySampleDetail,
+    PbalLibraryConstructionInformation,
+    PbalLibraryQuantificationAndStorage,
+    TenxLibrarySampleDetail,
+    TenxLibraryConstructionInformation,
+    TenxLibraryQuantificationAndStorage,
     Sequencing,
     SequencingDetail,
-    Lane
-    )
+    PbalSequencing,
+    PbalSequencingDetail,
+    TenxSequencing,
+    TenxSequencingDetail,
+    Lane,
+    PbalLane,
+    TenxLane,
+    Plate
+)
 from .utils import parse_smartchipapp_results_file
+
 
 #===========================
 # 3rd-party app imports
 #---------------------------
 from taggit.models import Tag
+
 
 #===========================
 # Helpers
@@ -61,6 +81,7 @@ class SaveDefault(ModelForm):
         get validated and saved."""
         return True
 
+
 #===========================
 # Sample forms
 #---------------------------
@@ -69,9 +90,9 @@ class SampleForm(ModelForm):
         model = Sample
         fields = "__all__"
         widgets = {
-        'xenograft_biopsy_date': SelectDateWidget(
-            years=range(2000, 2020),
-            empty_label=('year', 'month', 'day')
+            'xenograft_biopsy_date': SelectDateWidget(
+                years=range(2000, 2020),
+                empty_label=('year', 'month', 'day'),
             )
         }
         labels = {
@@ -80,11 +101,10 @@ class SampleForm(ModelForm):
         help_texts = {
             'sample_id': ('Sequencing ID (usually SA ID).'),
             'anonymous_patient_id': ('Original/clinical patient ID.'),
-            # 'xenograft_biopsy_date': ('yyyy-mm-dd.')
-            }
+        }
 
     def clean(self):
-        ## if it's a new instance, the sample_id should not exist.
+        # if it's a new instance, the sample_id should not exist.
         if not self.instance.pk:
             cleaned_data = super(SampleForm, self).clean()
             sample_id = cleaned_data.get("sample_id")
@@ -96,23 +116,18 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     Sample,
     AdditionalSampleInformation,
     form = SaveDefault,
-    # exclude = ['delete'],
     fields = "__all__",
     widgets = {
-    'patient_biopsy_date': SelectDateWidget(
-        years=range(2000, 2020),
-        empty_label=('year', 'month', 'day')
+        'patient_biopsy_date': SelectDateWidget(
+            years=range(2000, 2020),
+            empty_label=('year', 'month', 'day'),
         )
     },
     labels = {
         'tissue_type':('*Tissue type'),
         'anatomic_site':('*Anatomic site'),
     },
-    # can_delete = True,
-    # help_texts = {
-    #     'patient_biopsy_date': ('yyyy-mm-dd.')
-    # },
-    )
+)
 
 
 #===========================
@@ -121,21 +136,20 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 class LibraryForm(ModelForm):
     class Meta:
         model = Library
-        # fields = "__all__"
         exclude = ['num_sublibraries']
         labels = {
             'primary sample': ('*Sample'),
             'pool_id': ('*Chip ID'),
             'jira_ticket': ('*Jira Ticket'),
-            }
+        }
         help_texts = {
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
             'pool_id': ('Chip ID.'),
             'jira_ticket': ('Jira Ticket.'),
-            }
+        }
 
     def clean(self):
-        ## if it's a new instance, the pool_id should not exist.
+        # if it's a new instance, the pool_id should not exist.
         if not self.instance.pk:
             cleaned_data = super(LibraryForm, self).clean()
             pool_id = cleaned_data.get("pool_id")
@@ -143,12 +157,38 @@ class LibraryForm(ModelForm):
                 msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
 
+class PbalLibraryForm(ModelForm):
+    class Meta:
+        model = PbalLibrary
+        exclude = []
+        labels = {
+            'primary sample': ('*Sample'),
+            'jira_ticket': ('*Jira Ticket'),
+        }
+        help_texts = {
+            'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
+            'jira_ticket': ('Jira Ticket.'),
+        }
+
+class TenxLibraryForm(ModelForm):
+    class Meta:
+        model = TenxLibrary
+        exclude = []
+        labels = {
+            'primary sample': ('*Sample'),
+            'jira_ticket': ('*Jira Ticket'),
+        }
+        help_texts = {
+            'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
+            'jira_ticket': ('Jira Ticket.'),
+        }
+
 class SublibraryForm(Form):
-    ## SmartChipApp results file
+    # SmartChipApp results file
     smartchipapp_results_file = FileField(
         label="SmartChipApp results:",
         required=False,
-        )
+    )
 
     def clean_smartchipapp_results_file(self):
         filename = self.cleaned_data['smartchipapp_results_file']
@@ -171,7 +211,6 @@ class LibraryQuantificationAndStorageForm(ModelForm):
     class Meta:
         model = LibraryQuantificationAndStorage
         fields = "__all__"
-        # exclude = ['library']
 
     def clean(self):
         """if Freezer specified, so should Rack,Shelf,Box,Positoin in box."""
@@ -227,15 +266,12 @@ LibrarySampleDetailInlineFormset = inlineformset_factory(
     form = SaveDefault,
     fields = "__all__",
     widgets = {
-    'sample_spot_date': SelectDateWidget(
-        years=range(2000,2020),
-        empty_label=('year', 'month', 'day')
+        'sample_spot_date': SelectDateWidget(
+            years=range(2000,2020),
+            empty_label=('year', 'month', 'day'),
         )
     }
-    # help_texts = {
-    #     'sample_spot_date': ('yyyy-mm-dd.')
-    # }
-    )
+)
 
 LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     Library,
@@ -243,15 +279,12 @@ LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     form = SaveDefault,
     fields = "__all__",
     widgets = {
-    'library_prep_date': SelectDateWidget(
-        years=range(2000,2020),
-        empty_label=('year', 'month', 'day')
+        'library_prep_date': SelectDateWidget(
+            years=range(2000,2020),
+            empty_label=('year', 'month', 'day'),
         )
     }
-    # help_texts = {
-    #     'library_prep_date': ('yyyy-mm-dd.'),
-    # }
-    )
+)
 
 LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     Library,
@@ -262,7 +295,105 @@ LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
         'agilent_bioanalyzer_xad': ('Select a xad file to upload.'),
         'agilent_bioanalyzer_png': ('Supported formats: png, jpg, jpeg, bmp.'),
     }
-    )
+)
+
+class PbalLibraryQuantificationAndStorageForm(ModelForm):
+
+    """
+    Clean uploaded files.
+    """
+
+    class Meta:
+        model = PbalLibraryQuantificationAndStorage
+        fields = "__all__"
+
+    def has_changed(self):
+        """ Should returns True if data differs from initial.
+        By always returning true even unchanged inlines will
+        get validated and saved."""
+        return True
+
+PbalLibrarySampleDetailInlineFormset = inlineformset_factory(
+    PbalLibrary,
+    PbalLibrarySampleDetail,
+    form = SaveDefault,
+    fields = "__all__",
+    widgets = {
+        'sample_spot_date': SelectDateWidget(
+            years=range(2000,2020),
+            empty_label=('year', 'month', 'day'),
+        )
+    }    
+)
+
+PbalLibraryConstructionInfoInlineFormset =  inlineformset_factory(
+    PbalLibrary,
+    PbalLibraryConstructionInformation,
+    form = SaveDefault,
+    fields = "__all__",
+    widgets = {
+        'library_prep_date': SelectDateWidget(
+            years=range(2000,2020),
+            empty_label=('year', 'month', 'day'),
+        )
+    }
+)
+
+PbalLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
+    PbalLibrary,
+    PbalLibraryQuantificationAndStorage,
+    form = PbalLibraryQuantificationAndStorageForm,
+    fields = "__all__",
+)
+
+class TenxLibraryQuantificationAndStorageForm(ModelForm):
+
+    """
+    Clean uploaded files.
+    """
+
+    class Meta:
+        model = TenxLibraryQuantificationAndStorage
+        fields = "__all__"
+
+    def has_changed(self):
+        """ Should returns True if data differs from initial.
+        By always returning true even unchanged inlines will
+        get validated and saved."""
+        return True
+
+TenxLibrarySampleDetailInlineFormset = inlineformset_factory(
+    TenxLibrary,
+    TenxLibrarySampleDetail,
+    form = SaveDefault,
+    fields = "__all__",
+    widgets = {
+        'sample_prep_date': SelectDateWidget(
+            years=range(2000,2020),
+            empty_label=('year', 'month', 'day'),
+        )
+    }
+)
+
+TenxLibraryConstructionInfoInlineFormset =  inlineformset_factory(
+    TenxLibrary,
+    TenxLibraryConstructionInformation,
+    form = SaveDefault,
+    fields = "__all__",
+    widgets = {
+        'library_prep_date': SelectDateWidget(
+            years=range(2000,2020),
+            empty_label=('year', 'month', 'day'),
+        )
+    }
+)
+
+TenxLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
+    TenxLibrary,
+    TenxLibraryQuantificationAndStorage,
+    form = TenxLibraryQuantificationAndStorageForm,
+    fields = "__all__",
+)
 
 
 #===========================
@@ -280,36 +411,103 @@ class ProjectForm(ModelForm):
 class SequencingForm(ModelForm):
     class Meta:
         model = Sequencing
-        # fields = "__all__"
         exclude = ['pool_id']
         widgets = {
             'submission_date': SelectDateWidget(
                 years=range(2000,2020),
-                empty_label=('year', 'month', 'day')
-                )
+                empty_label=('year', 'month', 'day'),
+            )
         }
         labels = {
             'library': ('*Library'),
-            }
+        }
         help_texts = {
             'library': ('Select a library.'),
-            # 'submission_date': ('yyyy-mm-dd.')
-            }
+        }
 
 SequencingDetailInlineFormset = inlineformset_factory(
     Sequencing,
     SequencingDetail,
     form = SaveDefault,
-    fields = "__all__"
-    )
+    fields = "__all__",
+)
+
+class PbalSequencingForm(ModelForm):
+    class Meta:
+        model = PbalSequencing
+        exclude = ['pool_id']
+        widgets = {
+            'submission_date': SelectDateWidget(
+                years=range(2000,2020),
+                empty_label=('year', 'month', 'day'),
+            )
+        }
+        labels = {
+            'library': ('*Library'),
+        }
+        help_texts = {
+            'library': ('Select a library.'),
+        }
+
+PbalSequencingDetailInlineFormset = inlineformset_factory(
+    PbalSequencing,
+    PbalSequencingDetail,
+    form = SaveDefault,
+    fields = "__all__",
+)
+
+class TenxSequencingForm(ModelForm):
+    class Meta:
+        model = TenxSequencing
+        exclude = ['pool_id']
+        widgets = {
+            'submission_date': SelectDateWidget(
+                years=range(2000,2020),
+                empty_label=('year', 'month', 'day'),
+            )
+        }
+        labels = {
+            'library': ('*Library'),
+        }
+        help_texts = {
+            'library': ('Select a library.'),
+        }
+
+TenxSequencingDetailInlineFormset = inlineformset_factory(
+    TenxSequencing,
+    TenxSequencingDetail,
+    form = SaveDefault,
+    fields = "__all__",
+)
+
 
 #===========================
-# Lane form
+# Lane forms
 #---------------------------
 class LaneForm(ModelForm):
     class Meta:
         model = Lane
         fields = "__all__"
+
+class PbalLaneForm(ModelForm):
+    class Meta:
+        model = PbalLane
+        fields = "__all__"
+
+class TenxLaneForm(ModelForm):
+    class Meta:
+        model = TenxLane
+        fields = "__all__"
+
+
+#===========================
+# Plate form
+#---------------------------
+class PlateForm(ModelForm):
+    class Meta:
+        model = Plate
+        fields = "__all__"
+
 
 #===========================
 # GSC submission forms
@@ -324,26 +522,27 @@ class GSCFormDeliveryInfo(Form):
     name = CharField(
         label="Name",
         max_length=100,
-        initial="Andy Mungall, Room 508"
-        )
+        initial="Andy Mungall, Room 508",
+    )
     org = CharField(
         label="Organization",
         max_length=100,
-        initial="Biospecimen Core, Genome Sciences Centre, BC Cancer Agency"
-        )
+        initial="Biospecimen Core, Genome Sciences Centre, BC Cancer Agency",
+    )
     addr = CharField(
         label="Address",
         max_length=100,
-        initial="Suite 100, 570 West 7th Avenue, Vancouver, BC  V5Z 4S6, Canada"
-        )
+        initial="Suite 100, 570 West 7th Avenue, Vancouver, BC  V5Z 4S6, Canada",
+    )
     email = EmailField(
         label="Email",
-        initial="amungall@bcgsc.ca"
-        )
+        initial="amungall@bcgsc.ca",
+    )
     tel = CharField(
         label="Tel",
         max_length=100,
-        initial="604-707-5900 ext 673251")
+        initial="604-707-5900 ext 673251",
+    )
 
 class GSCFormSubmitterInfo(Form):
 
@@ -351,58 +550,57 @@ class GSCFormSubmitterInfo(Form):
     Delivery information section of GSC submission form.
     """
 
-    #choices
+    # choices
     at_completion_choices = (
         ('R', 'Return unused sample'),
-        ('D', 'Destroy unused sample')
-        )
+        ('D', 'Destroy unused sample'),
+    )
 
     # fields
     submitter_name = CharField(
         label="Name of Submitter",
         max_length=100,
-        )
+    )
     submitter_email = EmailField(
         label="Submitter's email",
-        )
+    )
     submission_date = DateField(
         label="Submission Date",
         help_text = 'yyyy-mm-dd',
-        # widget=SelectDateWidget
-        )
+    )
     submitting_org = CharField(
         label="Submitting Organization",
         max_length=100,
-        initial="BCCRC/ UBC"
-        )
+        initial="BCCRC/ UBC",
+    )
     pi_name = CharField(
         label="Name of Principal Investigator",
         max_length=100,
-        initial="Sam Aparicio/ Carl Hansen"
-        )
+        initial="Sam Aparicio/ Carl Hansen",
+    )
     pi_email = EmailField(
         label="Principal Investigator's email",
-        initial="saparicio@bccrc.ca"
-        )
+        initial="saparicio@bccrc.ca",
+    )
     project_name = CharField(
         label="Project Name",
         max_length=100,
-        initial="Single cell indexing"
-        )
+        initial="Single cell indexing",
+    )
     sow = CharField(
         label="Statement of Work (SOW) #",
         max_length=100,
-        initial="GSC-0297"
-        )
+        initial="GSC-0297",
+    )
     nextera_compatible = BooleanField(
         label="Nextera compatible",
         required=False,
         initial=True,
-        )
+    )
     truseq_compatible = BooleanField(
         label="TruSeq compatible",
         required=False,
-        )
+    )
     bsgsc_standard = BooleanField(
         label='BC GSC Standard',
         required=False,
@@ -410,12 +608,11 @@ class GSCFormSubmitterInfo(Form):
     custom = BooleanField(
         label="Custom",
         required=False,
-        )
+    )
     is_this_pbal_library = BooleanField(
-        label="Is this PBAL library",
+        label="Is this pbal library",
         required=False,
-        )
-
+    )
     is_this_chromium_library = BooleanField(
         label="Is this Chromium library",
         required=False,
@@ -423,6 +620,5 @@ class GSCFormSubmitterInfo(Form):
     at_completion = ChoiceField(
         label="At completion of project",
         choices=at_completion_choices,
-        initial='R'
-        )
-
+        initial='R',
+    )

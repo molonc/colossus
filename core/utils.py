@@ -719,7 +719,7 @@ class Submission(object):
         self.worksheet.write(input_cell.format(column="B", row=row), custom)
 
         row += 2
-        self.worksheet.write(input_cell.format(column="A", row=row), "Is this is PBAL Library?", peach)
+        self.worksheet.write(input_cell.format(column="A", row=row), "Is this is pbal Library?", peach)
         self.worksheet.write(input_cell.format(column="B", row=row), pbal_library)
 
         row += 2

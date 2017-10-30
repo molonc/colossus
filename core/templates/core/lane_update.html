@@ -7,7 +7,7 @@ Update Lane
 
 {% block body %}
 <div class="container graybg">
-    <form action="{% url 'core:lane_update' pk=pk %}" method="POST">
+    <form action="{% url library_type|add:':lane_update' pk=pk %}" method="POST">
         {% csrf_token %}
         <fieldset>
             <legend>Lane Information</legend>
@@ -37,9 +37,9 @@ Update Lane
         </fieldset><br>
         <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
         {% if sequencing_id %}
-        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_detail' pk=sequencing_id %}">Cancel</a>
+        <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_detail' pk=sequencing_id %}">Cancel</a>
         {% else %}
-        <a class="btn btn-default btn-sm" href="{% url 'core:sequencing_list'%}">Cancel</a>
+        <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_list'%}">Cancel</a>
         {% endif %}
     </form><br>
 </div>

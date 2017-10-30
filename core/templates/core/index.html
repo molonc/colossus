@@ -8,8 +8,8 @@ Main
 {% block body %}
 <br/>
 <div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">
-    <a style="text-decoration: none;" href="#db_collapse" data-toggle="collapse"><h4>Database</h4></a>
-    <div id="db_collapse" class="collapse in">
+    <a style="text-decoration: none;" href="#core_collapse" data-toggle="collapse"><h4>Core</h4></a>
+    <div id="core_collapse" class="collapse in">
         <table class="table-striped" style="width:100%;">
             <tbody>
                 <tr>
@@ -20,24 +20,34 @@ Main
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="{% url 'core:library_list' %}">Libraries</a> <i class="counter">{{library_size}}</i></td>
+                    <td><a href="{% url 'core:project_list' %}">Projects</a></td><td></td>
+                </tr>    
+            </tbody>
+        </table>
+    </div>
+</div>
+<br />
+<div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">
+    <a style="text-decoration: none;" href="#db_collapse" data-toggle="collapse"><h4>DLP</h4></a>
+    <div id="db_collapse" class="collapse in">
+        <table class="table-striped" style="width:100%;">
+            <tbody>
+                <tr>
+                    <td><a href="{% url 'dlp:library_list' %}">Libraries</a> <i class="counter">{{dlp_library_size}}</i></td>
                     <td>
                         <p style="float:right;">
-                        <a href="{% url 'core:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                        <a href="{% url 'dlp:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="{% url 'core:sequencing_list' %}">Sequencings</a> <i class="counter">{{sequencing_size}}</i></td>
+                    <td><a href="{% url 'dlp:sequencing_list' %}">Sequencings</a> <i class="counter">{{dlp_sequencing_size}}</i></td>
                     <td>
                         <p style="float:right;">
-                        <a href="{% url 'core:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                        <a href="{% url 'dlp:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="{% url 'core:project_list' %}">Projects</a></td>
-                </tr>
-                <tr>
-                    <td><a href="{% url 'core:summary' %}">Summary Statistics</a></td>
+                    <td><a href="{% url 'dlp:summary' %}">Summary Statistics</a></td>
                     <td></td>
                 </tr>
             </tbody>
@@ -45,6 +55,53 @@ Main
     </div>
 </div>
 <br/>
+<div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">
+    <a style="text-decoration: none;" href="#pbal_collapse" data-toggle="collapse"><h4>PBAL</h4></a>
+    <div id="pbal_collapse" class="collapse in">
+        <table class="table-striped" style="width:100%;">
+            <tbody>
+                <tr>
+                    <td><a href="{% url 'pbal:library_list' %}">Libraries</a> <i class="counter">{{pbal_library_size}}</i></td>
+                    <td>
+                        <p style="float:right;">
+                        <a href="{% url 'pbal:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href="{% url 'pbal:sequencing_list' %}">Sequencings</a> <i class="counter">{{pbal_sequencing_size}}</i></td>
+                    <td>
+                        <p style="float:right;">
+                        <a href="{% url 'pbal:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<br/><div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">
+    <a style="text-decoration: none;" href="#10x_collapse" data-toggle="collapse"><h4>10X Genomics</h4></a>
+    <div id="10x_collapse" class="collapse in">
+        <table class="table-striped" style="width:100%;">
+            <tbody>
+                <tr>
+                    <td><a href="{% url 'tenx:library_list' %}">Libraries</a> <i class="counter">{{tenx_library_size}}</i></td>
+                    <td>
+                        <p style="float:right;">
+                        <a href="{% url 'tenx:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href="{% url 'tenx:sequencing_list' %}">Sequencings</a> <i class="counter">{{tenx_sequencing_size}}</i></td>
+                    <td>
+                        <p style="float:right;">
+                        <a href="{% url 'tenx:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<br />
 <div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">
     <a style="text-decoration: none;" href="#analysis_collapse" data-toggle="collapse"><h4>Analysis</h4></a>
     <div id="analysis_collapse" class="collapse in">

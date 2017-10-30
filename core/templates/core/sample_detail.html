@@ -39,11 +39,11 @@ Sample Details
     
 <!-- Library Information -->
 <div class="container">
-    <h4>Library Information</h4>
-    {% if sample.library_set.all %}
     <div class="table">
         <table class="table">
+            {% if sample.library_set.all %}
             <thead>
+                <tr><th><h4>DLP Library Information</h4></th><th></th><th></th></tr>
                 <tr>
                     <th>Chip ID</th>
                     <th>JIRA Ticket</th>
@@ -59,12 +59,68 @@ Sample Details
                 </tr>
                 {% endfor %}
             </tbody>
+            {% else %}
+            <tbody>
+                <tr>
+                    <td><h5><i class="text-warning">There is no dlp library information for this sample!</i></h5></td>
+                </tr>
+            </tbody>
+            {% endif %}
+            {% if sample.pballibrary_set.all %}
+            <thead>
+                <tr><th><h4>PBAL Library Information</h4></th><th></th><th></th></tr>
+                <tr>
+                    <th>Library ID</th>
+                    <th>Number of plates</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for library in sample.pballibrary_set.all %}
+                <tr>
+                    <td><a href="{{library.get_absolute_url}}">{{library.id}}</a></td>
+                    <td>{{library.plate_set.count}}</td>
+                    <td>{{library.description}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody>
+                <tr>
+                    <td><h5><i class="text-warning">There is no pbal library information for this sample!</i></h5></td>
+                </tr>
+            </tbody>
+            {% endif %}
+            {% if sample.tenxlibrary_set.all %}
+            <thead>
+                <tr><th><h4>TENX Library Information</h4></th><th></th><th></th></tr>
+                <tr>
+                    <th>Library ID</th>
+                    <th>JIRA Ticket</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for library in sample.tenxlibrary_set.all %}
+                <tr>
+                    <td><a href="{{library.get_absolute_url}}">{{library.id}}</a></td>
+                    <td>{{library.jira_ticket}}</td>
+                    <td>{{library.description}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody>
+                <tr>
+                    <td><h5><i class="text-warning">There is no tenx library information for this sample!</i></h5></td>
+                </tr>
+            </tbody>
+            {% endif %}
         </table>
-    </div>    
-    {% else %}
-    <h5><i class="text-warning">There is no library information for this sample!</i></h5>
-    {% endif %}
-    <a href="{% url 'core:library_create_from_sample' from_sample=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Library</a></p>
+    </div>
+    {% for library in library_list %}
+    <a href="{% url library|add:':library_create_from_sample' from_sample=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i>Add {{library|upper}} Library</a></p>
+    {% endfor %}
 </div><br>
 <!-- end of Library Information -->
 
@@ -77,4 +133,3 @@ Sample Details
 <!-- end of footer bottons -->
 
 {% endblock %}
-

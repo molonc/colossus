@@ -8,22 +8,35 @@ List of Libraries
 {% block body %}
 <div class="container" style="padding:0; margin-bottom:5px;">
     <h4 style="float:left;">Select a library to view its details</h4>
-    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url 'core:library_create' %}">Add Library</a>
+    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url library_type|add:':library_create' %}">Add Library</a>
 </div>
 <div class="container" style="background-color:#F5F5F5;">
     <div class="table-responsive">
         <table id="datatable" class="table table-striped">
             <thead>
                 <tr>
+                    {% if library_type == 'dlp' %}
                     <th>Chip ID</th>
+                    {% elif library_type == 'pbal' or library_type == 'tenx' %}
+                    <th>Library ID</th>
+                    {% endif %}
                     <th>Primary Sample ID</th>
+                    {% if library_type == 'pbal' %}
+                    <th>Number of plates</th>
+                    {% endif %}
                     <th>Sample Spot Date</th>
                     <th>Library Prep Date</th>
                     <th>Description</th>
+                    {% if library_type == 'dlp' or library_type == 'tenx' %}
                     <th>JIRA Ticket</th>
+                    {% endif %}
                     <th>Project</th>
+                    {% if library_type == 'dlp' %}
                     <th>Library Location</th>
+                    {% endif %}
+                    {% if library_type == 'dlp' or library_type == 'tenx' %}
                     <th>#Sublibraries</th>
+                    {% endif %}
                     <th>Sequenced</th>
                     <th>Result</th>
                 </tr>
@@ -31,19 +44,44 @@ List of Libraries
             <tbody>
                 {% for library in libraries %}
                 <tr>
-                    <td><a href="{% url 'core:library_detail' pk=library.pk %}">{{library.pool_id}}</a></td>
+                    <td><a href="{% url library_type|add:':library_detail' pk=library.pk %}">
+                    {% if library_type == 'dlp' %}
+                        {{library.pool_id}}
+                    {% else %}
+                        {{library.id}}
+                    {% endif %}
+                    </a></td>
                     <td>{{library.sample.sample_id}}</td>
+                    {% if library_type == 'pbal' %}
+                    <td>
+                        {{library.plate_set.count}}
+                    </td>
+                    {% endif %}
+                    {% if library_type == 'dlp' %}
                     <td>{{library.librarysampledetail.sample_spot_date|date:"M j, Y"}}</td>
                     <td>{{library.libraryconstructioninformation.library_prep_date|date:"M j, Y"}}</td>
+                    {% elif library_type == 'pbal' %}
+                    <td>{{library.pballibrarysampledetail.sample_spot_date|date:"M j, Y"}}</td>
+                    <td>{{library.pballibraryconstructioninformation.library_prep_date|date:"M j, Y"}}</td>
+                    {% elif library_type == 'tenx' %}
+                    <td>{{library.tenxlibrarysampledetail.sample_prep_date|date:"M j, Y"}}</td>
+                    <td>{{library.tenxlibraryconstructioninformation.library_prep_date|date:"M j, Y"}}</td>
+                    {% endif %}
                     <td>{{library.description}}</td>
+                    {% if library_type == 'dlp' or library_type == 'tenx' %}
                     <td><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{library.jira_ticket}}</a></td>
+                    {% endif %}
                     <td>
                         {% for project in library.projects.all %}
                         {{project}}<br>
                         {% endfor %}
                     </td>
+                    {% if library_type == 'dlp' %}
                     <td>{{library.libraryquantificationandstorage.library_location}}</td>
+                    {% endif %}
+                    {% if library_type == 'dlp' or library_type == 'tenx' %}
                     <td style="text-align:center;">{{library.num_sublibraries}}</td>
+                    {% endif %}
                     {% if library.is_sequenced %}
                     <td style="text-align:center;"><i class="fa fa-check" aria-hidden="true" style="color:green;" title="Sequenced"></i></td>
                     {% elif library.libraryquantificationandstorage.qc_check == 'P' %}
@@ -53,10 +91,6 @@ List of Libraries
                     {% else %}
                     <td style="text-align:center"></td>
                     {% endif %}
-<!--                     <td>
-                        <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:library_update' pk=library.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;" "></i> edit</a>
-                        <a href="{% url 'core:library_delete' pk=library.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
-                    </td> -->
                     <td>{{library.result}}</td>
                 </tr>
                 {% endfor %}

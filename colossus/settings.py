@@ -25,11 +25,6 @@ VERSION = "1.0.0"
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Export apps to PYTHONPATH
-PATH=os.path.join(BASE_DIR, 'apps')
-if (PATH not in sys.path):
-    sys.path.append(PATH)
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -48,6 +43,9 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig', 
     'account.apps.AccountConfig',
     'sisyphus.apps.SisyphusConfig',
+    'dlp.apps.DlpConfig',
+    'pbal.apps.PbalConfig',
+    'tenx.apps.TenxConfig',
     'rest_framework',
     'django_filters', #filtering for rest_framework
     'django_extensions',

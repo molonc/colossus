@@ -2,6 +2,8 @@
 Created on May 31, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
+
+Updated Nov 7, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 from collections import OrderedDict
@@ -128,6 +130,9 @@ class FieldValue(object):
 
 
 class LibraryAssistant(object):
+    # def __init__(self, object):
+    #     self.object = object
+
     gsc_required_fields = [
         (
             "sample",
@@ -180,18 +185,28 @@ class LibraryAssistant(object):
         ]
 
     def has_library_sample_detail(self):
-        return hasattr(self,
-            'librarysampledetail')
+        if self.__class__.__name__ == 'Library':
+            return hasattr(self, 'librarysampledetail')
+        elif self.__class__.__name__ == 'PbalLibrary':
+            return hasattr(self, 'pballibrarysampledetail')
+        elif self.__class__.__name__ == 'TenxLibrary':
+            return hasattr(self, 'tenxlibrarysampledetail')
 
     def has_library_construction_information(self):
-        return hasattr(self,
-            'libraryconstructioninformation'
-            )
+        if self.__class__.__name__ == 'Library':
+            return hasattr(self, 'libraryconstructioninformation')
+        elif self.__class__.__name__ == 'PbalLibrary':
+            return hasattr(self, 'pballibraryconstructioninformation')
+        elif self.__class__.__name__ == 'TenxLibrary':
+            return hasattr(self, 'tenxlibraryconstructioninformation')
 
     def has_library_quantification_and_storage(self):
-        return hasattr(self,
-            'libraryquantificationandstorage'
-            )
+        if self.__class__.__name__ == 'Library':
+            return hasattr(self, 'libraryquantificationandstorage')
+        elif self.__class__.__name__ == 'PbalLibrary':
+            return hasattr(self, 'pballibraryquantificationandstorage')
+        elif self.__class__.__name__ == 'TenxLibrary':
+            return hasattr(self, 'tenxlibraryquantificationandstorage')
 
     def get_missing_gsc_required_fields(self):
         missing_required_fields = []
@@ -217,5 +232,9 @@ class LibraryAssistant(object):
         return missing_required_fields
 
     def is_sequenced(self):
-        return any([s.lane_set.filter(path_to_archive__isnull=False) for s in self.sequencing_set.all()])
-
+        if self.__class__.__name__ == 'Library':
+            return any([s.lane_set.filter(path_to_archive__isnull=False) for s in self.sequencing_set.all()])
+        elif self.__class__.__name__ == 'PbalLibrary':
+            return any([s.pballane_set.filter(path_to_archive__isnull=False) for s in self.pbalsequencing_set.all()])
+        elif self.__class__.__name__ == 'TenxLibrary':
+            return any([s.tenxlane_set.filter(path_to_archive__isnull=False) for s in self.tenxsequencing_set.all()])
