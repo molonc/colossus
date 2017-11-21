@@ -1269,7 +1269,7 @@ def dlp_sequencing_get_queried_samplesheet(request, pool_id, flowcell):
 
     try:
         pk = Lane.objects.get(flow_cell_id=flowcell, sequencing__library__pool_id=pool_id).pk
-        return sequencing_get_samplesheet(request, pk)
+        return dlp_sequencing_get_samplesheet(request, pk)
     except Sequencing.DoesNotExist:
         msg = "Sorry, no sequencing with flowcell {} and chip id {} found.".format(flowcell, pool_id)
         messages.warning(request, msg)
