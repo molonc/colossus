@@ -46,7 +46,7 @@ List of Sequencings
                     <td><a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">{{sequencing.library.sample.sample_id}}</td>
                     <td>
                     {% if library_type == 'dlp' %}
-                    {{sequencing.sequencingdetail.gsc_library_id}}
+                    {{sequencing.dlpsequencingdetail.gsc_library_id}}
                     {% elif library_type == 'pbal' %}
                     {{sequencing.pbalsequencingdetail.gsc_library_id}}
                     {% elif library_type == 'tenx' %}

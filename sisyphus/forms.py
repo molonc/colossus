@@ -23,7 +23,7 @@ from django.forms import (
 from .models import *
 
 from core.models import(
-    Library, Sequencing
+    DlpLibrary, DlpSequencing
 )
 
 #===========================
@@ -54,7 +54,7 @@ class AnalysisInformationForm(ModelForm):
         library = kwargs.pop('library')
         super(AnalysisInformationForm, self).__init__(*args, **kwargs)
         self.fields['sequencings'].widget = widgets.CheckboxSelectMultiple()
-        self.fields['sequencings'].queryset = Sequencing.objects.filter(library__pk = library.pk)
+        self.fields['sequencings'].queryset = DlpSequencing.objects.filter(library__pk = library.pk)
 
 #===========================
 # Analysis forms (Admin)
@@ -73,4 +73,4 @@ class AnalysisRunForm(ModelForm):
         }
 
 class AnalysisLibrarySelection(Form):
-    library = ModelChoiceField(queryset=Library.objects.all())
+    library = ModelChoiceField(queryset=DlpLibrary.objects.all())

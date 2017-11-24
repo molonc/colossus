@@ -23,9 +23,9 @@ from .serializers import (
 
 from core.models import (
     Sample,
-    Library,
-    Sequencing,
-    Lane,
+    DlpLibrary,
+    DlpSequencing,
+    DlpLane,
     )
 
 
@@ -63,7 +63,7 @@ class LaneViewSet(viewsets.ModelViewSet):
     See documentation here:
     https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
     """
-    queryset = Lane.objects.all()
+    queryset = DlpLane.objects.all()
     serializer_class = LaneSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
@@ -82,7 +82,7 @@ class SequencingViewSet(viewsets.ModelViewSet):
     See documentation here:
     https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
     """
-    queryset = Sequencing.objects.all()
+    queryset = DlpSequencing.objects.all()
     serializer_class = SequencingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
@@ -101,7 +101,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
     https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
     """
 
-    queryset = Library.objects.all()
+    queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
@@ -125,6 +125,3 @@ class LibraryBriefViewSet(LibraryViewSet):
     serializer_class = LibrarySerializerBrief
     pagination_class = SmallResultsSetPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
-
-
-

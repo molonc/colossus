@@ -7,20 +7,20 @@ Created on May 16, 2016
 from django.contrib import admin
 
 from .models import Sample, AdditionalSampleInformation
-from .models import Library, SublibraryInformation, LibrarySampleDetail
-from .models import LibraryConstructionInformation
-from .models import LibraryQuantificationAndStorage
-from .models import Sequencing, SequencingDetail
+from .models import DlpLibrary, SublibraryInformation, DlpLibrarySampleDetail
+from .models import DlpLibraryConstructionInformation
+from .models import DlpLibraryQuantificationAndStorage
+from .models import DlpSequencing, DlpSequencingDetail
 from .models import ChipRegion, ChipRegionMetadata
 from .models import MetadataField
 
-## third-party apps
+# third-party apps
 from simple_history.admin import SimpleHistoryAdmin
 from taggit.models import Tag
 from taggit.admin import TagAdmin
 
 
-## Sample information
+# Sample information
 class AdditionalSampleInformationInline(admin.StackedInline):
     model = AdditionalSampleInformation
 
@@ -31,21 +31,21 @@ class SampleAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     search_fields = ['sample_id']
 
 
-## Library information
+# Library information
 class SublibraryInformationInline(admin.TabularInline):
     model = SublibraryInformation
     extra = 3
 
-class LibrarySampleDetailInline(admin.StackedInline):
-    model = LibrarySampleDetail
+class DlpLibrarySampleDetailInline(admin.StackedInline):
+    model = DlpLibrarySampleDetail
 
-class LibraryConstructionInformationInline(admin.StackedInline):
-    model = LibraryConstructionInformation
+class DlpLibraryConstructionInformationInline(admin.StackedInline):
+    model = DlpLibraryConstructionInformation
 
-class LibraryQuantificationAndStorageInline(admin.StackedInline):
-    model = LibraryQuantificationAndStorage
+class DlpLibraryQuantificationAndStorageInline(admin.StackedInline):
+    model = DlpLibraryQuantificationAndStorage
 
-class LibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
+class DlpLibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     fieldsets = [
       (
         '',
@@ -62,44 +62,43 @@ class LibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     ]
     inlines = [
       SublibraryInformationInline,
-      LibrarySampleDetailInline,
-      LibraryConstructionInformationInline,
-      LibraryQuantificationAndStorageInline
+      DlpLibrarySampleDetailInline,
+      DlpLibraryConstructionInformationInline,
+      DlpLibraryQuantificationAndStorageInline
       ]
     list_display = ['sample', 'pool_id', 'jira_ticket']
     list_filter = ['jira_ticket']
     search_fields = ['pool_id']
 
 
-## Sequencing information
-class SequencingDetailInline(admin.StackedInline):
-    model = SequencingDetail
+# Sequencing information
+class DlpSequencingDetailInline(admin.StackedInline):
+    model = DlpSequencingDetail
 
-class SequencingAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
-    inlines = [SequencingDetailInline]
+class DlpSequencingAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
+    inlines = [DlpSequencingDetailInline]
 
 
-## Tag information (Project information)
+# Tag information (Project information)
 class CustomTagAdmin(SimpleHistoryAdmin, TagAdmin):
     list_display = ['name', 'slug']
 
 
 admin.site.register(Sample, SampleAdmin)
-admin.site.register(Library, LibraryAdmin)
-admin.site.register(Sequencing, SequencingAdmin)
+admin.site.register(DlpLibrary, DlpLibraryAdmin)
+admin.site.register(DlpSequencing, DlpSequencingAdmin)
 
-## extra admin only information
+# extra admin only information
 admin.site.register(AdditionalSampleInformation)
 admin.site.register(SublibraryInformation)
-admin.site.register(LibrarySampleDetail)
-admin.site.register(LibraryConstructionInformation)
-admin.site.register(LibraryQuantificationAndStorage)
-admin.site.register(SequencingDetail)
+admin.site.register(DlpLibrarySampleDetail)
+admin.site.register(DlpLibraryConstructionInformation)
+admin.site.register(DlpLibraryQuantificationAndStorage)
+admin.site.register(DlpSequencingDetail)
 admin.site.register(ChipRegion)
 admin.site.register(ChipRegionMetadata)
 admin.site.register(MetadataField)
 
-## register Taggit
+# register Taggit
 admin.site.unregister(Tag)
 admin.site.register(Tag, CustomTagAdmin)
-

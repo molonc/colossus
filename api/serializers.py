@@ -13,12 +13,12 @@ from rest_framework import serializers
 # App imports
 #----------------------------
 from core.models import (
-    Library,
+    DlpLibrary,
     Sample,
     SublibraryInformation,
-    Sequencing,
-    SequencingDetail,
-    Lane
+    DlpSequencing,
+    DlpSequencingDetail,
+    DlpLane
 )
 
 #============================
@@ -28,7 +28,7 @@ from core.models import (
 
 class SampleSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Sample
+        model = Sample
         fields = (
             'anonymous_patient_id',
             'cell_line_id',
@@ -41,7 +41,7 @@ class SampleSerializer(serializers.ModelSerializer):
 class SublibraryInformationSerializer(serializers.ModelSerializer):
     sample_id = SampleSerializer(read_only=True)
     class Meta:
-        model=SublibraryInformation
+        model = SublibraryInformation
         fields = (
             'sample_id',
             'row',
@@ -58,7 +58,7 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
 
 class LaneSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Lane
+        model = DlpLane
         fields = (
             'sequencing',
             'flow_cell_id',
@@ -68,7 +68,7 @@ class LaneSerializer(serializers.ModelSerializer):
 
 class SequencingDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SequencingDetail
+        model = DlpSequencingDetail
         fields = (
             'gsc_library_id',
             'sequencing_center',
@@ -80,7 +80,7 @@ class SequencingSerializer(serializers.ModelSerializer):
     library = serializers.SlugRelatedField(read_only=True, slug_field='pool_id')
     lane_set = LaneSerializer(many=True, read_only=True)
     class Meta:
-        model = Sequencing
+        model = DlpSequencing
         fields = (
             'library',
             'adapter',
@@ -100,7 +100,7 @@ class LibrarySerializer(serializers.ModelSerializer):
     sublibraryinformation_set = SublibraryInformationSerializer(many=True,
         read_only=True)
     class Meta:
-        model=Library
+        model = DlpLibrary
         fields = (
             'pool_id',
             'jira_ticket',
@@ -116,7 +116,7 @@ class LibrarySerializer(serializers.ModelSerializer):
 
 class LibrarySerializerBrief(LibrarySerializer):
     class Meta:
-        model=Library
+        model = DlpLibrary
         fields = (
             'pool_id',
             'jira_ticket',

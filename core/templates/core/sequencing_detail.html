@@ -57,7 +57,7 @@ Sequencing Details
     {% if sequencing.has_sequencing_detail %}
     <table class="table-condensed">
         {% if library_type == 'dlp' %}
-            {% for field, value in sequencing.sequencingdetail.get_field_values.items %}
+            {% for field, value in sequencing.dlpsequencingdetail.get_field_values.items %}
             <tr>
                 <th id="thid">{{field}}:</th>
                 <td id="tdid" class="notes">{{value}}</td>
@@ -80,7 +80,7 @@ Sequencing Details
         {% endif %}
     </table>
     {% else %}
-    <h5><i class="text-warning">There is no sequencing details for this library!</i></h5>
+    <h5><i class="text-warning">There are no sequencing details for this library!</i></h5>
     {% endif %}
 </div><br>
 <!-- end of Sequencing Detail -->
@@ -97,9 +97,9 @@ Sequencing Details
                     <th></th>
                 </tr>
             </thead>
-    {% if sequencing.lane_set %}
+    {% if sequencing.dlplane_set %}
             <tbody>
-                {% for lane in sequencing.lane_set.all %}
+                {% for lane in sequencing.dlplane_set.all %}
                 <tr>
                     <td>{{lane.flow_cell_id}}</td>
                     <td>{{lane.path_to_archive}}</td>

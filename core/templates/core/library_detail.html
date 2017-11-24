@@ -53,6 +53,7 @@ Library Details
             <thead>
                 <tr>
                     <th>Jira ticket</th>
+                    <th>Plate number</th>
                     <th>Plate status</th>
                     <th>Plate location</th>
                     <th></th>
@@ -61,7 +62,8 @@ Library Details
             <tbody>
                 {% for plate in library.plate_set.all %}
                 <tr>
-                    <td>{{plate.jira_ticket}}</td>
+                    <td><a href="https://www.bcgsc.ca/jira/browse/{{plate.jira_ticket}}">{{plate.jira_ticket}}</a></td>
+                    <td>{{plate.plate_number}}</td>
                     <td>{{plate.plate_status}}</td>
                     <td>{{plate.plate_location}}</td>
                     <td>
@@ -87,7 +89,7 @@ Library Details
     {% if library.has_library_sample_detail %}
     <table class="table-condensed">
         {% if library_type == 'dlp' %}
-            {% for field, value in library.librarysampledetail.get_field_values.items %}
+            {% for field, value in library.dlplibrarysampledetail.get_field_values.items %}
             <tr>
                 <th id="thid">{{field}}:</th>
                 <td id="tdid" class="notes">{{value}}</td>
@@ -121,7 +123,7 @@ Library Details
     {% if library.has_library_construction_information %}
     <table class="table-condensed">
         {% if library_type == 'dlp' %}
-            {% for field, value in library.libraryconstructioninformation.get_field_values.items %}
+            {% for field, value in library.dlplibraryconstructioninformation.get_field_values.items %}
             <tr>
                 <th id="thid">{{field}}:</th>
                 <td id="tdid" class="notes">{{value}}</td>
@@ -157,21 +159,21 @@ Library Details
         {% if library_type == 'dlp' %}
             <tr>
                 <th id="thid">Library location:</th>
-                <td id="tdid">{{library.libraryquantificationandstorage.library_location}}</td>
+                <td id="tdid">{{library.dlplibraryquantificationandstorage.library_location}}</td>
             </tr>
-            {% for field, value in library.libraryquantificationandstorage.get_field_values.items %}
+            {% for field, value in library.dlplibraryquantificationandstorage.get_field_values.items %}
             <tr>
                 {% if field == "Agilent bioanalyzer xad file" and value %}
                 <th id="thid">{{field}}:</th>
                 <td id="tdid">
-                    <a href="{{library.libraryquantificationandstorage.agilent_bioanalyzer_xad.url}}">
+                    <a href="{{library.dlplibraryquantificationandstorage.agilent_bioanalyzer_xad.url}}">
                         {{value}}
                     </a>
                 </td>
                 {% elif field == "Agilent bioanalyzer image file" and value %}
                 <th id="thid">{{field}}:</th>
                 <td id="tdid">
-                    <a href="{{library.libraryquantificationandstorage.agilent_bioanalyzer_image.url}}">
+                    <a href="{{library.dlplibraryquantificationandstorage.agilent_bioanalyzer_image.url}}">
                         {{value}}
                     </a>
                 </td>
@@ -277,7 +279,7 @@ Library Details
 <!-- Sequencing Information -->
 <div class="container">
     <h4>Sequencing Information</h4>
-    {% if library.sequencing_set.all %}
+    {% if library.dlpsequencing_set.all %}
     <div class="table">
         <table class="table">
             <thead>
@@ -290,7 +292,7 @@ Library Details
                 </tr>
             </thead>
             <tbody>
-                {% for sequencing in library.sequencing_set.all %}
+                {% for sequencing in library.dlpsequencing_set.all %}
                 <tr>
                     <td><a href="{{sequencing.get_absolute_url}}">{{sequencing.library.sample.sample_id}}</a></td>
                     <td>{{sequencing.library.pool_id}}</td>

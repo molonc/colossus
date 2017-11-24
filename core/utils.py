@@ -2,6 +2,8 @@
 Created on June 6, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
+
+Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 import os, sys
@@ -14,13 +16,13 @@ from datetime import date
 #===============
 # Django imports
 #---------------
-from .models import Sample, Sequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, Lane
+from .models import Sample, DlpSequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, DlpLane
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 
 #==================================================
-# upload, parse and populate Sublibrary Information
+# Upload, parse and populate Sublibrary Information
 #--------------------------------------------------
 def read_excel_sheets(filename, sheetnames):
     """ Read the excel sheet.
@@ -39,11 +41,11 @@ def parse_smartchipapp_results_file(filename):
     """
     results, region_metadata = read_excel_sheets(filename, ['Summary', 'Region_Meta_Data'])
 
-    ## filter out the cells whose Spot_Well value is not NaN
+    # filter out the cells whose Spot_Well value is not NaN
     results = results[~results['Spot_Well'].isnull()]
     results = results.sort_values(by='Sample')
 
-    ## change the column names to match the filed names of the model
+    # change the column names to match the filed names of the model
     results.columns = [c.lower() for c in results.columns]
     region_metadata.columns = [c.lower() for c in region_metadata.columns]
 
@@ -104,7 +106,7 @@ def create_sublibrary_models(library, sublib_results, region_metadata):
     library.save()
 
 #=================
-# history manager
+# History manager
 #-----------------
 class HistoryManager(object):
 
@@ -133,7 +135,7 @@ class HistoryManager(object):
             print '-' * 100
 
 #======================
-# generate sample sheet
+# Generate sample sheet
 #----------------------
 def generate_samplesheet(pk, wdir=None):
     """generate samplesheet for the given Sequencing."""
@@ -154,7 +156,7 @@ class SampleSheet(object):
     """
 
     def __init__(self, pk):
-        self._lane = get_object_or_404(Lane, pk=pk)
+        self._lane = get_object_or_404(DlpLane, pk=pk)
         self._si = self._lane.sequencing.sequencing_instrument
         self._header = os.path.join(settings.BASE_DIR,
             "templates/template_samplesheet_header.html")
@@ -269,7 +271,7 @@ def _rc(primer):
     return res[::-1]
 
 #=============================
-# generate GSC submission form
+# Generate GSC submission form
 #-----------------------------
 def generate_gsc_form(pk, metadata):
     """generate the GSC submission form for the given library."""
@@ -296,7 +298,7 @@ class GSCForm(object):
     """
 
     def __init__(self, pk):
-        self._sequencing = get_object_or_404(Sequencing, pk=pk)
+        self._sequencing = get_object_or_404(DlpSequencing, pk=pk)
         self._library = self._sequencing.library
         self._libconst = self._library.libraryconstructioninformation
         self._libquant = self._library.libraryquantificationandstorage
@@ -599,7 +601,6 @@ class Submission(object):
         return self.worksheet
 
     def write_address_box(self, info_dict):
-        ## updated by jtaghiyar
 
         HEADER = ["Deliver/ship samples on dry ice or ice pack to:",
                   "%s" % info_dict['name'],

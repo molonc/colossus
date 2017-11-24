@@ -45,7 +45,8 @@ Summary Statistics
                     {% for s in samples %}
                     <tr>
                         <th id="thid"><a href="{% url 'core:sample_detail' pk=s.pk %}">{{s.sample_id}}:</a> </th>
-                        <td id="tdid">{{s.library_set.count}}</td>
+                        <!-- DLP specific: needs to be changed if support for other libraries is added -->
+                        <td id="tdid">{{s.dlplibrary_set.count}}</td>
                     </tr>
                     {% endfor %}
                 </table><br>

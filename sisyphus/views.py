@@ -24,15 +24,11 @@ from django.http import HttpResponseRedirect
 #----------------------------
 from core.helpers import *
 from core.models import (
-    Library,
-    SequencingDetail
+    DlpLibrary,
+    DlpSequencingDetail
 )
 from .forms import *
 from .models import *
-
-#============================
-# Other imports
-#----------------------------
 
 
 #============================
@@ -70,7 +66,7 @@ class AnalysisInformationCreate(CreateView):
     template_name='sisyphus/analysisinformation_create.html'
 
     def get_context_data(self, **kwargs):
-        library = get_object_or_404(Library, pk=kwargs.get('from_library'))
+        library = get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
         # Assigning self.object to self is required so that in the AnalysisInformationForm,
         # access to the instance of AnalysisInformation in the AnalysisInformationCreate view is possible
         self.object = AnalysisInformation()
@@ -94,7 +90,7 @@ class AnalysisInformationCreate(CreateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
-        self.library=get_object_or_404(Library, pk=kwargs.get('from_library'))
+        self.library=get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)
@@ -135,7 +131,7 @@ class AnalysisInformationUpdate(UpdateView):
 
     def get_context_data(self, **kwargs):
         self.object = get_object_or_404(AnalysisInformation, pk=kwargs.get('analysis_pk'))
-        self.library = get_object_or_404(Library, pk=kwargs.get('library_pk'))
+        self.library = get_object_or_404(DlpLibrary, pk=kwargs.get('library_pk'))
         context = super(AnalysisInformationUpdate, self).get_context_data()
         context.update({'analysisinformation':self.object,
                         'library':self.library})
@@ -151,7 +147,7 @@ class AnalysisInformationUpdate(UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = get_object_or_404(AnalysisInformation, pk=kwargs.get('analysis_pk'))
-        self.library = get_object_or_404(Library, pk=kwargs.get('library_pk'))
+        self.library = get_object_or_404(DlpLibrary, pk=kwargs.get('library_pk'))
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)
@@ -195,6 +191,6 @@ class AnalysisInformationDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(AnalysisInformationDetailView, self).get_context_data(**kwargs)
         instance_sequencings = context['object'].sequencings.all()
-        context['library']=Library.objects.filter(sequencing__in=instance_sequencings).distinct()[0]
+        context['library']=DlpLibrary.objects.filter(sequencing__in=instance_sequencings).distinct()[0]
         context['analysisrun']=context['object'].analysisrun
         return context

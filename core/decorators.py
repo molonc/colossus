@@ -21,10 +21,9 @@ class Render(object):
         # @functools.wraps(func)
         def wrapper(request, *args, **kwargs):
             res = func(request, *args, **kwargs)
-            ## render it only if the response is a context dictionary
+            # render it only if the response is a context dictionary
             if isinstance(res, dict):
                 return render(request, self.template, res)
             else:
                 return res
         return wrapper
-

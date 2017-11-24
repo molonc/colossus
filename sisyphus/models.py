@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 #============================
 # App imports
 #----------------------------
-from core.models import Sequencing
+from core.models import DlpSequencing
 from core.helpers import *
 
 
@@ -41,17 +41,17 @@ class AnalysisInformation(models.Model, FieldValue):
     fields_to_exclude=['ID']
     values_to_exclude=['id']
 
-    ## database relationships
-    sequencings = models.ManyToManyField(Sequencing)
+    # database relationships
+    sequencings = models.ManyToManyField(DlpSequencing)
 
-    ## choices
+    # choices
     priority_level_choices = (
         ('L', 'Low'),
         ('M', 'Medium'),
         ('H', 'High'),
     )
 
-    ## fields
+    # fields
     priority_level = create_chrfield(
         "Priority Level",
         choices=priority_level_choices,
@@ -81,10 +81,10 @@ class AnalysisRun(models.Model):
     Analysis/workflow details filled in or changed by database admin
     """
 
-    ## database relationships
+    # database relationships
     analysis_information = models.OneToOneField(AnalysisInformation)
 
-    ## choices
+    # choices
     run_status_choices = (
         ('W', 'Waiting to be reviewed/submitted'),
         ('R', 'Running'),
@@ -93,7 +93,7 @@ class AnalysisRun(models.Model):
         ('A', 'Archiving'),
     )
 
-    ## fields
+    # fields
     analysis_submission_date = models.DateField(
         "Analysis start date/time",
         null=True,

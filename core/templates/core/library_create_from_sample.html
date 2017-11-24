@@ -48,6 +48,7 @@ Create Library
                 </thead>
             </table>
          </fieldset><br>
+         {% if library_type == 'dlp' %}
          <fieldset>
             <legend>Sublibrary Information</legend>
             <table class="table-condensed">
@@ -56,6 +57,7 @@ Create Library
                 </thead>
             </table>
          </fieldset><br>
+         {% endif %}
          <fieldset>
             <legend>Library Sample Details</legend>
             <table class="table-condensed">

@@ -3,12 +3,14 @@ Created on May 16, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 
-Updated Nov 16, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
+Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 import os
 import collections
 import subprocess
+
+
 #============================
 # Django imports
 #----------------------------
@@ -27,19 +29,20 @@ from django.conf import settings
 from django.utils import timezone
 from itertools import chain
 
+
 #============================
 # App imports
 #----------------------------
 from .helpers import Render
 from .models import (
     Sample,
-    Library,
-    Sequencing,
+    DlpLibrary,
+    DlpSequencing,
     PbalLibrary,
     PbalSequencing,
     TenxLibrary,
     TenxSequencing,
-    Lane,
+    DlpLane,
     PbalLane,
     TenxLane,
     SublibraryInformation,
@@ -47,17 +50,17 @@ from .models import (
     ChipRegionMetadata,
     MetadataField,
     Plate
-    )
+)
 from sisyphus.models import *
 from .forms import (
     SampleForm, 
     AdditionalSampleInfoInlineFormset,
-    LibraryForm,
+    DlpLibraryForm,
     PbalLibraryForm,
     TenxLibraryForm,
-    LibrarySampleDetailInlineFormset,
-    LibraryConstructionInfoInlineFormset,
-    LibraryQuantificationAndStorageInlineFormset,
+    DlpLibrarySampleDetailInlineFormset,
+    DlpLibraryConstructionInfoInlineFormset,
+    DlpLibraryQuantificationAndStorageInlineFormset,
     PbalLibrarySampleDetailInlineFormset,
     PbalLibraryConstructionInfoInlineFormset,
     PbalLibraryQuantificationAndStorageInlineFormset,
@@ -65,37 +68,39 @@ from .forms import (
     TenxLibraryConstructionInfoInlineFormset,
     TenxLibraryQuantificationAndStorageInlineFormset,
     SublibraryForm,
-    SequencingForm,
-    SequencingDetailInlineFormset,
+    DlpSequencingForm,
+    DlpSequencingDetailInlineFormset,
     PbalSequencingForm,
     PbalSequencingDetailInlineFormset,
     TenxSequencingForm,
     TenxSequencingDetailInlineFormset,
-    LaneForm,
+    DlpLaneForm,
     PbalLaneForm,
     TenxLaneForm,
     GSCFormDeliveryInfo,
     GSCFormSubmitterInfo,
     ProjectForm,
     PlateForm
-    )
+)
 from .utils import (
     create_sublibrary_models,
     generate_samplesheet,
     generate_gsc_form,
-    )
+)
+
 
 #============================
 # 3rd-party app imports
 #----------------------------
 from taggit.models import Tag
 
+
 #============================
 # Helpers
 #----------------------------
 def get_libraries(self):
-    return list(chain(Library.objects.filter(projects__name=self.name), PbalLibrary.objects.filter(projects__name=self.name), TenxLibrary.objects.filter(projects__name=self.name)))
-## add a method to get the list of libraries for each project name
+    return list(chain(DlpLibrary.objects.filter(projects__name=self.name), PbalLibrary.objects.filter(projects__name=self.name), TenxLibrary.objects.filter(projects__name=self.name)))
+# add a method to get the list of libraries for each project name
 Tag.get_libraries = get_libraries
 
 
@@ -106,8 +111,8 @@ Tag.get_libraries = get_libraries
 def index_view(request):
     context = {
     'sample_size': Sample.objects.count(),
-    'dlp_library_size': Library.objects.count(),
-    'dlp_sequencing_size': Sequencing.objects.count(),
+    'dlp_library_size': DlpLibrary.objects.count(),
+    'dlp_sequencing_size': DlpSequencing.objects.count(),
     'pbal_library_size': PbalLibrary.objects.count(),
     'pbal_sequencing_size': PbalSequencing.objects.count(),
     'tenx_library_size': TenxLibrary.objects.count(),
@@ -128,6 +133,7 @@ def sample_list(request):
     context = {'samples': samples}
     return context
 
+
 @Render("core/sample_detail.html")
 def sample_detail(request, pk):
     """sample detail page."""
@@ -138,7 +144,7 @@ def sample_detail(request, pk):
         'library_list': library_list
     }
     return context
-            
+         
 
 @method_decorator(login_required, name='dispatch')
 class SampleCreate(TemplateView):
@@ -226,18 +232,20 @@ def sample_delete(request, pk):
     }
     return context
 
+
 #============================
 # Library views
 #----------------------------
 @Render("core/library_list.html")
 def dlp_library_list(request):
     """list of libraries."""
-    libraries = Library.objects.all().order_by('pool_id')
+    libraries = DlpLibrary.objects.all().order_by('pool_id')
     context = {
         'libraries': libraries, 
         'library_type': 'dlp',
     }
     return context
+
 
 @Render("core/library_list.html")
 def pbal_library_list(request):
@@ -249,6 +257,7 @@ def pbal_library_list(request):
     }
     return context
 
+
 @Render("core/library_list.html")
 def tenx_library_list(request):
     """list of libraries."""
@@ -259,11 +268,12 @@ def tenx_library_list(request):
     }
     return context
 
+
 @Render("core/library_detail.html")
 def dlp_library_detail(request, pk):
     """library detail page."""
-    library = get_object_or_404(Library, pk=pk)
-    analyses = AnalysisInformation.objects.filter(sequencings__in=library.sequencing_set.all()).distinct()
+    library = get_object_or_404(DlpLibrary, pk=pk)
+    analyses = AnalysisInformation.objects.filter(sequencings__in=library.dlpsequencing_set.all()).distinct()
     sublibinfo = SublibraryInformation()
     fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
     metadata_dict = collections.OrderedDict()
@@ -294,6 +304,7 @@ def dlp_library_detail(request, pk):
     }
     return context
 
+
 @Render("core/library_detail.html")
 def pbal_library_detail(request, pk):
     """library detail page."""
@@ -308,11 +319,12 @@ def pbal_library_detail(request, pk):
     }
     return context
 
+
 @Render("core/library_detail.html")
 def tenx_library_detail(request, pk):
     """library detail page."""
     library = get_object_or_404(TenxLibrary, pk=pk)
-    # sisyphus integration not implemented yet for tenx
+    # sisyphus integration not implemented yet for 10x
     # analyses = AnalysisInformation.objects.filter(sequencings__in=library.tenxsequencing_set.all()).distinct()
 
     context = {
@@ -322,11 +334,12 @@ def tenx_library_detail(request, pk):
     }
     return context
 
+
 @Render("core/library_delete.html")
 @login_required()
 def dlp_library_delete(request, pk):
     """library delete page."""
-    library = get_object_or_404(Library, pk=pk)
+    library = get_object_or_404(DlpLibrary, pk=pk)
 
     if request.method == 'POST':
         library.delete()
@@ -340,6 +353,7 @@ def dlp_library_delete(request, pk):
         'library_type': 'dlp',
     }
     return context
+
 
 @Render("core/library_delete.html")
 @login_required()
@@ -360,6 +374,7 @@ def pbal_library_delete(request, pk):
     }
     return context
 
+
 @Render("core/library_delete.html")
 @login_required()
 def tenx_library_delete(request, pk):
@@ -378,7 +393,8 @@ def tenx_library_delete(request, pk):
         'library_type': 'tenx',
     }
     return context
-            
+
+
 @method_decorator(login_required, name='dispatch')
 class DlpLibraryCreate(TemplateView):
 
@@ -394,15 +410,15 @@ class DlpLibraryCreate(TemplateView):
         else:
             sample = None
         context = {
-            'lib_form': LibraryForm(),
+            'lib_form': DlpLibraryForm(),
             'sublib_form': SublibraryForm(),
-            'libdetail_formset': LibrarySampleDetailInlineFormset(),
-            'libcons_formset': LibraryConstructionInfoInlineFormset(),
-            'libqs_formset': LibraryQuantificationAndStorageInlineFormset(),
+            'libdetail_formset': DlpLibrarySampleDetailInlineFormset(),
+            'libcons_formset': DlpLibraryConstructionInfoInlineFormset(),
+            'libqs_formset': DlpLibraryQuantificationAndStorageInlineFormset(),
             'projects': [t.name for t in Tag.objects.all()],
             'sample': str(sample),
             'sample_id': from_sample,
-            'related_libs': Library.objects.all(),
+            'related_libs': DlpLibrary.objects.all(),
             'library_type': 'dlp',
         }
         return context
@@ -416,11 +432,11 @@ class DlpLibraryCreate(TemplateView):
         return self._post(request, context, *args, **kwargs)
 
     def _post(self, request, context, *args, **kwargs):
-        ## this is becaues of this django feature:
-        ## https://code.djangoproject.com/ticket/1130
+        # this is becaues of this django feature:
+        # https://code.djangoproject.com/ticket/1130
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
 
-        lib_form = LibraryForm(request.POST, instance=kwargs.get('library', None))
+        lib_form = DlpLibraryForm(request.POST, instance=kwargs.get('library', None))
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
@@ -462,15 +478,15 @@ class DlpLibraryCreate(TemplateView):
     def _validate_formsets(self, request, instance):
         all_valid = True
         formsets = {
-        'libdetail_formset': LibrarySampleDetailInlineFormset(
+        'libdetail_formset': DlpLibrarySampleDetailInlineFormset(
             request.POST,
             instance=instance
             ),
-        'libcons_formset': LibraryConstructionInfoInlineFormset(
+        'libcons_formset': DlpLibraryConstructionInfoInlineFormset(
             request.POST,
             instance=instance
             ),
-        'libqs_formset': LibraryQuantificationAndStorageInlineFormset(
+        'libqs_formset': DlpLibraryQuantificationAndStorageInlineFormset(
             request.POST,
             request.FILES or None,
             instance=instance
@@ -505,7 +521,7 @@ class PbalLibraryCreate(TemplateView):
             'projects': [t.name for t in Tag.objects.all()],
             'sample': str(sample),
             'sample_id': from_sample,
-            'related_libs': Library.objects.all(),
+            'related_libs': DlpLibrary.objects.all(),
             'library_type': 'pbal',
         }
         return context
@@ -519,8 +535,8 @@ class PbalLibraryCreate(TemplateView):
         return self._post(request, context, *args, **kwargs)
 
     def _post(self, request, context, *args, **kwargs):
-        ## this is becaues of this django feature:
-        ## https://code.djangoproject.com/ticket/1130
+        # this is becaues of this django feature:
+        # https://code.djangoproject.com/ticket/1130
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
 
         lib_form = PbalLibraryForm(request.POST, instance=kwargs.get('library', None))
@@ -599,7 +615,7 @@ class TenxLibraryCreate(TemplateView):
             'projects': [t.name for t in Tag.objects.all()],
             'sample': str(sample),
             'sample_id': from_sample,
-            'related_libs': Library.objects.all(),
+            'related_libs': DlpLibrary.objects.all(),
             'library_type': 'tenx',
         }
         return context
@@ -613,8 +629,8 @@ class TenxLibraryCreate(TemplateView):
         return self._post(request, context, *args, **kwargs)
 
     def _post(self, request, context, *args, **kwargs):
-        ## this is becaues of this django feature:
-        ## https://code.djangoproject.com/ticket/1130
+        # this is becaues of this django feature:
+        # https://code.djangoproject.com/ticket/1130
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
 
         lib_form = TenxLibraryForm(request.POST, instance=kwargs.get('library', None))
@@ -680,25 +696,25 @@ class DlpLibraryUpdate(DlpLibraryCreate):
     template_name = "core/library_update.html"
 
     def get_context_data(self, pk):
-        library = get_object_or_404(Library, pk=pk)
+        library = get_object_or_404(DlpLibrary, pk=pk)
         selected_projects = library.projects.names()
         selected_related_libs = library.relates_to.only()
         context = {
         'pk': pk,
-        'lib_form': LibraryForm(instance=library),
+        'lib_form': DlpLibraryForm(instance=library),
         'sublib_form': SublibraryForm(),
-        'libdetail_formset': LibrarySampleDetailInlineFormset(
+        'libdetail_formset': DlpLibrarySampleDetailInlineFormset(
             instance=library
             ),
-        'libcons_formset': LibraryConstructionInfoInlineFormset(
+        'libcons_formset': DlpLibraryConstructionInfoInlineFormset(
             instance=library
             ),
-        'libqs_formset': LibraryQuantificationAndStorageInlineFormset(
+        'libqs_formset': DlpLibraryQuantificationAndStorageInlineFormset(
             instance=library
             ),
         'projects': [t.name for t in Tag.objects.all()],
         'selected_projects': selected_projects,
-        'related_libs': Library.objects.all(),
+        'related_libs': DlpLibrary.objects.all(),
         'selected_related_libs': selected_related_libs,
         'library_type': 'dlp',
         }
@@ -710,7 +726,7 @@ class DlpLibraryUpdate(DlpLibraryCreate):
 
     def post(self, request, pk, *args, **kwargs):
         context = self.get_context_data(pk)
-        library = get_object_or_404(Library, pk=pk)
+        library = get_object_or_404(DlpLibrary, pk=pk)
         return self._post(request, context, *args, library=library, **kwargs)
 
 
@@ -740,7 +756,7 @@ class PbalLibraryUpdate(PbalLibraryCreate):
             ),
         'projects': [t.name for t in Tag.objects.all()],
         'selected_projects': selected_projects,
-        'related_libs': Library.objects.all(),
+        'related_libs': DlpLibrary.objects.all(),
         'selected_related_libs': selected_related_libs,
         'library_type': 'pbal',
         }
@@ -782,7 +798,7 @@ class TenxLibraryUpdate(TenxLibraryCreate):
             ),
         'projects': [t.name for t in Tag.objects.all()],
         'selected_projects': selected_projects,
-        'related_libs': Library.objects.all(),
+        'related_libs': DlpLibrary.objects.all(),
         'selected_related_libs': selected_related_libs,
         'library_type': 'tenx',
         }
@@ -808,6 +824,7 @@ def project_list(request):
     context = {'projects': projects}
     return context
 
+
 @Render("core/project_delete.html")
 @login_required()
 def project_delete(request, pk):
@@ -825,6 +842,7 @@ def project_delete(request, pk):
         'pk': pk
     }
     return context
+
 
 @Render("core/project_update.html")
 @login_required()
@@ -848,76 +866,20 @@ def project_update(request, pk):
     }
     return context
 
+
 #============================
 # Sequencing views
 #----------------------------
 @Render("core/sequencing_list.html")
 def dlp_sequencing_list(request):
     """list of sequencings."""
-    sequencings = Sequencing.objects.all().order_by('library')
+    sequencings = DlpSequencing.objects.all().order_by('library')
     context = {
         'sequencings': sequencings,
         'library_type': 'dlp',
     }
     return context
 
-@Render("core/sequencing_detail.html")
-def dlp_sequencing_detail(request, pk):
-    """sequencing detail page."""
-    sequencing = get_object_or_404(Sequencing, pk=pk)
-    key = "gsc_form_metadata_%s" % pk
-    download = False
-    if key in request.session.keys():
-        download = True
-    context = {
-        'sequencing': sequencing,
-        'download': download,
-        'library_type': 'dlp',
-    }
-    return context
-            
-@Render("core/sequencing_create.html")
-@login_required()
-def dlp_sequencing_create(request, from_library=None):
-    """sequencing create page."""
-    if from_library:
-        library = get_object_or_404(Library, pk=from_library)
-    else:
-        library = None
-    if request.method == 'POST':
-        form = SequencingForm(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            form.save_m2m()
-            seqdetail_formset = SequencingDetailInlineFormset(
-                request.POST,
-                instance=instance
-                )
-            if seqdetail_formset.is_valid():
-                seqdetail_formset.save()
-
-            msg = "Successfully created the Sequencing."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
-        else:
-            msg = "Failed to create the sequencing. Please fix the errors below."
-            messages.error(request, msg)
-            seqdetail_formset = SequencingDetailInlineFormset()
-    
-    else:
-        form = SequencingForm()
-        seqdetail_formset = SequencingDetailInlineFormset()
-
-    context = {
-        'form': form,
-        'seqdetail_formset': seqdetail_formset,
-        'library': str(library),
-        'library_id': from_library,
-        'related_seqs': Sequencing.objects.all(),
-        'library_type': 'dlp',
-        }
-    return context
 
 @Render("core/sequencing_list.html")
 def pbal_sequencing_list(request):
@@ -928,6 +890,34 @@ def pbal_sequencing_list(request):
         'library_type': 'pbal',
     }
     return context
+
+
+@Render("core/sequencing_list.html")
+def tenx_sequencing_list(request):
+    """list of sequencings."""
+    sequencings = TenxSequencing.objects.all().order_by('library')
+    context = {
+        'sequencings': sequencings,
+        'library_type': 'tenx',
+    }
+    return context
+
+
+@Render("core/sequencing_detail.html")
+def dlp_sequencing_detail(request, pk):
+    """sequencing detail page."""
+    sequencing = get_object_or_404(DlpSequencing, pk=pk)
+    key = "gsc_form_metadata_%s" % pk
+    download = False
+    if key in request.session.keys():
+        download = True
+    context = {
+        'sequencing': sequencing,
+        'download': download,
+        'library_type': 'dlp',
+    }
+    return context
+
 
 @Render("core/sequencing_detail.html")
 def pbal_sequencing_detail(request, pk):
@@ -943,6 +933,67 @@ def pbal_sequencing_detail(request, pk):
         'library_type': 'pbal',
     }
     return context
+
+
+@Render("core/sequencing_detail.html")
+def tenx_sequencing_detail(request, pk):
+    """sequencing detail page."""
+    sequencing = get_object_or_404(TenxSequencing, pk=pk)
+    key = "gsc_form_metadata_%s" % pk
+    download = False
+    if key in request.session.keys():
+        download = True
+    context = {
+        'sequencing': sequencing,
+        'download': download,
+        'library_type': 'tenx',
+    }
+    return context
+            
+
+@Render("core/sequencing_create.html")
+@login_required()
+def dlp_sequencing_create(request, from_library=None):
+    """sequencing create page."""
+    if from_library:
+        library = get_object_or_404(DlpLibrary, pk=from_library)
+    else:
+        library = None
+    if request.method == 'POST':
+        form = DlpSequencingForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.save()
+            form.save_m2m()
+            seqdetail_formset = DlpSequencingDetailInlineFormset(
+                request.POST,
+                instance=instance
+                )
+            if seqdetail_formset.is_valid():
+                seqdetail_formset.save()
+
+            msg = "Successfully created the Sequencing."
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.get_absolute_url())
+        else:
+            msg = "Failed to create the sequencing. Please fix the errors below."
+            messages.error(request, msg)
+            seqdetail_formset = DlpSequencingDetailInlineFormset()
+    
+    else:
+        form = DlpSequencingForm()
+        seqdetail_formset = DlpSequencingDetailInlineFormset()
+
+    context = {
+        'form': form,
+        'seqdetail_formset': seqdetail_formset,
+        'library': str(library),
+        'library_id': from_library,
+        'related_seqs': DlpSequencing.objects.all(),
+        'library_type': 'dlp',
+    }
+    return context
+
 
 @Render("core/sequencing_create.html")
 @login_required()
@@ -987,30 +1038,6 @@ def pbal_sequencing_create(request, from_library=None):
         }
     return context
 
-@Render("core/sequencing_list.html")
-def tenx_sequencing_list(request):
-    """list of sequencings."""
-    sequencings = TenxSequencing.objects.all().order_by('library')
-    context = {
-        'sequencings': sequencings,
-        'library_type': 'tenx',
-    }
-    return context
-
-@Render("core/sequencing_detail.html")
-def tenx_sequencing_detail(request, pk):
-    """sequencing detail page."""
-    sequencing = get_object_or_404(TenxSequencing, pk=pk)
-    key = "gsc_form_metadata_%s" % pk
-    download = False
-    if key in request.session.keys():
-        download = True
-    context = {
-        'sequencing': sequencing,
-        'download': download,
-        'library_type': 'tenx',
-    }
-    return context
 
 @Render("core/sequencing_create.html")
 @login_required()
@@ -1055,18 +1082,19 @@ def tenx_sequencing_create(request, from_library=None):
     }
     return context
 
+
 @Render("core/sequencing_update.html")
 @login_required()
 def dlp_sequencing_update(request, pk):
     """sequencing update page."""
-    sequencing = get_object_or_404(Sequencing, pk=pk)
+    sequencing = get_object_or_404(DlpSequencing, pk=pk)
     if request.method == 'POST':
-        form = SequencingForm(request.POST, instance=sequencing)
+        form = DlpSequencingForm(request.POST, instance=sequencing)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
             form.save_m2m()
-            seqdetail_formset = SequencingDetailInlineFormset(
+            seqdetail_formset = DlpSequencingDetailInlineFormset(
                 request.POST,
                 instance=instance
                 )                        
@@ -1079,15 +1107,15 @@ def dlp_sequencing_update(request, pk):
         else:
             msg = "Failed to update the sequencing. Please fix the errors below."
             messages.error(request, msg)
-            seqdetail_formset = SequencingDetailInlineFormset(
+            seqdetail_formset = DlpSequencingDetailInlineFormset(
                 instance=sequencing
                 )
     
     else:
-        form = SequencingForm(
+        form = DlpSequencingForm(
             instance=sequencing
             )
-        seqdetail_formset = SequencingDetailInlineFormset(
+        seqdetail_formset = DlpSequencingDetailInlineFormset(
             instance=sequencing
             )
 
@@ -1096,11 +1124,12 @@ def dlp_sequencing_update(request, pk):
         'pk': pk,
         'form': form,
         'seqdetail_formset': seqdetail_formset,
-        'related_seqs': Sequencing.objects.all(),
+        'related_seqs': DlpSequencing.objects.all(),
         'selected_related_seqs': selected_related_seqs,
         'library_type': 'dlp',
         }
     return context
+
 
 @Render("core/sequencing_update.html")
 @login_required()
@@ -1149,6 +1178,7 @@ def pbal_sequencing_update(request, pk):
     }
     return context
 
+
 @Render("core/sequencing_update.html")
 @login_required()
 def tenx_sequencing_update(request, pk):
@@ -1196,11 +1226,12 @@ def tenx_sequencing_update(request, pk):
     }
     return context
 
+
 @Render("core/sequencing_delete.html")
 @login_required()
 def dlp_sequencing_delete(request, pk):
     """sequencing delete page."""
-    sequencing = get_object_or_404(Sequencing, pk=pk)
+    sequencing = get_object_or_404(DlpSequencing, pk=pk)
 
     if request.method == 'POST':
         sequencing.delete()
@@ -1214,6 +1245,7 @@ def dlp_sequencing_delete(request, pk):
         'library_type': 'dlp',
     }
     return context
+
 
 @Render("core/sequencing_delete.html")
 @login_required()
@@ -1234,6 +1266,7 @@ def pbal_sequencing_delete(request, pk):
     }
     return context
 
+
 @Render("core/sequencing_delete.html")
 @login_required()
 def tenx_sequencing_delete(request, pk):
@@ -1253,6 +1286,7 @@ def tenx_sequencing_delete(request, pk):
     }
     return context
 
+
 def dlp_sequencing_get_samplesheet(request, pk):
     """generate downloadable samplesheet."""
     ofilename, ofilepath = generate_samplesheet(pk)
@@ -1264,16 +1298,18 @@ def dlp_sequencing_get_samplesheet(request, pk):
     os.remove(ofilepath)
     return response
 
+
 def dlp_sequencing_get_queried_samplesheet(request, pool_id, flowcell):
     """ make downloading samplesheets from flowcell possible """
 
     try:
-        pk = Lane.objects.get(flow_cell_id=flowcell, sequencing__library__pool_id=pool_id).pk
+        pk = DlpLane.objects.get(flow_cell_id=flowcell, sequencing__library__pool_id=pool_id).pk
         return dlp_sequencing_get_samplesheet(request, pk)
-    except Sequencing.DoesNotExist:
+    except DlpSequencing.DoesNotExist:
         msg = "Sorry, no sequencing with flowcell {} and chip id {} found.".format(flowcell, pool_id)
         messages.warning(request, msg)
         return HttpResponseRedirect(reverse('index'))
+
 
 @method_decorator(login_required, name='dispatch')
 class DlpSequencingCreateGSCFormView(TemplateView):
@@ -1298,7 +1334,7 @@ class DlpSequencingCreateGSCFormView(TemplateView):
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
-        sequencing = get_object_or_404(Sequencing, pk=pk)
+        sequencing = get_object_or_404(DlpSequencing, pk=pk)
         context = self.get_context_data(pk)
         delivery_info_form = GSCFormDeliveryInfo(request.POST)
         submitter_info_form = GSCFormSubmitterInfo(request.POST)
@@ -1315,6 +1351,7 @@ class DlpSequencingCreateGSCFormView(TemplateView):
             messages.error(request, msg)
         return render(request, self.template_name, context)
 
+
 def dlp_sequencing_get_gsc_form(request, pk):
     """generate downloadable GSC submission form."""
     key = "gsc_form_metadata_%s" % pk
@@ -1328,20 +1365,20 @@ def dlp_sequencing_get_gsc_form(request, pk):
     os.remove(ofilepath)
     return response
 
+
 #============================
 # Lane views
 #----------------------------
-
 @Render("core/lane_create.html")
 @login_required()
 def dlp_lane_create(request, from_sequencing=None):
     """lane create page."""
     if from_sequencing:
-        sequencing = get_object_or_404(Sequencing, pk=from_sequencing)
+        sequencing = get_object_or_404(DlpSequencing, pk=from_sequencing)
     else:
         sequencing = None
     if request.method == 'POST':
-        form = LaneForm(request.POST)
+        form = DlpLaneForm(request.POST)
         if form.is_valid():
             instance = form.save()
             msg = "Successfully created the lane."
@@ -1351,7 +1388,7 @@ def dlp_lane_create(request, from_sequencing=None):
             msg = "Failed to create the lane. Please fix the errors below."
             messages.error(request, msg)
     else:
-        form = LaneForm()
+        form = DlpLaneForm()
 
     context = {
         'form': form,
@@ -1361,55 +1398,6 @@ def dlp_lane_create(request, from_sequencing=None):
     }
     return context
 
-@Render("core/lane_update.html")
-@login_required()
-def dlp_lane_update(request, pk):
-    """lane update page."""
-    lane = get_object_or_404(Lane, pk=pk)
-
-    if request.method == 'POST':
-        form = LaneForm(request.POST, instance=lane)
-        if form.is_valid():
-            instance = form.save()
-            msg = "Successfully updated the lane."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.sequencing.get_absolute_url())
-        else:
-            msg = "Failed to update the lane. Please fix the errors below."
-            messages.error(request, msg)
-
-    else:
-        form = LaneForm(instance=lane)
-
-    context = {
-        'form': form,
-        'sequencing': lane.sequencing,
-        'sequencing_id': lane.sequencing_id,
-        'pk': pk,
-        'library_type': 'dlp',
-    }
-    return context
-
-@Render("core/lane_delete.html")
-@login_required()
-def dlp_lane_delete(request, pk):
-    """lane delete page."""
-    lane = get_object_or_404(Lane, pk=pk)
-    sequencing = lane.sequencing
-
-    if request.method == 'POST':
-        lane.delete()
-        msg = "Successfully deleted the Lane."
-        messages.success(request, msg)
-        return HttpResponseRedirect(sequencing.get_absolute_url())
-
-    context = {
-        'lane': lane,
-        'pk': pk,
-        'sequencing_id': sequencing.id,
-        'library_type': 'dlp',
-    }
-    return context
 
 @Render("core/lane_create.html")
 @login_required()
@@ -1440,55 +1428,6 @@ def pbal_lane_create(request, from_sequencing=None):
     }
     return context
 
-@Render("core/lane_update.html")
-@login_required()
-def pbal_lane_update(request, pk):
-    """lane update page."""
-    lane = get_object_or_404(PbalLane, pk=pk)
-
-    if request.method == 'POST':
-        form = PbalLaneForm(request.POST, instance=lane)
-        if form.is_valid():
-            instance = form.save()
-            msg = "Successfully updated the lane."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.sequencing.get_absolute_url())
-        else:
-            msg = "Failed to update the lane. Please fix the errors below."
-            messages.error(request, msg)
-
-    else:
-        form = PbalLaneForm(instance=lane)
-
-    context = {
-        'form': form,
-        'sequencing': lane.sequencing,
-        'sequencing_id': lane.sequencing_id,
-        'pk': pk,
-        'library_type': 'pbal',
-    }
-    return context
-
-@Render("core/lane_delete.html")
-@login_required()
-def pbal_lane_delete(request, pk):
-    """lane delete page."""
-    lane = get_object_or_404(PbalLane, pk=pk)
-    sequencing = lane.sequencing
-
-    if request.method == 'POST':
-        lane.delete()
-        msg = "Successfully deleted the Lane."
-        messages.success(request, msg)
-        return HttpResponseRedirect(sequencing.get_absolute_url())
-
-    context = {
-        'lane': lane,
-        'pk': pk,
-        'sequencing_id': sequencing.id,
-        'library_type': 'pbal',
-    }
-    return context
 
 @Render("core/lane_create.html")
 @login_required()
@@ -1519,6 +1458,67 @@ def tenx_lane_create(request, from_sequencing=None):
     }
     return context
 
+
+@Render("core/lane_update.html")
+@login_required()
+def dlp_lane_update(request, pk):
+    """lane update page."""
+    lane = get_object_or_404(DlpLane, pk=pk)
+
+    if request.method == 'POST':
+        form = DlpLaneForm(request.POST, instance=lane)
+        if form.is_valid():
+            instance = form.save()
+            msg = "Successfully updated the lane."
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.sequencing.get_absolute_url())
+        else:
+            msg = "Failed to update the lane. Please fix the errors below."
+            messages.error(request, msg)
+
+    else:
+        form = DlpLaneForm(instance=lane)
+
+    context = {
+        'form': form,
+        'sequencing': lane.sequencing,
+        'sequencing_id': lane.sequencing_id,
+        'pk': pk,
+        'library_type': 'dlp',
+    }
+    return context
+
+
+@Render("core/lane_update.html")
+@login_required()
+def pbal_lane_update(request, pk):
+    """lane update page."""
+    lane = get_object_or_404(PbalLane, pk=pk)
+
+    if request.method == 'POST':
+        form = PbalLaneForm(request.POST, instance=lane)
+        if form.is_valid():
+            instance = form.save()
+            msg = "Successfully updated the lane."
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.sequencing.get_absolute_url())
+        else:
+            msg = "Failed to update the lane. Please fix the errors below."
+            messages.error(request, msg)
+
+    else:
+        form = PbalLaneForm(instance=lane)
+
+    context = {
+        'form': form,
+        'sequencing': lane.sequencing,
+        'sequencing_id': lane.sequencing_id,
+        'pk': pk,
+        'library_type': 'pbal',
+    }
+    return context
+
+
 @Render("core/lane_update.html")
 @login_required()
 def tenx_lane_update(request, pk):
@@ -1548,6 +1548,51 @@ def tenx_lane_update(request, pk):
     }
     return context
 
+
+@Render("core/lane_delete.html")
+@login_required()
+def dlp_lane_delete(request, pk):
+    """lane delete page."""
+    lane = get_object_or_404(DlpLane, pk=pk)
+    sequencing = lane.sequencing
+
+    if request.method == 'POST':
+        lane.delete()
+        msg = "Successfully deleted the Lane."
+        messages.success(request, msg)
+        return HttpResponseRedirect(sequencing.get_absolute_url())
+
+    context = {
+        'lane': lane,
+        'pk': pk,
+        'sequencing_id': sequencing.id,
+        'library_type': 'dlp',
+    }
+    return context
+
+
+@Render("core/lane_delete.html")
+@login_required()
+def pbal_lane_delete(request, pk):
+    """lane delete page."""
+    lane = get_object_or_404(PbalLane, pk=pk)
+    sequencing = lane.sequencing
+
+    if request.method == 'POST':
+        lane.delete()
+        msg = "Successfully deleted the Lane."
+        messages.success(request, msg)
+        return HttpResponseRedirect(sequencing.get_absolute_url())
+
+    context = {
+        'lane': lane,
+        'pk': pk,
+        'sequencing_id': sequencing.id,
+        'library_type': 'pbal',
+    }
+    return context
+
+
 @Render("core/lane_delete.html")
 @login_required()
 def tenx_lane_delete(request, pk):
@@ -1569,10 +1614,10 @@ def tenx_lane_delete(request, pk):
     }
     return context
 
+
 #============================
 # Plate views
 #----------------------------
-
 @Render("core/plate_create.html")
 @login_required()
 def plate_create(request, from_library=None):
@@ -1601,6 +1646,7 @@ def plate_create(request, from_library=None):
     }
     return context
 
+
 @Render("core/plate_update.html")
 @login_required()
 def plate_update(request, pk):
@@ -1628,6 +1674,7 @@ def plate_update(request, pk):
     }
     return context
 
+
 @Render("core/plate_delete.html")
 @login_required()
 def plate_delete(request, pk):
@@ -1648,6 +1695,7 @@ def plate_delete(request, pk):
     }
     return context
 
+
 #============================
 # Search view
 #----------------------------
@@ -1655,19 +1703,19 @@ def search_view(request):
     query_str = request.GET.get('query_str')
     instance = None
 
-    ## search for samples
+    # search for samples
     if Sample.objects.filter(sample_id=query_str):
         instance = Sample.objects.filter(sample_id=query_str)[0]
 
-    ## search for dlp libraries
-    elif Library.objects.filter(pool_id=query_str):
-        instance = Library.objects.filter(pool_id=query_str)[0]
+    # search for dlp libraries
+    elif DlpLibrary.objects.filter(pool_id=query_str):
+        instance = DlpLibrary.objects.filter(pool_id=query_str)[0]
 
-    ## search for jira ticket associated with dlp library
-    elif Library.objects.filter(jira_ticket=query_str):
-        instance = Library.objects.filter(jira_ticket=query_str)[0]
+    # search for jira ticket associated with dlp library
+    elif DlpLibrary.objects.filter(jira_ticket=query_str):
+        instance = DlpLibrary.objects.filter(jira_ticket=query_str)[0]
 
-    ## search for jira ticket associated with tenx library
+    # search for jira ticket associated with tenx library
     elif TenxLibrary.objects.filter(jira_ticket=query_str):
         instance = TenxLibrary.objects.filter(jira_ticket=query_str)[0]
 
@@ -1678,13 +1726,14 @@ def search_view(request):
         messages.warning(request, msg)
         return HttpResponseRedirect(reverse('index'))
 
+
 #============================
 # Summary view
 #----------------------------
 @Render("core/summary.html")
 def dlp_summary_view(request):
 
-    library_per_sample_count = {s.sample_id : s.library_set.count()
+    library_per_sample_count = {s.sample_id : s.dlplibrary_set.count()
                     for s in Sample.objects.all()}
 
     sublibrary_per_sample_count = { s.sample_id : s.sublibraryinformation_set.count()
@@ -1694,11 +1743,12 @@ def dlp_summary_view(request):
         'library_per_sample': library_per_sample_count,
         'sublibrary_per_sample': sublibrary_per_sample_count,
         'total_sublibs': SublibraryInformation.objects.count(),
-        'total_libs': Library.objects.count(),
+        'total_libs': DlpLibrary.objects.count(),
         'samples':Sample.objects.all().order_by('sample_id')
     }
 
     return context
+
 
 def dlp_get_filtered_sublib_count(sublibs):
     unfiltered_count = sublibs.count()
@@ -1710,10 +1760,11 @@ def dlp_get_filtered_sublib_count(sublibs):
     filtered_count = unfiltered_count - blankwells_count
     return filtered_count
 
+
 def dlp_get_cell_graph(request):
 
     data = []
-    libs = Library.objects.filter(sequencing__isnull=False, sublibraryinformation__isnull=False).distinct()
+    libs = DlpLibrary.objects.filter(sequencing__isnull=False, sublibraryinformation__isnull=False).distinct()
 
     for lib in libs:
         lib_info = {}

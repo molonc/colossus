@@ -3,7 +3,7 @@ Created on May 31, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 
-Updated Nov 7, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
+Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 from collections import OrderedDict
@@ -29,7 +29,7 @@ class Render(object):
         # @functools.wraps(func)
         def wrapper(request, *args, **kwargs):
             res = func(request, *args, **kwargs)
-            ## render it only if the response is a context dictionary
+            # render it only if the response is a context dictionary
             if isinstance(res, dict):
                 return render(request, self.template, res)
             else:
@@ -92,7 +92,6 @@ def upload_path(instance, filename):
 class FieldValue(object):
     fields_to_exclude = ['ID']
     values_to_exclude = ['id']
-    # model = models.Model
 
     def get_fields(self):
         """get verbose names of all the fields."""
@@ -130,9 +129,6 @@ class FieldValue(object):
 
 
 class LibraryAssistant(object):
-    # def __init__(self, object):
-    #     self.object = object
-
     gsc_required_fields = [
         (
             "sample",
@@ -185,24 +181,24 @@ class LibraryAssistant(object):
         ]
 
     def has_library_sample_detail(self):
-        if self.__class__.__name__ == 'Library':
-            return hasattr(self, 'librarysampledetail')
+        if self.__class__.__name__ == 'DlpLibrary':
+            return hasattr(self, 'dlplibrarysampledetail')
         elif self.__class__.__name__ == 'PbalLibrary':
             return hasattr(self, 'pballibrarysampledetail')
         elif self.__class__.__name__ == 'TenxLibrary':
             return hasattr(self, 'tenxlibrarysampledetail')
 
     def has_library_construction_information(self):
-        if self.__class__.__name__ == 'Library':
-            return hasattr(self, 'libraryconstructioninformation')
+        if self.__class__.__name__ == 'DlpLibrary':
+            return hasattr(self, 'dlplibraryconstructioninformation')
         elif self.__class__.__name__ == 'PbalLibrary':
             return hasattr(self, 'pballibraryconstructioninformation')
         elif self.__class__.__name__ == 'TenxLibrary':
             return hasattr(self, 'tenxlibraryconstructioninformation')
 
     def has_library_quantification_and_storage(self):
-        if self.__class__.__name__ == 'Library':
-            return hasattr(self, 'libraryquantificationandstorage')
+        if self.__class__.__name__ == 'DlpLibrary':
+            return hasattr(self, 'dlplibraryquantificationandstorage')
         elif self.__class__.__name__ == 'PbalLibrary':
             return hasattr(self, 'pballibraryquantificationandstorage')
         elif self.__class__.__name__ == 'TenxLibrary':
@@ -220,7 +216,7 @@ class LibraryAssistant(object):
             field_verbose_name = i[3]
             try:
                 value = get_value(related_obj, field)
-            ## self might not have the related_obj yet.
+            # self might not have the related_obj yet.
             except:
                 missing_required_fields.append(
                     (obj_verbose_name, field_verbose_name)
@@ -232,8 +228,8 @@ class LibraryAssistant(object):
         return missing_required_fields
 
     def is_sequenced(self):
-        if self.__class__.__name__ == 'Library':
-            return any([s.lane_set.filter(path_to_archive__isnull=False) for s in self.sequencing_set.all()])
+        if self.__class__.__name__ == 'DlpLibrary':
+            return any([s.dlplane_set.filter(path_to_archive__isnull=False) for s in self.dlpsequencing_set.all()])
         elif self.__class__.__name__ == 'PbalLibrary':
             return any([s.pballane_set.filter(path_to_archive__isnull=False) for s in self.pbalsequencing_set.all()])
         elif self.__class__.__name__ == 'TenxLibrary':

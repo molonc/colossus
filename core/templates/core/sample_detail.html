@@ -41,7 +41,7 @@ Sample Details
 <div class="container">
     <div class="table">
         <table class="table">
-            {% if sample.library_set.all %}
+            {% if sample.dlplibrary_set.all %}
             <thead>
                 <tr><th><h4>DLP Library Information</h4></th><th></th><th></th></tr>
                 <tr>
@@ -51,7 +51,7 @@ Sample Details
                 </tr>
             </thead>
             <tbody>
-                {% for library in sample.library_set.all %}
+                {% for library in sample.dlplibrary_set.all %}
                 <tr>
                     <td><a href="{{library.get_absolute_url}}">{{library.pool_id}}</a></td>
                     <td>{{library.jira_ticket}}</td>
@@ -60,11 +60,7 @@ Sample Details
                 {% endfor %}
             </tbody>
             {% else %}
-            <tbody>
-                <tr>
-                    <td><h5><i class="text-warning">There is no dlp library information for this sample!</i></h5></td>
-                </tr>
-            </tbody>
+            <tr><h5><i class="text-warning">There is no dlp library information for this sample!</i></h5></tr>
             {% endif %}
             {% if sample.pballibrary_set.all %}
             <thead>
@@ -85,11 +81,7 @@ Sample Details
                 {% endfor %}
             </tbody>
             {% else %}
-            <tbody>
-                <tr>
-                    <td><h5><i class="text-warning">There is no pbal library information for this sample!</i></h5></td>
-                </tr>
-            </tbody>
+            <tr><h5><i class="text-warning">There is no pbal library information for this sample!</i></h5></tr>
             {% endif %}
             {% if sample.tenxlibrary_set.all %}
             <thead>
@@ -110,16 +102,12 @@ Sample Details
                 {% endfor %}
             </tbody>
             {% else %}
-            <tbody>
-                <tr>
-                    <td><h5><i class="text-warning">There is no tenx library information for this sample!</i></h5></td>
-                </tr>
-            </tbody>
+            <tr><h5><i class="text-warning">There is no 10x library information for this sample!</i></h5></tr>
             {% endif %}
         </table>
     </div>
     {% for library in library_list %}
-    <a href="{% url library|add:':library_create_from_sample' from_sample=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i>Add {{library|upper}} Library</a></p>
+    <a href="{% url library|add:':library_create_from_sample' from_sample=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i>{% if library == 'tenx' %} Add 10x Library {% else %} Add {{library|upper}} Library {% endif %}</a></p>
     {% endfor %}
 </div><br>
 <!-- end of Library Information -->

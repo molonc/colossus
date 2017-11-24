@@ -3,7 +3,7 @@ Created on May 16, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 
-Updated Nov 16, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
+Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 from __future__ import unicode_literals
@@ -199,10 +199,10 @@ class AdditionalSampleInformation(models.Model, FieldValue):
 #============================
 # Library models
 #----------------------------
-class Library(models.Model, FieldValue, LibraryAssistant):
+class DlpLibrary(models.Model, FieldValue, LibraryAssistant):
 
     """
-    Library contains several Cell objects.
+    DLP library contains several Cell objects.
     """
 
     class Meta:
@@ -217,6 +217,7 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     # Taggit
     projects = TaggableManager(
         verbose_name="Project",
+        related_name="Library",
         help_text="A comma-separated list of project names.",
         blank=True,
     )
@@ -262,10 +263,11 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     def __str__(self):
         return 'LIB_' + self.get_library_id()
 
+
 class PbalLibrary(models.Model, FieldValue, LibraryAssistant):
     
     """
-    Library contains several Cell objects.
+    PBAL library contains several Cell objects.
     """
 
     class Meta:
@@ -295,7 +297,7 @@ class PbalLibrary(models.Model, FieldValue, LibraryAssistant):
     description = create_textfield("Description")
     result = create_textfield("Result")
     relates_to = models.ManyToManyField(
-        Library,
+        DlpLibrary,
         verbose_name="Relates to",
         null=True,
         blank=True,
@@ -310,10 +312,11 @@ class PbalLibrary(models.Model, FieldValue, LibraryAssistant):
     def __str__(self):
         return 'LIB_' + self.get_library_id()
     
+
 class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     
     """
-    Library contains several Cell objects.
+    10x library contains several Cell objects.
     """
 
     class Meta:
@@ -351,7 +354,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     description = create_textfield("Description")
     result = create_textfield("Result")
     relates_to = models.ManyToManyField(
-        Library,
+        DlpLibrary,
         verbose_name="Relates to",
         null=True,
         blank=True,
@@ -366,10 +369,11 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     def __str__(self):
         return 'LIB_' + self.get_library_id()
 
+
 class ChipRegion(models.Model, FieldValue):
 
     """
-    Region code for a sublibrary
+    Region code for a sublibrary. DLP only.
     """
 
     fields_to_exclude = ['ID', 'Library']
@@ -377,22 +381,22 @@ class ChipRegion(models.Model, FieldValue):
 
     # database relationships
     library = models.ForeignKey(
-        Library,
+        DlpLibrary,
         verbose_name='Library',
         on_delete=models.CASCADE,
     )
 
-    # fields
     region_code = create_chrfield("region_code")
 
     def __str__(self):
         return "{}".format(self.region_code)
 
+
 class SublibraryInformation(models.Model, FieldValue):
 
     """
     Sublibrary Information from the SmartChipApp output file.
-    It's technically a table of cell information.
+    It's technically a table of cell information. DLP only.
     """
 
     fields_to_exclude = ['ID', 'Library', 'Sample_ID', 'Chip_Region']
@@ -400,7 +404,7 @@ class SublibraryInformation(models.Model, FieldValue):
 
     # database relationships
     library = models.ForeignKey(
-        Library,
+        DlpLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
     )
@@ -457,10 +461,12 @@ class SublibraryInformation(models.Model, FieldValue):
 
 
 class MetadataField(models.Model):
+    
     """
     Keeps track of the metadata fields used, and allows ease of creating but still controlling
-    added new fields in table.
+    added new fields in table. DLP only.
     """
+    
     field = create_chrfield(
         "Metadata key",
         blank=False,
@@ -474,14 +480,13 @@ class MetadataField(models.Model):
 class ChipRegionMetadata(models.Model, FieldValue):
 
     """
-    Library/Sublibrary Metadata
+    Library/Sublibrary Metadata. DLP only.
     """
 
     fields_to_exclude = ['ID', 'Chip_Region']
     values_to_exclude = ['id', 'chip_region']
 
     # database relationships
-
     chip_region = models.ForeignKey(
         ChipRegion,
         verbose_name="Chip_Region",
@@ -494,7 +499,6 @@ class ChipRegionMetadata(models.Model, FieldValue):
         on_delete=models.CASCADE,
     )
 
-    # fields
     metadata_value = create_chrfield("Metadata value")
 
     def __str__(self):
@@ -506,28 +510,23 @@ class ChipRegionMetadata(models.Model, FieldValue):
             )
 
 
-class LibrarySampleDetail(models.Model, FieldValue):
+class DlpLibrarySampleDetail(models.Model, FieldValue):
 
     """
-    Library sample details.
+    DLP Library sample details.
     """
 
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
-    # track history
-    # history = HistoricalRecords(
-    #     table_name='history_library_sample_detail'
-    #     )
-
     # database relationships
     library = models.OneToOneField(
-        Library,
+        DlpLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
         null=True,
         blank=True
-        )
+    )
 
     # choices 
     cell_state_choices = (
@@ -535,31 +534,31 @@ class LibrarySampleDetail(models.Model, FieldValue):
         ('N','Nuclei'),
         ('M','Mixed'),
         ('U','Unknown'),
-        )
+    )
 
     spotting_location_choices = (
         ('A','Aparicio Lab'),
         ('H','Hansen Lab'),
         ('G','GSC'),
-        )
+    )
 
     # fields
     cell_state = create_chrfield(
         "Cell state",
         choices=cell_state_choices
-        )
+    )
     estimated_percent_viability = create_intfield(
         "Estimated percent viability",
-        )
+    )
     label_of_original_sample_vial = create_chrfield(
         "Label of original sample vial"
-        )
+    )
     lims_vial_barcode = create_chrfield(
         "LIMS vial barcode"
     )
     original_storage_temperature = create_intfield(
         "Original storage temperature (C)",
-        )
+    )
     passage_of_cell_line  = create_intfield("Passage")
     sample_notes = create_textfield("Sample notes")
     sample_preparation_method = create_textfield("Sample preparation method")
@@ -568,195 +567,11 @@ class LibrarySampleDetail(models.Model, FieldValue):
         "Sample spot date",
         null=True,
         blank=True,
-        )
+    )
     spotting_location = create_chrfield(
         "Spotting location",
-        choices=spotting_location_choices
-        )
-
-
-class LibraryConstructionInformation(models.Model, FieldValue):
-
-    """
-    Library construction information.
-    """
-
-    fields_to_exclude = ['ID', 'Library']
-    values_to_exclude = ['id', 'library']
-
-    # track history
-    # history = HistoricalRecords(
-    #     table_name='history_library_construction_information'
-    #     )
-
-    # database relationships
-    library = models.OneToOneField(
-        Library,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-        )
-
-    # choices 
-    chip_format_choices = (
-        ('W','Wafergen'),
-        ('M','Microfluidic'),
-        ('B','Bulk'),
-        ('O','Other'),
-        )
-
-    spotting_location_choices = (
-        ('A','Aparicio Lab'),
-        ('H','Hansen Lab'),
-        ('G','GSC'),
-        )
-
-    # fields
-    chip_format = create_chrfield(
-        "Chip format",
-        choices=chip_format_choices,
-        default="W"
-        )
-    library_construction_method = create_chrfield(
-        "Library construction method",
-        default="Nextera (Illumina)"
-        )
-    library_type = create_chrfield(
-        "Library type",
-        default="genome"
-        )
-    library_notes = create_textfield("Library notes")
-    library_prep_date = models.DateField(
-        "Library prep date",
-        null=True,
-        blank=True,
-        )
-    number_of_pcr_cycles = create_intfield(
-        "Number of PCR cycles",
-        )
-    protocol = create_textfield("Protocol")
-    spotting_location = create_chrfield(
-        "Spotting location",
-        choices=spotting_location_choices
-        )
-
-
-class LibraryQuantificationAndStorage(models.Model, FieldValue):
-
-    """
-    Library quantification and storage.
-    """
-
-    fields_to_exclude = [
-    'ID',
-    'Library',
-    'Freezer',
-    'Rack',
-    'Shelf',
-    'Box',
-    'Position in box'
-    ]
-
-    values_to_exclude = [
-    'id',
-    'library',
-    'freezer',
-    'rack',
-    'shelf',
-    'box',
-    'position_in_box'
-    ]
-
-    # track history
-    # history = HistoricalRecords(
-    #     table_name='history_library_quantification_and_storage'
-    #     )
-
-    # database relationships
-    library = models.OneToOneField(
-        Library,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-        )
-
-    # choices
-    qc_check_choices = (
-        ('P','Will sequence'),
-        ('N','Will not sequence'),
-        )
-
-    # fields
-    average_size = create_intfield("Average size (bp)")
-    dna_concentration_nm = models.DecimalField(
-        "DNA concentration (nM)",
-        max_digits=6,
-        decimal_places=3,
-        null=True,
-        blank=True
-        )
-    dna_concentration_ngul = models.DecimalField(
-        "DNA concentration (ng/uL)",
-        max_digits=6,
-        decimal_places=3,
-        null=True,
-        blank=True
-        )
-    dna_volume = create_chrfield("DNA volume (uL)")
-    freezer = create_chrfield(
-        "Freezer",
-        # default="UL1",
-        )
-    rack = create_intfield("Rack")
-    shelf = create_intfield("Shelf")
-    box = create_intfield("Box")
-    position_in_box = create_intfield("Position in box")
-    library_tube_label = create_chrfield("Library tube label")
-    qc_check = create_chrfield(
-        "QC check",
-        choices=qc_check_choices
-        )
-    qc_notes = create_textfield("QC notes")
-    quantification_method = create_chrfield(
-        "Quantification method",
-        default="Bioanalyzer"
-        )
-    size_range = create_chrfield("Size range (bp)")
-    size_selection_method = create_chrfield(
-        "Size selection method",
-        default="AmpureXP"
-        )
-    storage_medium = create_chrfield(
-        "Storage medium", 
-        default="TE 10:0.1"
-        )
-    agilent_bioanalyzer_xad = models.FileField(
-        "Agilent bioanalyzer xad file",
-        upload_to=upload_path,
-        max_length=200,
-        null=True,
-        blank=True
-        )
-    agilent_bioanalyzer_image = models.FileField(
-        "Agilent bioanalyzer image file",
-        upload_to=upload_path,
-        max_length=200,
-        null=True,
-        blank=True
-        )
-
-    def library_location(self):
-        loc = None
-        if self.freezer:
-            loc = '_'.join([
-                'CRC',
-                self.freezer,
-                str(self.rack) + ':' + str(self.shelf),
-                str(self.box) + ':' + str(self.position_in_box),
-                ])
-        return loc
+        choices=spotting_location_choices,
+    )
 
 
 class PbalLibrarySampleDetail(models.Model, FieldValue):
@@ -775,7 +590,7 @@ class PbalLibrarySampleDetail(models.Model, FieldValue):
         on_delete=models.CASCADE,
         null=True,
         blank=True
-        )
+    )
 
     # choices 
     cell_state_choices = (
@@ -783,7 +598,7 @@ class PbalLibrarySampleDetail(models.Model, FieldValue):
         ('N','Nuclei'),
         ('M','Mixed'),
         ('U','Unknown'),
-        )
+    )
 
     spotting_location_choices = (
         ('A','Aparicio Lab'),
@@ -822,97 +637,6 @@ class PbalLibrarySampleDetail(models.Model, FieldValue):
         "Spotting location",
         choices=spotting_location_choices
         )
-
-
-class PbalLibraryConstructionInformation(models.Model, FieldValue):
-
-    """
-    Library construction information.
-    """
-
-    fields_to_exclude = ['ID', 'Library']
-    values_to_exclude = ['id', 'library']
-
-    # database relationships
-    library = models.OneToOneField(
-        PbalLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-        )
-
-    # fields
-    format = create_chrfield(
-        "Format",
-        default="384-well plate"
-        )
-    library_construction_method = create_chrfield(
-        "Library construction method",
-        default="pbal"
-        )
-    library_type = create_chrfield(
-        "Library type",
-        default="methylome"
-        )
-    library_prep_date = models.DateField(
-        "Library prep date",
-        null=True,
-        blank=True,
-        )
-    library_prep_location = create_chrfield(
-        "Library prep location",
-        default="Hirst Lab"
-        )
-
-
-class PbalLibraryQuantificationAndStorage(models.Model, FieldValue):
-
-    """
-    Library quantification and storage.
-    """
-
-    fields_to_exclude = [
-    'ID',
-    'Library',
-    'Freezer',
-    'Rack',
-    'Shelf',
-    'Box',
-    'Position in box'
-    ]
-
-    values_to_exclude = [
-    'id',
-    'library',
-    'freezer',
-    'rack',
-    'shelf',
-    'box',
-    'position_in_box'
-    ]
-
-    # database relationships
-    library = models.OneToOneField(
-        PbalLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-        )
-
-    # choices
-    qc_check_choices = (
-        ('P','Will sequence'),
-        ('N','Will not sequence'),
-        )
-
-    # fields
-    qc_check = create_chrfield(
-        "QC check",
-        choices=qc_check_choices
-        )
-    qc_notes = create_textfield("QC notes")
 
 
 class TenxLibrarySampleDetail(models.Model, FieldValue):
@@ -973,6 +697,110 @@ class TenxLibrarySampleDetail(models.Model, FieldValue):
     )
 
 
+class DlpLibraryConstructionInformation(models.Model, FieldValue):
+
+    """
+    Library construction information.
+    """
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
+    # database relationships
+    library = models.OneToOneField(
+        DlpLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+        )
+
+    # choices 
+    chip_format_choices = (
+        ('W','Wafergen'),
+        ('M','Microfluidic'),
+        ('B','Bulk'),
+        ('O','Other'),
+        )
+
+    spotting_location_choices = (
+        ('A','Aparicio Lab'),
+        ('H','Hansen Lab'),
+        ('G','GSC'),
+        )
+
+    # fields
+    chip_format = create_chrfield(
+        "Chip format",
+        choices=chip_format_choices,
+        default="W"
+        )
+    library_construction_method = create_chrfield(
+        "Library construction method",
+        default="Nextera (Illumina)"
+        )
+    library_type = create_chrfield(
+        "Library type",
+        default="genome"
+        )
+    library_notes = create_textfield("Library notes")
+    library_prep_date = models.DateField(
+        "Library prep date",
+        null=True,
+        blank=True,
+        )
+    number_of_pcr_cycles = create_intfield(
+        "Number of PCR cycles",
+        )
+    protocol = create_textfield("Protocol")
+    spotting_location = create_chrfield(
+        "Spotting location",
+        choices=spotting_location_choices
+        )
+
+
+class PbalLibraryConstructionInformation(models.Model, FieldValue):
+
+    """
+    Library construction information.
+    """
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
+    # database relationships
+    library = models.OneToOneField(
+        PbalLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+        )
+
+    # fields
+    format = create_chrfield(
+        "Format",
+        default="384-well plate"
+        )
+    library_construction_method = create_chrfield(
+        "Library construction method",
+        default="pbal"
+        )
+    library_type = create_chrfield(
+        "Library type",
+        default="methylome"
+        )
+    submission_date = models.DateField(
+        "Submission date",
+        null=True,
+        blank=True,
+        )
+    library_prep_location = create_chrfield(
+        "Library prep location",
+        default="Hirst Lab"
+        )
+
+
 class TenxLibraryConstructionInformation(models.Model, FieldValue):
 
     """
@@ -1008,14 +836,14 @@ class TenxLibraryConstructionInformation(models.Model, FieldValue):
     # fields
     library_construction_method = create_chrfield(
         "Library construction method",
-        default="10X Genomics"
+        default="10x Genomics"
         )
     library_type = create_chrfield(
         "Library type",
         default="transciptome"
         )
-    library_prep_date = models.DateField(
-        "Library prep date",
+    submission_date = models.DateField(
+        "Submission date",
         null=True,
         blank=True,
         )
@@ -1023,6 +851,165 @@ class TenxLibraryConstructionInformation(models.Model, FieldValue):
         "Library prep location",
         default="UBC-BRC"
     )
+
+
+class DlpLibraryQuantificationAndStorage(models.Model, FieldValue):
+
+    """
+    Library quantification and storage.
+    """
+
+    fields_to_exclude = [
+    'ID',
+    'Library',
+    'Freezer',
+    'Rack',
+    'Shelf',
+    'Box',
+    'Position in box'
+    ]
+
+    values_to_exclude = [
+    'id',
+    'library',
+    'freezer',
+    'rack',
+    'shelf',
+    'box',
+    'position_in_box'
+    ]
+
+    library = models.OneToOneField(
+        DlpLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+        )
+
+    # choices
+    qc_check_choices = (
+        ('P','Will sequence'),
+        ('N','Will not sequence'),
+        )
+
+    # fields
+    average_size = create_intfield("Average size (bp)")
+    dna_concentration_nm = models.DecimalField(
+        "DNA concentration (nM)",
+        max_digits=6,
+        decimal_places=3,
+        null=True,
+        blank=True
+        )
+    dna_concentration_ngul = models.DecimalField(
+        "DNA concentration (ng/uL)",
+        max_digits=6,
+        decimal_places=3,
+        null=True,
+        blank=True
+        )
+    dna_volume = create_chrfield("DNA volume (uL)")
+    freezer = create_chrfield(
+        "Freezer",
+        )
+    rack = create_intfield("Rack")
+    shelf = create_intfield("Shelf")
+    box = create_intfield("Box")
+    position_in_box = create_intfield("Position in box")
+    library_tube_label = create_chrfield("Library tube label")
+    qc_check = create_chrfield(
+        "QC check",
+        choices=qc_check_choices
+        )
+    qc_notes = create_textfield("QC notes")
+    quantification_method = create_chrfield(
+        "Quantification method",
+        default="Bioanalyzer"
+        )
+    size_range = create_chrfield("Size range (bp)")
+    size_selection_method = create_chrfield(
+        "Size selection method",
+        default="AmpureXP"
+        )
+    storage_medium = create_chrfield(
+        "Storage medium", 
+        default="TE 10:0.1"
+        )
+    agilent_bioanalyzer_xad = models.FileField(
+        "Agilent bioanalyzer xad file",
+        upload_to=upload_path,
+        max_length=200,
+        null=True,
+        blank=True
+        )
+    agilent_bioanalyzer_image = models.FileField(
+        "Agilent bioanalyzer image file",
+        upload_to=upload_path,
+        max_length=200,
+        null=True,
+        blank=True
+        )
+
+    def library_location(self):
+        loc = None
+        if self.freezer:
+            loc = '_'.join([
+                'CRC',
+                self.freezer,
+                str(self.rack) + ':' + str(self.shelf),
+                str(self.box) + ':' + str(self.position_in_box),
+                ])
+        return loc
+
+
+class PbalLibraryQuantificationAndStorage(models.Model, FieldValue):
+
+    """
+    Library quantification and storage.
+    """
+
+    fields_to_exclude = [
+    'ID',
+    'Library',
+    'Freezer',
+    'Rack',
+    'Shelf',
+    'Box',
+    'Position in box'
+    ]
+
+    values_to_exclude = [
+    'id',
+    'library',
+    'freezer',
+    'rack',
+    'shelf',
+    'box',
+    'position_in_box'
+    ]
+
+    # database relationships
+    library = models.OneToOneField(
+        PbalLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+        )
+
+    # choices
+    qc_check_choices = (
+        ('P','Will sequence'),
+        ('N','Will not sequence'),
+        )
+
+    # fields
+    qc_check = create_chrfield(
+        "QC check",
+        choices=qc_check_choices
+        )
+    qc_notes = create_textfield("QC notes")
     
 
 class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
@@ -1077,7 +1064,7 @@ class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
 #============================
 # Sequencing models
 #----------------------------
-class Sequencing(models.Model, FieldValue):
+class DlpSequencing(models.Model, FieldValue):
 
     """
     Sequencing information.
@@ -1093,7 +1080,7 @@ class Sequencing(models.Model, FieldValue):
 
     # database relationships
     library = models.ForeignKey(
-        Library,
+        DlpLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
         )
@@ -1148,22 +1135,21 @@ class Sequencing(models.Model, FieldValue):
         )
     read1_length = create_intfield(
         "Read1 length",
-        default=125,
+        default=150,
         )
     read2_length = create_intfield(
         "Read2 length",
-        default=125
+        default=150,
         )
     sequencing_goal = create_chrfield("Sequencing goal (# lanes)")
     sequencing_instrument = create_chrfield(
         "Sequencing instrument",
         choices=sequencing_instrument_choices,
-        default="H2500"
+        default="HX"
         )
     sequencing_output_mode = create_chrfield(
         "Sequencing output mode",
         choices=sequencing_output_mode_choices,
-        # default="Low"
         )
     short_description_of_submission = create_chrfield(
         "Short description of submission",
@@ -1185,13 +1171,14 @@ class Sequencing(models.Model, FieldValue):
 
     def has_sequencing_detail(self):
         return hasattr(self,
-            'sequencingdetail')
+            'dlpsequencingdetail')
 
     def get_absolute_url(self):
         return reverse("dlp:sequencing_detail", kwargs={"pk": self.pk})
 
     def __str__(self):
         return 'SEQ_' + self.library.get_library_id()
+
 
 class PbalSequencing(models.Model, FieldValue):
 
@@ -1262,17 +1249,17 @@ class PbalSequencing(models.Model, FieldValue):
         )
     read1_length = create_intfield(
         "Read1 length",
-        default=125,
+        default=150,
         )
     read2_length = create_intfield(
         "Read2 length",
-        default=125
+        default=150,
         )
     sequencing_goal = create_chrfield("Sequencing goal (# lanes)")
     sequencing_instrument = create_chrfield(
         "Sequencing instrument",
         choices=sequencing_instrument_choices,
-        default="H2500"
+        default="HX"
         )
     sequencing_output_mode = create_chrfield(
         "Sequencing output mode",
@@ -1377,17 +1364,17 @@ class TenxSequencing(models.Model, FieldValue):
         )
     read1_length = create_intfield(
         "Read1 length",
-        default=125,
+        default=150,
         )
     read2_length = create_intfield(
         "Read2 length",
-        default=125
+        default=150,
         )
     sequencing_goal = create_chrfield("Sequencing goal (# lanes)")
     sequencing_instrument = create_chrfield(
         "Sequencing instrument",
         choices=sequencing_instrument_choices,
-        default="H2500"
+        default="HX"
         )
     sequencing_output_mode = create_chrfield(
         "Sequencing output mode",
@@ -1422,7 +1409,7 @@ class TenxSequencing(models.Model, FieldValue):
         return 'SEQ_' + self.library.get_library_id()
 
 
-class SequencingDetail(models.Model, FieldValue):
+class DlpSequencingDetail(models.Model, FieldValue):
 
     """
     Sequencing details.
@@ -1431,14 +1418,9 @@ class SequencingDetail(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Sequencing']
     values_to_exclude = ['id', 'sequencing']
 
-    # track history
-    # history = HistoricalRecords(
-    #     table_name='history_sequencing_detail'
-    #     )
-
     # database relationships
     sequencing = models.OneToOneField(
-        Sequencing,
+        DlpSequencing,
         verbose_name="Sequencing",
         on_delete=models.CASCADE,
         null=True,
@@ -1452,24 +1434,6 @@ class SequencingDetail(models.Model, FieldValue):
         default="BCCAGSC"
         )
     sequencer_notes = create_textfield("Sequencing notes")
-
-
-class Lane(models.Model, FieldValue):
-    """
-    Lane information.
-    """
-
-    fields_to_exclude = ['ID', 'Lane']
-    values_to_exclude = ['id', 'lane']
-
-    sequencing = models.ForeignKey(
-        Sequencing,
-        verbose_name="Sequencing",
-        on_delete=models.CASCADE)
-
-    flow_cell_id = create_chrfield("Flow cell/Lane ID", null=False, blank=False)
-
-    path_to_archive = create_chrfield("Path to archive", max_length=150)
 
 
 class PbalSequencingDetail(models.Model, FieldValue):
@@ -1499,25 +1463,6 @@ class PbalSequencingDetail(models.Model, FieldValue):
     sequencer_notes = create_textfield("Sequencing notes")
 
 
-class PbalLane(models.Model, FieldValue):
-    
-    """
-    Lane information.
-    """
-
-    fields_to_exclude = ['ID', 'Lane']
-    values_to_exclude = ['id', 'lane']
-
-    sequencing = models.ForeignKey(
-        PbalSequencing,
-        verbose_name="Sequencing",
-        on_delete=models.CASCADE)
-
-    flow_cell_id = create_chrfield("Flow cell/Lane ID", null=False, blank=False)
-
-    path_to_archive = create_chrfield("Path to archive", max_length=150)
-
-
 class TenxSequencingDetail(models.Model, FieldValue):
 
     """
@@ -1545,6 +1490,44 @@ class TenxSequencingDetail(models.Model, FieldValue):
     sequencer_notes = create_textfield("Sequencing notes")
 
 
+class DlpLane(models.Model, FieldValue):
+    
+    """
+    Lane information.
+    """
+
+    fields_to_exclude = ['ID', 'Lane']
+    values_to_exclude = ['id', 'lane']
+
+    sequencing = models.ForeignKey(
+        DlpSequencing,
+        verbose_name="Sequencing",
+        on_delete=models.CASCADE)
+
+    flow_cell_id = create_chrfield("Flow cell/Lane ID", null=False, blank=False)
+
+    path_to_archive = create_chrfield("Path to archive", max_length=150)
+
+
+class PbalLane(models.Model, FieldValue):
+    
+    """
+    Lane information.
+    """
+
+    fields_to_exclude = ['ID', 'Lane']
+    values_to_exclude = ['id', 'lane']
+
+    sequencing = models.ForeignKey(
+        PbalSequencing,
+        verbose_name="Sequencing",
+        on_delete=models.CASCADE)
+
+    flow_cell_id = create_chrfield("Flow cell/Lane ID", null=False, blank=False)
+
+    path_to_archive = create_chrfield("Path to archive", max_length=150)
+
+
 class TenxLane(models.Model, FieldValue):
     
     """
@@ -1562,6 +1545,7 @@ class TenxLane(models.Model, FieldValue):
     flow_cell_id = create_chrfield("Flow cell/Lane ID", null=False, blank=False)
 
     path_to_archive = create_chrfield("Path to archive", max_length=150)
+
 
 class Plate(models.Model, FieldValue):
     
@@ -1588,6 +1572,7 @@ class Plate(models.Model, FieldValue):
 
     # fields
     jira_ticket = create_chrfield("Jira ticket", null=False, blank=False)
+    plate_number = create_intfield("Plate number")
     plate_status = create_chrfield(
         "Plate status",
         choices=plate_type_choices

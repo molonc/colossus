@@ -33,26 +33,26 @@ from django.forms.extras.widgets import SelectDateWidget
 from .models import (
     Sample,
     AdditionalSampleInformation,
-    Library,
+    DlpLibrary,
     PbalLibrary,
     TenxLibrary,
     SublibraryInformation,
-    LibrarySampleDetail,
-    LibraryConstructionInformation,
-    LibraryQuantificationAndStorage,
+    DlpLibrarySampleDetail,
+    DlpLibraryConstructionInformation,
+    DlpLibraryQuantificationAndStorage,
     PbalLibrarySampleDetail,
     PbalLibraryConstructionInformation,
     PbalLibraryQuantificationAndStorage,
     TenxLibrarySampleDetail,
     TenxLibraryConstructionInformation,
     TenxLibraryQuantificationAndStorage,
-    Sequencing,
-    SequencingDetail,
+    DlpSequencing,
+    DlpSequencingDetail,
     PbalSequencing,
     PbalSequencingDetail,
     TenxSequencing,
     TenxSequencingDetail,
-    Lane,
+    DlpLane,
     PbalLane,
     TenxLane,
     Plate
@@ -133,9 +133,9 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 #===========================
 # Library forms
 #---------------------------
-class LibraryForm(ModelForm):
+class DlpLibraryForm(ModelForm):
     class Meta:
-        model = Library
+        model = DlpLibrary
         exclude = ['num_sublibraries']
         labels = {
             'primary sample': ('*Sample'),
@@ -151,9 +151,9 @@ class LibraryForm(ModelForm):
     def clean(self):
         # if it's a new instance, the pool_id should not exist.
         if not self.instance.pk:
-            cleaned_data = super(LibraryForm, self).clean()
+            cleaned_data = super(DlpLibraryForm, self).clean()
             pool_id = cleaned_data.get("pool_id")
-            if len(Library.objects.filter(pool_id=pool_id)):
+            if len(DlpLibrary.objects.filter(pool_id=pool_id)):
                 msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
 
@@ -202,19 +202,19 @@ class SublibraryForm(Form):
             except Exception as e:
                 self.add_error('smartchipapp_results_file', 'failed to parse the file.')
 
-class LibraryQuantificationAndStorageForm(ModelForm):
+class DlpLibraryQuantificationAndStorageForm(ModelForm):
 
     """
     Clean uploaded files.
     """
 
     class Meta:
-        model = LibraryQuantificationAndStorage
+        model = DlpLibraryQuantificationAndStorage
         fields = "__all__"
 
     def clean(self):
         """if Freezer specified, so should Rack,Shelf,Box,Positoin in box."""
-        cleaned_data = super(LibraryQuantificationAndStorageForm, self).clean()
+        cleaned_data = super(DlpLibraryQuantificationAndStorageForm, self).clean()
         freezer = cleaned_data.get('freezer')
         if freezer != '':
             if cleaned_data.get('rack') is None:
@@ -260,9 +260,9 @@ class LibraryQuantificationAndStorageForm(ModelForm):
         get validated and saved."""
         return True
 
-LibrarySampleDetailInlineFormset = inlineformset_factory(
-    Library,
-    LibrarySampleDetail,
+DlpLibrarySampleDetailInlineFormset = inlineformset_factory(
+    DlpLibrary,
+    DlpLibrarySampleDetail,
     form = SaveDefault,
     fields = "__all__",
     widgets = {
@@ -273,9 +273,9 @@ LibrarySampleDetailInlineFormset = inlineformset_factory(
     }
 )
 
-LibraryConstructionInfoInlineFormset =  inlineformset_factory(
-    Library,
-    LibraryConstructionInformation,
+DlpLibraryConstructionInfoInlineFormset =  inlineformset_factory(
+    DlpLibrary,
+    DlpLibraryConstructionInformation,
     form = SaveDefault,
     fields = "__all__",
     widgets = {
@@ -286,10 +286,10 @@ LibraryConstructionInfoInlineFormset =  inlineformset_factory(
     }
 )
 
-LibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
-    Library,
-    LibraryQuantificationAndStorage,
-    form = LibraryQuantificationAndStorageForm,
+DlpLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
+    DlpLibrary,
+    DlpLibraryQuantificationAndStorage,
+    form = DlpLibraryQuantificationAndStorageForm,
     fields = "__all__",
     help_texts = {
         'agilent_bioanalyzer_xad': ('Select a xad file to upload.'),
@@ -332,7 +332,7 @@ PbalLibraryConstructionInfoInlineFormset =  inlineformset_factory(
     form = SaveDefault,
     fields = "__all__",
     widgets = {
-        'library_prep_date': SelectDateWidget(
+        'submission_date': SelectDateWidget(
             years=range(2000,2020),
             empty_label=('year', 'month', 'day'),
         )
@@ -381,7 +381,7 @@ TenxLibraryConstructionInfoInlineFormset =  inlineformset_factory(
     form = SaveDefault,
     fields = "__all__",
     widgets = {
-        'library_prep_date': SelectDateWidget(
+        'submission_date': SelectDateWidget(
             years=range(2000,2020),
             empty_label=('year', 'month', 'day'),
         )
@@ -408,9 +408,9 @@ class ProjectForm(ModelForm):
 #===========================
 # Sequencing forms
 #---------------------------
-class SequencingForm(ModelForm):
+class DlpSequencingForm(ModelForm):
     class Meta:
-        model = Sequencing
+        model = DlpSequencing
         exclude = ['pool_id']
         widgets = {
             'submission_date': SelectDateWidget(
@@ -425,9 +425,9 @@ class SequencingForm(ModelForm):
             'library': ('Select a library.'),
         }
 
-SequencingDetailInlineFormset = inlineformset_factory(
-    Sequencing,
-    SequencingDetail,
+DlpSequencingDetailInlineFormset = inlineformset_factory(
+    DlpSequencing,
+    DlpSequencingDetail,
     form = SaveDefault,
     fields = "__all__",
 )
@@ -484,9 +484,9 @@ TenxSequencingDetailInlineFormset = inlineformset_factory(
 #===========================
 # Lane forms
 #---------------------------
-class LaneForm(ModelForm):
+class DlpLaneForm(ModelForm):
     class Meta:
-        model = Lane
+        model = DlpLane
         fields = "__all__"
 
 class PbalLaneForm(ModelForm):
