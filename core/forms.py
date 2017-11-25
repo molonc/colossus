@@ -3,7 +3,7 @@ Created on May 24, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 
-Updated Nov 3, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
+Updated Nov 27, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 import os
@@ -133,7 +133,12 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 #===========================
 # Library forms
 #---------------------------
-class DlpLibraryForm(ModelForm):
+class LibraryForm(ModelForm):
+    class Meta:
+        abstract = True
+
+
+class DlpLibraryForm(LibraryForm):
     class Meta:
         model = DlpLibrary
         exclude = ['num_sublibraries']
@@ -157,7 +162,8 @@ class DlpLibraryForm(ModelForm):
                 msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
 
-class PbalLibraryForm(ModelForm):
+
+class PbalLibraryForm(LibraryForm):
     class Meta:
         model = PbalLibrary
         exclude = []
@@ -170,7 +176,8 @@ class PbalLibraryForm(ModelForm):
             'jira_ticket': ('Jira Ticket.'),
         }
 
-class TenxLibraryForm(ModelForm):
+
+class TenxLibraryForm(LibraryForm):
     class Meta:
         model = TenxLibrary
         exclude = []
@@ -182,6 +189,7 @@ class TenxLibraryForm(ModelForm):
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
             'jira_ticket': ('Jira Ticket.'),
         }
+
 
 class SublibraryForm(Form):
     # SmartChipApp results file
@@ -202,15 +210,32 @@ class SublibraryForm(Form):
             except Exception as e:
                 self.add_error('smartchipapp_results_file', 'failed to parse the file.')
 
-class DlpLibraryQuantificationAndStorageForm(ModelForm):
+
+class LibraryQuantificationAndStorageForm(ModelForm):
 
     """
-    Clean uploaded files.
+    Base class for cleaning uploaded files.
     """
 
     class Meta:
-        model = DlpLibraryQuantificationAndStorage
+        abstract = True
         fields = "__all__"
+
+    def has_changed(self):
+        """ Should returns True if data differs from initial.
+        By always returning true even unchanged inlines will
+        get validated and saved."""
+        return True
+
+
+class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
+
+    """
+    Clean uploaded DLP-related files.
+    """
+
+    class Meta(LibraryQuantificationAndStorageForm.Meta):
+        model = DlpLibraryQuantificationAndStorage
 
     def clean(self):
         """if Freezer specified, so should Rack,Shelf,Box,Positoin in box."""
@@ -254,12 +279,6 @@ class DlpLibraryQuantificationAndStorageForm(ModelForm):
                 self.add_error('agilent_bioanalyzer_image', msg)
         return file
 
-    def has_changed(self):
-        """ Should returns True if data differs from initial.
-        By always returning true even unchanged inlines will
-        get validated and saved."""
-        return True
-
 DlpLibrarySampleDetailInlineFormset = inlineformset_factory(
     DlpLibrary,
     DlpLibrarySampleDetail,
@@ -297,21 +316,15 @@ DlpLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     }
 )
 
-class PbalLibraryQuantificationAndStorageForm(ModelForm):
+
+class PbalLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
     """
-    Clean uploaded files.
+    Clean uploaded PBAL-related files.
     """
 
-    class Meta:
+    class Meta(LibraryQuantificationAndStorageForm.Meta):
         model = PbalLibraryQuantificationAndStorage
-        fields = "__all__"
-
-    def has_changed(self):
-        """ Should returns True if data differs from initial.
-        By always returning true even unchanged inlines will
-        get validated and saved."""
-        return True
 
 PbalLibrarySampleDetailInlineFormset = inlineformset_factory(
     PbalLibrary,
@@ -346,21 +359,15 @@ PbalLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     fields = "__all__",
 )
 
-class TenxLibraryQuantificationAndStorageForm(ModelForm):
+
+class TenxLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
     """
-    Clean uploaded files.
+    Clean uploaded 10x-related files.
     """
 
-    class Meta:
+    class Meta(LibraryQuantificationAndStorageForm.Meta):
         model = TenxLibraryQuantificationAndStorage
-        fields = "__all__"
-
-    def has_changed(self):
-        """ Should returns True if data differs from initial.
-        By always returning true even unchanged inlines will
-        get validated and saved."""
-        return True
 
 TenxLibrarySampleDetailInlineFormset = inlineformset_factory(
     TenxLibrary,
@@ -408,9 +415,9 @@ class ProjectForm(ModelForm):
 #===========================
 # Sequencing forms
 #---------------------------
-class DlpSequencingForm(ModelForm):
+class SequencingForm(ModelForm):
     class Meta:
-        model = DlpSequencing
+        abstract = True
         exclude = ['pool_id']
         widgets = {
             'submission_date': SelectDateWidget(
@@ -424,6 +431,11 @@ class DlpSequencingForm(ModelForm):
         help_texts = {
             'library': ('Select a library.'),
         }
+
+
+class DlpSequencingForm(SequencingForm):
+    class Meta(SequencingForm.Meta):
+        model = DlpSequencing
 
 DlpSequencingDetailInlineFormset = inlineformset_factory(
     DlpSequencing,
@@ -432,22 +444,10 @@ DlpSequencingDetailInlineFormset = inlineformset_factory(
     fields = "__all__",
 )
 
-class PbalSequencingForm(ModelForm):
-    class Meta:
+
+class PbalSequencingForm(SequencingForm):
+    class Meta(SequencingForm.Meta):
         model = PbalSequencing
-        exclude = ['pool_id']
-        widgets = {
-            'submission_date': SelectDateWidget(
-                years=range(2000,2020),
-                empty_label=('year', 'month', 'day'),
-            )
-        }
-        labels = {
-            'library': ('*Library'),
-        }
-        help_texts = {
-            'library': ('Select a library.'),
-        }
 
 PbalSequencingDetailInlineFormset = inlineformset_factory(
     PbalSequencing,
@@ -456,22 +456,10 @@ PbalSequencingDetailInlineFormset = inlineformset_factory(
     fields = "__all__",
 )
 
-class TenxSequencingForm(ModelForm):
-    class Meta:
+
+class TenxSequencingForm(SequencingForm):
+    class Meta(SequencingForm.Meta):
         model = TenxSequencing
-        exclude = ['pool_id']
-        widgets = {
-            'submission_date': SelectDateWidget(
-                years=range(2000,2020),
-                empty_label=('year', 'month', 'day'),
-            )
-        }
-        labels = {
-            'library': ('*Library'),
-        }
-        help_texts = {
-            'library': ('Select a library.'),
-        }
 
 TenxSequencingDetailInlineFormset = inlineformset_factory(
     TenxSequencing,
@@ -484,20 +472,25 @@ TenxSequencingDetailInlineFormset = inlineformset_factory(
 #===========================
 # Lane forms
 #---------------------------
-class DlpLaneForm(ModelForm):
+class LaneForm(ModelForm):
     class Meta:
+        abstract = True
+        fields = "__all__"
+
+
+class DlpLaneForm(LaneForm):
+    class Meta(LaneForm.Meta):
         model = DlpLane
-        fields = "__all__"
 
-class PbalLaneForm(ModelForm):
-    class Meta:
+
+class PbalLaneForm(LaneForm):
+    class Meta(LaneForm.Meta):
         model = PbalLane
-        fields = "__all__"
 
-class TenxLaneForm(ModelForm):
-    class Meta:
+
+class TenxLaneForm(LaneForm):
+    class Meta(LaneForm.Meta):
         model = TenxLane
-        fields = "__all__"
 
 
 #===========================
@@ -543,6 +536,7 @@ class GSCFormDeliveryInfo(Form):
         max_length=100,
         initial="604-707-5900 ext 673251",
     )
+
 
 class GSCFormSubmitterInfo(Form):
 

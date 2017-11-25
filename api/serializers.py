@@ -2,6 +2,8 @@
 Created on July 25, 2017
 
 @author: Jessica Ngo (jngo@bccrc.ca)
+
+Updated by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 #============================

@@ -107,7 +107,7 @@ Sample Details
         </table>
     </div>
     {% for library in library_list %}
-    <a href="{% url library|add:':library_create_from_sample' from_sample=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i>{% if library == 'tenx' %} Add 10x Library {% else %} Add {{library|upper}} Library {% endif %}</a></p>
+    <a href="{% url library|add:':library_create_from_sample' pk=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i>{% if library == 'tenx' %} Add 10x Library {% else %} Add {{library|upper}} Library {% endif %}</a></p>
     {% endfor %}
 </div><br>
 <!-- end of Library Information -->

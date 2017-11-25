@@ -27,7 +27,7 @@ from django.contrib import admin
 from core import views
 
 urlpatterns = [
-    url(r'^$', views.index_view, name='index'),    
+    url(r'^$', views.IndexView.as_view(), name='index'),    
     url(r'^admin/', admin.site.urls),
     url(r'^search/', views.search_view, name='search'),
     url(r'^core/', include('core.urls')),
