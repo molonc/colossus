@@ -469,7 +469,7 @@ class GSCForm(object):
 
         library_columns = {
         'Tube Label': 'NA', #self.library.library_tube_label,
-        'Sample Collection Date': self._library.librarysampledetail.sample_spot_date,
+        'Sample Collection Date': self._library.dlplibrarysampledetail.sample_spot_date,
         'DNA Volume (uL)': "", #self._libquant.dna_volume,
         'DNA Concentration (nM)': "", #self._libquant.dna_concentration_nm,
         'Storage Medium': "", #self._libquant.storage_medium,
