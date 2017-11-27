@@ -300,8 +300,8 @@ class GSCForm(object):
     def __init__(self, pk):
         self._sequencing = get_object_or_404(DlpSequencing, pk=pk)
         self._library = self._sequencing.library
-        self._libconst = self._library.libraryconstructioninformation
-        self._libquant = self._library.libraryquantificationandstorage
+        self._libconst = self._library.dlplibraryconstructioninformation
+        self._libquant = self._library.dlplibraryquantificationandstorage
         self._sample = self._library.sample
         self._sample_addinfo = self._sample.additionalsampleinformation
         self._meta_header = os.path.join(settings.BASE_DIR,
