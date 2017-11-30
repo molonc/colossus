@@ -1764,7 +1764,7 @@ def dlp_get_filtered_sublib_count(sublibs):
 def dlp_get_cell_graph(request):
 
     data = []
-    libs = DlpLibrary.objects.filter(sequencing__isnull=False, sublibraryinformation__isnull=False).distinct()
+    libs = DlpLibrary.objects.filter(dlpsequencing__isnull=False, sublibraryinformation__isnull=False).distinct()
 
     for lib in libs:
         lib_info = {}
@@ -1772,7 +1772,7 @@ def dlp_get_cell_graph(request):
         lib_info['pool_id'] = lib.pool_id
         lib_info['count'] = dlp_get_filtered_sublib_count(lib.sublibraryinformation_set)
         lib_info['id'] = lib.pk
-        for sequencing in lib.sequencing_set.all():
+        for sequencing in lib.dlpsequencing_set.all():
             lib_info['submission_date'] = sequencing.submission_date
             data.append(lib_info)
 
