@@ -76,9 +76,9 @@ class SequencingDetailSerializer(serializers.ModelSerializer):
 
 
 class SequencingSerializer(serializers.ModelSerializer):
-    sequencingdetail = SequencingDetailSerializer(read_only=True)
+    dlpsequencingdetail = SequencingDetailSerializer(read_only=True)
     library = serializers.SlugRelatedField(read_only=True, slug_field='pool_id')
-    lane_set = LaneSerializer(many=True, read_only=True)
+    dlplane_set = LaneSerializer(many=True, read_only=True)
     class Meta:
         model = DlpSequencing
         fields = (
@@ -89,14 +89,14 @@ class SequencingSerializer(serializers.ModelSerializer):
             'index_read_type',
             'sequencing_instrument',
             'submission_date',
-            'lane_set',
-            'sequencingdetail'
+            'dlplane_set',
+            'dlpsequencingdetail'
         )
 
 
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer(read_only=True)
-    sequencing_set = SequencingSerializer(many=True, read_only=True)
+    dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
     sublibraryinformation_set = SublibraryInformationSerializer(many=True,
         read_only=True)
     class Meta:
@@ -109,7 +109,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'sample',
             'result',
             'relates_to',
-            'sequencing_set',
+            'dlpsequencing_set',
             'sublibraryinformation_set',
         )
 
@@ -125,5 +125,5 @@ class LibrarySerializerBrief(LibrarySerializer):
             'sample',
             'result',
             'relates_to',
-            'sequencing_set'
+            'dlpsequencing_set'
         )

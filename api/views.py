@@ -2,6 +2,8 @@
 Created on July 25, 2017
 
 @author: Jessica Ngo (jngo@bccrc.ca)
+
+Updated by Spencer Vatrt-Watts (github.com/Spenca)
 """
 #============================
 # Django & Django rest framework imports
@@ -86,7 +88,7 @@ class SequencingViewSet(viewsets.ModelViewSet):
     serializer_class = SequencingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
-        'sequencingdetail__gsc_library_id',
+        'dlpsequencingdetail__gsc_library_id',
     )
 
 
