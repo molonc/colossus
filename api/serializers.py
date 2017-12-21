@@ -23,6 +23,8 @@ from core.models import (
     DlpLane
 )
 
+from sisyphus.models import AnalysisInformation, ReferenceGenome, AnalysisRun
+
 #============================
 # Other imports
 #----------------------------
@@ -114,3 +116,50 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
             'library',
         )
 
+
+class ReferenceGenomeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReferenceGenome
+        fields = (
+            'reference_genome',
+        )
+
+
+class AnalysisRunSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnalysisRun
+        fields = (
+            'id',
+            'run_status',
+            'log_file',
+            'last_updated'
+        )
+
+
+class AnalysisInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnalysisInformation
+        fields = (
+            'id',
+            'priority_level',
+            'analysis_jira_ticket',
+            'version',
+            'analysis_submission_date',
+            'sequencings',
+            'reference_genome',
+            'sisyphus_options',
+            'analysis_run'
+        )
+
+    def create(self, validated_data):
+        validated_data['analysis_run'] = AnalysisRun.objects.create()
+        # Remove many to many field
+        sequencings = validated_data.pop('sequencings')
+        instance = AnalysisInformation.objects.create(**validated_data)
+        instance.full_clean()
+        instance.save()
+
+        # Re-add many to many field
+        instance.sequencings = sequencings
+        instance.save()
+        return instance

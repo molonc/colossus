@@ -9,7 +9,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 # Django & Django rest framework imports
 #----------------------------
 from rest_framework import pagination, viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
 
 #============================
@@ -21,6 +21,8 @@ from .serializers import (
     LaneSerializer,
     SequencingSerializer,
     SublibraryInformationSerializer,
+    AnalysisInformationSerializer,
+    AnalysisRunSerializer
     )
 
 from core.models import (
@@ -30,6 +32,8 @@ from core.models import (
     DlpLane,
     SublibraryInformation,
     )
+
+from sisyphus.models import AnalysisInformation, AnalysisRun
 
 
 #============================
@@ -122,3 +126,34 @@ class SublibraryViewSet(viewsets.ModelViewSet):
         'library__pool_id',
     )
 
+
+class AnalysisInformationViewSet(viewsets.ModelViewSet):
+    """
+    View for Analysis Objects
+    Analysis Objects are queryable by Jira ticket
+    """
+    queryset = AnalysisInformation.objects.all()
+    serializer_class = AnalysisInformationSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_fields = (
+        'priority_level',
+        'analysis_jira_ticket',
+        'version',
+        'analysis_submission_date',
+        'reference_genome'
+    )
+
+
+class AnalysisRunViewSet(viewsets.ModelViewSet):
+    """
+    View for AnalaysisRun Objects
+    Should be be AllowAll so that Sisyphus can modify it
+    """
+    queryset = AnalysisRun.objects.all()
+    serializer_class = AnalysisRunSerializer
+    permission_classes = (AllowAny,)
+    filter_fields = (
+        'last_updated',
+        'run_status',
+        'log_file'
+    )

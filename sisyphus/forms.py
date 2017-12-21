@@ -56,21 +56,11 @@ class AnalysisInformationForm(ModelForm):
         self.fields['sequencings'].widget = widgets.CheckboxSelectMultiple()
         self.fields['sequencings'].queryset = DlpSequencing.objects.filter(library__pk = library.pk)
 
-#===========================
-# Analysis forms (Admin)
-#---------------------------
-class AnalysisRunForm(ModelForm):
-    class Meta:
-        model = AnalysisRun
-        fields = [
-            'analysis_submission_date',
-            'analysis_completion_date',
-            'run_status',
-        ]
-        labels = {
-            'analysis_start_date':'Analysis start date',
-            'run_status':'status',
-        }
 
 class AnalysisLibrarySelection(Form):
     library = ModelChoiceField(queryset=DlpLibrary.objects.all())
+
+class ReferenceGenomeSelection(Form):
+    ref_genome = ModelChoiceField(queryset=ReferenceGenome.objects.all())
+
+#TODO add Reference genome dropdown, Sequencings, Add nice way to input JSON

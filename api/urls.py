@@ -14,6 +14,8 @@ router.register(r'lane', views.LaneViewSet)
 router.register(r'sequencing', views.SequencingViewSet)
 router.register(r'library', views.LibraryViewSet, base_name='library')
 router.register(r'sublibraries', views.SublibraryViewSet, base_name='sublibraries')
+router.register(r'analysis_information', views.AnalysisInformationViewSet, base_name='analysis_information')
+router.register(r'analysis_run', views.AnalysisRunViewSet, base_name='analysis_run')
 
 app_name='api'
 urlpatterns = [
