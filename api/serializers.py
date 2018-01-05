@@ -38,24 +38,6 @@ class SampleSerializer(serializers.ModelSerializer):
         )
 
 
-class SublibraryInformationSerializer(serializers.ModelSerializer):
-    sample_id = SampleSerializer(read_only=True)
-    class Meta:
-        model = SublibraryInformation
-        fields = (
-            'sample_id',
-            'row',
-            'column',
-            'img_col',
-            'condition',
-            'index_i5',
-            'index_i7',
-            'primer_i5',
-            'primer_i7',
-            'pick_met',
-        )
-
-
 class LaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = DlpLane
@@ -97,8 +79,6 @@ class SequencingSerializer(serializers.ModelSerializer):
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer(read_only=True)
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
-    sublibraryinformation_set = SublibraryInformationSerializer(many=True,
-        read_only=True)
     class Meta:
         model = DlpLibrary
         fields = (
@@ -110,20 +90,25 @@ class LibrarySerializer(serializers.ModelSerializer):
             'result',
             'relates_to',
             'dlpsequencing_set',
-            'sublibraryinformation_set',
         )
 
+class SublibraryInformationSerializer(serializers.ModelSerializer):
+    sample_id = SampleSerializer(read_only=True)
+    library = LibrarySerializer(read_only=True)
 
-class LibrarySerializerBrief(LibrarySerializer):
     class Meta:
-        model = DlpLibrary
+        model = SublibraryInformation
         fields = (
-            'pool_id',
-            'jira_ticket',
-            'num_sublibraries',
-            'description',
-            'sample',
-            'result',
-            'relates_to',
-            'dlpsequencing_set'
+            'sample_id',
+            'row',
+            'column',
+            'img_col',
+            'condition',
+            'index_i5',
+            'index_i7',
+            'primer_i5',
+            'primer_i7',
+            'pick_met',
+            'library',
         )
+

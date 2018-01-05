@@ -165,7 +165,7 @@ X_FRAME_OPTIONS = "DENY"
 # Rest Framework Settings
 REST_FRAMEWORK = {
     # pagination setting
-    # 'PAGE_SIZE': 3,
+    'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 
 }

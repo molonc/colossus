@@ -13,7 +13,7 @@ router.register(r'sample', views.SampleViewSet)
 router.register(r'lane', views.LaneViewSet)
 router.register(r'sequencing', views.SequencingViewSet)
 router.register(r'library', views.LibraryViewSet, base_name='library')
-router.register(r'library_brief', views.LibraryBriefViewSet, base_name='library_brief')
+router.register(r'sublibraries', views.SublibraryViewSet, base_name='sublibraries')
 
 app_name='api'
 urlpatterns = [

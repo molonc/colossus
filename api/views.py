@@ -20,7 +20,7 @@ from .serializers import (
     LibrarySerializer,
     LaneSerializer,
     SequencingSerializer,
-    LibrarySerializerBrief,
+    SublibraryInformationSerializer,
     )
 
 from core.models import (
@@ -28,6 +28,7 @@ from core.models import (
     DlpLibrary,
     DlpSequencing,
     DlpLane,
+    SublibraryInformation,
     )
 
 
@@ -95,9 +96,6 @@ class SequencingViewSet(viewsets.ModelViewSet):
 class LibraryViewSet(viewsets.ModelViewSet):
     """
     View for Library that is queryable by pool_id (aka chip ID) and sample it belongs to.
-    This returns with sublibrary information for use by our workflows. This is not paginated, and loads slow on browser.
-
-    If you are browsing from the web, consider browsing through library_brief instead.
 
     See documentation here:
     https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
@@ -112,18 +110,15 @@ class LibraryViewSet(viewsets.ModelViewSet):
         'jira_ticket',
     )
 
-class LibraryBriefViewSet(LibraryViewSet):
+
+class SublibraryViewSet(viewsets.ModelViewSet):
     """
-    View for Library that is the same as /library/ with the exception that it does not return sublibrary information,
-    so it is much faster, and ideal for browsing.
-
-    Libraries are queryable by their pool_id (aka chip ID) and or sample it belongs to.
-    Try adding "?pool_id=A72833" or "sample__sample_id=SA532X2XB00145" without the quotes to the end of the url.
-
-    See documentation here:
-    https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
+    View for Library's Sublibraries that is queryable by Library's pool_id (aka chip id)
     """
-
-    serializer_class = LibrarySerializerBrief
-    pagination_class = SmallResultsSetPagination
+    queryset = SublibraryInformation.objects.all()
+    serializer_class = SublibraryInformationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_fields = (
+        'library__pool_id',
+    )
+
