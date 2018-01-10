@@ -70,7 +70,6 @@ class SequencingSerializer(serializers.ModelSerializer):
         fields = (
             'library',
             'adapter',
-            'pool_id',
             'read_type',
             'index_read_type',
             'sequencing_instrument',

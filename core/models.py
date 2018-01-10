@@ -932,8 +932,8 @@ class Sequencing(models.Model, FieldValue):
     class Meta:
         abstract = True
 
-    fields_to_exclude = ['ID', 'Library', 'Chip ID']
-    values_to_exclude = ['id', 'library', 'pool_id']
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
 
     # choices 
     sequencing_instrument_choices = (
@@ -1042,9 +1042,6 @@ class DlpSequencing(Sequencing):
         verbose_name="Library",
         on_delete=models.CASCADE,
     )
-
-    # fields
-    pool_id = create_chrfield("Chip ID")
 
 
 class PbalSequencing(Sequencing):
