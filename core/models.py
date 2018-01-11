@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 #============================
 # Django imports
 #----------------------------
+import datetime
 from django.core.urlresolvers import reverse
 from django.db import models
 
@@ -1004,8 +1005,7 @@ class Sequencing(models.Model, FieldValue):
     )
     submission_date = models.DateField(
         "Submission date",
-        null=True,
-        blank=True,
+        default= datetime.date.today
         )
     relates_to = models.ManyToManyField(
         "self",
@@ -1096,13 +1096,17 @@ class SequencingDetail(models.Model, FieldValue):
 
     fields_to_exclude = ['ID', 'Sequencing']
     values_to_exclude = ['id', 'sequencing']
+    SEQ_CENTER = (
+        ('bccagsc', 'BCCAGSC'),
+        ('ubcbrc', 'UBCBRC'),
+    )
 
     # fields
     gsc_library_id = create_chrfield("GSC library ID")
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
         "Sequencing center",
-        default="BCCAGSC",
+        choices=SEQ_CENTER,
     )
     sequencer_notes = create_textfield("Sequencing notes")
 

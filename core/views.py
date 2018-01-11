@@ -1503,20 +1503,20 @@ def search_view(request):
     instance = None
 
     # search for samples
-    if Sample.objects.filter(sample_id=query_str):
-        instance = Sample.objects.filter(sample_id=query_str)[0]
+    if Sample.objects.filter(sample_id__iexact=query_str):
+        instance = Sample.objects.filter(sample_id__iexact=query_str)[0]
 
     # search for dlp libraries
-    elif DlpLibrary.objects.filter(pool_id=query_str):
-        instance = DlpLibrary.objects.filter(pool_id=query_str)[0]
+    elif DlpLibrary.objects.filter(pool_id__iexact=query_str):
+        instance = DlpLibrary.objects.filter(pool_id__iexact=query_str)[0]
 
     # search for jira ticket associated with dlp library
-    elif DlpLibrary.objects.filter(jira_ticket=query_str):
-        instance = DlpLibrary.objects.filter(jira_ticket=query_str)[0]
+    elif DlpLibrary.objects.filter(jira_ticket__iexact=query_str):
+        instance = DlpLibrary.objects.filter(jira_ticket__iexact=query_str)[0]
 
     # search for jira ticket associated with tenx library
-    elif TenxLibrary.objects.filter(jira_ticket=query_str):
-        instance = TenxLibrary.objects.filter(jira_ticket=query_str)[0]
+    elif TenxLibrary.objects.filter(jira_ticket__iexact=query_str):
+        instance = TenxLibrary.objects.filter(jira_ticket__iexact=query_str)[0]
 
     if instance:
         return HttpResponseRedirect(instance.get_absolute_url())

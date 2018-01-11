@@ -11,6 +11,7 @@ import os
 #===========================
 # Django imports
 #---------------------------
+import datetime
 from django.forms import (
     ModelForm,
     Form,
@@ -561,6 +562,7 @@ class GSCFormSubmitterInfo(Form):
     submission_date = DateField(
         label="Submission Date",
         help_text = 'yyyy-mm-dd',
+        initial= datetime.date.today
     )
     submitting_org = CharField(
         label="Submitting Organization",
