@@ -191,6 +191,6 @@ class AnalysisInformationDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(AnalysisInformationDetailView, self).get_context_data(**kwargs)
         instance_sequencings = context['object'].sequencings.all()
-        context['library']=DlpLibrary.objects.filter(sequencing__in=instance_sequencings).distinct()[0]
+        context['library']=DlpLibrary.objects.filter(dlpsequencing__in=instance_sequencings).distinct()[0]
         context['analysisrun']=context['object'].analysisrun
         return context
