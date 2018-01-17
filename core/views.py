@@ -125,7 +125,7 @@ class IndexView(TemplateView):
             'pbal_sequencing_size': PbalSequencing.objects.count(),
             'tenx_library_size': TenxLibrary.objects.count(),
             'tenx_sequencing_size': TenxSequencing.objects.count(),
-            'analysisinformation_size':AnalysisInformation.objects.count(),
+            'analysisinformation_size':DlpAnalysisInformation.objects.count(),
             'analysisrun_size':AnalysisRun.objects.count(),
         }
         return context
@@ -350,7 +350,7 @@ class DlpLibraryDetail(LibraryDetail):
     def get(self, request, pk):
         library = get_object_or_404(DlpLibrary, pk=pk)
         library_type = 'dlp'
-        analyses = AnalysisInformation.objects.filter(sequencings__in=library.dlpsequencing_set.all()).distinct()
+        analyses = DlpAnalysisInformation.objects.filter(sequencings__in=library.dlpsequencing_set.all()).distinct()
         sublibinfo = SublibraryInformation()
         fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
         metadata_dict = collections.OrderedDict()

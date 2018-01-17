@@ -31,7 +31,7 @@ from core.models import(
 #---------------------------
 class AnalysisInformationForm(ModelForm):
     class Meta:
-        model = AnalysisInformation
+        model = DlpAnalysisInformation
         fields = [
             'sequencings',
             'priority_level',

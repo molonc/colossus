@@ -69,7 +69,7 @@ class AnalysisInformationCreate(CreateView):
         library = get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
         # Assigning self.object to self is required so that in the AnalysisInformationForm,
         # access to the instance of AnalysisInformation in the AnalysisInformationCreate view is possible
-        self.object = AnalysisInformation()
+        self.object = DlpAnalysisInformation()
         self.library = library
 
         # adding library to TEMPLATE context here
@@ -130,7 +130,7 @@ class AnalysisInformationUpdate(UpdateView):
     template_name = 'sisyphus/analysisinformation_update.html'
 
     def get_context_data(self, **kwargs):
-        self.object = get_object_or_404(AnalysisInformation, pk=kwargs.get('analysis_pk'))
+        self.object = get_object_or_404(DlpAnalysisInformation, pk=kwargs.get('analysis_pk'))
         self.library = get_object_or_404(DlpLibrary, pk=kwargs.get('library_pk'))
         context = super(AnalysisInformationUpdate, self).get_context_data()
         context.update({'analysisinformation':self.object,
@@ -146,7 +146,7 @@ class AnalysisInformationUpdate(UpdateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
-        self.object = get_object_or_404(AnalysisInformation, pk=kwargs.get('analysis_pk'))
+        self.object = get_object_or_404(DlpAnalysisInformation, pk=kwargs.get('analysis_pk'))
         self.library = get_object_or_404(DlpLibrary, pk=kwargs.get('library_pk'))
         form = self.get_form()
         if form.is_valid():
@@ -162,7 +162,7 @@ class AnalysisInformationUpdate(UpdateView):
 @login_required()
 def analysis_delete(request, pk):
     """analysis delete page."""
-    analysis = get_object_or_404(AnalysisInformation, pk=pk)
+    analysis = get_object_or_404(DlpAnalysisInformation, pk=pk)
 
     if request.method == 'POST':
         analysis.delete()
@@ -181,16 +181,16 @@ def analysis_delete(request, pk):
 def analysisinformation_list(request):
     """list of analysis information."""
     context = {
-        'analyses': AnalysisInformation.objects.all().order_by('analysis_jira_ticket'),
+        'analyses': DlpAnalysisInformation.objects.all().order_by('analysis_jira_ticket'),
     }
     return context
 
 
 class AnalysisInformationDetailView(DetailView):
-    model = AnalysisInformation
+    model = DlpAnalysisInformation
     def get_context_data(self, **kwargs):
         context = super(AnalysisInformationDetailView, self).get_context_data(**kwargs)
         instance_sequencings = context['object'].sequencings.all()
         context['library']=DlpLibrary.objects.filter(dlpsequencing__in=instance_sequencings).distinct()[0]
-        context['analysisrun']=context['object'].analysisrun
+        context['analysisrun']=context['object'].analysis_run
         return context

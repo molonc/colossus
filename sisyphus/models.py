@@ -16,16 +16,53 @@ from django.contrib.postgres.fields import JSONField
 #============================
 # App imports
 #----------------------------
-from core.models import DlpSequencing
+from core.models import DlpSequencing,PbalSequencing,TenxSequencing,DlpLibrary,PbalLibrary,TenxLibrary
 from core.helpers import *
 
 
-class AnalysisVersion(models.Model):
+class AbstractVersion(models.Model):
+    """
+    Keeps track of the available analysis software versions.
+    """
+
+    class Meta:
+        abstract = True
+
+
+class DlpAnalysisVersion(AbstractVersion):
     """
     Keeps track of the available analysis software versions.
     """
     version = create_chrfield(
-        "Analysis Version",
+        "DlpAnalysis Version",
+        blank=False,
+        null=False,
+    )
+
+    def __str__(self):
+        return self.version
+
+
+class PbalAnalysisVersion(AbstractVersion):
+    """
+    Keeps track of the available analysis software versions.
+    """
+    version = create_chrfield(
+        "PbalAnalysis Version",
+        blank=False,
+        null=False,
+    )
+
+    def __str__(self):
+        return self.version
+
+
+class TenxAnalysisVersion(AbstractVersion):
+    """
+    Keeps track of the available analysis software versions.
+    """
+    version = create_chrfield(
+        "TenxAnalysis Version",
         blank=False,
         null=False,
     )
@@ -45,13 +82,9 @@ class ReferenceGenome(models.Model):
 
 
 class AnalysisRun(models.Model):
-
     """
     Analysis/workflow details filled in or changed by database admin
     """
-
-    # database relationships
-    # analysis_information = models.OneToOneField(AnalysisInformation)
 
     # choices
     run_status_choices = (
@@ -81,17 +114,15 @@ class AnalysisRun(models.Model):
     def get_absolute_url(self):
         return reverse("sisyphus:analysisrun_detail")
 
-class AnalysisInformation(models.Model, FieldValue):
 
+class AbstractAnalysisInformation(models.Model):
     """
     Analysis/workflow information, typical user sees this
     """
-    fields_to_exclude=['ID']
-    values_to_exclude=['id']
+    fields_to_exclude = ['ID']
+    values_to_exclude = ['id']
 
     # database relationships
-    sequencings = models.ManyToManyField(DlpSequencing)
-
     analysis_run = models.OneToOneField(AnalysisRun, null=True)
 
     # choices
@@ -111,12 +142,6 @@ class AnalysisInformation(models.Model, FieldValue):
     )
 
     analysis_jira_ticket = create_chrfield("Jira ticket", blank=False)
-
-    version = models.ForeignKey(
-        AnalysisVersion,
-        verbose_name="Analysis Version",
-        on_delete=models.CASCADE,
-    )
 
     # fields
     analysis_submission_date = models.DateField(
@@ -138,3 +163,41 @@ class AnalysisInformation(models.Model, FieldValue):
 
     def __str__(self):
         return "Analysis of {jira}".format(jira=self.analysis_jira_ticket)
+
+    class Meta:
+        abstract = True
+
+
+class DlpAnalysisInformation(AbstractAnalysisInformation):
+    sequencings = models.ManyToManyField(DlpSequencing)
+
+    version = models.ForeignKey(
+        DlpAnalysisVersion,
+        verbose_name="Analysis Version",
+        on_delete=models.CASCADE,
+    )
+
+
+class PbalAnalysisInformation(AbstractAnalysisInformation):
+    sequencings = models.ManyToManyField(PbalSequencing)
+
+    version = models.ForeignKey(
+        PbalAnalysisVersion,
+        verbose_name="Analysis Version",
+        on_delete=models.CASCADE,
+    )
+
+
+class TenxAnalysisInformation(AbstractAnalysisInformation):
+    sequencings = models.ManyToManyField(TenxSequencing)
+
+    version = models.ForeignKey(
+        TenxAnalysisVersion,
+        verbose_name="Analysis Version",
+        on_delete=models.CASCADE,
+    )
+
+
+
+
+

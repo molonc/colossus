@@ -47,13 +47,22 @@ Main
                     </td>
                 </tr>
                 <tr>
+                    <td><a href="{% url 'sisyphus:analysisinformation_list' %}">Job Queue</a> <i class="counter">{{analysisinformation_size}}</i></td>
+                    <td>
+                        <p style="float:right;">
+                        <a href="{% url 'sisyphus:analysisinformation_create_choose_library' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
+                    </td>
+                </tr>
+                <tr>
                     <td><a href="{% url 'dlp:summary' %}">Summary Statistics</a></td>
                     <td></td>
                 </tr>
+
             </tbody>
         </table>
     </div>
 </div>
+
 <br/>
 <div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">
     <a style="text-decoration: none;" href="#pbal_collapse" data-toggle="collapse"><h4>PBAL</h4></a>
@@ -102,20 +111,20 @@ Main
     </div>
 </div>
 <br />
-<div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">
-    <a style="text-decoration: none;" href="#analysis_collapse" data-toggle="collapse"><h4>Analysis</h4></a>
-    <div id="analysis_collapse" class="collapse in">
-        <table class="table-striped" style="width:100%;">
-            <tbody>
-                <tr>
-                    <td><a href="{% url 'sisyphus:analysisinformation_list' %}">Job Queue</a> <i class="counter">{{analysisinformation_size}}</i></td>
-                    <td>
-                        <p style="float:right;">
-                        <a href="{% url 'sisyphus:analysisinformation_create_choose_library' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+{#<div class="container" style="border:solid 1px #E0E0E0; border-radius: 3px;">#}
+{#    <a style="text-decoration: none;" href="#analysis_collapse" data-toggle="collapse"><h4>Analysis</h4></a>#}
+{#    <div id="analysis_collapse" class="collapse in">#}
+{#        <table class="table-striped" style="width:100%;">#}
+{#            <tbody>#}
+{#                <tr>#}
+{#                    <td><a href="{% url 'sisyphus:analysisinformation_list' %}">Job Queue</a> <i class="counter">{{analysisinformation_size}}</i></td>#}
+{#                    <td>#}
+{#                        <p style="float:right;">#}
+{#                        <a href="{% url 'sisyphus:analysisinformation_create_choose_library' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add</a></p>#}
+{#                    </td>#}
+{#                </tr>#}
+{#            </tbody>#}
+{#        </table>#}
+{#    </div>#}
+{#</div>#}
 {% endblock %}

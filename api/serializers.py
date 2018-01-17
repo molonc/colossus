@@ -23,7 +23,7 @@ from core.models import (
     DlpLane
 )
 
-from sisyphus.models import AnalysisInformation, ReferenceGenome, AnalysisRun
+from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun
 
 #============================
 # Other imports
@@ -137,7 +137,7 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
 
 class AnalysisInformationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AnalysisInformation
+        model = DlpAnalysisInformation
         fields = (
             'id',
             'priority_level',
@@ -154,7 +154,7 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
         validated_data['analysis_run'] = AnalysisRun.objects.create()
         # Remove many to many field
         sequencings = validated_data.pop('sequencings')
-        instance = AnalysisInformation.objects.create(**validated_data)
+        instance = DlpAnalysisInformation.objects.create(**validated_data)
         instance.full_clean()
         instance.save()
 

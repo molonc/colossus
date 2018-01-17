@@ -33,7 +33,7 @@ from core.models import (
     SublibraryInformation,
     )
 
-from sisyphus.models import AnalysisInformation, AnalysisRun
+from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
 
 #============================
@@ -132,7 +132,7 @@ class AnalysisInformationViewSet(viewsets.ModelViewSet):
     View for Analysis Objects
     Analysis Objects are queryable by Jira ticket
     """
-    queryset = AnalysisInformation.objects.all()
+    queryset = DlpAnalysisInformation.objects.all()
     serializer_class = AnalysisInformationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
