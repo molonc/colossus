@@ -14,8 +14,10 @@ Library Details
             <td id="tdid" class="notes"><a href="{{library.sample.get_absolute_url}}">{{library.sample}}</a></td>
         </tr>
         <tr>
+            {% if library_type == 'pbal' %}
             <th id="thid"> Number of plates:</th>
             <td id="tdid" class="notes">{{library.plate_set.count}}</td>
+            {% endif %}
         </tr>
         {% for field, value in library.get_field_values.items %}
         <tr>

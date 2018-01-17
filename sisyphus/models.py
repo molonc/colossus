@@ -187,13 +187,6 @@ class DlpAnalysisInformation(AbstractAnalysisInformation):
 class PbalAnalysisInformation(AbstractAnalysisInformation):
     sequencings = models.ManyToManyField(PbalSequencing)
 
-    library = models.ForeignKey(
-        DlpLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-        null=True
-
-    )
     version = models.ForeignKey(
         PbalAnalysisVersion,
         verbose_name="Analysis Version",
@@ -204,13 +197,6 @@ class PbalAnalysisInformation(AbstractAnalysisInformation):
 class TenxAnalysisInformation(AbstractAnalysisInformation):
     sequencings = models.ManyToManyField(TenxSequencing)
 
-    library = models.ForeignKey(
-        DlpLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-        null=True
-
-    )
     version = models.ForeignKey(
         TenxAnalysisVersion,
         verbose_name="Analysis Version",
