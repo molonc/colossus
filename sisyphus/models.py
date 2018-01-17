@@ -173,7 +173,6 @@ class DlpAnalysisInformation(AbstractAnalysisInformation):
         DlpLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
-        null=True,
     )
 
     sequencings = models.ManyToManyField(DlpSequencing)
