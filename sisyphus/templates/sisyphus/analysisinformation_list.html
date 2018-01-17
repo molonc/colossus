@@ -20,15 +20,20 @@
                 <th>Jira Ticket</th>
                 <th>Priority</th>
                 <th>Sequences Analyzed</th>
+                <th>Library</th>
+
             </tr>
         </thead>
         <tbody>
             {% for analysis in analyses %}
               <tr>
-                  <td><a href="{% url 'sisyphus:analysisinformation_detail' pk=analysis.pk%}">{{ analysis }}</a></td>
+                  <td><a href="{% url 'sisyphus:analysisinformation_detail' pk=analysis.pk%}">{{ analysis.pk }}</a></td>
                   <td><a href="https://www.bcgsc.ca/jira/browse/{{analysis.analysis_jira_ticket}}">{{analysis.analysis_jira_ticket}}</a></td>
                   <td>{{ analysis.get_priority_level_display }}</td>
                   <td>{{ analysis.sequencings.all|join:", "}}</td>
+                  <td>{{ analysis.library }}</td>
+
+
               </tr>
             {% endfor %}
         </tbody>
