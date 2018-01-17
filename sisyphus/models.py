@@ -169,6 +169,13 @@ class AbstractAnalysisInformation(models.Model):
 
 
 class DlpAnalysisInformation(AbstractAnalysisInformation):
+    library = models.ForeignKey(
+        DlpLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
     sequencings = models.ManyToManyField(DlpSequencing)
 
     version = models.ForeignKey(
