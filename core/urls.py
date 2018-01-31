@@ -3,7 +3,7 @@ Created on May 16, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
 
-Updated Nov. 30, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
+Updated by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 from django.conf.urls import url
@@ -11,6 +11,7 @@ from . import views
 
 app_name = 'core'
 urlpatterns = [
+    url(r'^inventory$', views.Inventory.as_view(), name='inventory'),
     url(r'^sample/(?P<pk>\d+)$', views.SampleDetail.as_view(), name='sample_detail'),
     url(r'^sample/list$', views.SampleList.as_view(), name='sample_list'),
     url(r'^sample/create/$', views.SampleCreate.as_view(), name='sample_create'),
