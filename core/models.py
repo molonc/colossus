@@ -1094,8 +1094,8 @@ class SequencingDetail(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Sequencing']
     values_to_exclude = ['id', 'sequencing']
     SEQ_CENTER = (
-        ('bccagsc', 'BCCAGSC'),
-        ('ubcbrc', 'UBCBRC'),
+        ('BCCAGSC', 'BCCAGSC'),
+        ('UBCBRC', 'UBCBRC'),
     )
 
     # fields
