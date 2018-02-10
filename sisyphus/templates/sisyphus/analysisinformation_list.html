@@ -21,6 +21,8 @@
                 <th>Priority</th>
                 <th>Sequences Analyzed</th>
                 <th>Library</th>
+                <th>Analysis Run</th>
+
             </tr>
         </thead>
         <tbody>
@@ -31,6 +33,8 @@
                   <td>{{ analysis.get_priority_level_display }}</td>
                   <td>{{ analysis.sequencings.all|join:", "}}</td>
                   <td>{{ analysis.library }}</td>
+                  <td>{{ analysis.analysis_run }}</td>
+
               </tr>
             {% endfor %}
         </tbody>

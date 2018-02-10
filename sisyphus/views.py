@@ -25,8 +25,8 @@ from django.http import HttpResponseRedirect
 from core.helpers import *
 from core.models import (
     DlpLibrary,
-    DlpSequencingDetail
-)
+    DlpSequencingDetail,
+    DlpLane)
 from .forms import *
 from .models import *
 
@@ -71,11 +71,18 @@ class AnalysisInformationCreate(CreateView):
         # access to the instance of AnalysisInformation in the AnalysisInformationCreate view is possible
         self.object = DlpAnalysisInformation()
         self.library = library
-
         # adding library to TEMPLATE context here
         context =  super(AnalysisInformationCreate, self).get_context_data()
-        context.update({'library':library})
-        return context
+        if(DlpSequencing.objects.filter(library__pk=library.pk).filter().exists()):
+            context_dict = {}
+            for sequences in DlpSequencing.objects.filter(library__pk=library.pk).filter():
+                flow_cell_id = DlpLane.objects.filter(sequencing=sequences).values_list('flow_cell_id',flat=True)
+                context_dict[str(sequences)] = flow_cell_id
+            context.update({'library':library, 'lane':context_dict})
+            return context
+        else:
+            context.update({'library':library})
+            return context
 
     def get_form_kwargs(self):
         """
@@ -93,6 +100,9 @@ class AnalysisInformationCreate(CreateView):
         self.library=get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
         form = self.get_form()
         if form.is_valid():
+            analysis_information = form.save()
+            analysis_information.analysis_run = AnalysisRun.objects.create(log_file=" ",last_updated=None,run_status="W")
+            analysis_information.save()
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
@@ -105,13 +115,6 @@ class AnalysisInformationCreate(CreateView):
         If the form is valid, save the associated model, and create the associated analysis run model
         """
         self.object = form.save()
-        analysis_run = AnalysisRun(
-                analysis_information=self.object,
-                analysis_submission_date=timezone.now(),
-                analysis_completion_date=None,
-                run_status='W',
-        )
-        analysis_run.save()
         return super(AnalysisInformationCreate, self).form_valid(form)
 
     def form_invalid(self, form, **kwargs):
@@ -180,6 +183,7 @@ def analysis_delete(request, pk):
 @Render("sisyphus/analysisinformation_list.html")
 def analysisinformation_list(request):
     """list of analysis information."""
+
     context = {
         'analyses': DlpAnalysisInformation.objects.all().order_by('analysis_jira_ticket'),
     }

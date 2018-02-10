@@ -1016,7 +1016,7 @@ class Sequencing(models.Model, FieldValue):
     objects = SequencingManager()
 
     def __str__(self):
-        return 'SEQ_' + self.library.get_library_id()
+        return 'SEQ_' + self.library.get_library_id() +"_" + str(self.id)
 
     def has_sequencing_detail(self):
         return hasattr(self, self.library_type + 'sequencingdetail')
@@ -1061,7 +1061,6 @@ class PbalSequencing(Sequencing):
         verbose_name="Library",
         on_delete=models.CASCADE,
     )
-    
 
 class TenxSequencing(Sequencing):
     

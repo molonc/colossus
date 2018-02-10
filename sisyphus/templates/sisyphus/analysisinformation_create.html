@@ -1,6 +1,5 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
-
 {% block title %}
     Analysis Information
 {% endblock %}
@@ -20,7 +19,20 @@
                 </th>
                 <td>
                 {{ field.errors }}
-                {{ field }}
+                {% if field.name == "sequencings" %}
+                    {%for f in field  %}
+                        {% for key,value in lane.items %}
+                            {% if f.choice_label == key %}
+                                {{f}}
+                                <ul>
+                                    {{value|unordered_list}}
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {{ field }}
+                {% endif%}
                 {% if field.help_text %}
                         <p class="helptext">{{ field.help_text }}</p>
                 {% endif %}

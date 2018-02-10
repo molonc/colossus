@@ -111,6 +111,9 @@ class AnalysisRun(models.Model):
 
     log_file = create_chrfield("error_log", default=None, blank=True, null=True, max_length=1000)
 
+    def __str__(self):
+        return 'Run Status: %s, Last Updated  %s' % (self.run_status, self.last_updated)
+
     def get_absolute_url(self):
         return reverse("sisyphus:analysisrun_detail")
 
