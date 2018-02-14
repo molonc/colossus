@@ -140,6 +140,7 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
         model = DlpAnalysisInformation
         fields = (
             'id',
+            'library',
             'priority_level',
             'analysis_jira_ticket',
             'version',
