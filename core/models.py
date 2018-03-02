@@ -176,7 +176,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         blank=False,
     )
     cell_type = create_chrfield("Cell type")
-    pathology_disease_name = create_chrfield("Pathology/disease name")
+    pathology_disease_name = create_chrfield("Pathology/disease name (for diseased samples only)")
     additional_pathology_info = create_chrfield("Additional pathology information")
     grade = create_chrfield("Grade")
     stage = create_chrfield("Stage")
@@ -524,7 +524,8 @@ class DlpLibrarySampleDetail(LibrarySampleDetail):
     )
 
     spotting_location_choices = (
-        ('A','Aparicio Lab'),
+        ('AD','Aparicio Lab - Deckard'),
+        ('AR','Aparicio Lab - Rachael'),
         ('H','Hansen Lab'),
         ('G','GSC'),
     )
@@ -557,7 +558,8 @@ class PbalLibrarySampleDetail(LibrarySampleDetail):
     )
 
     spotting_location_choices = (
-        ('A','Aparicio Lab'),
+        ('AD','Aparicio Lab - Deckard'),
+        ('AR','Aparicio Lab - Rachael'),
         ('H','Hansen Lab'),
         ('G','GSC'),
         ('T', 'TFL flow facility'),
@@ -639,7 +641,8 @@ class DlpLibraryConstructionInformation(LibraryConstructionInformation):
     )
 
     spotting_location_choices = (
-        ('A','Aparicio Lab'),
+        ('AD','Aparicio Lab - Deckard'),
+        ('AR','Aparicio Lab - Rachael'),
         ('H','Hansen Lab'),
         ('G','GSC'),
     )
@@ -732,12 +735,6 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
         ('M','Microfluidic'),
         ('B','Bulk'),
         ('O','Other'),
-    )
-
-    spotting_location_choices = (
-        ('A','Aparicio Lab'),
-        ('H','Hansen Lab'),
-        ('G','GSC'),
     )
 
     # fields
