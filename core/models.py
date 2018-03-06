@@ -1118,6 +1118,21 @@ class DlpSequencingDetail(SequencingDetail):
         null=True,
     )
 
+    # fields
+    rev_comp_override_choices = (
+        ('i7,i5', 'No Reverse Complement'),
+        ('i7,rev(i5)', 'Reverse Complement i5'),
+        ('rev(i7),i5', 'Reverse Complement i7'),
+        ('rev(i7),rev(i5)', 'Reverse Complement i7 and i5'),
+    )
+
+    rev_comp_override = create_chrfield(
+        "Reverse Complement Override",
+        choices=rev_comp_override_choices,
+        default=None,
+        null=True,
+    )
+
 
 class PbalSequencingDetail(SequencingDetail):
 

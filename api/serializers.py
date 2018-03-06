@@ -58,6 +58,7 @@ class SequencingDetailSerializer(serializers.ModelSerializer):
         fields = (
             'gsc_library_id',
             'sequencing_center',
+            'rev_comp_override',
         )
 
 
@@ -75,7 +76,7 @@ class SequencingSerializer(serializers.ModelSerializer):
             'sequencing_instrument',
             'submission_date',
             'dlplane_set',
-            'dlpsequencingdetail'
+            'dlpsequencingdetail',
         )
 
 
