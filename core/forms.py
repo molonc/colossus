@@ -136,6 +136,7 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     labels = {
         'tissue_type':('*Tissue type'),
         'anatomic_site':('*Anatomic site'),
+        'pathology_disease_name': ('*Pathology/disease name (for diseased samples only)')
     },
 )
 
