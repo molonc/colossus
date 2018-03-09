@@ -23,7 +23,7 @@ from core.models import (
     DlpLane
 )
 
-from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun
+from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
 
 #============================
 # Other imports
@@ -136,7 +136,17 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
         )
 
 
+class DlpAnalysisVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpAnalysisVersion
+        fields = (
+            'version',
+        )
+
+
 class AnalysisInformationSerializer(serializers.ModelSerializer):
+    version = DlpAnalysisVersionSerializer(read_only=True)
+
     class Meta:
         model = DlpAnalysisInformation
         fields = (
