@@ -145,6 +145,7 @@ class DlpAnalysisVersionSerializer(serializers.ModelSerializer):
 
 
 class AnalysisInformationSerializer(serializers.ModelSerializer):
+    reference_genome = ReferenceGenomeSerializer(read_only=True)
     version = DlpAnalysisVersionSerializer(read_only=True)
 
     class Meta:
