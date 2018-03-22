@@ -7,7 +7,7 @@ Delete Library
 
 {% block body %}
 <div class="container graybg">
-    <h5>Are you sure you want to detete library <i class="emph">{{library}}</i>? All of the following related items will be deleted too:</h5>
+    <h5>Are you sure you want to delete library <i class="emph">{{library}}</i>? All of the following related items will be deleted too:</h5>
     {% if library.dlpsequencing_set.all %}
     <ul style="list-style-type:square">
     {% for sequencing in library.dlpsequencing_set.all %}

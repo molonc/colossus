@@ -7,7 +7,7 @@ Delete Sample
 
 {% block body %}
 <div class="container graybg">
-    <h5>Are you sure you want to detete sample <i class="emph">{{sample.sample_id}}</i>? All of the following related items will be deleted too:</h5>
+    <h5>Are you sure you want to delete sample <i class="emph">{{sample.sample_id}}</i>? All of the following related items will be deleted too:</h5>
     {% if sample.dlplibrary_set.all %}
     <ul style="list-style-type:square">
     {% for library in sample.dlplibrary_set.all %}
