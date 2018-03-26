@@ -50,6 +50,7 @@ from .models import (
     ChipRegionMetadata,
     MetadataField,
     Plate,
+    Library
 )
 from sisyphus.models import *
 from .forms import (
@@ -1607,3 +1608,15 @@ def dlp_get_cell_graph(request):
     os.remove(output_plots_path)
 
     return response
+
+
+def export_sublibrary_csv(request,pk):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="Sublibrary-info.csv"'
+    dlp = DlpLibrary.objects.get(id=pk)
+    df = pd.DataFrame(list(dlp.sublibraryinformation_set.all().values()))
+    df = df.assign(Sublibrary_information = pd.Series([x.get_sublibrary_id()for x in dlp.sublibraryinformation_set.all()], index=df.index))
+    df.to_csv(response)
+    return response
+
+

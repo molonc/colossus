@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^lane/update/(?P<pk>\d+)$', views.DlpLaneUpdate.as_view(), name='lane_update'),
     url(r'^lane/delete/(?P<pk>\d+)$', views.DlpLaneDelete.as_view(), name='lane_delete'),
     url(r'^summary$', views.dlp_summary_view, name='summary'),
-    url(r'summary/graph_cell_counts/$', views.dlp_get_cell_graph, name='summary_graph')
+    url(r'summary/graph_cell_counts/$', views.dlp_get_cell_graph, name='summary_graph'),
+    url(r'^library/(?P<pk>\d+)/export', views.export_sublibrary_csv, name='export_sublibrary_csv'),
 ]

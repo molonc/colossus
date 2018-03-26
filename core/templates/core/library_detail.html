@@ -270,7 +270,8 @@ Library Details
                 {% endfor %}
             </tbody>
         </table>
-    </div>    
+    </div>
+    <a href="{% url 'dlp:export_sublibrary_csv' pk=library.pk %}">Export HTML Table To CSV File</a>
     {% else %}
     <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
     {% endif %}
