@@ -93,6 +93,7 @@ class Sample(models.Model, FieldValue):
         null=True,
         blank=True,
     )
+    notes = create_textfield("Notes")
 
     def has_additional_sample_information(self):
         return hasattr(self, 'additionalsampleinformation')
