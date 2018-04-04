@@ -341,6 +341,9 @@ class TenxLibrary(Library):
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
 
+    def get_id(self):
+        return "TENX" + format(self.id, "04")
+
 
 class TenxCondition(models.Model, FieldValue):
     """A 10x experimental condition."""

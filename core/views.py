@@ -544,6 +544,8 @@ class LibraryCreate(TemplateView):
         else:
             sample = None
 
+        result_list = list(chain(DlpLibrary.objects.all(), TenxLibrary.objects.all()))
+
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
@@ -553,7 +555,7 @@ class LibraryCreate(TemplateView):
             'projects': [t.name for t in Tag.objects.all()],
             'sample': str(sample),
             'sample_id': pk,
-            'related_libs': DlpLibrary.objects.all(),
+            'related_libs': result_list,
             'library_type': self.library_type,
         }
         return context

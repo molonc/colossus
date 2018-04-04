@@ -61,6 +61,8 @@
                             <a href="{% url library_type|add:':library_detail' pk=library.pk %}">
                                 {% if library_type == 'dlp' %}
                                     {{ library.pool_id }}
+                                {% elif library_type == 'tenx' %}
+                                    {{library.get_id}}
                                 {% else %}
                                     {{ library.id }}
                                 {% endif %}

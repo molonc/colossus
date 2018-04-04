@@ -11,6 +11,7 @@
             <thead>
                 <th>Project</th>
                 <th>Libraries</th>
+                <th>Library Type</th>
                 <th>Number of Libraries</th>
                 <th class="no-sort-col"></th>
             </thead>
@@ -26,7 +27,12 @@
                         {% endfor %}
                     </td>
                     <td>
-                        {{ project.get_libraries|length }}
+                        {% for library in project.get_libraries %}
+                            <p style="margin: 0">{{ library.library_type }}</p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {{project.get_libraries|length}}
                     </td>
                     <td>
                         <div style="float: right; min-width: 69px">
