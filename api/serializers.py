@@ -86,6 +86,7 @@ class LibrarySerializer(serializers.ModelSerializer):
     class Meta:
         model = DlpLibrary
         fields = (
+            'id',
             'pool_id',
             'jira_ticket',
             'num_sublibraries',
