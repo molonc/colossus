@@ -172,6 +172,17 @@ class SampleSheet(object):
         'Sample_Project',
         'Description'
         ]
+        self._rev_comp_i7 = False
+        self._rev_comp_i5 = False
+        # All the sequencing machines listed in the models need i7 to be reverse complemented
+        if self._si != "O":
+            self._rev_comp_i7 = True
+        # Only the NextSeq & HX requires the i5 to be reverse complemented
+        if self._si == "N550" or self._si!='HX':
+            self._rev_comp_i5 = True
+        rev_comp_override = self._lane.sequencing.dlpsequencingdetail.rev_comp_override
+        self._rev_comp_i7 = ('rev(i7)' in rev_comp_override)
+        self._rev_comp_i5 = ('rev(i5)' in rev_comp_override)
 
     @property
     def sequencing(self):
@@ -231,6 +242,14 @@ class SampleSheet(object):
             row = str(d['row']) if d['row'] > 9 else '0' + str(d['row'])
             col = str(d['column']) if d['column'] > 9 else '0' + str(d['column'])
 
+            index = d['primer_i7']
+            if self._rev_comp_i7:
+                index = _rc(index)
+
+            index2 = d['primer_i5']
+            if self._rev_comp_i5:
+                index2 = _rc(index2)
+
             res = {
             'Sample_ID': '-'.join([
             str(self._lane.sequencing.library.sample),
@@ -242,12 +261,9 @@ class SampleSheet(object):
             'Sample_Plate': 'R' + str(d['row']) + '_C' + str(d['column']),
             'Sample_Well': 'R' + str(d['row']) + '_C' + str(d['img_col']),
             'I7_Index_ID': d['index_i7'],
-            # All the sequencing machines listed in the models need i7 to be reverse complemented
-            'index': d['primer_i7'] if self._si == "O" else _rc(d['primer_i7']),
+            'index': index,
             'I5_Index_ID': d['index_i5'],
-            # Only the NextSeq & HX requires the i5 to be reverse complemented
-            'index2': d['primer_i5'] if (self._si != "N550") and (self._si!='HX')  else _rc(d['primer_i5']),
-            #'Description': 'CC=<cell call number>;EC=<experimental condition letter>',
+            'index2': index2,
             'Description': 'CC=' + d['pick_met'] + ';' + 'EC=' + d['condition'],
             }
             return res
