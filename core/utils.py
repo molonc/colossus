@@ -181,8 +181,9 @@ class SampleSheet(object):
         if self._si == "N550" or self._si!='HX':
             self._rev_comp_i5 = True
         rev_comp_override = self._lane.sequencing.dlpsequencingdetail.rev_comp_override
-        self._rev_comp_i7 = ('rev(i7)' in rev_comp_override)
-        self._rev_comp_i5 = ('rev(i5)' in rev_comp_override)
+        if rev_comp_override is not None:
+            self._rev_comp_i7 = ('rev(i7)' in rev_comp_override)
+            self._rev_comp_i5 = ('rev(i5)' in rev_comp_override)
 
     @property
     def sequencing(self):
