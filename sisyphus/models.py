@@ -86,15 +86,6 @@ class AnalysisRun(models.Model):
     Analysis/workflow details filled in or changed by database admin
     """
 
-    # choices
-    run_status_choices = (
-        ('W', 'Waiting to be reviewed/submitted'),
-        ('R', 'Running'),
-        ('C', 'Completed successfully'),
-        ('E', 'Error in run'),
-        ('A', 'Archiving'),
-    )
-
     last_updated = models.DateField(
         "Analysis last updated date/time",
         null=True,
@@ -105,8 +96,7 @@ class AnalysisRun(models.Model):
         "Run Status",
         blank=False,
         null=False,
-        choices=run_status_choices,
-        default="W"
+        default="Unknown"
     )
 
     log_file = create_chrfield("error_log", default=None, blank=True, null=True, max_length=1000)
