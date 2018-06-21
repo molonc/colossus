@@ -20,6 +20,7 @@ List of Samples
                     <th>Xenograft ID</th>
                     <th>Cell Line ID</th>
                     <th>Anonymous Patient ID</th>
+                    <th>Notes</th>
                     <th></th>
                 </tr>
             </thead>
@@ -32,6 +33,7 @@ List of Samples
                     <td>{{sample.xenograft_id}}</td>
                     <td>{{sample.cell_line_id}}</td>
                     <td>{{sample.anonymous_patient_id}}</td>
+                    <td>{{sample.notes}}</td>
                     <td>
                         <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:sample_update' pk=sample.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;"></i> edit</a>
                         <a href="{% url 'core:sample_delete' pk=sample.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
