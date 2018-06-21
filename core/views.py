@@ -1183,7 +1183,6 @@ def dlp_sequencing_get_gsc_form(request, pk):
     """
     Generates downloadable GSC submission form.
     """
-    
     key = "gsc_form_metadata_%s" % pk
     metadata = request.session.pop(key)
     ofilename, ofilepath = generate_gsc_form(pk, metadata)

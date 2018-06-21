@@ -561,6 +561,13 @@ class GSCFormSubmitterInfo(Form):
         ('D', 'Destroy unused sample'),
     )
 
+    library_construction = (
+        ('Nanowell Single Cell Genome', 'Nanowell Single Cell Genome'),
+        ('Chromium Single Cell RNA', 'Chromium Single Cell RNA'),
+        ('Chromium Genome','Chromium Genome'),
+        ('Chromium Single Cell VDJ','Chromium Single Cell VDJ')
+    )
+
     # fields
     submitter_name = CharField(
         label="Name of Submitter",
@@ -623,6 +630,12 @@ class GSCFormSubmitterInfo(Form):
         label="Is this Chromium library",
         required=False,
     )
+
+    library_method = ChoiceField(
+        label="Library Construction Method",
+        choices=library_construction,
+    )
+
     at_completion = ChoiceField(
         label="At completion of project",
         choices=at_completion_choices,

@@ -292,7 +292,7 @@ def _rc(primer):
 #-----------------------------
 def generate_gsc_form(pk, metadata):
     """generate the GSC submission form for the given library."""
-    gsc_form = GSCForm(pk)
+    gsc_form = GSCForm(pk,metadata["library_method"])
     pool_df = gsc_form.meta_df
     sample_df = gsc_form.data_df
     header1 = gsc_form.meta_header
@@ -314,9 +314,10 @@ class GSCForm(object):
     GSC sequencing submission form.
     """
 
-    def __init__(self, pk):
+    def __init__(self, pk,library):
         self._sequencing = get_object_or_404(DlpSequencing, pk=pk)
         self._library = self._sequencing.library
+        self._library_method = library
         self._libconst = self._library.dlplibraryconstructioninformation
         self._libquant = self._library.dlplibraryquantificationandstorage
         self._sample = self._library.sample
@@ -334,7 +335,8 @@ class GSCForm(object):
         'Storage Medium',
         'Quantification Method',
         'Library Type',
-        'Library Construction Method',
+        'NON Chromium / Single Cell'
+        'Chromium / Single Cell',
         'Size Range (bp)',
         'Average Size (bp)',
         'Number of libraries in pool',
@@ -386,9 +388,13 @@ class GSCForm(object):
         'Crosslinking Time',
         'Sonication Time',
         'Antibody Used',
-        'Antibody catalogue #',
+        'Antibody catalogue number',
+        'Antibody Lot number',
         'Antibody Vendor',
-        'Amount of Antibody Used',
+        'Amount of Antibody Used(ug)',
+        'Amount of Bead Used(ul)',
+        'Bead Type',
+        'Amount of Chromatin Used(ug)',
         ]
         self._meta_df = self._get_meta_df()
         self._data_df = self._get_data_df()
@@ -437,7 +443,8 @@ class GSCForm(object):
         self._libquant.storage_medium,
         self._libquant.quantification_method,
         self._libconst.library_type,
-        self._libconst.library_construction_method,
+        " ",
+        self._library_method,
         self._libquant.size_range,
         self._libquant.average_size,
         self._library.num_sublibraries,
@@ -492,7 +499,7 @@ class GSCForm(object):
         'Storage Medium': "", #self._libquant.storage_medium,
         'Quantification Method': "", #self._libquant.quantification_method,
         'Library Type': self._libconst.library_type,
-        'Library Construction Method': self._libconst.library_construction_method,
+        'Library Construction Method': self._library_method,
         'Size Range (bp)': self._libquant.size_range,
         'Average Size (bp)': self._libquant.average_size,
         'Chromium Sample Index Name': "",
@@ -501,16 +508,19 @@ class GSCForm(object):
         sequencing_columns = {
         'Index Read Type (select from drop down list)': self._sequencing.index_read_type,
         }
-
         other_columns = {
         'No. of cells/IP': None,
         'Crosslinking Method': None,
         'Crosslinking Time': None,
         'Sonication Time': None,
         'Antibody Used': None,
-        'Antibody catalogue #': None,
+        'Antibody catalogue number': None,
+        'Antibody Lot number': None,
         'Antibody Vendor': None,
-        'Amount of Antibody Used': None,
+        'Amount of Antibody Used(ug)': None,
+        'Amount of Bead Used(ul)': None,
+        'Bead Type': None,
+        'Amount of Chromatin Used(ug)': None,
         }
 
         res = []
@@ -526,7 +536,6 @@ class GSCForm(object):
             d.update(sequencing_columns)
             d.update(other_columns)
             res.append(d)
-
         df = pd.DataFrame(res)
         # reorder the columns
         df = df[self._data_colnames]
@@ -588,7 +597,6 @@ class Submission(object):
 
         self.pool_start = 63
         self.sample_start = self.pool_start + len(df_pool) + 10
-
         self.writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
 
