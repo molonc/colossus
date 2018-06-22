@@ -595,8 +595,8 @@ class Submission(object):
 
     def __init__(self, df_pool, df_samples, output):
 
-        self.pool_start = 63
-        self.sample_start = self.pool_start + len(df_pool) + 10
+        self.pool_start = 65
+        self.sample_start = self.pool_start + len(df_pool) + 9
         self.writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
 
@@ -630,12 +630,14 @@ class Submission(object):
         HEADER = ["Deliver/ship samples on dry ice or ice pack to:",
                   "%s" % info_dict['name'],
                   "%s" % info_dict['org'],
+                  "%s" % info_dict['org_gsc'],
+                  "%s" % info_dict['org_bcca'],
                   "%s" % info_dict['addr'],
-                  "",
+                  "%s" % info_dict['city'],
+                  "%s" % info_dict['country'],
                   "",
                   "Email: %s" % info_dict['email'],
                   "Tel: %s" % info_dict['tel'],
-                  "",
                   "",
                   ]
 
@@ -690,7 +692,7 @@ class Submission(object):
                 self.worksheet.write(input_cell.format(column="A", row=x+1), HEADER[x], text)
 
 
-        row += 2
+        row += 1
         self.worksheet.write(input_cell.format(column="A", row=row), "PLEASE PROVIDE COMPLETE INFORMATION FOR YOUR SAMPLES IN THE FIELDS BELOW.  ENTER \"N/A\" IN FIELDS THAT DO NOT APPLY TO YOUR SAMPLES.", red)
 
         row += 2
@@ -781,7 +783,7 @@ class Submission(object):
         self.worksheet.write(input_cell.format(column="B", row=row), at_completion);
         self.worksheet.write(input_cell.format(column="C", row=row), "=IF(EXACT(B45, \"Destroy Unused Sample\"), \"GSC will destroy any remaining sample at completion of project\", IF(EXACT(B45,\"Return Unused Sample\"), \"GSC will return any residual sample at Submitter's expense\",\"\"))", bold)
 
-        row += 2
+        row += 3
         self.worksheet.write(input_cell.format(column="A", row=row), "Sample Requirements (Volume & Amounts):", right_align)
         self.worksheet.write(input_cell.format(column="B", row=row), "http://www.bcgsc.ca/services/sequencing-libraries-faq")
 

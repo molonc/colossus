@@ -531,12 +531,32 @@ class GSCFormDeliveryInfo(Form):
     org = CharField(
         label="Organization",
         max_length=100,
-        initial="Biospecimen Core, Genome Sciences Centre, BC Cancer Agency",
+        initial="Biospecimen Core",
+    )
+    org_gsc = CharField(
+        label="GSC",
+        max_length=100,
+        initial="Genome Sciences Centre",
+    )
+    org_bcca = CharField(
+        label="BC Cancer Agency",
+        max_length=100,
+        initial="BC Cancer Agency",
     )
     addr = CharField(
         label="Address",
         max_length=100,
-        initial="Suite 100, 570 West 7th Avenue, Vancouver, BC  V5Z 4S6, Canada",
+        initial="Suite 100, 570 West 7th Avenue",
+    )
+    city = CharField(
+        label="City",
+        max_length=100,
+        initial="Vancouver, BC  V5Z 4S6",
+    )
+    country = CharField(
+        label="Country",
+        max_length=100,
+        initial="Canada",
     )
     email = EmailField(
         label="Email",
