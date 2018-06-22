@@ -13,8 +13,48 @@
             <td id="tdid" class="notes"><a href="{{library.get_absolute_url}}">{{ library.pool_id }}</a></td>
         </tr>
         <tr>
+            <th id="thid">Priority:</th>
+            <td id="tdid">{{ object.get_priority_level_display}}</td>
+        </tr>
+        <tr>
             <th id="thid">Analysis ID:</th>
             <td id="tdid">{{ object.id }}</td>
+        </tr>
+        <tr>
+            <th id="thid">Analysis Jira Ticket:</th>
+            <td id="tdid" ><a href="https://www.bcgsc.ca/jira/browse/{{object.analysis_jira_tickett}}">{{object.analysis_jira_ticket}}</a></td>
+        </tr>
+        <tr>
+            <th id="thid">Analysis Submission Date:</th>
+            <td id="tdid">{{ object.analysis_submission_date }}</td>
+        </tr>
+        <tr>
+            <th id="thid">Workflow:</th>
+            <td id="tdid">{{ object.version }}</td>
+        </tr>
+        <tr>
+            <th id="thid">Aligner Option:</th>
+            <td id="tdid">{{ object.get_aligner_display }}</td>
+        </tr>
+        <tr>
+            <th id="thid">Smoothing Option:</th>
+            <td id="tdid">{{ object.get_smoothing_display }}</td>
+        </tr>
+        <tr>
+            <th id="thid">Reference:</th>
+            <td id="tdid">{{ object.reference_genome }}</td>
+        </tr>
+        <tr>
+            <th id="thid">Submission Date:</th>
+            <td id="tdid">{{ object.analysis_submission_date }}</td>
+        </tr>
+        <tr>
+            <th id="thid">SFTP Path:</th>
+            <td id="tdid" >{{ object.sftp_path }}</td>
+        </tr>
+            <tr>
+            <th id="thid">Tantalus Path:</th>
+            <td id="tdid" >{{ object.tantalus_path }}</td>
         </tr>
         {% for field, value in object.get_field_values.items %}
         <tr>

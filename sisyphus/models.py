@@ -115,6 +115,20 @@ class AbstractAnalysisInformation(models.Model):
     fields_to_exclude = ['ID']
     values_to_exclude = ['id']
 
+    # Aligner choices
+    aligner_choices = (
+        ('A','bwa-aln'),
+        ('M','bwa-mem'),
+    )
+
+    # Smoothing choices
+    smoothing_choices= (
+        ('M','modal'),
+        ('L','loess'),
+    )
+
+    analysis_jira_ticket = create_chrfield("Jira ticket", blank=False)
+
     # database relationships
     analysis_run = models.OneToOneField(AnalysisRun, null=True)
 
@@ -134,7 +148,21 @@ class AbstractAnalysisInformation(models.Model):
         null=False,
     )
 
-    analysis_jira_ticket = create_chrfield("Jira ticket", blank=False)
+    aligner = create_chrfield(
+        "Aligner",
+        choices=aligner_choices,
+        default="A",
+        blank=False,
+        null=False,
+    )
+
+    smoothing = create_chrfield(
+        "Smoothing",
+        choices=smoothing_choices,
+        default="M",
+        blank=False,
+        null=False,
+    )
 
     # fields
     analysis_submission_date = models.DateField(
@@ -149,7 +177,17 @@ class AbstractAnalysisInformation(models.Model):
         null=True,
     )
 
-    sisyphus_options = JSONField(default={}, blank=True, null=True)
+    sftp_path = create_chrfield(
+        "sftp path",
+        null=True,
+        blank=True,
+    )
+
+    tantalus_path = create_chrfield(
+        "tantalus path",
+        null=True,
+        blank=True,
+    )
 
     def get_absolute_url(self):
         return reverse("sisyphus:analysisinformation_detail", kwargs={'pk':self.pk})
