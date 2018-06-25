@@ -14,6 +14,7 @@ from __future__ import unicode_literals
 import datetime
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.core.validators import RegexValidator
 
 
 #============================
@@ -1185,7 +1186,8 @@ class Lane(models.Model, FieldValue):
 
     path_to_archive = create_chrfield(
         "Path to archive",
-        max_length=150,
+        blank=False,
+        max_length=150
     )
 
 
