@@ -23,7 +23,8 @@ from core.models import (
     DlpLane,
     ChipRegionMetadata,
     MetadataField,
-    ChipRegion)
+    ChipRegion
+)
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
 

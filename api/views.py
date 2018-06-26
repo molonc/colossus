@@ -23,7 +23,8 @@ from .serializers import (
     SublibraryInformationSerializer,
     AnalysisInformationSerializer,
     AnalysisRunSerializer,
-    ChipRegionSerializer)
+    ChipRegionSerializer
+)
 
 from core.models import (
     Sample,
@@ -31,7 +32,8 @@ from core.models import (
     DlpSequencing,
     DlpLane,
     SublibraryInformation,
-    ChipRegion)
+    ChipRegion
+)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
