@@ -160,7 +160,9 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
             'analysis_submission_date',
             'sequencings',
             'reference_genome',
-            'analysis_run'
+            'analysis_run',
+            'aligner',
+            'smoothing',
         )
 
     def create(self, validated_data):
