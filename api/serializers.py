@@ -160,7 +160,6 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
             'analysis_submission_date',
             'sequencings',
             'reference_genome',
-            'sisyphus_options',
             'analysis_run'
         )
 
