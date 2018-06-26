@@ -20,8 +20,10 @@ from core.models import (
     SublibraryInformation,
     DlpSequencing,
     DlpSequencingDetail,
-    DlpLane
-)
+    DlpLane,
+    ChipRegionMetadata,
+    MetadataField,
+    ChipRegion)
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
 
@@ -177,3 +179,36 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
         instance.sequencings = sequencings
         instance.save()
         return instance
+
+
+class MetadataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MetadataField
+        fields = (
+            '__all__'
+        )
+
+
+class ChipRegionMetadataSerializer(serializers.ModelSerializer):
+    metadata_field = MetadataSerializer(read_only=True)
+    metadata_field = metadata_field['field']._field
+
+    class Meta:
+        model = ChipRegionMetadata
+        fields = (
+            'metadata_field',
+            'metadata_value',
+        )
+
+
+class ChipRegionSerializer(serializers.ModelSerializer):
+    chipregionmetadata_set = ChipRegionMetadataSerializer(read_only=True,many=True)
+
+    class Meta:
+        model = ChipRegion
+        fields = (
+            'library',
+            'region_code',
+            'chipregionmetadata_set'
+        )

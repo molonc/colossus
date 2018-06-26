@@ -22,8 +22,8 @@ from .serializers import (
     SequencingSerializer,
     SublibraryInformationSerializer,
     AnalysisInformationSerializer,
-    AnalysisRunSerializer
-    )
+    AnalysisRunSerializer,
+    ChipRegionSerializer)
 
 from core.models import (
     Sample,
@@ -31,7 +31,7 @@ from core.models import (
     DlpSequencing,
     DlpLane,
     SublibraryInformation,
-    )
+    ChipRegion)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
@@ -156,4 +156,16 @@ class AnalysisRunViewSet(viewsets.ModelViewSet):
         'last_updated',
         'run_status',
         'log_file'
+    )
+
+
+class ExperimentalMetadata(viewsets.ModelViewSet):
+
+
+    queryset = ChipRegion.objects.all()
+    serializer_class = ChipRegionSerializer
+    permission_classes = (AllowAny,)
+    filter_fields = (
+        'library__jira_ticket',
+        'library__pool_id',
     )
