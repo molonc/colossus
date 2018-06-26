@@ -162,8 +162,10 @@ class AnalysisRunViewSet(viewsets.ModelViewSet):
 
 
 class ExperimentalMetadata(viewsets.ModelViewSet):
-
-
+    """
+    View for ChipRegion Objects
+    ChipRegion Objects are queryable by Jira ticket or library pool id
+    """
     queryset = ChipRegion.objects.all()
     serializer_class = ChipRegionSerializer
     permission_classes = (AllowAny,)
