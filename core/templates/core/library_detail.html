@@ -20,6 +20,14 @@ Library Details
             {% endif %}
         </tr>
         {% for field, value in library.get_field_values.items %}
+        {% if library_type == 'dlp' %}
+        <tr>
+            {% if field == "Jira ticket" %}
+            <th id="thid">Montage:</th>
+            <td id="tdid"><a href="https://52.235.35.201/?dashboard={{value}}">{{value}}</a></td>
+            {% endif %}
+        </tr>
+        {% endif %}
         <tr>
             <th id="thid">{{field}}:</th>
             {% if field == "Jira ticket" %}
