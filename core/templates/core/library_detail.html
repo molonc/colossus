@@ -224,7 +224,7 @@ Library Details
     <table class="table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Region Code</th>
+                    <th>experimental condition</th>
                         {% for field in metadata_fields %}
                     <th>{{ field }}</th>
                         {% endfor %}
@@ -259,10 +259,16 @@ Library Details
         <table id="datatable" class="table-striped table-bordered" style="text-align:center;">
             <thead>
                 <tr>
-                    <th>Sublibrary ID</th>
+                    <th>cell_id</th>
                     <th>Condition</th>
                     {% for field in  sublibinfo_fields %}
-                    <th>{{field}}</th>
+                        {% if field == "Pick_Met" %}
+                            <th>cell_call</th>
+                        {% elif field == "Condition" %}
+                            <th>experimental_condition</th>
+                        {% else %}
+                        <th>{{field}}</th>
+                        {% endif %}
                     {% endfor %}
                 </tr>
             </thead>
