@@ -262,13 +262,7 @@ Library Details
                     <th>cell_id</th>
                     <th>Condition</th>
                     {% for field in  sublibinfo_fields %}
-                        {% if field == "Pick_Met" %}
-                            <th>cell_call</th>
-                        {% elif field == "Condition" %}
-                            <th>experimental_condition</th>
-                        {% else %}
                         <th>{{field}}</th>
-                        {% endif %}
                     {% endfor %}
                 </tr>
             </thead>
