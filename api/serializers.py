@@ -205,10 +205,11 @@ class ChipRegionMetadataSerializer(serializers.ModelSerializer):
 
 class ChipRegionSerializer(serializers.ModelSerializer):
     chipregionmetadata_set = ChipRegionMetadataSerializer(read_only=True,many=True)
-
+    jira_ticket = serializers.CharField(source='library.jira_ticket')
     class Meta:
         model = ChipRegion
         fields = (
+            'jira_ticket',
             'library',
             'region_code',
             'chipregionmetadata_set'
