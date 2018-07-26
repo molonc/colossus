@@ -183,8 +183,8 @@ class AbstractAnalysisInformation(models.Model):
         blank=True,
     )
 
-    tantalus_path = create_chrfield(
-        "tantalus path",
+    blob_path = create_chrfield(
+        "Blob path",
         null=True,
         blank=True,
     )

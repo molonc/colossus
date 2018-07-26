@@ -166,6 +166,8 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
             'analysis_run',
             'aligner',
             'smoothing',
+            'sftp_path',
+            'blob_path'
         )
 
     def create(self, validated_data):

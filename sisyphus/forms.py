@@ -43,7 +43,7 @@ class AnalysisInformationForm(ModelForm):
             'reference_genome',
             'analysis_submission_date',
             'sftp_path',
-            'tantalus_path',
+            'blob_path',
         ]
 
         labels = {
@@ -57,7 +57,7 @@ class AnalysisInformationForm(ModelForm):
             'reference_genome':'Reference Genome',
             'analysis_submission_date':'Analysis Submission Date',
             'sftp_path':"SFTP Path",
-            'tantalus_path':"Tantalus Path",
+            'blob_path':"Blob Path",
         }
         help_texts = {
             'library' :'Library',
@@ -70,7 +70,7 @@ class AnalysisInformationForm(ModelForm):
             'reference_genome' : 'Please provide reference genome',
             'analysis_submission_date' :'Analysis Submission Date',
             'sftp_path':"Sftp path",
-            'tantalus_path':"Tantalus path",
+            'blob_path':"Blob path",
         }
     def __init__(self, *args, **kwargs):
         library = kwargs.pop('library')
