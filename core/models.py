@@ -1102,6 +1102,8 @@ class SequencingDetail(models.Model, FieldValue):
     sequencing_center = create_chrfield(
         "Sequencing center",
         choices=SEQ_CENTER,
+        default='BCCAGSC',
+        blank=False
     )
     sequencer_notes = create_textfield("Sequencing notes")
 

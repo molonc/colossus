@@ -23,8 +23,9 @@ from django.forms import (
     ChoiceField,
     ValidationError,
     inlineformset_factory,
-    BaseInlineFormSet
-)
+    BaseInlineFormSet,
+    forms)
+from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 
 
@@ -145,6 +146,9 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 # Library forms
 #---------------------------
 class LibraryForm(ModelForm):
+    additional_title = forms.CharField(max_length=100)
+    jira_user = forms.CharField(max_length=100)
+    jira_password = forms.CharField(widget=forms.PasswordInput)
     class Meta:
         abstract = True
 
@@ -152,16 +156,16 @@ class LibraryForm(ModelForm):
 class DlpLibraryForm(LibraryForm):
     class Meta:
         model = DlpLibrary
-        exclude = ['num_sublibraries']
+        exclude = ['num_sublibraries','jira_ticket']
+
         labels = {
             'primary sample': ('*Sample'),
             'pool_id': ('*Chip ID'),
-            'jira_ticket': ('*Jira Ticket'),
+            'additional_title': ('*Additional Title')
         }
         help_texts = {
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
             'pool_id': ('Chip ID.'),
-            'jira_ticket': ('Jira Ticket.'),
         }
 
     def clean(self):
@@ -427,6 +431,9 @@ class ProjectForm(ModelForm):
 # Sequencing forms
 #---------------------------
 class SequencingForm(ModelForm):
+    jira_user = forms.CharField(max_length=100)
+    jira_password = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         abstract = True
         exclude = ['pool_id']

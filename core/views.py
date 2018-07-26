@@ -9,7 +9,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import os
 import collections
 import subprocess
-
+from jira import JIRA, JIRAError
 
 #============================
 # Django imports
@@ -18,7 +18,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required #, permission_required
 from django.utils.decorators import method_decorator
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView
@@ -525,6 +525,17 @@ class LibraryCreate(TemplateView):
                     # 'LibraryForm' object has no attribute 'save_m2m'.
                     # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
                     instance = lib_form.save(commit=False)
+                    additional_title = lib_form['additional_title'].value()
+                    jira_user = lib_form['jira_user'].value()
+                    jira_password = lib_form['jira_password'].value()
+                    instance.jira_ticket = self.create_jira(instance,additional_title,jira_user,jira_password)
+                    if not instance.jira_ticket:
+                        msg = "Please provide correct JIRA credentials."
+                        app = resolve(request.path_info).app_name
+                        current_url = resolve(request.path_info).url_name
+                        messages.error(request, msg)
+                        link = str(app) + ":" + str(current_url)
+                        return HttpResponseRedirect(reverse(link))
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     if all_valid:
@@ -548,6 +559,29 @@ class LibraryCreate(TemplateView):
         error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
         messages.error(request, error_message)
         return render(request, self.template_name, context)
+
+    def get_credentials(self,jira_user,jira_password):
+        username = str(jira_user)
+        password = str(jira_password)
+        return username, password
+
+    def create_jira(self,instance,title,jira_user,jira_password):
+        auth = self.get_credentials(jira_user,jira_password)
+        try:
+            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
+            title = str(instance.sample) + "-" + str(instance.pool_id) + "-" + str(title)
+            issue_dict = {
+                'project': {'id': 11220},
+                'summary': title,
+                'description': instance.description,
+                'issuetype': {'name': 'Task'},
+                'reporter': {'name': 'danlai'},
+                'assignee': {'name': 'elaks'}
+            }
+            new_issue = jira.create_issue(fields=issue_dict)
+            return str(new_issue)
+        except JIRAError as e:
+            return
 
     def _validate_formsets(self, request, instance):
         all_valid = True
@@ -909,8 +943,18 @@ class SequencingCreate(TemplateView):
                 instance=instance,
             )
             if seqdetail_formset.is_valid():
+                library = instance.library
+                jira_user = form['jira_user'].value()
+                jira_password = form['jira_password'].value()
+                sequencing_center = seqdetail_formset[0]['sequencing_center'].value()
+                if self.update_jira(library,sequencing_center,jira_user,jira_password).status_code == 401:
+                    msg = "Please provide correct JIRA credentials."
+                    app = resolve(request.path_info).app_name
+                    current_url = resolve(request.path_info).url_name
+                    messages.error(request, msg)
+                    link = str(app) + ":" + str(current_url)
+                    return HttpResponseRedirect(reverse(link))
                 seqdetail_formset.save()
-
             msg = "Successfully created the Sequencing."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
@@ -919,6 +963,34 @@ class SequencingCreate(TemplateView):
             messages.error(request, msg)
             seqdetail_formset = self.seqdetail_formset_class()
             return self.get_context_and_render(request, from_library, form, seqdetail_formset)
+
+    def get_credentials(self,jira_user,jira_password):
+        username = str(jira_user)
+        password = str(jira_password)
+        return username, password
+
+    def update_jira(self,library,sequencing_center,jira_user,jira_password):
+        auth = self.get_credentials(jira_user,jira_password)
+        try:
+            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
+            issue = jira.search_issues('issue =' + str(library.jira_ticket))
+            new_watchers = self.get_watchers(sequencing_center)
+            if new_watchers:
+                for watcher in new_watchers['watcher_list']:
+                    jira.add_watcher(issue[0], watcher)
+            return HttpResponse('Successful JIRA access', status=200)
+        except JIRAError as e:
+            return HttpResponse('Unauthorized JIRA access', status=401)
+
+    def get_watchers(self,seq):
+        if seq == 'BCCAGSC':
+            # Watcher list for BCCAGSC. This might be updated in the future
+            watchers = {"watcher_list":["jbiele","elaks","danlai","sshah","saparicio","jedwards","jbwang","yma","dcheng","twong","ktse","sochan","coflanagan"]}
+            return watchers
+        elif seq == 'UBCBRC':
+            # Watcher list for UBCBRC. This might be updated in the future
+            watchers = {"watcher_list":["jbiele","elaks","danlai","sshah","saparicio","jedwards","jbwang","sochan","coflanagan"]}
+            return watchers
 
 
 class DlpSequencingCreate(SequencingCreate):
