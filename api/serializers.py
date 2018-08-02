@@ -42,6 +42,7 @@ class SampleSerializer(serializers.ModelSerializer):
             'sample_id',
             'sample_type',
             'taxonomy_id',
+            'xenograft_id'
         )
 
 
