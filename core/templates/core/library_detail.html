@@ -19,7 +19,7 @@ Library Details
             <td id="tdid" class="notes">{{library.plate_set.count}}</td>
             {% endif %}
         </tr>
-        {% for field, value in library.get_field_values.items %}
+        {% for field, value in library_dict.items %}
         {% if library_type == 'dlp' %}
         <tr>
             {% if field == "Jira ticket" %}

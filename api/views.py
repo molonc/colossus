@@ -111,6 +111,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
     serializer_class = LibrarySerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
+        'id',
         'pool_id',
         'sample__sample_id',
         'jira_ticket',
@@ -142,7 +143,8 @@ class AnalysisInformationViewSet(viewsets.ModelViewSet):
         'analysis_jira_ticket',
         'version',
         'analysis_submission_date',
-        'reference_genome'
+        'reference_genome',
+        'analysis_run',
     )
 
 

@@ -99,6 +99,8 @@ class LibrarySerializer(serializers.ModelSerializer):
             'result',
             'relates_to',
             'dlpsequencing_set',
+            'title',
+            'quality'
         )
 
 class SublibraryInformationSerializer(serializers.ModelSerializer):

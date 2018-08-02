@@ -86,7 +86,7 @@ class AnalysisRun(models.Model):
     Analysis/workflow details filled in or changed by database admin
     """
 
-    last_updated = models.DateField(
+    last_updated = models.DateTimeField(
         "Analysis last updated date/time",
         null=True,
         default=timezone.now

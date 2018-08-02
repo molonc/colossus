@@ -270,6 +270,8 @@ class DlpLibrary(Library):
         verbose_name="Relates to",
         blank=True,
     )
+    title = create_textfield("Title")
+    quality = models.DecimalField("Quality", max_digits=10, decimal_places=2, default=0.75)
 
     def get_library_id(self):
         return '_'.join([self.sample.sample_id, self.pool_id])

@@ -335,6 +335,7 @@ class LibraryDetail(TemplateView):
     template_name = "core/library_detail.html"
 
     def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None):
+        library_dict = self.sort_library_order(library)
         context = {
             'library': library, 
             'library_type': library_type,
@@ -342,6 +343,7 @@ class LibraryDetail(TemplateView):
             'sublibinfo_fields': sublibinfo_fields,
             'chip_metadata': chip_metadata,
             'metadata_fields': metadata_fields,
+            'library_dict':library_dict,
         }
         return render(request, self.template_name, context)
 
@@ -349,6 +351,9 @@ class LibraryDetail(TemplateView):
         library = get_object_or_404(self.library_class, pk=pk)
         library_type = self.library_type
         return self.get_context_and_render(request, library, library_type)
+
+    def sort_library_order(self,library):
+            return library.get_field_values()
 
 
 class DlpLibraryDetail(LibraryDetail):
@@ -382,6 +387,14 @@ class DlpLibraryDetail(LibraryDetail):
             metadata_dict[chip_region.region_code] = row
 
         return self.get_context_and_render(request, library, library_type, analyses, sublibinfo.get_fields(), metadata_dict, fields)
+
+    def sort_library_order(self, library):
+        new_library_order = ['Description', 'Result', 'Title', 'Jira ticket', 'Quality', 'Chip ID', 'Number of sublibraries']
+        sorted_library_dict = OrderedDict()
+        library_dict_original = dict(library.get_field_values())
+        for x in new_library_order:
+            sorted_library_dict[x] = library_dict_original[x]
+        return sorted_library_dict
 
 
 class PbalLibraryDetail(LibraryDetail):
