@@ -146,14 +146,19 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 # Library forms
 #---------------------------
 class LibraryForm(ModelForm):
-    additional_title = forms.CharField(max_length=100)
-    jira_user = forms.CharField(max_length=100)
-    jira_password = forms.CharField(widget=forms.PasswordInput)
     class Meta:
         abstract = True
 
 
 class DlpLibraryForm(LibraryForm):
+
+    def __init__(self,*args, **kwargs):
+        super(DlpLibraryForm, self).__init__(*args, **kwargs)
+        if not self.instance.pk:
+            self.fields['additional_title'] = forms.CharField(max_length=100)
+            self.fields['jira_user'] = forms.CharField(max_length=100)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         model = DlpLibrary
         exclude = ['num_sublibraries','jira_ticket']
@@ -431,8 +436,6 @@ class ProjectForm(ModelForm):
 # Sequencing forms
 #---------------------------
 class SequencingForm(ModelForm):
-    jira_user = forms.CharField(max_length=100)
-    jira_password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         abstract = True
@@ -452,6 +455,13 @@ class SequencingForm(ModelForm):
 
 
 class DlpSequencingForm(SequencingForm):
+
+    def __init__(self,*args,**kwargs):
+        super(DlpSequencingForm,self).__init__(*args,**kwargs)
+        if not self.instance.pk:
+            self.fields['jira_user'] = forms.CharField(max_length=100)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+
     class Meta(SequencingForm.Meta):
         model = DlpSequencing
 

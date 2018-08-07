@@ -271,6 +271,7 @@ class DlpLibrary(Library):
         blank=True,
     )
     title = create_textfield("Title")
+
     quality = models.DecimalField("Quality", max_digits=10, decimal_places=2, default=0.75)
 
     def get_library_id(self):
