@@ -538,97 +538,18 @@ class LibraryCreate(TemplateView):
                     # 'LibraryForm' object has no attribute 'save_m2m'.
                     # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
                     instance = lib_form.save(commit=False)
-                    all_valid, formsets = self._validate_formsets(request, instance)
-                    context.update(formsets)
-                    if all_valid:
-                        instance.save()
-                        # save the ManyToMany field.
-                        lib_form.save_m2m()
-                        # Add information from SmartChipApp files
-                        region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
-                        sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                        if region_metadata is not None and sublib_results is not None:
-                            instance.sublibraryinformation_set.all().delete()
-                            instance.chipregion_set.all().delete()
-                            create_sublibrary_models(instance, sublib_results, region_metadata)
-                        # save the formsets.
-                        [formset.save() for formset in formsets.values()]
-                        messages.success(request, "Successfully created the Library.")
-                        return HttpResponseRedirect(instance.get_absolute_url())
-        except ValueError as e:
-            error_message = ' '.join(e.args)
-
-        error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
-        messages.error(request, error_message)
-        return render(request, self.template_name, context)
-
-    def _validate_formsets(self, request, instance):
-        all_valid = True
-        formsets = {
-            'libdetail_formset': self.libdetail_formset_class(
-                request.POST,
-                instance=instance,
-            ),
-            'libcons_formset': self.libcons_formset_class(
-                request.POST,
-                instance=instance,
-            ),
-            'libqs_formset': self.libqs_formset_class(
-                request.POST,
-                request.FILES or None,
-                instance=instance,
-            ),
-        }
-        for k, formset in formsets.items():
-            if not formset.is_valid():
-                all_valid = False
-            formsets[k] = formset
-        return all_valid, formsets
-
-
-class DlpLibraryCreate(LibraryCreate):
-
-    """
-    DLP library create page.
-    """
-
-    lib_form_class = DlpLibraryForm
-    libdetail_formset_class = DlpLibrarySampleDetailInlineFormset
-    libcons_formset_class = DlpLibraryConstructionInfoInlineFormset
-    libqs_formset_class = DlpLibraryQuantificationAndStorageInlineFormset
-    library_type = 'dlp'
-
-    def _post(self, request, context, library=None):
-        # this is becaues of this django feature:
-        # https://code.djangoproject.com/ticket/1130
-        request.POST['projects'] = ','.join(request.POST.getlist('projects'))
-
-        lib_form = self.lib_form_class(request.POST, instance=library)
-        sublib_form = SublibraryForm(request.POST, request.FILES or None)
-        context['lib_form'] = lib_form
-        context['sublib_form'] = sublib_form
-
-        error_message = ''
-        try:
-            with transaction.atomic():
-                if lib_form.is_valid() and sublib_form.is_valid():
-                    # if 'commit=True' when saving lib_form, then it strangely
-                    # raises the following error when trying to save the
-                    # ManyToMany 'Projects' field:
-                    # 'LibraryForm' object has no attribute 'save_m2m'.
-                    # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
-                    instance = lib_form.save(commit=False)
-                    additional_title = lib_form['additional_title'].value()
-                    jira_user = lib_form['jira_user'].value()
-                    jira_password = lib_form['jira_password'].value()
-                    instance.jira_ticket = self.create_jira(instance, additional_title, jira_user, jira_password)
-                    if not instance.jira_ticket:
-                        msg = "Please provide correct JIRA credentials."
-                        app = resolve(request.path_info).app_name
-                        current_url = resolve(request.path_info).url_name
-                        messages.error(request, msg)
-                        link = str(app) + ":" + str(current_url)
-                        return HttpResponseRedirect(reverse(link))
+                    if context['library_type'] == 'dlp' and library == None:
+                        additional_title = lib_form['additional_title'].value()
+                        jira_user = lib_form['jira_user'].value()
+                        jira_password = lib_form['jira_password'].value()
+                        instance.jira_ticket = self.create_jira(instance, additional_title, jira_user, jira_password)
+                        if not instance.jira_ticket:
+                            msg = "Please provide correct JIRA credentials."
+                            app = resolve(request.path_info).app_name
+                            current_url = resolve(request.path_info).url_name
+                            messages.error(request, msg)
+                            link = str(app) + ":" + str(current_url)
+                            return HttpResponseRedirect(reverse(link))
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     if all_valid:
@@ -675,6 +596,43 @@ class DlpLibraryCreate(LibraryCreate):
             return str(new_issue)
         except JIRAError as e:
             return
+
+    def _validate_formsets(self, request, instance):
+        all_valid = True
+        formsets = {
+            'libdetail_formset': self.libdetail_formset_class(
+                request.POST,
+                instance=instance,
+            ),
+            'libcons_formset': self.libcons_formset_class(
+                request.POST,
+                instance=instance,
+            ),
+            'libqs_formset': self.libqs_formset_class(
+                request.POST,
+                request.FILES or None,
+                instance=instance,
+            ),
+        }
+        for k, formset in formsets.items():
+            if not formset.is_valid():
+                all_valid = False
+            formsets[k] = formset
+        return all_valid, formsets
+
+
+class DlpLibraryCreate(LibraryCreate):
+
+    """
+    DLP library create page.
+    """
+
+    lib_form_class = DlpLibraryForm
+    libdetail_formset_class = DlpLibrarySampleDetailInlineFormset
+    libcons_formset_class = DlpLibraryConstructionInfoInlineFormset
+    libqs_formset_class = DlpLibraryQuantificationAndStorageInlineFormset
+    library_type = 'dlp'
+
 
 class PbalLibraryCreate(LibraryCreate):
 
@@ -999,6 +957,18 @@ class SequencingCreate(TemplateView):
                 instance=instance,
             )
             if seqdetail_formset.is_valid():
+                library = instance.library
+                if library.library_type == 'dlp':
+                    jira_user = form['jira_user'].value()
+                    jira_password = form['jira_password'].value()
+                    sequencing_center = seqdetail_formset[0]['sequencing_center'].value()
+                    if self.update_jira(library, sequencing_center, jira_user, jira_password).status_code == 401:
+                        msg = "Please provide correct JIRA credentials."
+                        app = resolve(request.path_info).app_name
+                        current_url = resolve(request.path_info).url_name
+                        messages.error(request, msg)
+                        link = str(app) + ":" + str(current_url)
+                        return HttpResponseRedirect(reverse(link))
                 seqdetail_formset.save()
             msg = "Successfully created the Sequencing."
             messages.success(request, msg)
@@ -1008,6 +978,34 @@ class SequencingCreate(TemplateView):
             messages.error(request, msg)
             seqdetail_formset = self.seqdetail_formset_class()
             return self.get_context_and_render(request, from_library, form, seqdetail_formset)
+
+    def get_credentials(self, jira_user, jira_password):
+        username = str(jira_user)
+        password = str(jira_password)
+        return username, password
+
+    def update_jira(self, library, sequencing_center, jira_user, jira_password):
+        auth = self.get_credentials(jira_user, jira_password)
+        try:
+            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
+            issue = jira.search_issues('issue =' + str(library.jira_ticket))
+            new_watchers = self.get_watchers(sequencing_center)
+            if new_watchers:
+                for watcher in new_watchers['watcher_list']:
+                    jira.add_watcher(issue[0], watcher)
+            return HttpResponse('Successful JIRA access', status=200)
+        except JIRAError as e:
+            return HttpResponse('Unauthorized JIRA access', status=401)
+
+    def get_watchers(self, seq):
+        if seq == 'BCCAGSC':
+            # Watcher list for BCCAGSC. This might be updated in the future
+            watchers = {"watcher_list":["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "yma","dcheng", "twong", "ktse", "sochan", "coflanagan"]}
+            return watchers
+        elif seq == 'UBCBRC':
+            # Watcher list for UBCBRC. This might be updated in the future
+            watchers = {"watcher_list":["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "sochan","coflanagan"]}
+            return watchers
 
 
 class DlpSequencingCreate(SequencingCreate):
@@ -1021,66 +1019,6 @@ class DlpSequencingCreate(SequencingCreate):
     form_class = DlpSequencingForm
     seqdetail_formset_class = DlpSequencingDetailInlineFormset
     library_type = 'dlp'
-
-    def post(self, request, from_library=None):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            form.save_m2m()
-            seqdetail_formset = self.seqdetail_formset_class(
-                request.POST,
-                instance=instance,
-            )
-            if seqdetail_formset.is_valid():
-                library = instance.library
-                jira_user = form['jira_user'].value()
-                jira_password = form['jira_password'].value()
-                sequencing_center = seqdetail_formset[0]['sequencing_center'].value()
-                if self.update_jira(library, sequencing_center, jira_user, jira_password).status_code == 401:
-                    msg = "Please provide correct JIRA credentials."
-                    app = resolve(request.path_info).app_name
-                    current_url = resolve(request.path_info).url_name
-                    messages.error(request, msg)
-                    link = str(app) + ":" + str(current_url)
-                    return HttpResponseRedirect(reverse(link))
-                seqdetail_formset.save()
-            msg = "Successfully created the Sequencing."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
-        else:
-            msg = "Failed to create the sequencing. Please fix the errors below."
-            messages.error(request, msg)
-            seqdetail_formset = self.seqdetail_formset_class()
-            return self.get_context_and_render(request, from_library, form, seqdetail_formset)
-
-    def get_credentials(self,jira_user,jira_password):
-        username = str(jira_user)
-        password = str(jira_password)
-        return username, password
-
-    def update_jira(self,library,sequencing_center,jira_user,jira_password):
-        auth = self.get_credentials(jira_user,jira_password)
-        try:
-            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
-            issue = jira.search_issues('issue =' + str(library.jira_ticket))
-            new_watchers = self.get_watchers(sequencing_center)
-            if new_watchers:
-                for watcher in new_watchers['watcher_list']:
-                    jira.add_watcher(issue[0], watcher)
-            return HttpResponse('Successful JIRA access', status=200)
-        except JIRAError as e:
-            return HttpResponse('Unauthorized JIRA access', status=401)
-
-    def get_watchers(self,seq):
-        if seq == 'BCCAGSC':
-            # Watcher list for BCCAGSC. This might be updated in the future
-            watchers = {"watcher_list":["jbiele","elaks","danlai","sshah","saparicio","jedwards","jbwang","yma","dcheng","twong","ktse","sochan","coflanagan"]}
-            return watchers
-        elif seq == 'UBCBRC':
-            # Watcher list for UBCBRC. This might be updated in the future
-            watchers = {"watcher_list":["jbiele","elaks","danlai","sshah","saparicio","jedwards","jbwang","sochan","coflanagan"]}
-            return watchers
 
 
 class PbalSequencingCreate(SequencingCreate):
