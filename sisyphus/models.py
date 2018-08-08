@@ -101,6 +101,18 @@ class AnalysisRun(models.Model):
 
     log_file = create_chrfield("error_log", default=None, blank=True, null=True, max_length=1000)
 
+    sftp_path = create_chrfield(
+        "sftp path",
+        null=True,
+        blank=True,
+    )
+
+    blob_path = create_chrfield(
+        "Blob path",
+        null=True,
+        blank=True,
+    )
+
     def __str__(self):
         return 'Run Status: %s, Last Updated  %s' % (self.run_status, self.last_updated)
 
@@ -175,18 +187,6 @@ class AbstractAnalysisInformation(models.Model):
         ReferenceGenome,
         verbose_name="ReferenceGenome",
         null=True,
-    )
-
-    sftp_path = create_chrfield(
-        "sftp path",
-        null=True,
-        blank=True,
-    )
-
-    blob_path = create_chrfield(
-        "Blob path",
-        null=True,
-        blank=True,
     )
 
     def get_absolute_url(self):

@@ -42,8 +42,6 @@ class AnalysisInformationForm(ModelForm):
             'smoothing',
             'reference_genome',
             'analysis_submission_date',
-            'sftp_path',
-            'blob_path',
         ]
 
         labels = {
@@ -56,8 +54,6 @@ class AnalysisInformationForm(ModelForm):
             'smoothing':'Smoothing Option',
             'reference_genome':'Reference Genome',
             'analysis_submission_date':'Analysis Submission Date',
-            'sftp_path':"SFTP Path",
-            'blob_path':"Blob Path",
         }
         help_texts = {
             'library' :'Library',
@@ -69,8 +65,6 @@ class AnalysisInformationForm(ModelForm):
             'smoothing': 'Please provide smoothing options',
             'reference_genome' : 'Please provide reference genome',
             'analysis_submission_date' :'Analysis Submission Date',
-            'sftp_path':"Sftp path",
-            'blob_path':"Blob path",
         }
     def __init__(self, *args, **kwargs):
         library = kwargs.pop('library')
