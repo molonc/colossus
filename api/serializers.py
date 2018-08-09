@@ -141,6 +141,7 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
             'log_file',
             'sftp_path',
             'blob_path',
+            'dlpanalysisinformation',
             'last_updated'
         )
 

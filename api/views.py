@@ -145,6 +145,7 @@ class AnalysisInformationViewSet(viewsets.ModelViewSet):
         'analysis_submission_date',
         'reference_genome',
         'analysis_run',
+        'id',
     )
 
 
@@ -159,6 +160,7 @@ class AnalysisRunViewSet(viewsets.ModelViewSet):
     filter_fields = (
         'last_updated',
         'run_status',
+        'dlpanalysisinformation',
         'log_file'
     )
 
