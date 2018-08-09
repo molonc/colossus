@@ -158,6 +158,7 @@ class AnalysisRunViewSet(viewsets.ModelViewSet):
     serializer_class = AnalysisRunSerializer
     permission_classes = (AllowAny,)
     filter_fields = (
+        'id',
         'last_updated',
         'run_status',
         'dlpanalysisinformation',
