@@ -123,6 +123,13 @@ class SampleForm(ModelForm):
                 msg = "Sample ID already exists."
                 self.add_error('sample_id', msg)
 
+    def __init__(self, *args, **kwargs):
+        super(SampleForm, self).__init__(*args, **kwargs)
+        uneditable_fields = ['sample_id']
+        if self.instance.pk:
+            for field in uneditable_fields:
+                self.fields[field].widget.attrs['readonly'] = 'true'
+
 AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     Sample,
     AdditionalSampleInformation,
@@ -158,6 +165,10 @@ class DlpLibraryForm(LibraryForm):
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+        else:
+            uneditable_fields = ['pool_id']
+            for field in uneditable_fields:
+                    self.fields[field].widget.attrs['readonly'] = 'true'
 
     class Meta:
         model = DlpLibrary
