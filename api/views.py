@@ -8,6 +8,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 #============================
 # Django & Django rest framework imports
 #----------------------------
+import django_filters
 from rest_framework import pagination, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
@@ -130,6 +131,25 @@ class SublibraryViewSet(viewsets.ModelViewSet):
     )
 
 
+class AnalysisInformationFilter(django_filters.FilterSet):
+    analysis_run__last_updated = django_filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = DlpAnalysisInformation
+        fields = [
+        'priority_level',
+        'analysis_jira_ticket',
+        'version',
+        'analysis_submission_date',
+        'reference_genome',
+        'analysis_run',
+        'analysis_run__last_updated',
+        'id',
+        'analysis_run__run_status',
+         'library__pool_id'
+        ]
+
+
 class AnalysisInformationViewSet(viewsets.ModelViewSet):
     """
     View for Analysis Objects
@@ -138,16 +158,7 @@ class AnalysisInformationViewSet(viewsets.ModelViewSet):
     queryset = DlpAnalysisInformation.objects.all()
     serializer_class = AnalysisInformationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    filter_fields = (
-        'priority_level',
-        'analysis_jira_ticket',
-        'version',
-        'analysis_submission_date',
-        'reference_genome',
-        'analysis_run',
-        'id',
-        'analysis_run__run_status',
-    )
+    filter_class = AnalysisInformationFilter
 
 
 class AnalysisRunViewSet(viewsets.ModelViewSet):
