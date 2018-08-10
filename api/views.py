@@ -132,6 +132,11 @@ class SublibraryViewSet(viewsets.ModelViewSet):
 
 
 class AnalysisInformationFilter(django_filters.FilterSet):
+    """"
+    https://django-filter.readthedocs.io/en/latest/guide/usage.html
+    DateFromToRangeFiler() :it uses datetime format values instead of numerical values.
+    It can be used with DateTimeField.
+    """
     analysis_run__last_updated = django_filters.DateFromToRangeFilter()
 
     class Meta:
