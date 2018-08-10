@@ -155,6 +155,8 @@ class DlpAnalysisVersionSerializer(serializers.ModelSerializer):
 
 
 class AnalysisInformationSerializer(serializers.ModelSerializer):
+    library = LibrarySerializer(read_only=True)
+    analysis_run = AnalysisRunSerializer(read_only=True)
     reference_genome = ReferenceGenomeSerializer(read_only=True)
     version = DlpAnalysisVersionSerializer(read_only=True)
 

@@ -146,6 +146,7 @@ class AnalysisInformationViewSet(viewsets.ModelViewSet):
         'reference_genome',
         'analysis_run',
         'id',
+        'analysis_run__run_status',
     )
 
 
