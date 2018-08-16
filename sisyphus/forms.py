@@ -74,6 +74,9 @@ class AnalysisInformationForm(ModelForm):
         self.fields['sequencings'].queryset = DlpSequencing.objects.filter(library__pk=library.pk)
         self.fields['library'].queryset = DlpLibrary.objects.filter(id=library.pk)
 
+        # Always select the most recent workflow
+        self.fields['version'].initial = DlpAnalysisVersion.objects.latest('pk')
+
 
 class AnalysisLibrarySelection(Form):
     library = ModelChoiceField(queryset=DlpLibrary.objects.all().order_by('pool_id'))
