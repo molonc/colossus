@@ -21,8 +21,8 @@
                 <th>Priority</th>
                 <th>Sequences Analyzed</th>
                 <th>Library</th>
-                <th>Analysis Run</th>
-
+                <th>Run Status</th>
+                <th>Last Updated</th>
             </tr>
         </thead>
         <tbody>
@@ -33,8 +33,8 @@
                   <td>{{ analysis.get_priority_level_display }}</td>
                   <td>{{ analysis.sequencings.all|join:", "}}</td>
                   <td>{{ analysis.library }}</td>
-                  <td>{{ analysis.analysis_run }}</td>
-
+                  <td>{{ analysis.analysis_run.get_run_status_display }}</td>
+                  <td style="white-space: nowrap;">{{ analysis.analysis_run.last_updated|date:'Y-m-d H:i' }}</td>
               </tr>
             {% endfor %}
         </tbody>
