@@ -112,7 +112,9 @@ class AnalysisInformationCreate(CreateView):
             analysis_information.analysis_jira_ticket = analysis_jira_ticket
             sequencings = form['sequencings'].value()
             analysis_information.lanes = DlpLane.objects.filter(sequencing__in=sequencings).filter()
-            analysis_information.analysis_run = AnalysisRun.objects.create(log_file=" ",last_updated=None,run_status="W")
+            analysis_information.analysis_run = AnalysisRun.objects.create(
+                log_file=" ",
+                last_updated=None)
             analysis_information.save()
             return self.form_valid(form)
         else:
