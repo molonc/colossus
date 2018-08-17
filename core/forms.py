@@ -217,16 +217,21 @@ class PbalLibraryForm(LibraryForm):
 
 
 class TenxLibraryForm(LibraryForm):
+    def __init__(self,*args, **kwargs):
+        super(TenxLibraryForm, self).__init__(*args, **kwargs)
+        if not self.instance.pk:
+            self.fields['additional_title'] = forms.CharField(max_length=100)
+            self.fields['jira_user'] = forms.CharField(max_length=100)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         model = TenxLibrary
-        exclude = []
+        exclude = ['jira_ticket']
         labels = {
             'primary sample': ('*Sample'),
-            'jira_ticket': ('*Jira Ticket'),
         }
         help_texts = {
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
-            'jira_ticket': ('Jira Ticket.'),
         }
 
 

@@ -541,17 +541,36 @@ class LibraryCreate(TemplateView):
                     # 'LibraryForm' object has no attribute 'save_m2m'.
                     # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
                     instance = lib_form.save(commit=False)
-                    if context['library_type'] == 'dlp' and library == None:
+
+                    # Jira ticket stuff
+                    if context['library_type'] in ('dlp', 'tenx') and library == None:
                         additional_title = lib_form['additional_title'].value()
                         jira_user = lib_form['jira_user'].value()
                         jira_password = lib_form['jira_password'].value()
-                        instance.jira_ticket = self.create_jira(
-                            instance=instance,
-                            title=additional_title,
-                            reporter='elaks',
-                            assignee='danlai',
-                            jira_user=jira_user,
-                            jira_password=jira_password)
+
+                        if context['library_type'] == 'dlp':
+                            instance.jira_ticket = self.create_jira(
+                                instance=instance,
+                                title=additional_title,
+                                reporter='elaks',
+                                assignee='danlai',
+                                jira_user=jira_user,
+                                jira_password=jira_password)
+                        else:
+                            # Ten x
+                            instance.jira_ticket = self.create_jira(
+                                instance=instance,
+                                title=additional_title,
+                                reporter='coflanagan',
+                                assignee='coflanagan',
+                                watchers=[
+                                    'jbiele',
+                                    'jbwant',
+                                    'jedwards',
+                                    'coflanagan',],
+                                jira_user=jira_user,
+                                jira_password=jira_password)
+
                         if not instance.jira_ticket:
                             msg = "Please provide correct JIRA credentials."
                             app = resolve(request.path_info).app_name
@@ -559,6 +578,7 @@ class LibraryCreate(TemplateView):
                             messages.error(request, msg)
                             link = str(app) + ":" + str(current_url)
                             return HttpResponseRedirect(reverse(link))
+
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     if all_valid:
@@ -599,8 +619,18 @@ class LibraryCreate(TemplateView):
             watchers=None,):
         auth = self.get_credentials(jira_user, jira_password)
         try:
+            # Connect to the API
             jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
-            title = str(instance.sample) + "-" + str(instance.pool_id) + "-" + str(title)
+
+            # Build the title
+            if hasattr(instance, 'pool_id'):
+                # Use the DLP pool ID
+                title = (str(instance.sample)
+                         + "-" + str(instance.pool_id)
+                         + "-" + str(title))
+            else:
+                title = str(instance.sample) + "-" + str(title)
+
             issue_dict = {
                 'project': {'id': 11220},
                 'summary': title,
@@ -617,8 +647,8 @@ class LibraryCreate(TemplateView):
                     jira.add_watcher(new_issue.id, watcher)
 
             return str(new_issue)
-        except JIRAError as e:
-            return
+        except JIRAError:
+            return None
 
     def _validate_formsets(self, request, instance):
         all_valid = True
