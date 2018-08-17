@@ -545,7 +545,13 @@ class LibraryCreate(TemplateView):
                         additional_title = lib_form['additional_title'].value()
                         jira_user = lib_form['jira_user'].value()
                         jira_password = lib_form['jira_password'].value()
-                        instance.jira_ticket = self.create_jira(instance, additional_title, jira_user, jira_password)
+                        instance.jira_ticket = self.create_jira(
+                            instance=instance,
+                            title=additional_title,
+                            reporter='elaks',
+                            assignee='danlai',
+                            jira_user=jira_user,
+                            jira_password=jira_password)
                         if not instance.jira_ticket:
                             msg = "Please provide correct JIRA credentials."
                             app = resolve(request.path_info).app_name
@@ -582,7 +588,14 @@ class LibraryCreate(TemplateView):
         password = str(jira_password)
         return username, password
 
-    def create_jira(self, instance, title, jira_user, jira_password):
+    def create_jira(
+            self,
+            instance,
+            title,
+            reporter,
+            assignee,
+            jira_user,
+            jira_password,):
         auth = self.get_credentials(jira_user, jira_password)
         try:
             jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
@@ -592,8 +605,8 @@ class LibraryCreate(TemplateView):
                 'summary': title,
                 'description': instance.description,
                 'issuetype': {'name': 'Task'},
-                'reporter': {'name': 'elaks'},
-                'assignee': {'name': 'danlai'}
+                'reporter': {'name': reporter},
+                'assignee': {'name': assignee}
             }
             new_issue = jira.create_issue(fields=issue_dict)
             return str(new_issue)
