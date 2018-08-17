@@ -595,7 +595,8 @@ class LibraryCreate(TemplateView):
             reporter,
             assignee,
             jira_user,
-            jira_password,):
+            jira_password,
+            watchers=None,):
         auth = self.get_credentials(jira_user, jira_password)
         try:
             jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
@@ -609,6 +610,12 @@ class LibraryCreate(TemplateView):
                 'assignee': {'name': assignee}
             }
             new_issue = jira.create_issue(fields=issue_dict)
+
+            # Add any watchers passed in
+            if watchers:
+                for watcher in watchers:
+                    jira.add_watcher(new_issue.id, watcher)
+
             return str(new_issue)
         except JIRAError as e:
             return
