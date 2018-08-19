@@ -88,6 +88,12 @@ from .utils import (
     generate_samplesheet,
     generate_gsc_form,
 )
+from .jira_templates.templates import (
+    get_reference_genome_from_sample_id,
+    generate_dlp_jira_description,
+    generate_tenx_jira_description,
+)
+
 
 
 #============================
@@ -552,6 +558,9 @@ class LibraryCreate(TemplateView):
                             instance.jira_ticket = self.create_jira(
                                 instance=instance,
                                 title=additional_title,
+                                description=generate_dlp_jira_description(
+                                    get_reference_genome_from_sample_id(
+                                        instance.sample.sample_id)),
                                 reporter='elaks',
                                 assignee='danlai',
                                 jira_user=jira_user,
@@ -561,6 +570,9 @@ class LibraryCreate(TemplateView):
                             instance.jira_ticket = self.create_jira(
                                 instance=instance,
                                 title=additional_title,
+                                description=generate_tenx_jira_description(
+                                    get_reference_genome_from_sample_id(
+                                        instance.sample.sample_id)),
                                 reporter='coflanagan',
                                 assignee='coflanagan',
                                 watchers=[
@@ -612,6 +624,7 @@ class LibraryCreate(TemplateView):
             self,
             instance,
             title,
+            description,
             reporter,
             assignee,
             jira_user,
@@ -634,7 +647,7 @@ class LibraryCreate(TemplateView):
             issue_dict = {
                 'project': {'id': 11220},
                 'summary': title,
-                'description': instance.description,
+                'description': description,
                 'issuetype': {'name': 'Task'},
                 'reporter': {'name': reporter},
                 'assignee': {'name': assignee}
