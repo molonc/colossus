@@ -151,6 +151,11 @@ class AbstractAnalysisInformation(models.Model):
         ('H', 'High'),
     )
 
+    verified_choices = (
+        ('T', 'True'),
+        ('F', 'False'),
+    )
+
     # fields
     priority_level = create_chrfield(
         "Priority Level",
@@ -187,6 +192,12 @@ class AbstractAnalysisInformation(models.Model):
         ReferenceGenome,
         verbose_name="ReferenceGenome",
         null=True,
+    )
+
+    verified = create_chrfield(
+        "Verified",
+        choices=verified_choices,
+        default="F",
     )
 
     def get_absolute_url(self):

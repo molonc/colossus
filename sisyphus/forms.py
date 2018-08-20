@@ -42,6 +42,7 @@ class AnalysisInformationForm(ModelForm):
             'smoothing',
             'reference_genome',
             'analysis_submission_date',
+            'verified'
         ]
 
         labels = {

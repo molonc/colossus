@@ -25,6 +25,14 @@
             <td id="tdid" ><a href="https://www.bcgsc.ca/jira/browse/{{object.analysis_jira_ticket}}">{{object.analysis_jira_ticket}}</a></td>
         </tr>
         <tr>
+            <th id="thid">Montage:</th>
+            <td id="tdid" ><a href="https://52.235.35.201/?dashboard={{object.analysis_jira_ticket}}">{{object.analysis_jira_ticket}}</a></td>
+        </tr>
+        <tr>
+            <th id="thid">Verified:</th>
+            <td id="tdid" >{{object.get_verified_display}}</td>
+        </tr>
+        <tr>
             <th id="thid">Analysis Submission Date:</th>
             <td id="tdid">{{ object.analysis_submission_date }}</td>
         </tr>
