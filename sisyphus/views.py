@@ -103,6 +103,10 @@ class AnalysisInformationCreate(CreateView):
             analysis_information = form.save()
             analysis_information.analysis_run = AnalysisRun.objects.create(log_file=" ",last_updated=None,run_status="W")
             analysis_information.save()
+
+            if request.POST['create'] == 'CreateRun':
+                analysis_information.start_analysis_run()
+
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
@@ -197,4 +201,19 @@ class AnalysisInformationDetailView(DetailView):
         instance_sequencings = context['object'].sequencings.all()
         context['library']=DlpLibrary.objects.filter(dlpsequencing__in=instance_sequencings).distinct()[0]
         context['analysisrun']=context['object'].analysis_run
+        context['started']=False if not context['object'].saltant_job_uuid else True
+        if context['object'].saltant_job_uuid:
+            context['uuid_url'] = 'https://shahlabjobs.ca/api/taskinstances/' + context['object'].saltant_job_uuid
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = get_object_or_404(DlpAnalysisInformation, pk=kwargs.get('pk'))
+
+        if request.POST['action'] == 'start':
+            self.object.start_analysis_run()
+        elif request.POST['action'] == 'restart':
+            self.object.restart_analysis_run()
+        elif request.POST['action'] == 'stop':
+            self.object.kill_analysis_run()
+
+        return render(request=request, context=self.get_context_data(**kwargs), template_name='sisyphus/dlpanalysisinformation_detail.html')
