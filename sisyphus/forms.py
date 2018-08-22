@@ -76,7 +76,23 @@ class AnalysisInformationForm(ModelForm):
 
 
 class AnalysisLibrarySelection(Form):
-    library = ModelChoiceField(queryset=DlpLibrary.objects.all().order_by('pool_id'))
+    def __init__(self, *args, **kwargs):
+        """Only show DLP libs with sequences."""
+        # Call parent constructor method
+        super(AnalysisLibrarySelection, self).__init__(*args, **kwargs)
+
+        # Get DlpLibraries with at least one sequence
+        all_dlp_libs = DlpLibrary.objects.all()
+
+        # Build a list of DlpLibraries to exclude
+        exclude_ids = [dlp_lib.id for dlp_lib in all_dlp_libs
+                       if not dlp_lib.dlpsequencing_set.count()]
+
+        # Build the queryset to return
+        queryset = all_dlp_libs.exclude(id__in=exclude_ids).order_by('pool_id')
+
+        # Add the library choice field
+        self.fields['library'] = ModelChoiceField(queryset=queryset)
 
 
 class ReferenceGenomeSelection(Form):
