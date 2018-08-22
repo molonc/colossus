@@ -63,6 +63,13 @@ class AnalysisInformationForm(ModelForm):
         }
     def __init__(self, *args, **kwargs):
         library = kwargs.pop('library')
+
+        # Always select the library that has been ... selected. Honestly
+        # this shouldn't even be a form field since there's literally
+        # only one option that you must choose, but that's a refactoring
+        # task for another day.
+        kwargs['initial']['library'] = DlpLibrary.objects.get(id=library.pk)
+
         super(AnalysisInformationForm, self).__init__(*args, **kwargs)
         self.fields['sequencings'].widget = widgets.CheckboxSelectMultiple()
         self.fields['sequencings'].queryset = DlpSequencing.objects.filter(library__pk=library.pk)
