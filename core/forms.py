@@ -87,8 +87,13 @@ class SaveDefault(ModelForm):
         cleaned_data = super(SaveDefault, self).clean()
         disease_condition_health_status = cleaned_data.get("disease_condition_health_status")
         pathology_disease_name = cleaned_data.get("pathology_disease_name")
+        tissue_type = cleaned_data.get("tissue_type")
 
         if disease_condition_health_status and not pathology_disease_name:
+            msg = "This field is required for diseased samples"
+            self.add_error('pathology_disease_name', msg)
+
+        if tissue_type != 'N' and not pathology_disease_name:
             msg = "This field is required for diseased samples"
             self.add_error('pathology_disease_name', msg)
 
