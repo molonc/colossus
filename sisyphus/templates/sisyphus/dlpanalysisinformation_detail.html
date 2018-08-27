@@ -75,6 +75,10 @@
                 <th id="thid">Sequencings Analyzed:</th>
                 <td id="tdid" class="notes">{% for sequencing in object.sequencings.all %}<a href="{% url 'dlp:sequencing_detail' pk=sequencing.pk %}">{{ sequencing }}</a><br/>{% endfor %}</td>
             </tr>
+            <tr>
+                <th id="thid">Flowcell ID:</th>
+                <td id="tdid" class="notes">{% for lane in object.lanes.all %}{{ lane }}<br/>{% endfor %}</td>
+            </tr>
         </table>
     </div>
     <br/>

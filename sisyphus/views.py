@@ -22,6 +22,8 @@ from django.http import HttpResponseRedirect
 #============================
 # App imports
 #----------------------------
+from jira import JIRA, JIRAError
+
 from core.helpers import *
 from core.models import (
     DlpLibrary,
@@ -100,7 +102,16 @@ class AnalysisInformationCreate(CreateView):
         self.library=get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
         form = self.get_form()
         if form.is_valid():
+            analysis_jira_ticket = self.create_jira(form)
+            if not analysis_jira_ticket:
+                msg = "Please provide correct JIRA credentials."
+                messages.error(request, msg)
+                return HttpResponseRedirect(request.get_full_path())
+            # need to save analysis information in order to set many-to-many field
             analysis_information = form.save()
+            analysis_information.analysis_jira_ticket = analysis_jira_ticket
+            sequencings = form['sequencings'].value()
+            analysis_information.lanes = DlpLane.objects.filter(sequencing__in=sequencings).filter()
             analysis_information.analysis_run = AnalysisRun.objects.create(log_file=" ",last_updated=None,run_status="W")
             analysis_information.save()
 
@@ -110,6 +121,38 @@ class AnalysisInformationCreate(CreateView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
+
+    def get_credentials(self, jira_user, jira_password):
+        username = str(jira_user)
+        password = str(jira_password)
+        return username, password
+
+    def create_jira(self, form):
+        #  Get authentication info for the JIRA login
+        auth = self.get_credentials(form['jira_user'].value(), form['jira_password'].value())
+        try:
+            # Create the JIRA ticket
+            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
+            library = form['library'].value()
+            library = get_object_or_404(DlpLibrary, id=library)
+            title = "Analysis of " + str(library)
+            issue_dict = {
+                'project': {'id': 11220},
+                'summary': title,
+                'issuetype': {'name': 'Task'},
+                'priority': {'name':'Medium'},
+                'assignee':{'name':'sochan'}
+            }
+            new_issue = jira.create_issue(fields=issue_dict)
+            # Link the analysis jira ticket with the initial library ticket
+            issue_link = jira.create_issue_link(
+                type="relates to",
+                inwardIssue=str(new_issue),
+                outwardIssue=str(library.jira_ticket),
+            )
+            return str(new_issue)
+        except JIRAError:
+            return None
 
     def get_success_url(self):
         return self.object.get_absolute_url()

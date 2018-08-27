@@ -16,7 +16,7 @@ from django.forms import (
     ValidationError,
     Form
 )
-
+from django import forms
 #===========================
 # App imports
 #---------------------------
@@ -35,8 +35,6 @@ class AnalysisInformationForm(ModelForm):
         fields = [
             'library',
             'sequencings',
-            'priority_level',
-            'analysis_jira_ticket',
             'version',
             'aligner',
             'smoothing',
@@ -48,8 +46,6 @@ class AnalysisInformationForm(ModelForm):
         labels = {
             'library':'Library',
             'sequencings':'Sequence(s)',
-            'priority_level':'Priority Level',
-            'analysis_jira_ticket':'Jira Ticket',
             'version':'Workflow',
             'aligner':'Aligner Option',
             'smoothing':'Smoothing Option',
@@ -59,8 +55,6 @@ class AnalysisInformationForm(ModelForm):
         help_texts = {
             'library' :'Library',
             'sequencings': 'Sequence(s) to analyze',
-            'priority_level': 'Priority should match the urgency of this request.',
-            'analysis_jira_ticket': 'Jira Ticket associated with this request',
             'version': 'Workflow and version to run',
             'aligner': 'Please provide aligner options',
             'smoothing': 'Please provide smoothing options',
@@ -73,6 +67,9 @@ class AnalysisInformationForm(ModelForm):
         self.fields['sequencings'].widget = widgets.CheckboxSelectMultiple()
         self.fields['sequencings'].queryset = DlpSequencing.objects.filter(library__pk=library.pk)
         self.fields['library'].queryset = DlpLibrary.objects.filter(id=library.pk)
+        if not self.instance.pk:
+            self.fields['jira_user'] = forms.CharField(max_length=100)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
 
         # Always select the most recent workflow
         self.fields['version'].initial = DlpAnalysisVersion.objects.latest('pk')

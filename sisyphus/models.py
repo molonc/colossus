@@ -16,7 +16,7 @@ from django.contrib.postgres.fields import JSONField
 #============================
 # App imports
 #----------------------------
-from core.models import DlpSequencing,PbalSequencing,TenxSequencing,DlpLibrary,PbalLibrary,TenxLibrary
+from core.models import DlpSequencing,PbalSequencing,TenxSequencing,DlpLibrary,PbalLibrary,TenxLibrary,DlpLane
 from core.helpers import *
 
 
@@ -291,6 +291,8 @@ class DlpAnalysisInformation(AbstractAnalysisInformation):
         verbose_name="Analysis Version",
         on_delete=models.CASCADE,
     )
+
+    lanes = models.ManyToManyField(DlpLane)
 
 
 class PbalAnalysisInformation(AbstractAnalysisInformation):

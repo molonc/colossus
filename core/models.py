@@ -1194,6 +1194,9 @@ class Lane(models.Model, FieldValue):
         max_length=150
     )
 
+    def __str__(self):
+        return self.flow_cell_id
+
 
 class DlpLane(Lane):
     
