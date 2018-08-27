@@ -34,7 +34,7 @@ SECRET_KEY = os.environ.get('COLOSSUS_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get('COLOSSUS_DEBUG', False))
 
-ALLOWED_HOSTS = [os.environ.get('COLOSSUS_ALLOWED_HOSTS', '127.0.0.1')]
+ALLOWED_HOSTS = os.environ.get('COLOSSUS_ALLOWED_HOSTS', '127.0.0.1').split()
 
 
 # Application definition
@@ -148,11 +148,13 @@ STATIC_URL = '/static/'
 
 # STATICDILES_DIR = []
 
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn") 
+#STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn") 
+STATIC_ROOT = "/var/www/html/singlecell/static/"
 
 # Media files
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "uploads")
+#MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "uploads")
+MEDIA_ROOT = "/var/www/html/singlecell/media/"
 
 # Login url
 LOGIN_URL = '/account/login/'
