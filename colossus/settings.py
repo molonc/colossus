@@ -168,6 +168,7 @@ X_FRAME_OPTIONS = "DENY"
 REST_FRAMEWORK = {
     # pagination setting
     'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 
 }
