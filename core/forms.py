@@ -93,9 +93,13 @@ class SaveDefault(ModelForm):
             msg = "This field is required for diseased samples"
             self.add_error('pathology_disease_name', msg)
 
-        if tissue_type != 'N' and not pathology_disease_name:
-            msg = "This field is required for diseased samples"
-            self.add_error('pathology_disease_name', msg)
+        # Don't break the library form! TODO: What's a better way to do
+        # this?
+        if self.__class__.__name__ not in ['DlpLibrarySampleDetailForm',
+                                           'DlpLibraryConstructionInformationForm']:
+            if tissue_type != 'N' and not pathology_disease_name:
+                msg = "This field is required for diseased samples"
+                self.add_error('pathology_disease_name', msg)
 
 
 #===========================
