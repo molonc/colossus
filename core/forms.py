@@ -281,7 +281,7 @@ class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm
         """if Freezer specified, so should Rack,Shelf,Box,Positoin in box."""
         cleaned_data = super(DlpLibraryQuantificationAndStorageForm, self).clean()
         freezer = cleaned_data.get('freezer')
-        if freezer != '':
+        if freezer:
             if cleaned_data.get('rack') is None:
                 msg = "Rack is required when specifying the Freezer."
                 self.add_error('rack', msg)
