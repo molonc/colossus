@@ -521,7 +521,10 @@ class LibraryCreate(TemplateView):
     def _post(self, request, context, library=None):
         # this is becaues of this django feature:
         # https://code.djangoproject.com/ticket/1130
+        _mutable = request.POST._mutable
+        request.POST._mutable = True
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
+        request.POST._mutable = _mutable
 
         lib_form = self.lib_form_class(request.POST, instance=library)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
