@@ -20,7 +20,7 @@ List of Sequencings
                     <th>Sample ID</th>
                     <th>GSC library ID</th>
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <th>Jira Ticket</th>
+                    <th class="jiraticket">Jira Ticket</th>
                     {% endif %}
                     <th>Submission date</th>
                     <th></th>
@@ -67,5 +67,18 @@ List of Sequencings
         </table>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#lib_datatable").DataTable({
+            "columnDefs": [
+                {
+                    "type": "natural",
+                    "targets": "jiraticket",
+                }
+            ]
+        });
+    });
+</script>
 
 {% endblock %}

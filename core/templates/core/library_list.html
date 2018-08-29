@@ -32,7 +32,7 @@ List of Libraries
                     {% endif %}
                     <th>Description</th>
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <th>JIRA Ticket</th>
+                    <th class="jiraticket">JIRA Ticket</th>
                     {% endif %}
                     <th>Project</th>
                     {% if library_type == 'dlp' %}
@@ -121,10 +121,16 @@ List of Libraries
     };
     $(document).ready(function() {
         $("#lib_datatable").DataTable({
-            "columnDefs": [ {
-                "type": "sequenced",
-                "targets": "sequenced"
-            } ]
+            "columnDefs": [
+                {
+                    "type": "sequenced",
+                    "targets": "sequenced"
+                },
+                {
+                    "type": "natural",
+                    "targets": "jiraticket",
+                }
+            ]
         });
     });
 </script>
