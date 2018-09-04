@@ -32,13 +32,17 @@
                                 <select id="id_sample" name="sample">
                                     <option value="{{ sample_id }}" selected="selected">{{ sample }}</option>
                                 </select>
-                            {% elif field.name == "relates_to" %}
-                                <select class="selectpicker" data-live-search="True" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
-
-                                    {% for lib in related_libs %}
+                            {% elif field.name == "relates_to_dlp" %}
+                                <select class="selectpicker" data-live-search="True" id="id_relates_to_dlp" name="relates_to_dlp" multiple data-none-selected-text="--------">
+                                    {% for lib in related_dlp_libs %}
                                         <option value={{ lib.id }}>{{ lib }}</option>
                                     {% endfor %}
-
+                                </select>
+                            {% elif field.name == "relates_to_tenx" %}
+                                <select class="selectpicker" data-live-search="True" id="id_relates_to_tenx" name="relates_to_tenx" multiple data-none-selected-text="--------">
+                                    {% for lib in related_tenx_libs %}
+                                        <option value={{ lib.id }}>{{ lib }}</option>
+                                    {% endfor %}
                                 </select>
                             {% else %}
                                 {{ field }}

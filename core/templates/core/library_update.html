@@ -31,17 +31,25 @@
                                         {% endfor %}
 
                                     </select>
-                                {% elif field.name == "relates_to" %}
-                                    <select class="selectpicker" id="id_relates_to" data-live-search="True" name="relates_to" multiple data-none-selected-text="--------">
-
-                                        {% for lib in related_libs %}
-                                            {% if lib in selected_related_libs %}
+                                {% elif field.name == "relates_to_dlp" %}
+                                    <select class="selectpicker" id="id_relates_to_dlp" data-live-search="True" name="relates_to_dlp" multiple data-none-selected-text="--------">
+                                        {% for lib in related_dlp_libs %}
+                                            {% if lib in selected_related_dlp_libs %}
                                                 <option value={{ lib.id }} selected="{{ lib }}">{{ lib }}</option>
                                             {% else %}
                                                 <option value={{ lib.id }}>{{ lib }}</option>
                                             {% endif %}
                                         {% endfor %}
-
+                                    </select>
+                                {% elif field.name == "relates_to_tenx" %}
+                                    <select class="selectpicker" id="id_relates_to_tenx" data-live-search="True" name="relates_to_tenx" multiple data-none-selected-text="--------">
+                                        {% for lib in related_tenx_libs %}
+                                            {% if lib in selected_related_tenx_libs %}
+                                                <option value={{ lib.id }} selected="{{ lib }}">{{ lib }}</option>
+                                            {% else %}
+                                                <option value={{ lib.id }}>{{ lib }}</option>
+                                            {% endif %}
+                                        {% endfor %}
                                     </select>
                                 {% else %}
                                     {{ field }}

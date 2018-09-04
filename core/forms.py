@@ -168,6 +168,20 @@ class LibraryForm(ModelForm):
 
 
 class DlpLibraryForm(LibraryForm):
+    field_order = [
+        'sample',
+        'description',
+        'result',
+        'pool_id',
+        'title',
+        'quality',
+        'relates_to_dlp',
+        'relates_to_tenx',
+        'projects',
+        'additional_title',
+        'jira_user',
+        'jira_password',
+    ]
 
     def __init__(self,*args, **kwargs):
         super(DlpLibraryForm, self).__init__(*args, **kwargs)
@@ -224,6 +238,17 @@ class PbalLibraryForm(LibraryForm):
 
 
 class TenxLibraryForm(LibraryForm):
+    field_order = [
+        'sample',
+        'description',
+        'result',
+        'num_sublibraries',
+        'relates_to_dlp',
+        'relates_to_tenx',
+        'projects',
+        'jira_ticket',
+    ]
+
     def __init__(self,*args, **kwargs):
         super(TenxLibraryForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:

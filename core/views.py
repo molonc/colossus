@@ -544,8 +544,6 @@ class LibraryCreate(TemplateView):
         else:
             sample = None
 
-        result_list = list(chain(DlpLibrary.objects.all(), TenxLibrary.objects.all()))
-
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
@@ -555,7 +553,8 @@ class LibraryCreate(TemplateView):
             'projects': [t.name for t in Tag.objects.all()],
             'sample': str(sample),
             'sample_id': pk,
-            'related_libs': result_list,
+            'related_dlp_libs': DlpLibrary.objects.all(),
+            'related_tenx_libs': TenxLibrary.objects.all(),
             'library_type': self.library_type,
         }
         return context
@@ -853,7 +852,8 @@ class LibraryUpdate(LibraryCreate):
     def get_context_data(self, pk):
         library = get_object_or_404(self.library_class, pk=pk)
         selected_projects = library.projects.names()
-        selected_related_libs = library.relates_to.only()
+        selected_related_dlp_libs = library.relates_to_dlp.all()
+        selected_related_tenx_libs = library.relates_to_tenx.all()
 
         context = {
             'pk': pk,
@@ -864,8 +864,10 @@ class LibraryUpdate(LibraryCreate):
             'libqs_formset': self.libqs_formset_class(instance=library),
             'projects': [t.name for t in Tag.objects.all()],
             'selected_projects': selected_projects,
-            'related_libs': DlpLibrary.objects.all(),
-            'selected_related_libs': selected_related_libs,
+            'related_dlp_libs': DlpLibrary.objects.all(),
+            'related_tenx_libs': TenxLibrary.objects.all(),
+            'selected_related_dlp_libs': selected_related_dlp_libs,
+            'selected_related_tenx_libs': selected_related_tenx_libs,
             'library_type': self.library_type,
         }
         return context

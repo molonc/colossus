@@ -224,11 +224,23 @@ class Library(models.Model, FieldValue, LibraryAssistant):
         blank=True,
     )
 
-    # database relationships
+    # related sample
     sample = models.ForeignKey(
         Sample,
         verbose_name="Primary Sample",
         on_delete=models.CASCADE,
+    )
+
+    # related libraries
+    relates_to_dlp = models.ManyToManyField(
+        'DlpLibrary',   # DlpLibrary hasn't been seen yet
+        verbose_name="Relates to (DLP)",
+        blank=True,
+    )
+    relates_to_tenx = models.ManyToManyField(
+        'TenxLibrary',   # TenxLibrary hasn't been seen yet
+        verbose_name="Relates to (Tenx)",
+        blank=True,
     )
 
     # fields
@@ -269,11 +281,6 @@ class DlpLibrary(Library):
         "Number of sublibraries",
         default=0,
     )
-    relates_to = models.ManyToManyField(
-        "self",
-        verbose_name="Relates to",
-        blank=True,
-    )
     title = create_textfield("Title")
     quality = models.DecimalField("Quality", max_digits=10, decimal_places=2, default=0.75)
 
@@ -297,13 +304,6 @@ class PbalLibrary(Library):
 
     # track history
     history = HistoricalRecords(table_name='pbal_history_library')
-
-    # fields
-    relates_to = models.ManyToManyField(
-        DlpLibrary,
-        verbose_name="Relates to",
-        blank=True,
-    )
 
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
@@ -331,11 +331,6 @@ class TenxLibrary(Library):
     num_sublibraries = create_intfield(
         "Number of sublibraries",
         default=0,
-    )
-    relates_to = models.ManyToManyField(
-        DlpLibrary,
-        verbose_name="Relates to",
-        blank=True,
     )
 
     def get_library_id(self):
