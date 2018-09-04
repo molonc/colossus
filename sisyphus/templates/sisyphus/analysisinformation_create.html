@@ -42,9 +42,8 @@
             </thead>
         </table>
      </fieldset>
-    <button type="submit" name="create" value="CreateRun" class="btn btn-primary btn-sm">Create and run</button>
-    <button type="submit" name="create" value="Create" class="btn btn-primary btn-sm">Create and run later</button>
-    <a class="btn btn-default btn-sm" href="{% url 'sisyphus:analysisinformation_list' %}">Cancel</a>
+    <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" href="{% url 'sisyphus:analysisinformation_list' %}">Cancel</a>
     </form>
 </div>
 {% endblock %}

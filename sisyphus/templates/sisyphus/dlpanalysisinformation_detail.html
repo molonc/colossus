@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container" style="background-color:#fff3e0;">
+    <div class="container" style="background-color:#FFF3E0;">
         <table class="table-condensed">
         <tr>
             <th id="thid"> Library:</th>
@@ -83,45 +83,9 @@
     </div>
     <br/>
     <br/>
-
     <div class="container">
         <a class="btn btn-warning btn-sm" href="{% url 'sisyphus:analysisinformation_update' library_pk=library.pk analysis_pk=object.pk %}">Edit analysis run</a>
         <a class="btn btn-danger btn-sm" href="{% url 'sisyphus:analysis_delete' pk=object.pk %}">Delete analysis run</a>
     </div>
-    <br/>
-    <br/>
-
-    <div class="container">
-        <table class="table-condensed">
-            <tr>
-                <th id="thid">Saltant UUID:</th>
-                <td id="tdid">
-                    {% if not started %}
-                    Not yet started!
-                    {% else %}
-                    <a href='{{ uuid_url }}'>{{ object.saltant_job_uuid }}</a>
-                    {% endif %}
-                </td>
-            </tr>
-        </table>
-    </div>
-    <br/>
-    <br/>
-
-    <div class="container">
-        <form method="post">
-        {% csrf_token %}
-        {% if not started %}
-        <button type="submit" name="action" value="start" class="btn btn-primary btn-sm">Start!</button>
-        {% else %}
-        <button type="submit" name="action" value="restart" class="btn btn-warning btn-sm">Restart</button>
-        <button type="submit" name="action" value="stop" class="btn btn-danger btn-sm">Terminate</button>
-        {% endif %}
-        </form>
-    </div>
-
-
-
-
 
 {% endblock %}

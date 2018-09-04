@@ -209,75 +209,8 @@ class AbstractAnalysisInformation(models.Model):
     class Meta:
         abstract = True
 
-# TODO(matt): clean me up!
-import os
-import json
-import requests
-
-SALTANT_SERVER_API_BASE_URL = 'https://shahlabjobs.ca/api'
-SALTANT_SERVER_API_INSTANCE_CREATE_URL = (
-    SALTANT_SERVER_API_BASE_URL
-    + '/taskinstances/')
-SALTANT_SERVER_API_INSTANCE_CLONE_URL_TEMPLATE = (
-    SALTANT_SERVER_API_BASE_URL
-    + '/taskinstances/{uuid}/clone/')
-SALTANT_SERVER_API_INSTANCE_TERMINATE_URL_TEMPLATE = (
-    SALTANT_SERVER_API_BASE_URL
-    + '/taskinstances/{uuid}/terminate/')
-
-SALTANT_TASK_TYPE = 9
-SALTANT_TASK_QUEUE = 1
-os.environ['SALTANT_AUTH_TOKEN'] = '3339553a38072521bc25c89ab8c8fe9cfffa37b0'
-
 
 class DlpAnalysisInformation(AbstractAnalysisInformation):
-    # TODO(matt): clean me up!
-
-    # Shahlab Jobs stuff
-    saltant_job_uuid = models.CharField(max_length=36,
-                                        editable=False,
-                                        null=True)
-
-    def start_analysis_run(self):
-        r = requests.post(
-            SALTANT_SERVER_API_INSTANCE_CREATE_URL,
-            headers={
-                'Authorization': 'Token ' + os.environ['SALTANT_AUTH_TOKEN']},
-            data={
-                "name": self.analysis_jira_ticket,
-                "arguments": json.dumps(
-                    {"analysis_id": self.id}),
-                "task_type": SALTANT_TASK_TYPE,
-                "task_queue": SALTANT_TASK_QUEUE,})
-
-        assert 200 <= r.status_code < 300
-
-        self.saltant_job_uuid = r.json()['uuid']
-        self.save()
-
-    def restart_analysis_run(self):
-        r = requests.post(
-            SALTANT_SERVER_API_INSTANCE_CLONE_URL_TEMPLATE.format(uuid=self.saltant_job_uuid),
-            headers={
-                'Authorization': 'Token ' + os.environ['SALTANT_AUTH_TOKEN']},)
-
-        assert 200 <= r.status_code < 300
-
-        self.saltant_job_uuid = r.json()['uuid']
-        self.save()
-
-    def kill_analysis_run(self):
-        r = requests.post(
-            SALTANT_SERVER_API_INSTANCE_TERMINATE_URL_TEMPLATE.format(uuid=self.saltant_job_uuid),
-            headers={
-                'Authorization': 'Token ' + os.environ['SALTANT_AUTH_TOKEN']},)
-
-        assert 200 <= r.status_code < 300
-
-        self.saltant_job_uuid = r.json()['uuid']
-        self.save()
-
-
     library = models.ForeignKey(
         DlpLibrary,
         verbose_name="Library",
