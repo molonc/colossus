@@ -806,7 +806,7 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
     concentration = models.PositiveIntegerField(
         null=True,
         blank=True,
-        verbose_name="Concentration (in nanomolar)",
+        verbose_name="DNA concentration (nM)",
     )
 
 
