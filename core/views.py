@@ -554,6 +554,8 @@ class LibraryCreate(TemplateView):
                         jira_user = lib_form['jira_user'].value()
                         jira_password = lib_form['jira_password'].value()
 
+                        # TODO(mwiens91): define custom behavior in
+                        # subclasses!
                         if context['library_type'] == 'dlp':
                             instance.jira_ticket = self.create_jira(
                                 instance=instance,
@@ -565,8 +567,7 @@ class LibraryCreate(TemplateView):
                                 assignee='danlai',
                                 jira_user=jira_user,
                                 jira_password=jira_password)
-                        else:
-                            # Ten x
+                        elif context['library_type'] == 'tenx':
                             instance.jira_ticket = self.create_jira(
                                 instance=instance,
                                 title=additional_title,
@@ -635,7 +636,10 @@ class LibraryCreate(TemplateView):
             # Connect to the API
             jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
 
-            # Build the title
+            # Build the title - use the fact that DLP has pool_id field
+            # to differentiate the library classes
+            # TODO(mwiens91): find a better way to differentiate DLP and
+            # 10x
             if hasattr(instance, 'pool_id'):
                 # Use the DLP pool ID
                 title = (str(instance.sample)
