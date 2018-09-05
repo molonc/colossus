@@ -80,10 +80,22 @@ def create_pathfield(name, max_length=250, blank=True, null=True, **kwargs):
         )
 
 
-def upload_path(instance, filename):
+def upload_dlp_library_path(instance, filename):
     """make a proper /path/to/filename for uploaded files."""
     return "{0}/{1}/{2}".format(
-        'library',
+        'library',      # leave this as 'library' for backwards compatibility
+        instance.library.id,
+        filename
+        )
+
+# Maintain migrations backwards compatibility
+upload_path = upload_dlp_library_path
+
+
+def upload_tenx_library_path(instance, filename):
+    """Make a proper file path for uploading 10x library files."""
+    return "{0}/{1}/{2}".format(
+        'tenxlibrary',
         instance.library.id,
         filename
         )

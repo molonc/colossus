@@ -20,6 +20,10 @@ from django.core.validators import RegexValidator
 #============================
 # App imports
 #----------------------------
+from .constants import (
+    TENX_LIBRARY_TYPE_CHOICES,
+    TENX_INDEX_CHOICES,
+)
 from .helpers import *
 
 
@@ -606,6 +610,16 @@ class TenxLibrarySampleDetail(LibrarySampleDetail):
         "Sorting location",
         default="TFL flow facility",
     )
+    num_cells_targeted = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Number of cells targeted",
+    )
+    num_conditions = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Number of conditions",
+    )
 
 
 class LibraryConstructionInformation(models.Model, FieldValue):
@@ -759,6 +773,41 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
         "Library prep location",
         default="UBC-BRC",
     )
+    chip_lot_number = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Chip lot number",
+    )
+    reagent_lot_number = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Reagent lot number",
+    )
+    library_type = models.CharField(
+        null=True,
+        blank=True,
+        choices=TENX_LIBRARY_TYPE_CHOICES,
+        max_length=20,
+        verbose_name="Library type",
+    )
+    index_used = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True,
+        choices=TENX_INDEX_CHOICES,
+        verbose_name="Index used",
+    )
+    pool = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True,
+        verbose_name="Pool",
+    )
+    concentration = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Concentration (in nanomolar)",
+    )
 
 
 class LibraryQuantificationAndStorage(models.Model, FieldValue):
@@ -856,14 +905,14 @@ class DlpLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
     )
     agilent_bioanalyzer_xad = models.FileField(
         "Agilent bioanalyzer xad file",
-        upload_to=upload_path,
+        upload_to=upload_dlp_library_path,
         max_length=200,
         null=True,
         blank=True,
     )
     agilent_bioanalyzer_image = models.FileField(
         "Agilent bioanalyzer image file",
-        upload_to=upload_path,
+        upload_to=upload_dlp_library_path,
         max_length=200,
         null=True,
         blank=True,
@@ -916,6 +965,21 @@ class TenxLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
         TenxLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    agilent_bioanalyzer_xad = models.FileField(
+        "Agilent bioanalyzer xad file",
+        upload_to=upload_tenx_library_path,
+        max_length=200,
+        null=True,
+        blank=True,
+    )
+    agilent_bioanalyzer_image = models.FileField(
+        "Agilent bioanalyzer image file",
+        upload_to=upload_tenx_library_path,
+        max_length=200,
         null=True,
         blank=True,
     )

@@ -293,7 +293,7 @@ class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm
         model = DlpLibraryQuantificationAndStorage
 
     def clean(self):
-        """if Freezer specified, so should Rack,Shelf,Box,Positoin in box."""
+        """if Freezer specified, so should Rack, Shelf, Box, Position in box."""
         cleaned_data = super(DlpLibraryQuantificationAndStorageForm, self).clean()
         freezer = cleaned_data.get('freezer')
         if freezer:
