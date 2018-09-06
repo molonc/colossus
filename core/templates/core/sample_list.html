@@ -35,8 +35,11 @@
                         <td>{{ sample.anonymous_patient_id }}</td>
                         <td>{{ sample.notes }}</td>
                         <td>
-                            <p style="float: right;"><a style="margin-right: 2px;" href="{% url 'core:sample_update' pk=sample.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
-                            <a href="{% url 'core:sample_delete' pk=sample.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a></p>
+                            <div style="float: right; min-width: 69px">
+                                <a style="margin-right: 2px;" href="{% url 'core:sample_update' pk=sample.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
+                                <br>
+                                <a href="{% url 'core:sample_delete' pk=sample.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}

@@ -1,9 +1,8 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-List of Projects
-{% endblock %}
+{% block title %}List of Projects{% endblock %}
 
 {% block body %}
 <div class="container" style="background-color:#F5F5F5;">
@@ -19,19 +18,22 @@ List of Projects
             {% for project in projects%}
                 <tr>
                     <td>
-                    {{project}}
+                        {{ project }}
                     </td>
                     <td>
-                    {% for library in project.get_libraries %}
-                        <p style="margin:0;"><a href="{{library.get_absolute_url}}">{{library}}</a></p>
-                    {% endfor %}
+                        {% for library in project.get_libraries %}
+                            <p style="margin: 0;"><a href="{{ library.get_absolute_url }}">{{ library }}</a></p>
+                        {% endfor %}
                     </td>
                     <td>
-                    {{project.get_libraries|length}}
+                        {{ project.get_libraries|length }}
                     </td>
                     <td>
-                        <p style="float:right;"><a style="margin-right:2px;" href="{% url 'core:project_update' pk=project.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange"></i>edit</a>
-                        <a href="{% url 'core:project_delete' pk=project.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
+                        <div style="float: right; min-width: 69px">
+                            <a style="margin-right: 2px;" href="{% url 'core:project_update' pk=project.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange"></i> edit</a>
+                            <br>
+                            <a href="{% url 'core:project_delete' pk=project.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
+                        </div>
                     </td>
                 </tr>
             {% endfor %}

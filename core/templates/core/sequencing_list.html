@@ -75,10 +75,11 @@
 
                         <td>{{ sequencing.submission_date }}</td>
                         <td>
-                            <p class="libdesc" style="float: right;">
+                            <div style="float: right; min-width: 69px">
                                 <a style="margin-right: 2px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
+                                <br>
                                 <a href="{% url library_type|add:':sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
-                            </p>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}
