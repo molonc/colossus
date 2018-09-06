@@ -16,20 +16,21 @@
         </tr>
         <tr>
             <th id="thid"> Total number of sublibraries/wells sequenced: </th>
-            <td id="tdid">{{ total_sublibs }}**</td>
+            <td id="tdid">{{ total_sublibs }}<span style="font-weight: bold">**</span></td>
         </tr>
 
     </table>
 
     <br>
 
-    <p>
-        **Note: This number may not be fully accurate, does not yet account
-        for wells that are chosed to not be sequenced, and should also not
-        be interpreted as the number of cells sequenced, since this number
-        does not account for whether the well actually contain a single,
-        live, cell.
-    </p>
+    <div>
+        <span style="font-weight: bold">**Note:</span> this number may not be fully accurate:
+
+        <ul>
+            <li>it does not account for wells chosen not to be sequenced</li>
+            <li>it does not account for whether each well actually contained a single, live, cell</li>
+        </ul>
+    </div>
 
 </div>
 
@@ -73,7 +74,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" href="#sublib_count"> Sublibrary Counts per Sample </a>
+                    <a data-toggle="collapse" href="#sublib_count">Sublibrary Counts per Sample </a>
                 </h4>
             </div>
             <div class="panel-collapse collapse panel-body" id="sublib_count">
