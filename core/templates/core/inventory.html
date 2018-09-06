@@ -1,15 +1,14 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
 
-{% block title %}
-Inventory
-{% endblock %}
+{% block title %}Inventory{% endblock %}
 
 {% block body %}
-<div class="container" style="padding:0; margin-bottom:5px;">
-    <h4 style="float:left;">Select a sequencing to view its JIRA ticket</h4>
+<div class="container" style="padding: 0; margin-bottom: 5px;">
+    <h4 style="float: left;">Select a sequencing to view its JIRA ticket</h4>
 </div>
-<div class="container" style="background-color:#F5F5F5;">
+
+<div class="container" style="background-color: #F5F5F5;">
     <div class="table-responsive">
         <table id="datatable" class="table table-striped">
             <thead>
@@ -20,35 +19,41 @@ Inventory
                 </tr>
             </thead>
             <tbody>
+
                 <br/>
+
                 {% for sample in samples %}
-                <tr>
-                    <td>{{sample.sample_id}}</td>
-                    <td>
-                        {% for library in sample.dlplibrary_set.all %}
-                            {% for sequencing in library.dlpsequencing_set.all %}
-                                <a href="https://www.bcgsc.ca/jira/browse/{{sequencing.library.jira_ticket}}">{{sequencing}}</a>
+                    <tr>
+                        <td>{{ sample.sample_id }}</td>
+                        <td>
+                            {% for library in sample.dlplibrary_set.all %}
+                                {% for sequencing in library.dlpsequencing_set.all %}
+                                    <a href="https://www.bcgsc.ca/jira/browse/{{ sequencing.library.jira_ticket }}">{{ sequencing }}</a>
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% for library in sample.tenxlibrary_set.all %}
-                            {% for sequencing in library.tenxsequencing_set.all %}
-                                <a href="https://www.bcgsc.ca/jira/browse/{{sequencing.library.jira_ticket}}">{{sequencing}}</a>
+                        </td>
+                        <td>
+                            {% for library in sample.tenxlibrary_set.all %}
+                                {% for sequencing in library.tenxsequencing_set.all %}
+                                    <a href="https://www.bcgsc.ca/jira/browse/{{ sequencing.library.jira_ticket }}">{{ sequencing }}</a>
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
                 {% endfor %}
+
             </tbody>
         </table>
     </div>
 </div>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $("#datatable").DataTable({
-            "pageLength": 100
+{% endblock %}
+
+{% block datatables_script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#datatable").DataTable({
+                "pageLength": 100
+            });
         });
-    });
-</script>
+    </script>
 {% endblock %}

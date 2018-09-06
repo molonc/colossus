@@ -1,38 +1,47 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Summary Statistics
-{% endblock %}
+{% block title %}Summary Statistics{% endblock %}
 
 {% block body %}
 <br>
-<div class="container" style="background-color:#FFF3E0;">
+
+<div class="container" style="background-color: #FFF3E0;">
     <h4> Overall Summary </h4>
     <table class="table-condensed">
         <tr>
             <th id="thid"> Total number of libraries: </th>
-            <td id="tdid">{{total_libs}}</td>
+            <td id="tdid">{{ total_libs }}</td>
         </tr>
         <tr>
             <th id="thid"> Total number of sublibraries/wells sequenced: </th>
-            <td id="tdid">{{total_sublibs}}**</td>
+            <td id="tdid">{{ total_sublibs }}**</td>
         </tr>
 
     </table>
-    <br />
-    **Note: This number may not be fully accurate, does not yet account for wells that are chosed to not be sequenced, and should also not be interpreted as the number of cells sequenced, since this number does not account for whether the well
-            actually contain a single, live, cell.
-    <br>
-</div><br>
 
-<div class="container" style="background-color:#FFF3E0;">
-    <h4> Counts per Sample </h4>
+    <br>
+
+    <p>
+        **Note: This number may not be fully accurate, does not yet account
+        for wells that are chosed to not be sequenced, and should also not
+        be interpreted as the number of cells sequenced, since this number
+        does not account for whether the well actually contain a single,
+        live, cell.
+    </p>
+
+</div>
+
+<br>
+
+<div class="container" style="background-color: #FFF3E0;">
+    <h4>Counts per Sample </h4>
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" href="#lib_count"> Library Counts per Sample </a>
+                    <a data-toggle="collapse" href="#lib_count">Library Counts per Sample </a>
                 </h4>
             </div>
             <div class="panel-collapse collapse panel-body" id="lib_count">
@@ -40,16 +49,22 @@ Summary Statistics
                     <tr>
                         <th id="thid"><u>Sample ID</u></th>
                         <th id="thid"><u>Number of Libraries</u></th>
-                        <th><br><th/>
+                        <th>
+                            <br>
+                        </th>
                     </tr>
+
                     {% for s in samples %}
-                    <tr>
-                        <th id="thid"><a href="{% url 'core:sample_detail' pk=s.pk %}">{{s.sample_id}}:</a> </th>
-                        <!-- DLP specific: needs to be changed if support for other libraries is added -->
-                        <td id="tdid">{{s.dlplibrary_set.count}}</td>
-                    </tr>
+                        <tr>
+                            <th id="thid"><a href="{% url 'core:sample_detail' pk=s.pk %}">{{ s.sample_id }}:</a> </th>
+                            <!-- DLP specific: needs to be changed if support for other libraries is added -->
+                            <td id="tdid">{{ s.dlplibrary_set.count }}</td>
+                        </tr>
                     {% endfor %}
-                </table><br>
+
+                </table>
+
+                <br>
             </div>
         </div>
     </div>
@@ -66,23 +81,30 @@ Summary Statistics
                     <tr>
                         <th id="thid"><u>Sample ID</u></th>
                         <th id="thid"><u>Number of Sublibraries</u></th>
-                        <th><br><th/>
+                        <th>
+                            <br>
+                        </th>
                     </tr>
+
                     {% for s in samples %}
-                    <tr>
-                        <th id="thid"><a href="{% url 'core:sample_detail' pk=s.pk %}">{{s.sample_id}}:</a> </th>
-                        <td id="tdid">{{s.sublibraryinformation_set.count}}</td>
-                    </tr>
+                        <tr>
+                            <th id="thid"><a href="{% url 'core:sample_detail' pk=s.pk %}">{{ s.sample_id }}:</a></th>
+                            <td id="tdid">{{ s.sublibraryinformation_set.count }}</td>
+                        </tr>
                     {% endfor %}
-                </table><br>
+                </table>
+
+                <br>
+
             </div>
         </div>
     </div>
-</div><br>
+</div>
+
+<br>
 
 <div class="container">
     <a class="btn btn-primary btn-sm" href="{% url 'dlp:summary_graph' %}">Graph cell count</a>
 </div>
-
 
 {% endblock %}

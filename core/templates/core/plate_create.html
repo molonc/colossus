@@ -1,9 +1,8 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Create Plate
-{% endblock %}
+{% block title %}Create Plate{% endblock %}
 
 {% block body %}
 <div class="container graybg">
@@ -13,34 +12,45 @@ Create Plate
             <legend>Plate Information</legend>
             <table class="table-condensed">
                 <thead>
-                {% for field in form %}
-                <tr>
-                    <th>
-                    {{field.label_tag}}
-                    </th>
-                    <td>
-                    {{ field.errors }}
-                    {% if field.name == "library" and library_id %}
-                        <select id="id_library" name="library">
-                            <option value="{{library_id}}" selected="selected">{{library}}</option>
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
-                    {% if field.help_text %}
-                        <p class="helptext">{{ field.help_text|safe }}</p>
-                    {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
+
+                    {% for field in form %}
+                        <tr>
+                            <th>
+                                {{ field.label_tag }}
+                            </th>
+                            <td>
+                                {{ field.errors }}
+
+                                {% if field.name == "library" and library_id %}
+                                    <select id="id_library" name="library">
+                                        <option value="{{ library_id }}" selected="selected">{{ library }}</option>
+                                    </select>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+
+                                {% if field.help_text %}
+                                    <p class="helptext">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
                 </thead>
             </table>
-        </fieldset><br>
+        </fieldset>
+
+        <br>
+
         <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+
         {% if library_id %}
-        <a class="btn btn-default btn-sm" href="{% url 'pbal:library_detail' pk=library_id %}">Cancel</a>
+            <a class="btn btn-default btn-sm" href="{% url 'pbal:library_detail' pk=library_id %}">Cancel</a>
         {% else %}
-        <a class="btn btn-default btn-sm" href="{% url 'pbal:library_list'%}">Cancel</a>
+            <a class="btn btn-default btn-sm" href="{% url 'pbal:library_list'%}">Cancel</a>
         {% endif %}
-    </form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

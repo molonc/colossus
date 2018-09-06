@@ -1,138 +1,165 @@
 {% extends "base_view.html" %}
 {% load staticfiles %}
 
-{% block title %}
-List of Libraries
-{% endblock %}
+{% block title %}List of Libraries{% endblock %}
 
 {% block body %}
-<div class="container" style="padding:0; margin-bottom:5px;">
-    <h4 style="float:left;">Select a library to view its details</h4>
-    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url library_type|add:':library_create' %}">Add Library</a>
+<div class="container" style="padding: 0; margin-bottom: 5px;">
+    <h4 style="float: left;">Select a library to view its details</h4>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url library_type|add:':library_create' %}">Add Library</a>
 </div>
-<div class="container" style="background-color:#F5F5F5;">
+
+<div class="container" style="background-color: #F5F5F5;">
     <div class="table-responsive">
         <table id="lib_datatable" class="table table-striped">
             <thead>
                 <tr>
                     {% if library_type == 'dlp' %}
-                    <th>Chip ID</th>
+                        <th>Chip ID</th>
                     {% elif library_type == 'pbal' or library_type == 'tenx' %}
-                    <th>Library ID</th>
+                        <th>Library ID</th>
                     {% endif %}
+
                     <th>Primary Sample ID</th>
+
                     {% if library_type == 'pbal' %}
-                    <th>Number of plates</th>
+                        <th>Number of plates</th>
                     {% endif %}
+
                     <th>Sample Spot Date</th>
+
                     {% if library_type == 'dlp' %}
-                    <th>Library Prep Date</th>
+                        <th>Library Prep Date</th>
                     {% else %}
-                    <th>Submission Date</th>
+                        <th>Submission Date</th>
                     {% endif %}
+
                     <th>Description</th>
+
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <th class="jiraticket">JIRA Ticket</th>
+                        <th class="jiraticket">JIRA Ticket</th>
                     {% endif %}
+
                     <th>Project</th>
+
                     {% if library_type == 'dlp' %}
-                    <th>Library Location</th>
+                        <th>Library Location</th>
                     {% endif %}
+
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <th>#Sublibraries</th>
+                        <th>#Sublibraries</th>
                     {% endif %}
+
                     <th class="sequenced">Sequenced</th>
                     <th>Result</th>
                 </tr>
             </thead>
             <tbody>
                 {% for library in libraries %}
-                <tr>
-                    <td><a href="{% url library_type|add:':library_detail' pk=library.pk %}">
-                    {% if library_type == 'dlp' %}
-                        {{library.pool_id}}
-                    {% else %}
-                        {{library.id}}
-                    {% endif %}
-                    </a></td>
-                    <td>{{library.sample.sample_id}}</td>
-                    {% if library_type == 'pbal' %}
-                    <td>{{library.plate_set.count}}</td>
-                    {% endif %}
-                    {% if library_type == 'dlp' %}
-                    <td>{{library.dlplibrarysampledetail.sample_spot_date|date:"M j, Y"}}</td>
-                    <td>{{library.dlplibraryconstructioninformation.library_prep_date|date:"M j, Y"}}</td>
-                    {% elif library_type == 'pbal' %}
-                    <td>{{library.pballibrarysampledetail.sample_spot_date|date:"M j, Y"}}</td>
-                    <td>{{library.pballibraryconstructioninformation.submission_date|date:"M j, Y"}}</td>
-                    {% elif library_type == 'tenx' %}
-                    <td>{{library.tenxlibrarysampledetail.sample_prep_date|date:"M j, Y"}}</td>
-                    <td>{{library.tenxlibraryconstructioninformation.submission_date|date:"M j, Y"}}</td>
-                    {% endif %}
-                    <td>{{library.description}}</td>
-                    {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <td><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{library.jira_ticket}}</a></td>
-                    {% endif %}
-                    <td>
-                        {% for project in library.projects.all %}
-                        {{project}}<br>
-                        {% endfor %}
-                    </td>
-                    {% if library_type == 'dlp' %}
-                    <td>{{library.dlplibraryquantificationandstorage.library_location}}</td>
-                    {% endif %}
-                    {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <td style="text-align:center;">{{library.num_sublibraries}}</td>
-                    {% endif %}
-                    {% if library.is_sequenced %}
-                    <td style="text-align:center;"><i class="fa fa-check" aria-hidden="true" style="color:green;" title="Sequenced"></i></td>
-                    {% elif library.dlplibraryquantificationandstorage.qc_check == 'P' %}
-                    <td style="text-align:center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:orange" title="Will sequence"></i></td>
-                    {% elif library.dlplibraryquantificationandstorage.qc_check == 'N' %}
-                    <td style="text-align:center"><i class="fa fa-times" aria-hidden="true" style="color:red" title="Will not sequence"></i></td>
-                    {% elif library.pballibraryquantificationandstorage.qc_check == 'P' %}
-                    <td style="text-align:center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:orange" title="Will sequence"></i></td>
-                    {% elif library.pballibraryquantificationandstorage.qc_check == 'N' %}
-                    <td style="text-align:center"><i class="fa fa-times" aria-hidden="true" style="color:red" title="Will not sequence"></i></td>
-                    {% elif library.tenxlibraryquantificationandstorage.qc_check == 'P' %}
-                    <td style="text-align:center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:orange" title="Will sequence"></i></td>
-                    {% elif library.tenxlibraryquantificationandstorage.qc_check == 'N' %}
-                    <td style="text-align:center"><i class="fa fa-times" aria-hidden="true" style="color:red" title="Will not sequence"></i></td>
-                    {% else %}
-                    <td style="text-align:center"></td>
-                    {% endif %}
-                    <td>{{library.result}}</td>
-                </tr>
+                    <tr>
+                        <td>
+                            <a href="{% url library_type|add:':library_detail' pk=library.pk %}">
+                                {% if library_type == 'dlp' %}
+                                    {{ library.pool_id }}
+                                {% else %}
+                                    {{ library.id }}
+                                {% endif %}
+                            </a>
+                        </td>
+
+                        <td>{{ library.sample.sample_id }}</td>
+
+                        {% if library_type == 'pbal' %}
+                            <td>{{ library.plate_set.count }}</td>
+                        {% endif %}
+
+                        {% if library_type == 'dlp' %}
+                            <td>{{ library.dlplibrarysampledetail.sample_spot_date|date:"M j, Y" }}</td>
+                            <td>{{ library.dlplibraryconstructioninformation.library_prep_date|date:"M j, Y" }}</td>
+                        {% elif library_type == 'pbal' %}
+                            <td>{{ library.pballibrarysampledetail.sample_spot_date|date:"M j, Y" }}</td>
+                            <td>{{ library.pballibraryconstructioninformation.submission_date|date:"M j, Y" }}</td>
+                        {% elif library_type == 'tenx' %}
+                            <td>{{ library.tenxlibrarysampledetail.sample_prep_date|date:"M j, Y" }}</td>
+                            <td>{{ library.tenxlibraryconstructioninformation.submission_date|date:"M j, Y" }}</td>
+                        {% endif %}
+
+                        <td>{{ library.description }}</td>
+
+                        {% if library_type == 'dlp' or library_type == 'tenx' %}
+                            <td>
+                                <a href="https://www.bcgsc.ca/jira/browse/{{ library.jira_ticket }}">{{ library.jira_ticket }}</a>
+                            </td>
+                        {% endif %}
+
+                        <td>
+                            {% for project in library.projects.all %}
+                                {{ project }}
+
+                                <br>
+                            {% endfor %}
+                        </td>
+
+                        {% if library_type == 'dlp' %}
+                            <td>{{ library.dlplibraryquantificationandstorage.library_location }}</td>
+                        {% endif %}
+
+                        {% if library_type == 'dlp' or library_type == 'tenx' %}
+                            <td style="text-align: center;">{{ library.num_sublibraries }}</td>
+                        {% endif %}
+
+                        {% if library.is_sequenced %}
+                            <td style="text-align: center;"><i class="fa fa-check" aria-hidden="true" style="color: green;" title="Sequenced"></i></td>
+                        {% elif library.dlplibraryquantificationandstorage.qc_check == 'P' %}
+                            <td style="text-align: center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: orange" title="Will sequence"></i></td>
+                        {% elif library.dlplibraryquantificationandstorage.qc_check == 'N' %}
+                            <td style="text-align: center"><i class="fa fa-times" aria-hidden="true" style="color: red" title="Will not sequence"></i></td>
+                        {% elif library.pballibraryquantificationandstorage.qc_check == 'P' %}
+                            <td style="text-align: center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: orange" title="Will sequence"></i></td>
+                        {% elif library.pballibraryquantificationandstorage.qc_check == 'N' %}
+                            <td style="text-align: center"><i class="fa fa-times" aria-hidden="true" style="color: red" title="Will not sequence"></i></td>
+                        {% elif library.tenxlibraryquantificationandstorage.qc_check == 'P' %}
+                            <td style="text-align: center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: orange" title="Will sequence"></i></td>
+                        {% elif library.tenxlibraryquantificationandstorage.qc_check == 'N' %}
+                            <td style="text-align: center"><i class="fa fa-times" aria-hidden="true" style="color: red" title="Will not sequence"></i></td>
+                        {% else %}
+                            <td style="text-align: center"></td>
+                        {% endif %}
+
+                        <td>{{ library.result }}</td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
 
-<script type="text/javascript">
-    $.fn.dataTable.ext.type.order['sequenced-pre'] = function ( d ) {
-        switch ( d ) {
-            case '<i class="fa fa-check" aria-hidden="true" style="color:green;" title="Sequenced">': return 1;
-            case '<i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:orange" title="Will sequence"></i>': return 2;
-            case '<i class="fa fa-times" aria-hidden="true" style="color:red" title="Will not sequence"></i>': return 3;
-            case '': return 4;
-        }
-        return 0;
-    };
-    $(document).ready(function() {
-        $("#lib_datatable").DataTable({
-            "columnDefs": [
-                {
-                    "type": "sequenced",
-                    "targets": "sequenced"
-                },
-                {
-                    "type": "natural",
-                    "targets": "jiraticket",
-                }
-            ]
+{% block datatables_script %}
+    <script type="text/javascript">
+        $.fn.dataTable.ext.type.order['sequenced-pre'] = function ( d ) {
+            switch ( d ) {
+                case '<i class="fa fa-check" aria-hidden="true" style="color: green;" title="Sequenced">': return 1;
+                case '<i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: orange" title="Will sequence"></i>': return 2;
+                case '<i class="fa fa-times" aria-hidden="true" style="color: red" title="Will not sequence"></i>': return 3;
+                case '': return 4;
+            }
+            return 0;
+        };
+        $(document).ready(function() {
+            $("#lib_datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "type": "sequenced",
+                        "targets": "sequenced"
+                    },
+                    {
+                        "type": "natural",
+                        "targets": "jiraticket",
+                    }
+                ]
+            });
         });
-    });
-</script>
+    </script>
+{% endblock %}
 
 {% endblock %}

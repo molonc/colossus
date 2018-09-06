@@ -1,9 +1,8 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-GSC submission Form
-{% endblock %}
+{% block title %}GSC submission Form{% endblock %}
 
 {% block body %}
 <!-- Meta Information -->
@@ -15,17 +14,25 @@ GSC submission Form
             <table class="table-condensed">
                 {{ delivery_info_form }}
             </table>
-        </fieldset><br>
+        </fieldset>
+
+        <br>
+
         <fieldset>
             <legend>Sample Information</legend>
             <table class="table-condensed">
                 {{ submitter_info_form }}
             </table>
-        </fieldset><br>
+        </fieldset>
+
+        <br>
+
         <input class="btn btn-primary btn-sm" type="submit" name="download" value="Download">
         <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_detail' pk=pk %}">Cancel</a>
     </form>
-</div><br>
+</div>
+
+<br>
 <!-- end of Meta Information -->
 
 {% endblock %}

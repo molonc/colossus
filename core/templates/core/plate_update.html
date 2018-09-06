@@ -1,9 +1,8 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Update Plate
-{% endblock %}
+{% block title %}Update Plate{% endblock %}
 
 {% block body %}
 <div class="container graybg">
@@ -14,29 +13,35 @@ Update Plate
             <table class="table-condensed">
                 <thead>
                 {% for field in form %}
-                <tr>
-                    <th>
-                    {{field.label_tag}}
-                    </th>
-                    <td>
-                    {{ field.errors }}
-                    {% if field.name == "library" and library_id %}
-                        <select id="id_library" name="library">
-                            <option value="{{library_id}}" selected="selected">{{library}}</option>
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
-                    {% if field.help_text %}
-                        <p class="helptext">{{ field.help_text|safe }}</p>
-                    {% endif %}
-                    </td>
-                </tr>
+                    <tr>
+                        <th>
+                        {{ field.label_tag }}
+                        </th>
+                        <td>
+                            {{ field.errors }}
+                            {% if field.name == "library" and library_id %}
+                                <select id="id_library" name="library">
+                                    <option value="{{ library_id }}" selected="selected">{{ library }}</option>
+                                </select>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                            {% if field.help_text %}
+                                <p class="helptext">{{ field.help_text|safe }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
                 </thead>
             </table>
-        </fieldset><br>
+        </fieldset>
+
+        <br>
+
         <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
         <a class="btn btn-default btn-sm" href="{% url 'pbal:library_detail' pk=library_id %}">Cancel</a>
-    </form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

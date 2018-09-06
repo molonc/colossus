@@ -1,65 +1,82 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Delete Sample
-{% endblock %}
+{% block title %}Delete Sample{% endblock %}
 
 {% block body %}
 <div class="container graybg">
-    <h5>Are you sure you want to delete sample <i class="emph">{{sample.sample_id}}</i>? All of the following related items will be deleted too:</h5>
+    <h5>Are you sure you want to delete sample <i class="emph">{{ sample.sample_id }}</i>? All of the following related items will be deleted too:</h5>
+
     {% if sample.dlplibrary_set.all %}
-    <ul style="list-style-type:square">
-    {% for library in sample.dlplibrary_set.all %}
-        <li><a href="{{library.get_absolute_url}}">{{library}}</a></li>
-        {% if library.dlpsequencing_set.all %}
-        <ul style="list-style-type:disc">
-        {% for sequencing in library.dlpsequencing_set.all %}
-        <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
-        {% endfor %}
+        <ul style="list-style-type: square">
+            {% for library in sample.dlplibrary_set.all %}
+                <li><a href="{{ library.get_absolute_url }}">{{ library }}</a></li>
+
+                {% if library.dlpsequencing_set.all %}
+                    <ul style="list-style-type: disc">
+                        {% for sequencing in library.dlpsequencing_set.all %}
+                            <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            {% endfor %}
         </ul>
-        {% endif %}
-    {% endfor %}
-    </ul><br>
     {% else %}
-    <h5><i class="text-warning">There are no dlp items related to this object!</i></h5><br>
+        <h5><i class="text-warning">There are no dlp items related to this object!</i></h5>
     {% endif %}
+
+    <br>
+
     {% if sample.pballibrary_set.all %}
-    <ul style="list-style-type:square">
-    {% for library in sample.pballibrary_set.all %}
-        <li><a href="{{library.get_absolute_url}}">{{library}}</a></li>
-        {% if library.pbalsequencing_set.all %}
-        <ul style="list-style-type:disc">
-        {% for sequencing in library.pbalsequencing_set.all %}
-        <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
-        {% endfor %}
+        <ul style="list-style-type: square">
+            {% for library in sample.pballibrary_set.all %}
+                <li><a href="{{ library.get_absolute_url }}">{{ library }}</a></li>
+
+                {% if library.pbalsequencing_set.all %}
+                    <ul style="list-style-type: disc">
+                        {% for sequencing in library.pbalsequencing_set.all %}
+                            <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            {% endfor %}
         </ul>
-        {% endif %}
-    {% endfor %}
-    </ul><br>
     {% else %}
-    <h5><i class="text-warning">There are no pbal items related to this object!</i></h5><br>
+        <h5><i class="text-warning">There are no pbal items related to this object!</i></h5>
     {% endif %}
+
+    <br>
+
     {% if sample.tenxlibrary_set.all %}
-    <ul style="list-style-type:square">
-    {% for library in sample.tenxlibrary_set.all %}
-        <li><a href="{{library.get_absolute_url}}">{{library}}</a></li>
-        {% if library.tenxsequencing_set.all %}
-        <ul style="list-style-type:disc">
-        {% for sequencing in library.tenxsequencing_set.all %}
-        <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
-        {% endfor %}
+        <ul style="list-style-type: square">
+            {% for library in sample.tenxlibrary_set.all %}
+                <li><a href="{{ library.get_absolute_url }}">{{ library }}</a></li>
+
+                {% if library.tenxsequencing_set.all %}
+                    <ul style="list-style-type: disc">
+                        {% for sequencing in library.tenxsequencing_set.all %}
+                            <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            {% endfor %}
         </ul>
-        {% endif %}
-    {% endfor %}
-    </ul><br>
     {% else %}
-    <h5><i class="text-warning">There are no 10x items related to this object!</i></h5><br>
+        <h5><i class="text-warning">There are no 10x items related to this object!</i></h5>
     {% endif %}
+
+    <br>
+
     <form action="{% url 'core:sample_delete' pk=pk %}" method="POST">
         {% csrf_token %}
         <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
         <a class="btn btn-default btn-sm" href="{% url 'core:sample_list' %}">Cancel</a>
-    </form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

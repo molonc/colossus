@@ -1,17 +1,21 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Delete project
-{% endblock %}
+{% block title %}Delete project{% endblock %}
 
 {% block body %}
 <div class="container graybg">
-    <h5>Are you sure you want to delete project <i class="emph">{{project}}</i>?</h5><br> 
+    <h5>Are you sure you want to delete project <i class="emph">{{ project }}</i>?</h5>
+
+    <br>
+
     <form action="{% url 'core:project_delete' pk=pk %}" method="POST">
         {% csrf_token %}
-            <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
-            <a class="btn btn-default btn-sm" href="{% url 'core:project_list' %}">Cancel</a>
-    </form><br>
+        <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
+        <a class="btn btn-default btn-sm" href="{% url 'core:project_list' %}">Cancel</a>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

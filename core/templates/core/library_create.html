@@ -1,9 +1,8 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Create Library
-{% endblock %}
+{% block title %}Create Library{% endblock %}
 
 {% block body %}
 <div class="container graybg">
@@ -13,76 +12,101 @@ Create Library
             <legend>Library Information</legend>
             <table class="table-condensed">
                 <thead>
+
                 {% for field in lib_form %}
-                <tr>
-                    <th>
-                    {{field.label_tag}}
-                    </th>
-                    <td>
-                    {{ field.errors }}
-                    {% if field.name == "projects" %}
-                        <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
-                            {% for project in projects %}
-                            <option>{{project}}</option>
-                            {% endfor %}
-                        </select>
-                    {% elif field.name == "sample" and sample_id %}
-                        <select id="id_sample" name="sample">
-                            <option value="{{sample_id}}" selected="selected">{{sample}}</option>
-                    {% elif field.name == "relates_to" %}
-                        <select class="selectpicker" data-live-search="True" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
-                            {% for lib in related_libs %}
-                            <option value={{lib.id}}>{{lib}}</option>
-                            {% endfor %}
-                        </select>
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
-                    {% if field.help_text %}
-                        <p class="helptext">{{ field.help_text }}</p>
-                    {% endif %}
-                    </td>
-                </tr>
+                    <tr>
+                        <th>
+                            {{ field.label_tag }}
+                        </th>
+                        <td>
+                            {{ field.errors }}
+
+                            {% if field.name == "projects" %}
+                                <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
+                                    {% for project in projects %}
+                                        <option>{{ project }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            {% elif field.name == "sample" and sample_id %}
+                                <select id="id_sample" name="sample">
+                                    <option value="{{ sample_id }}" selected="selected">{{ sample }}</option>
+                                </select>
+                            {% elif field.name == "relates_to" %}
+                                <select class="selectpicker" data-live-search="True" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
+
+                                    {% for lib in related_libs %}
+                                        <option value={{ lib.id }}>{{ lib }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+
+                            {% if field.help_text %}
+                                <p class="helptext">{{ field.help_text }}</p>
+                            {% endif %}
+                            </td>
+                    </tr>
                 {% endfor %}
+
                 </thead>
             </table>
-         </fieldset><br>
+         </fieldset>
+
+         <br>
+
          {% if library_type == 'dlp' %}
-         <fieldset>
-            <legend>Sublibrary Information</legend>
-            <table class="table-condensed">
-                <thead>
-                {{sublib_form}}
-                </thead>
-            </table>
-         </fieldset><br>
+             <fieldset>
+                <legend>Sublibrary Information</legend>
+                <table class="table-condensed">
+                    <thead>
+                    {{ sublib_form }}
+                    </thead>
+                </table>
+             </fieldset>
+
+             <br>
          {% endif %}
+
          <fieldset>
             <legend>Library Sample Details</legend>
             <table class="table-condensed">
                 <thead>
-                {{libdetail_formset}}
+                    {{ libdetail_formset }}
                 </thead>
             </table>
-         </fieldset><br>
+         </fieldset>
+
+         <br>
+
          <fieldset>
             <legend>Library Construction Information</legend>
             <table class="table-condensed">
                 <thead>
-                {{libcons_formset}}
+                    {{ libcons_formset }}
                 </thead>
             </table>
-         </fieldset><br>
+         </fieldset>
+
+         <br>
+
          <fieldset>
             <legend>Library Quantification and Storage</legend>
             <table class="table-condensed">
                 <thead>
-                {{libqs_formset}}
+                    {{ libqs_formset }}
                 </thead>
             </table>
-         </fieldset><br>
+         </fieldset>
+
+         <br>
+
         <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
         <a class="btn btn-default btn-sm" href="{% url library_type|add:':library_list' %}">Cancel</a>
-    </form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

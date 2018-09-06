@@ -1,9 +1,8 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Edit Sequencing
-{% endblock %}
+{% block title %}Edit Sequencing{% endblock %}
 
 {% block body %}
 <div class="container graybg">
@@ -14,44 +13,56 @@ Edit Sequencing
             <table class="table-condensed">
                 <thead>
                 {% for field in form %}
-                <tr>
-                    <th>
-                    {{field.label_tag}}
-                    </th>
-                    <td>
-                    {{ field.errors }}
-                    {% if field.name == "relates_to" %}
-                        <select class="selectpicker" data-live-search="True" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
-                            {% for seq in related_seqs %}
-                            {% if seq in selected_related_seqs %}
-                            <option value={{seq.id}} selected="{{seq}}">{{seq}}</option>
+                    <tr>
+                        <th>
+                            {{ field.label_tag }}
+                        </th>
+                        <td>
+                            {{ field.errors }}
+
+                            {% if field.name == "relates_to" %}
+                                <select class="selectpicker" data-live-search="True" id="id_relates_to" name="relates_to" multiple data-none-selected-text="--------">
+
+                                    {% for seq in related_seqs %}
+                                        {% if seq in selected_related_seqs %}
+                                            <option value={{ seq.id }} selected="{{ seq }}">{{ seq }}</option>
+                                        {% else %}
+                                            <option value={{ seq.id }}>{{ seq }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                </select>
                             {% else %}
-                            <option value={{seq.id}}>{{seq}}</option>
+                                {{ field }}
                             {% endif %}
-                            {% endfor %}
-                        </select>
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
-                    {% if field.help_text %}
-                        <p class="helptext">{{ field.help_text|safe }}</p>
-                    {% endif %}
-                    </td>
-                </tr>
+
+                            {% if field.help_text %}
+                                <p class="helptext">{{ field.help_text|safe }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
                 </thead>
             </table>
-         </fieldset><br>
+         </fieldset>
+
+         <br>
+
         <fieldset>
             <legend>Sequencing Details</legend>
             <table class="table-condensed">
                 <thead>
-                {{seqdetail_formset}}
+                    {{ seqdetail_formset }}
                 </thead>
             </table>
-         </fieldset><br>
+         </fieldset>
+
+         <br>
+
         <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
         <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_detail' pk=pk %}">Cancel</a>
-    </form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

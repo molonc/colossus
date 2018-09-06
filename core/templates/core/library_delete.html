@@ -1,38 +1,49 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Delete Library
-{% endblock %}
+{% block title %}Delete Library{% endblock %}
 
 {% block body %}
 <div class="container graybg">
-    <h5>Are you sure you want to delete library <i class="emph">{{library}}</i>? All of the following related items will be deleted too:</h5>
+    <h5>Are you sure you want to delete library <i class="emph">{{ library }}</i>? All of the following related items will be deleted too:</h5>
+
     {% if library.dlpsequencing_set.all %}
-    <ul style="list-style-type:square">
-    {% for sequencing in library.dlpsequencing_set.all %}
-    <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
-    {% endfor %}
-    </ul><br>
+        <ul style="list-style-type:square">
+
+            {% for sequencing in library.dlpsequencing_set.all %}
+                <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+            {% endfor %}
+
+        </ul>
     {% elif library.pbalsequencing_set.all %}
-    <ul style="list-style-type:square">
-    {% for sequencing in library.pbalsequencing_set.all %}
-    <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
-    {% endfor %}
-    </ul><br>
+        <ul style="list-style-type:square">
+
+            {% for sequencing in library.pbalsequencing_set.all %}
+                <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+            {% endfor %}
+
+        </ul>
     {% elif library.tenxsequencing_set.all %}
-    <ul style="list-style-type:square">
-    {% for sequencing in library.tenxsequencing_set.all %}
-    <li><a href="{{sequencing.get_absolute_url}}">{{sequencing}}</a></li>
-    {% endfor %}
-    </ul><br>
+        <ul style="list-style-type:square">
+
+            {% for sequencing in library.tenxsequencing_set.all %}
+                <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+            {% endfor %}
+
+        </ul>
     {% else %}
-    <h5><i class="text-warning">There are no related items to this object!</i></h5><br>
+        <h5><i class="text-warning">There are no related items to this object!</i></h5>
     {% endif %}
+
+    <br>
+
     <form action="{% url library_type|add:':library_delete' pk=pk %}" method="POST">
         {% csrf_token %}
         <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
         <a class="btn btn-default btn-sm" href="{% url library_type|add:':library_list' %}">Cancel</a>
-    </form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

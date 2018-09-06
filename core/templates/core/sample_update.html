@@ -1,19 +1,18 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Edit Sample
-{% endblock %}
+{% block title %}Edit Sample{% endblock %}
 
 {% block body %}
 <div class="container graybg">
-	<form action="{% url 'core:sample_update' pk=pk %}" method="POST">
-		{% csrf_token %}
+    <form action="{% url 'core:sample_update' pk=pk %}" method="POST">
+        {% csrf_token %}
          <fieldset>
             <legend>Sample Information</legend>
             <table class="table-condensed">
                 <thead>
-                {{form}}
+                    {{ form }}
                 </thead>
             </table>
          </fieldset>
@@ -21,12 +20,17 @@ Edit Sample
             <legend>Additional Sample Information</legend>
             <table class="table-condensed">
                 <thead>
-                {{formset}}
+                    {{ formset }}
                 </thead>
             </table>
-         </fieldset><br>
-    	<input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
+         </fieldset>
+
+         <br>
+
+        <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
         <a class="btn btn-default btn-sm" href="{% url 'core:sample_detail' pk=pk %}">Cancel</a>
-	</form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

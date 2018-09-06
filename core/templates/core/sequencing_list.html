@@ -1,16 +1,15 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-List of Sequencings
-{% endblock %}
+{% block title %}List of Sequencings{% endblock %}
 
 {% block body %}
-<div class="container" style="padding:0; margin-bottom:5px;">
-    <h4 style="float:left;">Select a sequencing to view its details</h4>
-    <a class="btn btn-primary btn-sm" style="float:right; margin-top:5px;" href="{% url library_type|add:':sequencing_create' %}">Add Sequencing</a>
+<div class="container" style="padding: 0; margin-bottom: 5px;">
+    <h4 style="float: left;">Select a sequencing to view its details</h4>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url library_type|add:':sequencing_create' %}">Add Sequencing</a>
 </div>
-<div class="container" style="background-color:#F5F5F5;">
+<div class="container" style="background-color: #F5F5F5;">
     <div class="table-responsive">
         <table id="datatable" class="table table-striped">
             <thead>
@@ -19,66 +18,87 @@ List of Sequencings
                     <th>Library Information</th>
                     <th>Sample ID</th>
                     <th>GSC library ID</th>
+
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <th class="jiraticket">Jira Ticket</th>
+                        <th class="jiraticket">Jira Ticket</th>
                     {% endif %}
+
                     <th>Submission date</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <br/>
+
                 {% for sequencing in sequencings %}
-                <tr>
-                    <td><a href="{% url library_type|add:':sequencing_detail' pk=sequencing.pk %}">
-                        {{sequencing.id}}
-                    </a></td>
-                    <td width="300px">
-                        <a href="{% url library_type|add:':library_detail' pk=sequencing.library.pk %}">
-                        {% if library_type == 'dlp' %}
-                        {{sequencing.library.pool_id}}
-                        {% else %}
-                        {{sequencing.library}}
+                    <tr>
+                        <td>
+                            <a href="{% url library_type|add:':sequencing_detail' pk=sequencing.pk %}">
+                                {{ sequencing.id }}
+                            </a>
+                        </td>
+                        <td width="300px">
+                            <a href="{% url library_type|add:':library_detail' pk=sequencing.library.pk %}">
+                                {% if library_type == 'dlp' %}
+                                    {{ sequencing.library.pool_id }}
+                                {% else %}
+                                    {{ sequencing.library }}
+                                {% endif %}
+                            </a>
+
+                            <br/>
+
+                            {{ sequencing.library.description }}
+                        </td>
+                        <td>
+                            <a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">
+                                {{ sequencing.library.sample.sample_id }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if library_type == 'dlp' %}
+                                {{ sequencing.dlpsequencingdetail.gsc_library_id }}
+                            {% elif library_type == 'pbal' %}
+                                {{ sequencing.pbalsequencingdetail.gsc_library_id }}
+                            {% elif library_type == 'tenx' %}
+                                {{ sequencing.tenxsequencingdetail.gsc_library_id }}
+                            {% endif %}
+                        </td>
+
+                        {% if library_type == 'dlp' or library_type == 'tenx' %}
+                            <td>
+                                <a href="https://www.bcgsc.ca/jira/browse/{{ sequencing.library.jira_ticket }}">
+                                    {{ sequencing.library.jira_ticket }}
+                                </a>
+                            </td>
                         {% endif %}
-                        </a><br/>
-                        {{sequencing.library.description}}
-                    </td>
-                    <td><a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">{{sequencing.library.sample.sample_id}}</td>
-                    <td>
-                    {% if library_type == 'dlp' %}
-                    {{sequencing.dlpsequencingdetail.gsc_library_id}}
-                    {% elif library_type == 'pbal' %}
-                    {{sequencing.pbalsequencingdetail.gsc_library_id}}
-                    {% elif library_type == 'tenx' %}
-                    {{sequencing.tenxsequencingdetail.gsc_library_id}}
-                    {% endif %}
-                    </td>
-                    {% if library_type == 'dlp' or library_type == 'tenx' %}
-                    <td><a href="https://www.bcgsc.ca/jira/browse/{{sequencing.library.jira_ticket}}">{{sequencing.library.jira_ticket}}</a></td>
-                    {% endif %}
-                    <td>{{sequencing.submission_date}}</td>
-                    <td>
-                        <p class="libdesc" style="float:right;"><a style="margin-right:2px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color:orange;"></i> edit</a>
-                        <a href="{% url library_type|add:':sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a></p>
-                    </td>
-                </tr>
+
+                        <td>{{ sequencing.submission_date }}</td>
+                        <td>
+                            <p class="libdesc" style="float: right;">
+                                <a style="margin-right: 2px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
+                                <a href="{% url library_type|add:':sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
+                            </p>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+{% endblock %}
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        $("#lib_datatable").DataTable({
-            "columnDefs": [
-                {
-                    "type": "natural",
-                    "targets": "jiraticket",
-                }
-            ]
+{% block datatables_script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#lib_datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "type": "natural",
+                        "targets": "jiraticket",
+                    }
+                ]
+            });
         });
-    });
-</script>
-
+    </script>
 {% endblock %}

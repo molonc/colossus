@@ -1,9 +1,8 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Create Sample
-{% endblock %}
+{% block title %}Create Sample{% endblock %}
 
 {% block body %}
 <div class="container graybg">
@@ -13,20 +12,25 @@ Create Sample
             <legend>Sample Information</legend>
             <table class="table-condensed">
                 <thead>
-                {{form}}
+                    {{ form }}
                 </thead>
             </table>
-         </fieldset><br>
+         </fieldset>
+
+         <br>
+
          <fieldset>
             <legend>Additional Sample Information</legend>
             <table class="table-condensed">
                 <thead>
-                {{formset}}
+                    {{ formset }}
                 </thead>
             </table>
          </fieldset>
         <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
         <a class="btn btn-default btn-sm" href="{% url 'core:sample_list' %}">Cancel</a>
-    </form><br>
+    </form>
+
+    <br>
 </div>
 {% endblock %}

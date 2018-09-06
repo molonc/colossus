@@ -1,218 +1,238 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Library Details
-{% endblock %}
+{% block title %}Library Details{% endblock %}
 
 {% block body %}
 <!-- Meta Information -->
-<div class="container" style="background-color:#FFF3E0;">
+<div class="container" style="background-color: #FFF3E0;">
     <table class="table-condensed">
         <tr>
             <th id="thid"> Sample:</th>
-            <td id="tdid" class="notes"><a href="{{library.sample.get_absolute_url}}">{{library.sample}}</a></td>
+            <td id="tdid" class="notes"><a href="{{ library.sample.get_absolute_url }}">{{ library.sample }}</a></td>
         </tr>
         <tr>
             {% if library_type == 'pbal' %}
-            <th id="thid"> Number of plates:</th>
-            <td id="tdid" class="notes">{{library.plate_set.count}}</td>
+                <th id="thid"> Number of plates:</th>
+                <td id="tdid" class="notes">{{ library.plate_set.count }}</td>
             {% endif %}
         </tr>
         {% for field, value in library_dict.items %}
-        {% if library_type == 'dlp' %}
-        <tr>
-            {% if field == "Jira ticket" %}
-            <th id="thid">Montage:</th>
-            <td id="tdid"><a href="https://52.235.35.201/?dashboard={{value}}">{{value}}</a></td>
+            {% if library_type == 'dlp' %}
+                <tr>
+                    {% if field == "Jira ticket" %}
+                        <th id="thid">Montage:</th>
+                        <td id="tdid"><a href="https://52.235.35.201/?dashboard={{ value }}">{{ value }}</a></td>
+                    {% endif %}
+                </tr>
             {% endif %}
-        </tr>
-        {% endif %}
-        <tr>
-            <th id="thid">{{field}}:</th>
-            {% if field == "Jira ticket" %}
-            <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{value}}">{{value}}</a></td>
-            {% else %}
-            <td id="tdid" class="notes">{{value}}</td>
-            {% endif %}
-        </tr>
+
+            <tr>
+                <th id="thid">{{ field }}:</th>
+                {% if field == "Jira ticket" %}
+                    <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{ value }}">{{ value }}</a></td>
+                {% else %}
+                    <td id="tdid" class="notes">{{ value }}</td>
+                {% endif %}
+            </tr>
         {% endfor %}
         <tr>
             <th id="thid">Project:</th>
-            <td id="tdid" class="notes">{{library.projects.all|join:", "}}</td>
+            <td id="tdid" class="notes">{{ library.projects.all|join:", " }}</td>
         </tr>
         <tr>
             <th id="thid">Relates to:</th>
             <td id="tdid">
+
             {% for lib in library.relates_to.only %}
-                <a href="{{lib.get_absolute_url}}">{{lib}}</a><br>
+                <a href="{{ lib.get_absolute_url }}">{{ lib }}</a>
+
+                <br>
             {% endfor %}
+
             </td>
         </tr>
     </table>
-</div><br>
+</div>
+
+<br>
 <!-- end of Meta Information -->
 
 {% if library_type == 'pbal' %}
-<!-- Plates -->
-<div class="container">
-    <h4>Plate Details</h4>
-    {% if library.plate_set %}
-    <div class="table">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Jira ticket</th>
-                    <th>Plate number</th>
-                    <th>Plate status</th>
-                    <th>Plate location</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for plate in library.plate_set.all %}
-                <tr>
-                    <td><a href="https://www.bcgsc.ca/jira/browse/{{plate.jira_ticket}}">{{plate.jira_ticket}}</a></td>
-                    <td>{{plate.plate_number}}</td>
-                    <td>{{plate.plate_status}}</td>
-                    <td>{{plate.plate_location}}</td>
-                    <td>
-                        <a href="{% url 'pbal:plate_update' pk=plate.pk %}"><i class="fa fa-pencil" style="color:orange;"></i> update</a>
-                        <a href="{% url 'pbal:plate_delete' pk=plate.pk %}"><i class="icon-remove-sign" style="color:red"></i> delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>   
-    {% else %}
-    <h5><i class="text-warning">There are no plates for this library!</i></h5>
-    {% endif %}
-    <a href="{% url 'pbal:plate_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Plate</a></p>
-</div><br>
-<!-- end of Plates -->
+    <!-- Plates -->
+    <div class="container">
+        <h4>Plate Details</h4>
+
+        {% if library.plate_set %}
+            <div class="table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Jira ticket</th>
+                            <th>Plate number</th>
+                            <th>Plate status</th>
+                            <th>Plate location</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plate in library.plate_set.all %}
+                            <tr>
+                                <td><a href="https://www.bcgsc.ca/jira/browse/{{ plate.jira_ticket }}">{{ plate.jira_ticket }}</a></td>
+                                <td>{{ plate.plate_number }}</td>
+                                <td>{{ plate.plate_status }}</td>
+                                <td>{{ plate.plate_location }}</td>
+                                <td>
+                                    <a href="{% url 'pbal:plate_update' pk=plate.pk %}"><i class="fa fa-pencil" style="color: orange;"></i> update</a>
+                                    <a href="{% url 'pbal:plate_delete' pk=plate.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <h5><i class="text-warning">There are no plates for this library!</i></h5>
+        {% endif %}
+
+        <a href="{% url 'pbal:plate_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i> Add Plate</a>
+    </div>
+
+    <br>
+    <!-- end of Plates -->
 {% endif %}
-        
+
 <!-- Library Sample Detail -->
 <div class="container">
     <h4>Library Sample Detail</h4>
+
     {% if library.has_library_sample_detail %}
     <table class="table-condensed">
         {% if library_type == 'dlp' %}
             {% for field, value in library.dlplibrarysampledetail.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
+                <tr>
+                    <th id="thid">{{ field }}:</th>
+                    <td id="tdid" class="notes">{{ value }}</td>
+                </tr>
             {% endfor %}
         {% elif library_type == 'pbal' %}
             {% for field, value in library.pballibrarysampledetail.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
+                <tr>
+                    <th id="thid">{{ field }}:</th>
+                    <td id="tdid" class="notes">{{ value }}</td>
+                </tr>
             {% endfor %}
         {% elif library_type == 'tenx' %}
             {% for field, value in library.tenxlibrarysampledetail.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
+                <tr>
+                    <th id="thid">{{ field }}:</th>
+                    <td id="tdid" class="notes">{{ value }}</td>
+                </tr>
             {% endfor %}
         {% endif %}
     </table>
     {% else %}
-    <h5><i class="text-warning">There is no library sample detail for this library!</i></h5>
+        <h5><i class="text-warning">There is no library sample detail for this library!</i></h5>
     {% endif %}
-</div><br>
-<!-- end of Library Sample Detail -->  
+</div>
+
+<br>
+<!-- end of Library Sample Detail -->
 
 <!-- Library Construction Information -->
 <div class="container">
     <h4>Library Construction Information</h4>
+
     {% if library.has_library_construction_information %}
-    <table class="table-condensed">
-        {% if library_type == 'dlp' %}
-            {% for field, value in library.dlplibraryconstructioninformation.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
-            {% endfor %}
-        {% elif library_type == 'pbal' %}
-            {% for field, value in library.pballibraryconstructioninformation.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
-            {% endfor %}
-        {% elif library_type == 'tenx' %}
-            {% for field, value in library.tenxlibraryconstructioninformation.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
-            {% endfor %}
-        {% endif %}
-    </table>
+        <table class="table-condensed">
+            {% if library_type == 'dlp' %}
+                {% for field, value in library.dlplibraryconstructioninformation.get_field_values.items %}
+                    <tr>
+                        <th id="thid">{{ field }}:</th>
+                        <td id="tdid" class="notes">{{ value }}</td>
+                    </tr>
+                {% endfor %}
+            {% elif library_type == 'pbal' %}
+                {% for field, value in library.pballibraryconstructioninformation.get_field_values.items %}
+                    <tr>
+                        <th id="thid">{{ field }}:</th>
+                        <td id="tdid" class="notes">{{ value }}</td>
+                    </tr>
+                {% endfor %}
+            {% elif library_type == 'tenx' %}
+                {% for field, value in library.tenxlibraryconstructioninformation.get_field_values.items %}
+                    <tr>
+                        <th id="thid">{{ field }}:</th>
+                        <td id="tdid" class="notes">{{ value }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
     {% else %}
-    <h5><i class="text-warning">There is no library construction information for this library!</i></h5>
+        <h5><i class="text-warning">There is no library construction information for this library!</i></h5>
     {% endif %}
-</div><br>
+</div>
+
+<br>
 <!-- end of Library Construction Information -->
-  
+
 <!-- Library Quantification and Storage -->
 <div class="container">
     <h4>Library Quantification and Storage</h4>
+
     {% if library.has_library_quantification_and_storage %}
-    <table class="table-condensed">
-        {% if library_type == 'dlp' %}
-            <tr>
-                <th id="thid">Library location:</th>
-                <td id="tdid">{{library.dlplibraryquantificationandstorage.library_location}}</td>
-            </tr>
-            {% for field, value in library.dlplibraryquantificationandstorage.get_field_values.items %}
-            <tr>
-                {% if field == "Agilent bioanalyzer xad file" and value %}
-                <th id="thid">{{field}}:</th>
-                <td id="tdid">
-                    <a href="{{library.dlplibraryquantificationandstorage.agilent_bioanalyzer_xad.url}}">
-                        {{value}}
-                    </a>
-                </td>
-                {% elif field == "Agilent bioanalyzer image file" and value %}
-                <th id="thid">{{field}}:</th>
-                <td id="tdid">
-                    <a href="{{library.dlplibraryquantificationandstorage.agilent_bioanalyzer_image.url}}">
-                        {{value}}
-                    </a>
-                </td>
-                {% else %}
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-        {% elif library_type == 'pbal' %}
-            {% for field, value in library.pballibraryquantificationandstorage.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
-            {% endfor %}
-        {% elif library_type == 'tenx' %}
-            {% for field, value in library.tenxlibraryquantificationandstorage.get_field_values.items %}
-            <tr>
-                <th id="thid">{{field}}:</th>
-                <td id="tdid" class="notes">{{value}}</td>
-            </tr>
-            {% endfor %}
-        {% endif %}
-    </table>
+        <table class="table-condensed">
+            {% if library_type == 'dlp' %}
+                <tr>
+                    <th id="thid">Library location:</th>
+                    <td id="tdid">{{ library.dlplibraryquantificationandstorage.library_location }}</td>
+                </tr>
+
+                {% for field, value in library.dlplibraryquantificationandstorage.get_field_values.items %}
+                    <tr>
+                        {% if field == "Agilent bioanalyzer xad file" and value %}
+                            <th id="thid">{{ field }}:</th>
+                            <td id="tdid">
+                                <a href="{{ library.dlplibraryquantificationandstorage.agilent_bioanalyzer_xad.url }}">
+                                    {{ value }}
+                                </a>
+                            </td>
+                        {% elif field == "Agilent bioanalyzer image file" and value %}
+                            <th id="thid">{{ field }}:</th>
+                            <td id="tdid">
+                                <a href="{{ library.dlplibraryquantificationandstorage.agilent_bioanalyzer_image.url }}">
+                                    {{ value }}
+                                </a>
+                            </td>
+                        {% else %}
+                            <th id="thid">{{ field }}:</th>
+                            <td id="tdid" class="notes">{{ value }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% elif library_type == 'pbal' %}
+                {% for field, value in library.pballibraryquantificationandstorage.get_field_values.items %}
+                    <tr>
+                        <th id="thid">{{ field }}:</th>
+                        <td id="tdid" class="notes">{{ value }}</td>
+                    </tr>
+                {% endfor %}
+            {% elif library_type == 'tenx' %}
+                {% for field, value in library.tenxlibraryquantificationandstorage.get_field_values.items %}
+                    <tr>
+                        <th id="thid">{{ field }}:</th>
+                        <td id="tdid" class="notes">{{ value }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
     {% else %}
-    <h5><i class="text-warning">There is no library quantification and storage for this library!</i></h5>
+        <h5><i class="text-warning">There is no library quantification and storage for this library!</i></h5>
     {% endif %}
-</div><br>
+</div>
+
+<br>
 <!-- end of Library Quantification and Storage -->
 
 <!-- Experimental Condition Metadata -->
@@ -220,32 +240,37 @@ Library Details
 <div class="container">
     <h4>Experimental Condition Metadata</h4>
         {% if library.chipregion_set.all %}
-    <div class="table-responsive">
-    <table class="table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th>experimental condition</th>
-                        {% for field in metadata_fields %}
-                    <th>{{ field }}</th>
+            <div class="table-responsive">
+                <table class="table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>experimental condition</th>
+
+                            {% for field in metadata_fields %}
+                                <th>{{ field }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for code, metadata_row in chip_metadata.items %}
+                            <tr>
+                                <td>{{ code }}</td>
+
+                                {% for data in metadata_row %}
+                                    <td>{{ data }}</td>
+                                {% endfor %}
+
+                            </tr>
                         {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                    {% for code, metadata_row in chip_metadata.items %}
-                <tr>
-                <td>{{ code }}</td>
-                    {% for data in metadata_row %}
-                <td>{{ data }}</td>
-                    {% endfor %}
-                </tr>
-                    {% endfor %}
-            </tbody>
-    </table>
-    </div>
+                    </tbody>
+                </table>
+            </div>
         {% else %}
-    <h5><i class="text-warning">There is no condition metadata for library!</i></h5>
+            <h5><i class="text-warning">There is no condition metadata for library!</i></h5>
         {% endif %}
-</div><br>
+</div>
+
+<br>
 {% endif %}
 <!-- endof Experimental Condition Metadata -->
 
@@ -254,36 +279,43 @@ Library Details
 {% if library_type == 'dlp' %}
 <div class="container">
     <h4>Sublibrary Information</h4>
+
     {% if library.sublibraryinformation_set.all %}
-    <div class="table-responsive">
-        <table id="datatable" class="table-striped table-bordered" style="text-align:center;">
-            <thead>
-                <tr>
-                    <th>cell_id</th>
-                    <th>Condition</th>
-                    {% for field in  sublibinfo_fields %}
-                        <th>{{field}}</th>
+        <div class="table-responsive">
+            <table id="datatable" class="table-striped table-bordered" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th>cell_id</th>
+                        <th>Condition</th>
+
+                        {% for field in  sublibinfo_fields %}
+                            <th>{{ field }}</th>
+                        {% endfor %}
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sublibinfo in library.sublibraryinformation_set.all %}
+                        <tr>
+                            <td>{{ sublibinfo.get_sublibrary_id }}</td>
+                            <td>{{ sublibinfo.chip_region.region_code }}</td>
+
+                            {% for value in sublibinfo.get_values %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+
+                        </tr>
                     {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for sublibinfo in library.sublibraryinformation_set.all %}
-                <tr>
-                    <td>{{sublibinfo.get_sublibrary_id}}</td>
-                    <td>{{sublibinfo.chip_region.region_code}}</td>
-                    {% for value in sublibinfo.get_values %}
-                    <td>{{value}}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <a href="{% url 'dlp:export_sublibrary_csv' pk=library.pk %}">Export HTML Table To CSV File</a>
+                </tbody>
+            </table>
+        </div>
+        <a href="{% url 'dlp:export_sublibrary_csv' pk=library.pk %}">Export HTML Table To CSV File</a>
     {% else %}
-    <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
+        <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
     {% endif %}
-</div><br>
+</div>
+
+<br>
 {% endif %}
 <!-- end of Sublibrary Information -->
 
@@ -291,117 +323,122 @@ Library Details
 <div class="container">
     <h4>Sequencing Information</h4>
     {% if library.dlpsequencing_set.all %}
-    <div class="table">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sample ID</th>
-                    <th>Chip ID</th>
-                    <th>Adapter</th>
-                    <th>Sequencing instrument</th>
-                    <th>Submission date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sequencing in library.dlpsequencing_set.all %}
-                <tr>
-                    <td><a href="{{sequencing.get_absolute_url}}">{{sequencing.library.sample.sample_id}}</a></td>
-                    <td>{{sequencing.library.pool_id}}</td>
-                    <td>{{sequencing.adapter}}</td>
-                    <td>{{sequencing.get_sequencing_instrument_display}}</td>
-                    <td>{{sequencing.submission_date}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <div class="table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sample ID</th>
+                        <th>Chip ID</th>
+                        <th>Adapter</th>
+                        <th>Sequencing instrument</th>
+                        <th>Submission date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sequencing in library.dlpsequencing_set.all %}
+                        <tr>
+                            <td><a href="{{ sequencing.get_absolute_url }}">{{ sequencing.library.sample.sample_id }}</a></td>
+                            <td>{{ sequencing.library.pool_id }}</td>
+                            <td>{{ sequencing.adapter }}</td>
+                            <td>{{ sequencing.get_sequencing_instrument_display }}</td>
+                            <td>{{ sequencing.submission_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% elif library.pbalsequencing_set.all %}
-    <div class="table">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sample ID</th>
-                    <th>Adapter</th>
-                    <th>Sequencing instrument</th>
-                    <th>Submission date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sequencing in library.pbalsequencing_set.all %}
-                <tr>
-                    <td><a href="{{sequencing.get_absolute_url}}">{{sequencing.library.sample.sample_id}}</a></td>
-                    <td>{{sequencing.adapter}}</td>
-                    <td>{{sequencing.get_sequencing_instrument_display}}</td>
-                    <td>{{sequencing.submission_date}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <div class="table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sample ID</th>
+                        <th>Adapter</th>
+                        <th>Sequencing instrument</th>
+                        <th>Submission date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sequencing in library.pbalsequencing_set.all %}
+                        <tr>
+                            <td><a href="{{ sequencing.get_absolute_url }}">{{ sequencing.library.sample.sample_id }}</a></td>
+                            <td>{{ sequencing.adapter }}</td>
+                            <td>{{ sequencing.get_sequencing_instrument_display }}</td>
+                            <td>{{ sequencing.submission_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% elif library.tenxsequencing_set.all %}
-    <div class="table">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sample ID</th>
-                    <th>Adapter</th>
-                    <th>Sequencing instrument</th>
-                    <th>Submission date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sequencing in library.tenxsequencing_set.all %}
-                <tr>
-                    <td><a href="{{sequencing.get_absolute_url}}">{{sequencing.library.sample.sample_id}}</a></td>
-                    <td>{{sequencing.adapter}}</td>
-                    <td>{{sequencing.get_sequencing_instrument_display}}</td>
-                    <td>{{sequencing.submission_date}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <div class="table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sample ID</th>
+                        <th>Adapter</th>
+                        <th>Sequencing instrument</th>
+                        <th>Submission date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sequencing in library.tenxsequencing_set.all %}
+                        <tr>
+                            <td><a href="{{ sequencing.get_absolute_url }}">{{ sequencing.library.sample.sample_id }}</a></td>
+                            <td>{{ sequencing.adapter }}</td>
+                            <td>{{ sequencing.get_sequencing_instrument_display }}</td>
+                            <td>{{ sequencing.submission_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-    <h5><i class="text-warning">There is no sequencing information for this library!</i></h5>
+        <h5><i class="text-warning">There is no sequencing information for this library!</i></h5>
     {% endif %}
+
     <a href="{% url library_type|add:':sequencing_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Sequencing</a></p>
-</div><br>
+</div>
+
+<br>
 <!-- end of Sequencing Information -->
 
 <!-- Analysis Information -->
 {% if library_type == 'dlp' %}
-<div class="container">
-    <h4>Analysis Information</h4>
-    {% if analyses %}
-          <div class="table">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Analysis ID</th>
-                            <th>Priority Level</th>
-                            <th>Jira ticket:</th>
-                            <th>Pipeline version</th>
-                            <th>Analysis run status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for analysis in analyses %}
-                        <tr>
-                            <td><a href="{{analysis.get_absolute_url}}">{{analysis}}</a></td>
-                            <td>{{analysis.get_priority_level_display}}</td>
-                            <td><a href="https://www.bcgsc.ca/jira/browse/{{analysis.analysis_jira_ticket}}">{{analysis.analysis_jira_ticket}}</a></td>
-                            <td>{{analysis.version.version}}</td>
-                            <td>{{analysis.analysisrun.get_run_status_display}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-    {% else %}
-          <h5><i class="text-warning">There is no Analysis information for this library!</i></h5>
-    {% endif %}
-    <a href="{% url 'sisyphus:analysisinformation_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Analysis </a></p>
-</div>
+    <div class="container">
+        <h4>Analysis Information</h4>
+
+        {% if analyses %}
+              <div class="table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Analysis ID</th>
+                                <th>Priority Level</th>
+                                <th>Jira ticket:</th>
+                                <th>Pipeline version</th>
+                                <th>Analysis run status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for analysis in analyses %}
+                                <tr>
+                                    <td><a href="{{ analysis.get_absolute_url }}">{{ analysis }}</a></td>
+                                    <td>{{ analysis.get_priority_level_display }}</td>
+                                    <td><a href="https://www.bcgsc.ca/jira/browse/{{ analysis.analysis_jira_ticket }}">{{ analysis.analysis_jira_ticket }}</a></td>
+                                    <td>{{ analysis.version.version }}</td>
+                                    <td>{{ analysis.analysisrun.get_run_status_display }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        {% else %}
+              <h5><i class="text-warning">There is no Analysis information for this library!</i></h5>
+        {% endif %}
+
+        <a href="{% url 'sisyphus:analysisinformation_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Analysis </a></p>
+    </div>
 {% endif %}
 <!-- end of Analysis Information -->
 
@@ -410,7 +447,9 @@ Library Details
     <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':library_update' pk=library.pk %}">Edit</a>
     <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':library_delete' pk=library.pk %}">Delete</a>
     <a style="float:right; margin:5px;" href="{% url library_type|add:':library_list' %}">List of libraries</a>
-</div><br>
+</div>
+
+<br>
 <!-- end of footer bottons -->
 
 {% endblock %}

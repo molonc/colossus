@@ -86,13 +86,9 @@
 
         {% block body %}{% endblock %}
 
-    <!-- Universal JS -->
+    <!-- Top of page button -->
     <script type="text/javascript">
         $(document).ready(function(){
-            // Support DataTables anywhere
-            $("#datatable").DataTable();
-
-            // Back to top of page button
             $('body').prepend('<a href="#" class="back-to-top">Back to Top</a>');
             $('a.back-to-top').click(function() {
                 $('html, body').animate({
@@ -109,6 +105,15 @@
             });
         });
     </script>
+
+    {# Customize the DataTables script as necessary #}
+    {% block datatables_script %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#datatable").DataTable();
+            });
+        </script>
+    {% endblock %}
 
     </body>
 </html>

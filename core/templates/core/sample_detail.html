@@ -1,123 +1,154 @@
 {% extends "base_view.html" %}
+
 {% load staticfiles %}
 
-{% block title %}
-Sample Details
-{% endblock %}
+{% block title %}Sample Details{% endblock %}
 
 {% block body %}
 <!-- Meta Information -->
-<div class="container" style="background-color:#FFF3E0;">
+<div class="container" style="background-color: #FFF3E0;">
     <table class="table-condensed">
         {% for field, value in sample.get_field_values.items %}
-        <tr>
-            <th id="thid">{{field}}:</th>
-            <td id="tdid" class="notes">{{value}}</td>
-        </tr>
+            <tr>
+                <th id="thid">{{ field }}:</th>
+                <td id="tdid" class="notes">{{ value }}</td>
+            </tr>
         {% endfor %}
     </table>
-</div><br>
+</div>
+
+<br>
 <!-- end of Meta Information -->
-    
+
 <!-- Additional Sample Information -->
 <div class="container">
     <h4>Additional Sample Information</h4>
+
     {% if sample.has_additional_sample_information %}
-    <table class="table-condensed">
-        {% for field, value in sample.additionalsampleinformation.get_field_values.items %}
-        <tr>
-            <th id="thid">{{field}}:</th>
-            <td id="tdid" class="notes">{{value}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+        <table class="table-condensed">
+            {% for field, value in sample.additionalsampleinformation.get_field_values.items %}
+                <tr>
+                    <th id="thid">{{ field }}:</th>
+                    <td id="tdid" class="notes">{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     {% else %}
-    <h5><i class="text-warning">There is no additional sample information for this sample!</i></h5>
+        <h5><i class="text-warning">There is no additional sample information for this sample!</i></h5>
     {% endif %}
-</div><br>
+
+</div>
+
+<br>
 <!-- end of Additional Sample Information -->
-    
+
 <!-- Library Information -->
 <div class="container">
     <div class="table">
         <table class="table">
             {% if sample.dlplibrary_set.all %}
-            <thead>
-                <tr><th><h4>DLP Library Information</h4></th><th></th><th></th></tr>
-                <tr>
-                    <th>Chip ID</th>
-                    <th>JIRA Ticket</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for library in sample.dlplibrary_set.all %}
-                <tr>
-                    <td><a href="{{library.get_absolute_url}}">{{library.pool_id}}</a></td>
-                    <td><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{library.jira_ticket}}</a></td>
-                    <td>{{library.description}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                <thead>
+                    <tr>
+                        <th><h4>DLP Library Information</h4></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Chip ID</th>
+                        <th>JIRA Ticket</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for library in sample.dlplibrary_set.all %}
+                        <tr>
+                            <td><a href="{{ library.get_absolute_url }}">{{ library.pool_id }}</a></td>
+                            <td><a href="https://www.bcgsc.ca/jira/browse/{{ library.jira_ticket }}">{{ library.jira_ticket }}</a></td>
+                            <td>{{ library.description }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             {% else %}
-            <tr><h5><i class="text-warning">There is no dlp library information for this sample!</i></h5></tr>
+                <tr><h5><i class="text-warning">There is no dlp library information for this sample!</i></h5></tr>
             {% endif %}
+
             {% if sample.pballibrary_set.all %}
-            <thead>
-                <tr><th><h4>PBAL Library Information</h4></th><th></th><th></th></tr>
-                <tr>
-                    <th>Library ID</th>
-                    <th>Number of plates</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for library in sample.pballibrary_set.all %}
-                <tr>
-                    <td><a href="{{library.get_absolute_url}}">{{library.id}}</a></td>
-                    <td>{{library.plate_set.count}}</td>
-                    <td>{{library.description}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                <thead>
+                    <tr>
+                        <th><h4>PBAL Library Information</h4></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Library ID</th>
+                        <th>Number of plates</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for library in sample.pballibrary_set.all %}
+                        <tr>
+                            <td><a href="{{ library.get_absolute_url }}">{{ library.id }}</a></td>
+                            <td>{{ library.plate_set.count }}</td>
+                            <td>{{ library.description }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             {% else %}
-            <tr><h5><i class="text-warning">There is no pbal library information for this sample!</i></h5></tr>
+                <tr><h5><i class="text-warning">There is no pbal library information for this sample!</i></h5></tr>
             {% endif %}
+
             {% if sample.tenxlibrary_set.all %}
-            <thead>
-                <tr><th><h4>TENX Library Information</h4></th><th></th><th></th></tr>
-                <tr>
-                    <th>Library ID</th>
-                    <th>JIRA Ticket</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for library in sample.tenxlibrary_set.all %}
-                <tr>
-                    <td><a href="{{library.get_absolute_url}}">{{library.id}}</a></td>
-                    <td><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{library.jira_ticket}}</a></td>
-                    <td>{{library.description}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                <thead>
+                    <tr>
+                        <th><h4>TENX Library Information</h4></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Library ID</th>
+                        <th>JIRA Ticket</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for library in sample.tenxlibrary_set.all %}
+                        <tr>
+                            <td><a href="{{ library.get_absolute_url }}">{{ library.id }}</a></td>
+                            <td><a href="https://www.bcgsc.ca/jira/browse/{{ library.jira_ticket }}">{{ library.jira_ticket }}</a></td>
+                            <td>{{ library.description }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             {% else %}
-            <tr><h5><i class="text-warning">There is no 10x library information for this sample!</i></h5></tr>
+                <tr><h5><i class="text-warning">There is no 10x library information for this sample!</i></h5></tr>
             {% endif %}
         </table>
     </div>
+
     {% for library in library_list %}
-    <a href="{% url library|add:':library_create_from_sample' pk=sample.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i>{% if library == 'tenx' %} Add 10x Library {% else %} Add {{library|upper}} Library {% endif %}</a></p>
+        <a href="{% url library|add:':library_create_from_sample' pk=sample.pk %}">
+            <i class="fa fa-plus" aria-hidden="true" style="color: green;"></i>
+            {% if library == 'tenx' %}
+                Add 10x Library
+            {% else %}
+                Add {{ library|upper }} Library
+            {% endif %}
+        </a>
     {% endfor %}
-</div><br>
+</div>
+
+<br>
 <!-- end of Library Information -->
 
 <!-- footer bottons -->
-<div class="container" style="margin-bottom:5px;">
-    <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url 'core:sample_update' pk=sample.pk %}">Edit</a>
-    <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url 'core:sample_delete' pk=sample.pk %}">Delete</a>
-    <a style="float:right; margin:5px;" href="{% url 'core:sample_list' %}">List of samples</a>
-</div><br>
+<div class="container" style="margin-bottom: 5px;">
+    <a class="btn btn-warning btn-sm" style="float: left; margin: 5px;" href="{% url 'core:sample_update' pk=sample.pk %}">Edit</a>
+    <a class="btn btn-danger btn-sm" style="float: left; margin: 5px;" href="{% url 'core:sample_delete' pk=sample.pk %}">Delete</a>
+    <a style="float: right; margin: 5px;" href="{% url 'core:sample_list' %}">List of samples</a>
+</div>
+
+<br>
 <!-- end of footer bottons -->
 
 {% endblock %}
