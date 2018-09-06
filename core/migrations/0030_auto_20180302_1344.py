@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 def update_spotting_location(apps, schema_editor):
-    
+
     DlpLibraryConstructionInformation = apps.get_model('core', 'DlpLibraryConstructionInformation')
     DlpLibraryConstructionInformation.objects.filter(spotting_location='A').update(spotting_location='AD')
 

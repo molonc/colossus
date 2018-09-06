@@ -40,7 +40,7 @@ ALLOWED_HOSTS = os.environ.get('COLOSSUS_ALLOWED_HOSTS', '127.0.0.1').split()
 # Application definition
 
 INSTALLED_APPS = [
-    'core.apps.CoreConfig', 
+    'core.apps.CoreConfig',
     'account.apps.AccountConfig',
     'sisyphus.apps.SisyphusConfig',
     'dlp.apps.DlpConfig',

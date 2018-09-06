@@ -102,7 +102,7 @@ a:hover {
 }
 
 .left-inner-addon input {
-    padding-left: 30px;    
+    padding-left: 30px;
 }
 
 .left-inner-addon i {
@@ -116,7 +116,7 @@ a:hover {
 }
 
 .right-inner-addon input {
-    padding-right: 30px;    
+    padding-right: 30px;
 }
 
 .right-inner-addon i {
@@ -143,7 +143,7 @@ a:hover {
   text-align: center;
 }
 
-@media screen and (min-width: 768px) { 
+@media screen and (min-width: 768px) {
   .modal:before {
     display: inline-block;
     vertical-align: middle;

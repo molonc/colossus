@@ -7,9 +7,9 @@ Created on May 16, 2016
 from django.test import TestCase
 
 class SampleViewTests(TestCase):
-    
+
     def setup(self):
         pass
-    
+
     def test_sample(self):
         print 'testing the test ...'

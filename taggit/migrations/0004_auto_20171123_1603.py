@@ -8,10 +8,10 @@ from core.models import DlpLibrary
 
 
 def edit_content_type_ids(apps, schema_editor):
-    
+
     dlp_library_content_type = ContentType.objects.get_for_model(DlpLibrary)
     TaggedItem = apps.get_model('taggit', 'TaggedItem')
-    
+
     TaggedItem.objects.filter(content_type_id = 3).update(content_type_id = dlp_library_content_type)
 
 class Migration(migrations.Migration):

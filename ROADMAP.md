@@ -5,8 +5,8 @@
         api/
             stuff
         core/
-            templates/ 
-            models.py 
+            templates/
+            models.py
             urls.py
             views.py
             other_stuff

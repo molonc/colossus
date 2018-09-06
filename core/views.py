@@ -54,7 +54,7 @@ from .models import (
 )
 from sisyphus.models import *
 from .forms import (
-    SampleForm, 
+    SampleForm,
     AdditionalSampleInfoInlineFormset,
     DlpLibraryForm,
     PbalLibraryForm,
@@ -116,13 +116,13 @@ Tag.get_libraries = get_libraries
 # Index page
 #----------------------------
 class IndexView(TemplateView):
-    
+
     """
     Home page.
     """
 
     template_name = "core/index.html"
-    
+
     def get_context_data(self):
         context = {
             'sample_size': Sample.objects.count(),
@@ -142,7 +142,7 @@ class IndexView(TemplateView):
 # Sample views
 #----------------------------
 class SampleList(TemplateView):
-    
+
     """
     List of samples.
     """
@@ -166,7 +166,7 @@ class Inventory(SampleList):
 
 
 class SampleDetail(TemplateView):
-    
+
     """
     Sample detail page.
     """
@@ -178,9 +178,9 @@ class SampleDetail(TemplateView):
             'sample': get_object_or_404(Sample, pk=pk),
             'library_list': ['dlp', 'pbal', 'tenx'],
             'pk': pk,
-        }   
+        }
         return context
-        
+
 
 @method_decorator(login_required, name='dispatch')
 class SampleCreate(TemplateView):
@@ -222,7 +222,7 @@ class SampleCreate(TemplateView):
 
 
 class SampleUpdate(SampleCreate):
-    
+
     """
     Sample update page.
     """
@@ -253,14 +253,14 @@ class SampleUpdate(SampleCreate):
 
 @method_decorator(login_required, name='dispatch')
 class SampleDelete(TemplateView):
-    
+
     """
     Sample delete page.
     """
 
     template_name = "core/sample_delete.html"
 
-    def get_context_data(self, pk): 
+    def get_context_data(self, pk):
         context = {
             'sample': get_object_or_404(Sample, pk=pk),
             'pk': pk,
@@ -278,7 +278,7 @@ class SampleDelete(TemplateView):
 # Library views
 #----------------------------
 class LibraryList(TemplateView):
-    
+
     """
     Library list base class.
     """
@@ -290,7 +290,7 @@ class LibraryList(TemplateView):
 
     def get_context_data(self):
         context = {
-            'libraries': self.library_class.objects.all().order_by(self.order), 
+            'libraries': self.library_class.objects.all().order_by(self.order),
             'library_type': self.library_type,
         }
         return context
@@ -343,7 +343,7 @@ class LibraryDetail(TemplateView):
     def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None):
         library_dict = self.sort_library_order(library)
         context = {
-            'library': library, 
+            'library': library,
             'library_type': library_type,
             'analyses': analyses,
             'sublibinfo_fields': sublibinfo_fields,
@@ -375,7 +375,7 @@ class DlpLibraryDetail(LibraryDetail):
         sublibinfo = SublibraryInformation()
         fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
         metadata_dict = collections.OrderedDict()
-        
+
         for chip_region in library.chipregion_set.all().order_by('region_code'):
             metadata_set = chip_region.chipregionmetadata_set.all()
             d1 = {}
@@ -429,7 +429,7 @@ class TenxLibraryDetail(LibraryDetail):
 
 @method_decorator(login_required, name='dispatch')
 class LibraryDelete(TemplateView):
-    
+
     """
     Library delete base class.
     """
@@ -439,7 +439,7 @@ class LibraryDelete(TemplateView):
 
     template_name = "core/library_delete.html"
 
-    def get_context_data(self, pk): 
+    def get_context_data(self, pk):
         context = {
             'library': get_object_or_404(self.library_class, pk=pk),
             'pk': pk,
@@ -501,7 +501,7 @@ class LibraryCreate(TemplateView):
             sample = get_object_or_404(Sample, pk=pk)
         else:
             sample = None
-        
+
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
@@ -745,7 +745,7 @@ class LibraryUpdate(LibraryCreate):
         library = get_object_or_404(self.library_class, pk=pk)
         selected_projects = library.projects.names()
         selected_related_libs = library.relates_to.only()
-        
+
         context = {
             'pk': pk,
             'lib_form': self.lib_form_class(instance=library),
@@ -764,7 +764,7 @@ class LibraryUpdate(LibraryCreate):
     def post(self, request, pk):
         context = self.get_context_data(pk)
         library = get_object_or_404(self.library_class, pk=pk)
-        return self._post(request, context, library=library)    
+        return self._post(request, context, library=library)
 
 
 class DlpLibraryUpdate(LibraryUpdate):
@@ -813,7 +813,7 @@ class TenxLibraryUpdate(LibraryUpdate):
 # Project views
 #----------------------------
 class ProjectList(TemplateView):
-    
+
     """
     Project detail page.
     """
@@ -852,7 +852,7 @@ class ProjectDelete(TemplateView):
 
 @method_decorator(login_required, name='dispatch')
 class ProjectUpdate(TemplateView):
-    
+
     """
     Project update page.
     """
@@ -862,7 +862,7 @@ class ProjectUpdate(TemplateView):
     def get_context_data(self, pk):
         context = {
             'pk': pk,
-            'form': ProjectForm(instance=get_object_or_404(Tag, pk=pk)), 
+            'form': ProjectForm(instance=get_object_or_404(Tag, pk=pk)),
         }
         return context
 
@@ -944,13 +944,13 @@ class SequencingDetail(TemplateView):
         download = False
         if key in request.session.keys():
             download = True
-        
+
         context = {
             'sequencing': get_object_or_404(self.sequencing_class, pk=pk),
             'download': download,
             'library_type': self.library_type,
         }
-        return render(request, self.template_name, context) 
+        return render(request, self.template_name, context)
 
 
 class DlpSequencingDetail(SequencingDetail):
@@ -981,7 +981,7 @@ class TenxSequencingDetail(SequencingDetail):
 
     sequencing_class = TenxSequencing
     library_type = 'tenx'
-            
+
 
 @method_decorator(login_required, name='dispatch')
 class SequencingCreate(TemplateView):
@@ -1021,7 +1021,7 @@ class SequencingCreate(TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
-            form.save_m2m() 
+            form.save_m2m()
             seqdetail_formset = self.seqdetail_formset_class(
                 request.POST,
                 instance=instance,
@@ -1156,7 +1156,7 @@ class SequencingUpdate(TemplateView):
             seqdetail_formset = self.seqdetail_formset_class(
                 request.POST,
                 instance=instance,
-            )                        
+            )
             if seqdetail_formset.is_valid():
                 seqdetail_formset.save()
 
@@ -1264,11 +1264,11 @@ class TenxSequencingDelete(SequencingDelete):
 
 
 def dlp_sequencing_get_samplesheet(request, pk):
-    
+
     """
     Generates downloadable samplesheet.
     """
-    
+
     ofilename, ofilepath = generate_samplesheet(pk)
     response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
@@ -1280,9 +1280,9 @@ def dlp_sequencing_get_samplesheet(request, pk):
 
 
 def dlp_sequencing_get_queried_samplesheet(request, pool_id, flowcell):
-    
+
     """
-    Makes downloading samplesheets from flowcell possible. 
+    Makes downloading samplesheets from flowcell possible.
     """
 
     try:
@@ -1336,7 +1336,7 @@ class DlpSequencingCreateGSCFormView(TemplateView):
 
 
 def dlp_sequencing_get_gsc_form(request, pk):
-    
+
     """
     Generates downloadable GSC submission form.
     """
@@ -1573,16 +1573,16 @@ class TenxLaneDelete(LaneDelete):
 @Render("core/plate_create.html")
 @login_required()
 def plate_create(request, from_library=None):
-    
+
     """
     Plate create page.
     """
-    
+
     if from_library:
         library = get_object_or_404(PbalLibrary, pk=from_library)
     else:
         library = None
-    
+
     if request.method == 'POST':
         form = PlateForm(request.POST)
         if form.is_valid():
@@ -1607,13 +1607,13 @@ def plate_create(request, from_library=None):
 @Render("core/plate_update.html")
 @login_required()
 def plate_update(request, pk):
-    
+
     """
     Plate update page.
     """
-    
+
     plate = get_object_or_404(Plate, pk=pk)
-    
+
     if request.method == 'POST':
         form = PlateForm(request.POST, instance=plate)
         if form.is_valid():
@@ -1639,11 +1639,11 @@ def plate_update(request, pk):
 @Render("core/plate_delete.html")
 @login_required()
 def plate_delete(request, pk):
-    
+
     """
     Plate delete page.
     """
-    
+
     plate = get_object_or_404(Plate, pk=pk)
     library = plate.library
 
@@ -1734,7 +1734,7 @@ def dlp_get_cell_graph(request):
         lib_info['pool_id'] = lib.pool_id
         lib_info['count'] = dlp_get_filtered_sublib_count(lib.sublibraryinformation_set)
         lib_info['id'] = lib.pk
-        
+
         for sequencing in lib.dlpsequencing_set.all():
             lib_info['submission_date'] = sequencing.submission_date
             data.append(lib_info)

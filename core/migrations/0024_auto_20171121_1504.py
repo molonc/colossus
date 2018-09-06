@@ -19,11 +19,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RenameModel(
             old_name='Library',
-            new_name='DlpLibrary',   
+            new_name='DlpLibrary',
         ),
         migrations.RenameModel(
             old_name='Sequencing',
-            new_name='DlpSequencing',    
+            new_name='DlpSequencing',
         ),
         migrations.RenameModel(
             old_name='Lane',

@@ -12,8 +12,8 @@ Class-based views
 Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
-    
-    
+
+
 Created on May 16, 2016
 
 @author: Jafar Taghiyar (jtaghiyar@bccrc.ca)
@@ -27,7 +27,7 @@ from django.contrib import admin
 from core import views
 
 urlpatterns = [
-    url(r'^$', views.IndexView.as_view(), name='index'),    
+    url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^admin/', admin.site.urls),
     url(r'^search/', views.search_view, name='search'),
     url(r'^core/', include('core.urls')),

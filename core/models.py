@@ -68,7 +68,7 @@ class Sample(models.Model, FieldValue):
 
     # required fields
     sample_id = create_chrfield(
-        "Sample ID", 
+        "Sample ID",
         blank=False,
     )
 
@@ -167,7 +167,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         blank=True,
     )
     anatomic_site = create_chrfield(
-        "Anatomic site", 
+        "Anatomic site",
         blank=False,
     )
     anatomic_sub_site = create_chrfield("Anatomic sub-site")
@@ -262,7 +262,7 @@ class DlpLibrary(Library):
         blank=False,
     )
     num_sublibraries = create_intfield(
-        "Number of sublibraries", 
+        "Number of sublibraries",
         default=0,
     )
     relates_to = models.ManyToManyField(
@@ -281,7 +281,7 @@ class DlpLibrary(Library):
 
 
 class PbalLibrary(Library):
-    
+
     """
     PBAL library contains several Cell objects.
     """
@@ -303,10 +303,10 @@ class PbalLibrary(Library):
 
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
-    
+
 
 class TenxLibrary(Library):
-    
+
     """
     10x library contains several Cell objects.
     """
@@ -321,11 +321,11 @@ class TenxLibrary(Library):
 
     # fields
     jira_ticket = create_chrfield(
-        "Jira ticket", 
+        "Jira ticket",
         blank=False,
     )
     num_sublibraries = create_intfield(
-        "Number of sublibraries", 
+        "Number of sublibraries",
         default=0,
     )
     relates_to = models.ManyToManyField(
@@ -368,7 +368,7 @@ class SublibraryInformation(models.Model, FieldValue):
     """
 
     fields_to_exclude = ['ID', 'Library', 'Sample_ID', 'Chip_Region']
-    values_to_exclude = ['id', 'library', 'sample_id', 'chip_region'] 
+    values_to_exclude = ['id', 'library', 'sample_id', 'chip_region']
 
     # database relationships
     library = models.ForeignKey(
@@ -429,12 +429,12 @@ class SublibraryInformation(models.Model, FieldValue):
 
 
 class MetadataField(models.Model):
-    
+
     """
     Keeps track of the metadata fields used, and allows ease of creating but still controlling
     added new fields in table. DLP only.
     """
-    
+
     field = create_chrfield(
         "Metadata key",
         blank=False,
@@ -489,7 +489,7 @@ class LibrarySampleDetail(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
-    # choices 
+    # choices
     cell_state_choices = (
         ('C','Cells'),
         ('N','Nuclei'),
@@ -636,7 +636,7 @@ class DlpLibraryConstructionInformation(LibraryConstructionInformation):
         blank=True,
     )
 
-    # choices 
+    # choices
     chip_format_choices = (
         ('W','Wafergen'),
         ('M','Microfluidic'),
@@ -733,7 +733,7 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
         blank=True,
     )
 
-    # choices 
+    # choices
     chip_format_choices = (
         ('W','Wafergen'),
         ('M','Microfluidic'),
@@ -851,7 +851,7 @@ class DlpLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
         default="AmpureXP",
     )
     storage_medium = create_chrfield(
-        "Storage medium", 
+        "Storage medium",
         default="TE 10:0.1",
     )
     agilent_bioanalyzer_xad = models.FileField(
@@ -899,7 +899,7 @@ class PbalLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
         null=True,
         blank=True,
     )
-    
+
 
 class TenxLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
 
@@ -936,7 +936,7 @@ class Sequencing(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
-    # choices 
+    # choices
     sequencing_instrument_choices = (
         ('HX','HiSeqX'),
         ('H2500','HiSeq2500'),
@@ -1064,7 +1064,7 @@ class PbalSequencing(Sequencing):
     )
 
 class TenxSequencing(Sequencing):
-    
+
     """
     10x sequencing information.
     """
@@ -1199,7 +1199,7 @@ class Lane(models.Model, FieldValue):
 
 
 class DlpLane(Lane):
-    
+
     """
     Dlp lane information.
     """
@@ -1213,7 +1213,7 @@ class DlpLane(Lane):
 
 
 class PbalLane(Lane):
-    
+
     """
     PBAL lane information.
     """
@@ -1227,7 +1227,7 @@ class PbalLane(Lane):
 
 
 class TenxLane(Lane):
-    
+
     """
     10x lane information.
     """
@@ -1241,7 +1241,7 @@ class TenxLane(Lane):
 
 
 class Plate(models.Model, FieldValue):
-    
+
     """
     PBAL plate information.
     """

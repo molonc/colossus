@@ -380,7 +380,7 @@ PbalLibrarySampleDetailInlineFormset = inlineformset_factory(
             years=range(2000,2020),
             empty_label=('year', 'month', 'day'),
         )
-    }    
+    }
 )
 
 PbalLibraryConstructionInfoInlineFormset =  inlineformset_factory(
