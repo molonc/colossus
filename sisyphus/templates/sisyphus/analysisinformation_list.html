@@ -12,12 +12,12 @@
 </div>
 
 <div class="container" style="background-color:#F5F5F5;">
-    <br/>
-    <table id="datatable" class="display">
+    <div class="table-responsive">
+    <table id="datatable" class="table table-striped">
         <thead>
             <tr>
                 <th>Analysis ID</th>
-                <th>Jira Ticket</th>
+                <th class="jiraticket">Jira Ticket</th>
                 <th>Priority</th>
                 <th>Sequences Analyzed</th>
                 <th>Library</th>
@@ -40,4 +40,19 @@
         </tbody>
     </table>
 </div>
+{% endblock %}
+
+{% block datatables_script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "type": "natural",
+                        "targets": "jiraticket",
+                    }
+                ]
+            });
+        });
+    </script>
 {% endblock %}
