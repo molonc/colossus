@@ -34,7 +34,7 @@
                         <th>Submission Date</th>
                     {% endif %}
 
-                    <th>Description</th>
+                    <th class="no-sort-col">Description</th>
 
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
                         <th class="jiraticket">JIRA Ticket</th>
@@ -51,7 +51,7 @@
                     {% endif %}
 
                     <th class="sequenced">Sequenced</th>
-                    <th>Result</th>
+                    <th class="no-sort-col">Result</th>
                 </tr>
             </thead>
             <tbody>
@@ -134,6 +134,8 @@
     </div>
 </div>
 
+{% endblock %}
+
 {% block datatables_script %}
     <script type="text/javascript">
         $.fn.dataTable.ext.type.order['sequenced-pre'] = function ( d ) {
@@ -155,11 +157,13 @@
                     {
                         "type": "natural",
                         "targets": "jiraticket",
+                    },
+                    {
+                        "orderable": false,
+                        "targets": "no-sort-col",
                     }
                 ]
             });
         });
     </script>
-{% endblock %}
-
 {% endblock %}

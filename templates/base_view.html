@@ -109,8 +109,15 @@
     {# Customize the DataTables script as necessary #}
     {% block datatables_script %}
         <script type="text/javascript">
-            $(document).ready(function(){
-                $("#datatable").DataTable();
+            $(document).ready(function() {
+                $("#datatable").DataTable({
+                    "columnDefs": [
+                        {
+                            "orderable": false,
+                            "targets": "no-sort-col",
+                        }
+                    ]
+                });
             });
         </script>
     {% endblock %}

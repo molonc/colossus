@@ -24,7 +24,7 @@
                     {% endif %}
 
                     <th>Submission date</th>
-                    <th></th>
+                    <th class="no-sort-col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -97,6 +97,10 @@
                     {
                         "type": "natural",
                         "targets": "jiraticket",
+                    },
+                    {
+                        "orderable": false,
+                        "targets": "no-sort-col",
                     }
                 ]
             });
