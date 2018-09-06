@@ -1,4 +1,5 @@
 {% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -25,7 +26,6 @@
 
         <link rel="stylesheet" href="{% static 'core/style.css' %}" />
         <link rel="shortcut icon" type="image/png" href="{% static 'core/favicon.ico' %}"/>
-        <!-- <script scr="{% static 'core/scripts.js' %}"></script> -->
 
         <title>Colossus</title>
 
@@ -68,7 +68,7 @@
 
         <div class="container" id="welcome">
             {% if user.is_authenticated %}
-            <span>Welcome, <b>{{user.username}}</b></span>
+            <span>Welcome, <b>{{ user.username }}</b></span>
             <span> / </span>
             <a href="{% url 'account:password_update' %}">Change Password</a>
             <span> / </span>
@@ -86,16 +86,13 @@
 
         {% block body %}{% endblock %}
 
-        <!-- Footer -->
-<!--         <div class="container" id="footer">
-            &copy; 2016&ndash;2016 <a href="">BC Cancer Agency</a>. Single cell database is licensed under the <a href="https://github.com/harvesthq/chosen/blob/master/LICENSE.md">MIT license</a>.
-        </div>
- -->        <!-- end of Footer -->
-    
-    <!-- back to top link -->
+    <!-- Universal JS -->
     <script type="text/javascript">
         $(document).ready(function(){
+            // Support DataTables anywhere
             $("#datatable").DataTable();
+
+            // Back to top of page button
             $('body').prepend('<a href="#" class="back-to-top">Back to Top</a>');
             $('a.back-to-top').click(function() {
                 $('html, body').animate({
