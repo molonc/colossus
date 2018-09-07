@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container" style="background-color:#FFF3E0;">
+    <div class="container detail-container">
         <table class="table-condensed">
         <tr>
             <th id="thid"> Library:</th>
@@ -68,8 +68,8 @@
         {% endfor %}
         </table>
     </div>
-    <br/>
-    <div class="container">
+
+    <div class="container detail-container">
         <table class="table-condensed">
             <tr>
                 <th id="thid">Sequencings Analyzed:</th>
@@ -86,6 +86,7 @@
     <div class="container">
         <a class="btn btn-warning btn-sm" href="{% url 'sisyphus:analysisinformation_update' library_pk=library.pk analysis_pk=object.pk %}">Edit analysis run</a>
         <a class="btn btn-danger btn-sm" href="{% url 'sisyphus:analysis_delete' pk=object.pk %}">Delete analysis run</a>
+    <a style="float:right; margin:5px;" href="{% url 'sisyphus:analysisinformation_list' %}"><i class="fa fa-arrow-circle-left"></i> Analyses</a>
     </div>
 
 {% endblock %}

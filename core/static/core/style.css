@@ -187,5 +187,26 @@ a.back-to-top {
 .index-container {
     border: solid 1px #E0E0E0;
     border-radius: 3px;
-    padding-bottom: 1em;
+    padding-bottom: 0.69em;
+}
+
+.detail-bordered-container {
+    border: solid 1px #E0E0E0;
+    margin-bottom: 0.5em;
+    padding-top: 0.1em;
+    padding-bottom: 0.4em;
+}
+
+.detail-container {
+    margin-bottom: 0.5em;
+    padding-top: 0.1em;
+    padding-bottom: 0.4em;
+}
+
+.detail-container:nth-child(odd) {
+    background-color: #FFF3E0;
+}
+
+.detail-container:nth-child(even) {
+    background-color: #f7f7f7;
 }

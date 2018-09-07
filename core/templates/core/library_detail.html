@@ -6,7 +6,9 @@
 
 {% block body %}
 <!-- Meta Information -->
-<div class="container" style="background-color: #FFF3E0;">
+<div class="container detail-container">
+    <h4>Library Detail</h4>
+
     <table class="table-condensed">
         <tr>
             <th id="thid"> Sample:</th>
@@ -55,13 +57,11 @@
         </tr>
     </table>
 </div>
-
-<br>
 <!-- end of Meta Information -->
 
 {% if library_type == 'pbal' %}
     <!-- Plates -->
-    <div class="container">
+    <div class="container detail-container">
         <h4>Plate Details</h4>
 
         {% if library.plate_set %}
@@ -104,7 +104,7 @@
 {% endif %}
 
 <!-- Library Sample Detail -->
-<div class="container">
+<div class="container detail-container">
     <h4>Library Sample Detail</h4>
 
     {% if library.has_library_sample_detail %}
@@ -136,12 +136,10 @@
         <h5><i class="text-warning">There is no library sample detail for this library!</i></h5>
     {% endif %}
 </div>
-
-<br>
 <!-- end of Library Sample Detail -->
 
 <!-- Library Construction Information -->
-<div class="container">
+<div class="container detail-container">
     <h4>Library Construction Information</h4>
 
     {% if library.has_library_construction_information %}
@@ -173,12 +171,10 @@
         <h5><i class="text-warning">There is no library construction information for this library!</i></h5>
     {% endif %}
 </div>
-
-<br>
 <!-- end of Library Construction Information -->
 
 <!-- Library Quantification and Storage -->
-<div class="container">
+<div class="container detail-container">
     <h4>Library Quantification and Storage</h4>
 
     {% if library.has_library_quantification_and_storage %}
@@ -231,33 +227,72 @@
         <h5><i class="text-warning">There is no library quantification and storage for this library!</i></h5>
     {% endif %}
 </div>
-
-<br>
 <!-- end of Library Quantification and Storage -->
 
 <!-- Experimental Condition Metadata -->
 {% if library_type == 'dlp' %}
-<div class="container">
-    <h4>Experimental Condition Metadata</h4>
-        {% if library.chipregion_set.all %}
+    <div class="container detail-bordered-container">
+        <h4>Experimental Condition Metadata</h4>
+            {% if library.chipregion_set.all %}
+                <div class="table-responsive">
+                    <table class="table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>experimental condition</th>
+
+                                {% for field in metadata_fields %}
+                                    <th>{{ field }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for code, metadata_row in chip_metadata.items %}
+                                <tr>
+                                    <td>{{ code }}</td>
+
+                                    {% for data in metadata_row %}
+                                        <td>{{ data }}</td>
+                                    {% endfor %}
+
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <h5><i class="text-warning">There is no condition metadata for library!</i></h5>
+            {% endif %}
+    </div>
+{% endif %}
+<!-- endof Experimental Condition Metadata -->
+
+<!-- Sublibrary Information -->
+{% if library_type == 'dlp' %}
+    <div class="container detail-bordered-container">
+        <h4>Sublibrary Information</h4>
+
+        {% if library.sublibraryinformation_set.all %}
             <div class="table-responsive">
-                <table class="table-striped table-bordered">
+                <table id="datatable" class="table-striped table-bordered" style="text-align: center;">
                     <thead>
                         <tr>
-                            <th>experimental condition</th>
+                            <th>cell_id</th>
+                            <th>Condition</th>
 
-                            {% for field in metadata_fields %}
+                            {% for field in  sublibinfo_fields %}
                                 <th>{{ field }}</th>
                             {% endfor %}
+
                         </tr>
                     </thead>
                     <tbody>
-                        {% for code, metadata_row in chip_metadata.items %}
+                        {% for sublibinfo in library.sublibraryinformation_set.all %}
                             <tr>
-                                <td>{{ code }}</td>
+                                <td>{{ sublibinfo.get_sublibrary_id }}</td>
+                                <td>{{ sublibinfo.chip_region.region_code }}</td>
 
-                                {% for data in metadata_row %}
-                                    <td>{{ data }}</td>
+                                {% for value in sublibinfo.get_values %}
+                                    <td>{{ value }}</td>
                                 {% endfor %}
 
                             </tr>
@@ -265,62 +300,19 @@
                     </tbody>
                 </table>
             </div>
+
+            <div style="padding-top: 0.5em;">
+                <a class="btn btn-primary btn-sm" href="{% url 'dlp:export_sublibrary_csv' pk=library.pk %}">Export to CSV</a>
+            </div>
         {% else %}
-            <h5><i class="text-warning">There is no condition metadata for library!</i></h5>
+            <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
         {% endif %}
-</div>
-
-<br>
-{% endif %}
-<!-- endof Experimental Condition Metadata -->
-
-
-<!-- Sublibrary Information -->
-{% if library_type == 'dlp' %}
-<div class="container">
-    <h4>Sublibrary Information</h4>
-
-    {% if library.sublibraryinformation_set.all %}
-        <div class="table-responsive">
-            <table id="datatable" class="table-striped table-bordered" style="text-align: center;">
-                <thead>
-                    <tr>
-                        <th>cell_id</th>
-                        <th>Condition</th>
-
-                        {% for field in  sublibinfo_fields %}
-                            <th>{{ field }}</th>
-                        {% endfor %}
-
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sublibinfo in library.sublibraryinformation_set.all %}
-                        <tr>
-                            <td>{{ sublibinfo.get_sublibrary_id }}</td>
-                            <td>{{ sublibinfo.chip_region.region_code }}</td>
-
-                            {% for value in sublibinfo.get_values %}
-                                <td>{{ value }}</td>
-                            {% endfor %}
-
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <a href="{% url 'dlp:export_sublibrary_csv' pk=library.pk %}">Export HTML Table To CSV File</a>
-    {% else %}
-        <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
-    {% endif %}
-</div>
-
-<br>
+    </div>
 {% endif %}
 <!-- end of Sublibrary Information -->
 
 <!-- Sequencing Information -->
-<div class="container">
+<div class="container detail-bordered-container">
     <h4>Sequencing Information</h4>
     {% if library.dlpsequencing_set.all %}
         <div class="table">
@@ -399,13 +391,11 @@
 
     <a href="{% url library_type|add:':sequencing_create_from_library' from_library=library.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Sequencing</a></p>
 </div>
-
-<br>
 <!-- end of Sequencing Information -->
 
 <!-- Analysis Information -->
 {% if library_type == 'dlp' %}
-    <div class="container">
+    <div class="container detail-bordered-container">
         <h4>Analysis Information</h4>
 
         {% if analyses %}
@@ -446,7 +436,7 @@
 <div class="container" style="margin-bottom:5px;">
     <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':library_update' pk=library.pk %}">Edit</a>
     <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':library_delete' pk=library.pk %}">Delete</a>
-    <a style="float:right; margin:5px;" href="{% url library_type|add:':library_list' %}">List of libraries</a>
+    <a style="float:right; margin:5px;" href="{% url library_type|add:':library_list' %}"><i class="fa fa-arrow-circle-left"></i> Libraries</a>
 </div>
 
 <br>

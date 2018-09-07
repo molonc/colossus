@@ -6,7 +6,7 @@
 
 {% block body %}
 <!-- Meta Information -->
-<div class="container" style="background-color: #FFF3E0;">
+<div class="container detail-container">
     <table class="table-condensed">
         {% for field, value in sample.get_field_values.items %}
             <tr>
@@ -16,12 +16,10 @@
         {% endfor %}
     </table>
 </div>
-
-<br>
 <!-- end of Meta Information -->
 
 <!-- Additional Sample Information -->
-<div class="container">
+<div class="container detail-container">
     <h4>Additional Sample Information</h4>
 
     {% if sample.has_additional_sample_information %}
@@ -38,12 +36,10 @@
     {% endif %}
 
 </div>
-
-<br>
 <!-- end of Additional Sample Information -->
 
 <!-- Library Information -->
-<div class="container">
+<div class="container detail-bordered-container">
     <div class="table">
         <table class="table">
             {% if sample.dlplibrary_set.all %}
@@ -137,15 +133,13 @@
         </a>
     {% endfor %}
 </div>
-
-<br>
 <!-- end of Library Information -->
 
 <!-- footer bottons -->
 <div class="container" style="margin-bottom: 5px;">
     <a class="btn btn-warning btn-sm" style="float: left; margin: 5px;" href="{% url 'core:sample_update' pk=sample.pk %}">Edit</a>
     <a class="btn btn-danger btn-sm" style="float: left; margin: 5px;" href="{% url 'core:sample_delete' pk=sample.pk %}">Delete</a>
-    <a style="float: right; margin: 5px;" href="{% url 'core:sample_list' %}">List of samples</a>
+    <a style="float: right; margin: 5px;" href="{% url 'core:sample_list' %}"><i class="fa fa-arrow-circle-left"></i> Samples</a>
 </div>
 
 <br>

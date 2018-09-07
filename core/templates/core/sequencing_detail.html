@@ -12,7 +12,7 @@
     <!-- End of Download an already made GSC submission form -->
 
 <!-- Meta Information -->
-<div class="container" style="background-color: #FFF3E0;">
+<div class="container detail-container">
 
     <!-- action list -->
     {% if library_type == 'dlp' %}
@@ -51,12 +51,10 @@
         </tr>
     </table>
 </div>
-
-<br>
 <!-- end of Meta Information -->
 
 <!-- Sequencing Detail -->
-<div class="container">
+<div class="container detail-container">
     <h4>Sequencing Details</h4>
 
     {% if sequencing.has_sequencing_detail %}
@@ -88,12 +86,10 @@
         <h5><i class="text-warning">There are no sequencing details for this library!</i></h5>
     {% endif %}
 </div>
-
-<br>
 <!-- end of Sequencing Detail -->
 
 <!-- Lane Detail -->
-<div class="container">
+<div class="container detail-bordered-container">
     <h4>Lane Details</h4>
     {% if sequencing.dlplane_set.all or sequencing.pballane_set.all or sequencing_tenxlane_set.all %}
         <div class="table">
@@ -149,15 +145,13 @@
 
     <a href="{% url library_type|add:':lane_create_from_sequencing' from_sequencing=sequencing.pk %}"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i> Add Lane</a></p>
 </div>
-
-<br>
 <!-- end of Sequencing Detail -->
 
 <!-- footer bottons -->
 <div class="container" style="margin-bottom: 5px;">
     <a class="btn btn-warning btn-sm" style="float: left; margin: 5px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}">Edit</a>
     <a class="btn btn-danger btn-sm" style="float: left; margin: 5px;" href="{% url library_type|add:':sequencing_delete' pk=sequencing.pk %}">Delete</a>
-    <a style="float: right; margin: 5px;" href="{% url library_type|add:':sequencing_list' %}">List of sequencings</a>
+    <a style="float: right; margin: 5px;" href="{% url library_type|add:':sequencing_list' %}"><i class="fa fa-arrow-circle-left"></i> Sequencings</a>
 </div>
 
 <br>
