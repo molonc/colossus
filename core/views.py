@@ -557,7 +557,7 @@ class LibraryCreate(TemplateView):
                         # TODO(mwiens91): define custom behavior in
                         # subclasses!
                         if context['library_type'] == 'dlp':
-                            instance.jira_ticket = self.create_jira(
+                            result, msg = self.create_jira(
                                 instance=instance,
                                 title=additional_title,
                                 description=generate_dlp_jira_description(
@@ -568,7 +568,7 @@ class LibraryCreate(TemplateView):
                                 jira_user=jira_user,
                                 jira_password=jira_password)
                         elif context['library_type'] == 'tenx':
-                            instance.jira_ticket = self.create_jira(
+                            result, msg = self.create_jira(
                                 instance=instance,
                                 title=additional_title,
                                 description=generate_tenx_jira_description(
@@ -578,14 +578,13 @@ class LibraryCreate(TemplateView):
                                 assignee='coflanagan',
                                 watchers=[
                                     'jbiele',
-                                    'jbwant',
+                                    'jbwang',
                                     'jedwards',
                                     'coflanagan',],
                                 jira_user=jira_user,
                                 jira_password=jira_password)
 
-                        if not instance.jira_ticket:
-                            msg = "Please provide correct JIRA credentials."
+                        if not result:
                             app = resolve(request.path_info).app_name
                             current_url = resolve(request.path_info).url_name
                             messages.error(request, msg)
@@ -631,6 +630,13 @@ class LibraryCreate(TemplateView):
             jira_user,
             jira_password,
             watchers=None,):
+        """Create a Jira ticket.
+
+        Returns a two-tuple containing a Boolean indicating whether the
+        ticket was successfully created, and a message containing
+        information about why it failed (just an empty string if it was
+        successful).
+        """
         auth = self.get_credentials(jira_user, jira_password)
         try:
             # Connect to the API
@@ -657,15 +663,31 @@ class LibraryCreate(TemplateView):
                 'assignee': {'name': assignee}
             }
             new_issue = jira.create_issue(fields=issue_dict)
-
-            # Add any watchers passed in
-            if watchers:
-                for watcher in watchers:
-                    jira.add_watcher(new_issue.id, watcher)
-
-            return str(new_issue)
         except JIRAError:
-            return None
+            return (
+                False,
+                ("Failed to create Jira ticket. "
+                 "Were your credentials correct?"),)
+
+        # Add any watchers passed in
+        if watchers:
+            failed_watchers = []
+            for watcher in watchers:
+                try:
+                    jira.add_watcher(new_issue.id, watcher)
+                except JIRAError:
+                    failed_watchers += [watcher]
+
+        if failed_watchers:
+            # Delete the failed issue
+            new_issue.delete()
+
+            return (
+                False,
+                ("Failed to add watchers "
+                 + ', '.join(watcher for watcher in failed_watchers)),)
+
+        return (True, "")
 
     def _validate_formsets(self, request, instance):
         all_valid = True
