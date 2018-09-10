@@ -670,8 +670,9 @@ class LibraryCreate(TemplateView):
                  "Were your credentials correct?"),)
 
         # Add any watchers passed in
+        failed_watchers = []
+
         if watchers:
-            failed_watchers = []
             for watcher in watchers:
                 try:
                     jira.add_watcher(new_issue.id, watcher)
