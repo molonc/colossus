@@ -41,6 +41,7 @@ from .models import (
     PbalLibrary,
     PbalSequencing,
     TenxLibrary,
+    TenxCondition,
     TenxSequencing,
     DlpLane,
     PbalLane,
@@ -80,6 +81,7 @@ from .forms import (
     TenxLaneForm,
     GSCFormDeliveryInfo,
     GSCFormSubmitterInfo,
+    TenxConditionFormset,
     ProjectForm,
     PlateForm,
 )
@@ -426,6 +428,33 @@ class TenxLibraryDetail(LibraryDetail):
     # sisyphus integration not implemented yet for 10x
     # analyses = AnalysisInformation.objects.filter(sequencings__in=library.tenxsequencing_set.all()).distinct()
 
+    def get(self, request, pk):
+        library = get_object_or_404(TenxLibrary, pk=pk)
+        library_type = 'tenx'
+
+        fields = (
+            'Experimental_condition',
+            'Enzyme',
+            'Digestion_Temperature',
+            'Live/Dead',
+            'Cells_Targeted',
+        )
+        metadata_dict = collections.OrderedDict()
+
+        for condition in library.tenxcondition_set.all():
+            condition_fields = condition.get_field_values()
+
+            metadata_dict[condition.condition_id] = (
+                [condition_fields[field] for field in fields])
+
+        return self.get_context_and_render(
+            request=request,
+            library=library,
+            library_type=library_type,
+            chip_metadata=metadata_dict,
+            metadata_fields=fields,
+        )
+
 
 @method_decorator(login_required, name='dispatch')
 class LibraryDelete(TemplateView):
@@ -548,8 +577,15 @@ class LibraryCreate(TemplateView):
                     # see this: https://stackoverflow.com/questions/7083152/is-save-m2m-required-in-the-django-forms-save-method-when-commit-false
                     instance = lib_form.save(commit=False)
 
-                    # Jira ticket stuff
-                    if context['library_type'] in ('dlp', 'tenx') and library == None:
+                    # Library is None when we are creating a new form
+                    # (else it's a Library instance), so we can have
+                    # creation specific logic by specifying library ==
+                    # None
+                    if context['library_type'] in ('dlp', 'tenx') and library is None:
+                        # TODO(mwiens91): define custom behavior in
+                        # subclasses!
+
+                        # Jira ticket stuff
                         additional_title = lib_form['additional_title'].value()
                         jira_user = lib_form['jira_user'].value()
                         jira_password = lib_form['jira_password'].value()
@@ -595,7 +631,20 @@ class LibraryCreate(TemplateView):
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     if all_valid:
+                        # Save the library
                         instance.save()
+
+                        # Save 10x conditions
+                        if context['library_type'] == 'tenx':
+                            condition_formset = TenxConditionFormset(request.POST)
+
+                            for idx, condition_form in enumerate(condition_formset, 1):
+                                condition = condition_form.save(commit=False)
+                                condition.condition_id = idx
+                                condition.library = instance
+                                condition.sample = instance.sample
+                                condition.save()
+
                         # save the ManyToMany field.
                         lib_form.save_m2m()
                         # Add information from SmartChipApp files
@@ -754,6 +803,15 @@ class TenxLibraryCreate(LibraryCreate):
     libqs_formset_class = TenxLibraryQuantificationAndStorageInlineFormset
     library_type = 'tenx'
 
+    def get_context_data(self, pk=None):
+        """Add in 10x condition forms."""
+        context = super(TenxLibraryCreate, self).get_context_data(pk)
+
+        context['tenx_condition_formset'] = TenxConditionFormset(
+            queryset=TenxCondition.objects.none())
+
+        return context
+
 
 class LibraryUpdate(LibraryCreate):
 
@@ -832,6 +890,16 @@ class TenxLibraryUpdate(LibraryUpdate):
     libcons_formset_class = TenxLibraryConstructionInfoInlineFormset
     libqs_formset_class = TenxLibraryQuantificationAndStorageInlineFormset
     library_type = 'tenx'
+
+    def get_context_data(self, pk=None):
+        """Add in 10x condition forms."""
+        context = super(TenxLibraryUpdate, self).get_context_data(pk)
+
+        library = get_object_or_404(self.library_class, pk=pk)
+        context['tenx_condition_formset'] = TenxConditionFormset(
+            queryset=library.tenxcondition_set.all())
+
+        return context
 
 
 #============================

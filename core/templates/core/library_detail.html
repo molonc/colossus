@@ -230,15 +230,19 @@
 <!-- end of Library Quantification and Storage -->
 
 <!-- Experimental Condition Metadata -->
-{% if library_type == 'dlp' %}
+{% if library_type == 'dlp' or library_type == 'tenx' %}
     <div class="container detail-bordered-container">
         <h4>Experimental Condition Metadata</h4>
-            {% if library.chipregion_set.all %}
+            {% if chip_metadata %}
                 <div class="table-responsive">
                     <table class="table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>experimental condition</th>
+                                {% if library_type == 'dlp' %}
+                                    <th>experimental condition</th>
+                                {% else %}
+                                    <th>Condition_ID</id>
+                                {% endif %}
 
                                 {% for field in metadata_fields %}
                                     <th>{{ field }}</th>

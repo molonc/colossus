@@ -342,6 +342,36 @@ class TenxLibrary(Library):
         return '_'.join([self.sample.sample_id])
 
 
+class TenxCondition(models.Model, FieldValue):
+    """A 10x experimental condition."""
+    fields_to_exclude = ['ID', 'Library', 'Sample']
+    values_to_exclude = ['id', 'library', 'sample']
+
+    library = models.ForeignKey(
+        TenxLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+    )
+
+    sample = models.ForeignKey(
+        Sample,
+        verbose_name="Sample",
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
+    condition_id = create_intfield("Condition_ID")
+    experimental_condition = create_chrfield("Experimental_condition")
+    enzyme = create_chrfield("Enzyme")
+    digestion_temperature = create_chrfield("Digestion_Temperature")
+    live_dead = create_chrfield("Live/Dead")
+    cells_targeted = create_chrfield("Cells_Targeted")
+
+    class Meta:
+        ordering = ['id']
+
+
+
 class ChipRegion(models.Model, FieldValue):
 
     """
@@ -614,11 +644,6 @@ class TenxLibrarySampleDetail(LibrarySampleDetail):
         null=True,
         blank=True,
         verbose_name="Number of cells targeted",
-    )
-    num_conditions = models.PositiveSmallIntegerField(
-        null=True,
-        blank=True,
-        verbose_name="Number of conditions",
     )
 
 
