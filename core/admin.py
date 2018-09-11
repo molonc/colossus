@@ -11,6 +11,9 @@ from .models import DlpLibrary, SublibraryInformation, DlpLibrarySampleDetail
 from .models import DlpLibraryConstructionInformation
 from .models import DlpLibraryQuantificationAndStorage
 from .models import DlpSequencing, DlpSequencingDetail
+from .models import TenxLibrary, TenxCondition, TenxLibrarySampleDetail
+from .models import TenxLibraryConstructionInformation
+from .models import TenxLibraryQuantificationAndStorage
 from .models import ChipRegion, ChipRegionMetadata
 from .models import MetadataField
 
@@ -70,6 +73,40 @@ class DlpLibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     list_filter = ['jira_ticket']
     search_fields = ['pool_id']
 
+class TenxLibrarySampleDetailInline(admin.StackedInline):
+    model = TenxLibrarySampleDetail
+
+class TenxLibraryConstructionInformationInline(admin.StackedInline):
+    model = TenxLibraryConstructionInformation
+
+class TenxLibraryQuantificationAndStorageInline(admin.StackedInline):
+    model = TenxLibraryQuantificationAndStorage
+
+class TenxLibraryConditionsInline(admin.StackedInline):
+    model = TenxCondition
+
+class TenxLibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
+    fieldsets = [
+      (
+        '',
+        {'fields': [
+          "sample",
+          "jira_ticket",
+          "description",
+          "projects"
+        ]
+        }
+      ),
+    ]
+    inlines = [
+      TenxLibrarySampleDetailInline,
+      TenxLibraryConstructionInformationInline,
+      TenxLibraryQuantificationAndStorageInline,
+      TenxLibraryConditionsInline,
+      ]
+    list_display = ['id', 'sample',  'jira_ticket']
+    list_filter = ['jira_ticket']
+
 
 # Sequencing information
 class DlpSequencingDetailInline(admin.StackedInline):
@@ -86,6 +123,7 @@ class CustomTagAdmin(SimpleHistoryAdmin, TagAdmin):
 
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(DlpLibrary, DlpLibraryAdmin)
+admin.site.register(TenxLibrary, TenxLibraryAdmin)
 admin.site.register(DlpSequencing, DlpSequencingAdmin)
 
 # extra admin only information
