@@ -10,13 +10,13 @@
         <table id="datatable" class="table table-striped">
             <thead>
                 <th>Project</th>
-                <th>Libraries</th>
-                <th>Library Type</th>
+                <th class="no-sort-col">Libraries</th>
+                <th class="no-sort-col">Library Type</th>
                 <th>Number of Libraries</th>
                 <th class="no-sort-col"></th>
             </thead>
             <tbody>
-            {% for project in projects%}
+            {% for project in projects %}
                 <tr>
                     <td>
                         {{ project }}
@@ -28,11 +28,11 @@
                     </td>
                     <td>
                         {% for library in project.get_libraries %}
-                            <p style="margin: 0">{{ library.library_type }}</p>
+                            <p style="margin: 0">{{ library.library_type|upper }}</p>
                         {% endfor %}
                     </td>
                     <td>
-                        {{project.get_libraries|length}}
+                        {{ project.get_libraries|length }}
                     </td>
                     <td>
                         <div style="float: right; min-width: 69px">
