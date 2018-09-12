@@ -263,6 +263,16 @@
                         </tbody>
                     </table>
                 </div>
+
+                {# Button to wipe 10x library conditions #}
+                {% if library_type == 'tenx' %}
+                    <div style="padding-top: 1em">
+                        <form action="{% url 'tenx:library_conditions_delete' library.pk %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="library-conditions-delete" class="btn btn-danger btn-sm">Wipe conditions</button>
+                        </form>
+                    </div>
+                {% endif %}
             {% else %}
                 <h5><i class="text-warning">There is no condition metadata for library!</i></h5>
             {% endif %}

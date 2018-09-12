@@ -21,7 +21,7 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 from django.db import transaction
 
 import pandas as pd
@@ -457,6 +457,19 @@ class TenxLibraryDetail(LibraryDetail):
 
 
 @method_decorator(login_required, name='dispatch')
+class TenxConditionsDelete(View):
+    """Delete 10x library conditions metadata."""
+    def post(self, request, pk):
+        """Delete the 10x library's conditions."""
+        library = get_object_or_404(TenxLibrary, pk=pk)
+        library.tenxcondition_set.all().delete()
+
+        msg = "Successfully deleted the the conditions metadata."
+        messages.success(request, msg)
+        return HttpResponseRedirect(reverse('tenx:library_detail', kwargs=dict(pk=pk)))
+
+
+@method_decorator(login_required, name='dispatch')
 class LibraryDelete(TemplateView):
 
     """
@@ -638,12 +651,23 @@ class LibraryCreate(TemplateView):
                         if context['library_type'] == 'tenx':
                             condition_formset = TenxConditionFormset(request.POST)
 
-                            for idx, condition_form in enumerate(condition_formset, 1):
+                            # Save each condition
+                            idx = 1
+                            for condition_form in condition_formset:
+                                # If a condition_form was left blank,
+                                # skip it
+                                if not condition_form.has_changed():
+                                    continue
+
+                                # Save the condition
                                 condition = condition_form.save(commit=False)
                                 condition.condition_id = idx
                                 condition.library = instance
                                 condition.sample = instance.sample
                                 condition.save()
+
+                                # Increment the index counter
+                                idx += 1
 
                         # save the ManyToMany field.
                         lib_form.save_m2m()
