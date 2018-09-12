@@ -554,40 +554,41 @@ class LibraryCreate(TemplateView):
                         jira_user = lib_form['jira_user'].value()
                         jira_password = lib_form['jira_password'].value()
 
-                        # TODO(mwiens91): define custom behavior in
-                        # subclasses!
-                        if context['library_type'] == 'dlp':
-                            result, msg = self.create_jira(
-                                instance=instance,
-                                title=additional_title,
-                                description=generate_dlp_jira_description(
-                                    get_reference_genome_from_sample_id(
-                                        instance.sample.sample_id)),
-                                reporter='elaks',
-                                assignee='danlai',
-                                jira_user=jira_user,
-                                jira_password=jira_password)
-                        elif context['library_type'] == 'tenx':
-                            result, msg = self.create_jira(
-                                instance=instance,
-                                title=additional_title,
-                                description=generate_tenx_jira_description(
-                                    get_reference_genome_from_sample_id(
-                                        instance.sample.sample_id)),
-                                reporter='coflanagan',
-                                assignee='coflanagan',
-                                watchers=[
-                                    'jbiele',
-                                    'jbwang',
-                                    'jedwards',
-                                    'coflanagan',],
-                                jira_user=jira_user,
-                                jira_password=jira_password)
+                        try:
+                            # TODO(mwiens91): define custom behavior in
+                            # subclasses!
+                            if context['library_type'] == 'dlp':
+                                instance.jira_ticket = self.create_jira(
+                                    instance=instance,
+                                    title=additional_title,
+                                    description=generate_dlp_jira_description(
+                                        get_reference_genome_from_sample_id(
+                                            instance.sample.sample_id)),
+                                    reporter='elaks',
+                                    assignee='danlai',
+                                    jira_user=jira_user,
+                                    jira_password=jira_password)
+                            elif context['library_type'] == 'tenx':
+                                instance.jira_ticket= self.create_jira(
+                                    instance=instance,
+                                    title=additional_title,
+                                    description=generate_tenx_jira_description(
+                                        get_reference_genome_from_sample_id(
+                                            instance.sample.sample_id)),
+                                    reporter='coflanagan',
+                                    assignee='coflanagan',
+                                    watchers=[
+                                        'jbiele',
+                                        'jbwang',
+                                        'jedwards',
+                                        'coflanagan',],
+                                    jira_user=jira_user,
+                                    jira_password=jira_password)
 
-                        if not result:
+                        except JIRAError as e:
                             app = resolve(request.path_info).app_name
                             current_url = resolve(request.path_info).url_name
-                            messages.error(request, msg)
+                            messages.error(request, e.text)
                             link = str(app) + ":" + str(current_url)
                             return HttpResponseRedirect(reverse(link))
 
@@ -632,10 +633,11 @@ class LibraryCreate(TemplateView):
             watchers=None,):
         """Create a Jira ticket.
 
-        Returns a two-tuple containing a Boolean indicating whether the
-        ticket was successfully created, and a message containing
-        information about why it failed (just an empty string if it was
-        successful).
+        Returns:
+            A string containing the ticket ID.
+
+        Raises:
+            JIRAError: ticket creation was unsuccessful.
         """
         auth = self.get_credentials(jira_user, jira_password)
         try:
@@ -664,10 +666,10 @@ class LibraryCreate(TemplateView):
             }
             new_issue = jira.create_issue(fields=issue_dict)
         except JIRAError:
-            return (
-                False,
-                ("Failed to create Jira ticket. "
-                 "Were your credentials correct?"),)
+            raise JIRAError(
+                text=(
+                    "Failed to create Jira ticket. "
+                     "Were your credentials correct?"),)
 
         # Add any watchers passed in
         failed_watchers = []
@@ -683,12 +685,12 @@ class LibraryCreate(TemplateView):
             # Delete the failed issue
             new_issue.delete()
 
-            return (
-                False,
-                ("Failed to add watchers "
-                 + ', '.join(watcher for watcher in failed_watchers)),)
+            raise JiraError(
+                text=(
+                    "Failed to add watchers "
+                     + ', '.join(watcher for watcher in failed_watchers)),)
 
-        return (True, "")
+        return str(new_issue)
 
     def _validate_formsets(self, request, instance):
         all_valid = True
