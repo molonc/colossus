@@ -170,9 +170,14 @@ class DlpLibraryForm(LibraryForm):
     def __init__(self,*args, **kwargs):
         super(DlpLibraryForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
+            # Get Jira info
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+
+            # Remove the field which allows explicitly setting the Jira
+            # ticket ID (since it's done automatically)
+            self.fields.pop('jira_ticket')
         else:
             uneditable_fields = ['pool_id']
             for field in uneditable_fields:
@@ -220,9 +225,14 @@ class TenxLibraryForm(LibraryForm):
     def __init__(self,*args, **kwargs):
         super(TenxLibraryForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
+            # Get Jira info
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+
+            # Remove the field which allows explicitly setting the Jira
+            # ticket ID (since it's done automatically)
+            self.fields.pop('jira_ticket')
 
     class Meta:
         model = TenxLibrary

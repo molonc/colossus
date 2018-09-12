@@ -259,7 +259,7 @@ class DlpLibrary(Library):
     )
     jira_ticket = create_chrfield(
         "Jira ticket",
-        blank=False,
+        blank=True,
     )
     num_sublibraries = create_intfield(
         "Number of sublibraries",
@@ -322,7 +322,7 @@ class TenxLibrary(Library):
     # fields
     jira_ticket = create_chrfield(
         "Jira ticket",
-        blank=False,
+        blank=True,
     )
     num_sublibraries = create_intfield(
         "Number of sublibraries",
