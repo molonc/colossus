@@ -180,7 +180,7 @@ class DlpLibraryForm(LibraryForm):
 
     class Meta:
         model = DlpLibrary
-        exclude = ['num_sublibraries','jira_ticket']
+        exclude = ['num_sublibraries']
 
         labels = {
             'primary sample': ('*Sample'),
@@ -226,7 +226,7 @@ class TenxLibraryForm(LibraryForm):
 
     class Meta:
         model = TenxLibrary
-        exclude = ['jira_ticket']
+        fields = '__all__'
         labels = {
             'primary sample': ('*Sample'),
         }
