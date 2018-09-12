@@ -49,42 +49,53 @@ def home_view(request):
 @login_required()
 def analysisinformation_create_choose_library(request):
     """ Library selection before proceding with analysis information creation """
-    if (request.method == 'POST'):
+    if request.method == 'POST':
         form = AnalysisLibrarySelection(request.POST)
+
         if form.is_valid():
             library_pk = form.cleaned_data['library'].pk
+
             return HttpResponseRedirect(
                 reverse('sisyphus:analysisinformation_create_from_library',
-                        kwargs={'from_library':library_pk}))
+                        kwargs={'from_library': library_pk}))
     else:
         form = AnalysisLibrarySelection()
-        context = {'form':form}
+
+        context = {'form': form}
         return context
 
 
 @method_decorator(login_required, name='dispatch')
 class AnalysisInformationCreate(CreateView):
-    form_class=AnalysisInformationForm
-    template_name='sisyphus/analysisinformation_create.html'
+    form_class = AnalysisInformationForm
+    template_name = 'sisyphus/analysisinformation_create.html'
 
     def get_context_data(self, **kwargs):
         library = get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
-        # Assigning self.object to self is required so that in the AnalysisInformationForm,
-        # access to the instance of AnalysisInformation in the AnalysisInformationCreate view is possible
+
+        # Assigning self.object to self is required so that in the
+        # AnalysisInformationForm, access to the instance of
+        # AnalysisInformation in the AnalysisInformationCreate view is
+        # possible
         self.object = DlpAnalysisInformation()
         self.library = library
+
         # adding library to TEMPLATE context here
-        context =  super(AnalysisInformationCreate, self).get_context_data()
-        if(DlpSequencing.objects.filter(library__pk=library.pk).filter().exists()):
+        context = super(AnalysisInformationCreate, self).get_context_data()
+
+        if DlpSequencing.objects.filter(library__pk=library.pk).filter().exists():
             context_dict = {}
+
             for sequences in DlpSequencing.objects.filter(library__pk=library.pk).filter():
-                flow_cell_id = DlpLane.objects.filter(sequencing=sequences).values_list('flow_cell_id',flat=True)
+                flow_cell_id = DlpLane.objects.filter(
+                    sequencing=sequences).values_list('flow_cell_id', flat=True)
                 context_dict[str(sequences)] = flow_cell_id
-            context.update({'library':library, 'lane':context_dict})
+
+            context.update({'library': library, 'lane': context_dict})
             return context
-        else:
-            context.update({'library':library})
-            return context
+
+        context.update({'library':library})
+        return context
 
     def get_form_kwargs(self):
         """
@@ -99,14 +110,16 @@ class AnalysisInformationCreate(CreateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
-        self.library=get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
+        self.library = get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
         form = self.get_form()
         if form.is_valid():
             analysis_jira_ticket = self.create_jira(form)
+
             if not analysis_jira_ticket:
                 msg = "Please provide correct JIRA credentials."
                 messages.error(request, msg)
                 return HttpResponseRedirect(request.get_full_path())
+
             # need to save analysis information in order to set many-to-many field
             analysis_information = form.save()
             analysis_information.analysis_jira_ticket = analysis_jira_ticket
@@ -116,6 +129,7 @@ class AnalysisInformationCreate(CreateView):
                 log_file=" ",
                 last_updated=None)
             analysis_information.save()
+
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
@@ -152,7 +166,8 @@ class AnalysisInformationCreate(CreateView):
 
     def form_valid(self, form):
         """
-        If the form is valid, save the associated model, and create the associated analysis run model
+        If the form is valid, save the associated model, and create the
+        associated analysis run model
         """
         self.object = form.save()
         return super(AnalysisInformationCreate, self).form_valid(form)
@@ -235,6 +250,7 @@ class AnalysisInformationDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(AnalysisInformationDetailView, self).get_context_data(**kwargs)
         instance_sequencings = context['object'].sequencings.all()
-        context['library']=DlpLibrary.objects.filter(dlpsequencing__in=instance_sequencings).distinct()[0]
-        context['analysisrun']=context['object'].analysis_run
+        context['library'] = DlpLibrary.objects.filter(
+            dlpsequencing__in=instance_sequencings).distinct()[0]
+        context['analysisrun'] = context['object'].analysis_run
         return context
