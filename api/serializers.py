@@ -97,7 +97,8 @@ class LibrarySerializer(serializers.ModelSerializer):
             'description',
             'sample',
             'result',
-            'relates_to',
+            'relates_to_dlp',
+            'relates_to_tenx',
             'dlpsequencing_set',
             'title',
             'quality'
