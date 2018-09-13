@@ -615,7 +615,7 @@ class LibraryCreate(TemplateView):
                                         get_reference_genome_from_sample_id(
                                             instance.sample.sample_id)),
                                     reporter='elaks',
-                                    assignee='danlai',
+                                    assignee=None,
                                     jira_user=jira_user,
                                     jira_password=jira_password)
                             elif context['library_type'] == 'tenx':
@@ -701,9 +701,9 @@ class LibraryCreate(TemplateView):
             title,
             description,
             reporter,
-            assignee,
             jira_user,
             jira_password,
+            assignee=None,
             watchers=None,):
         """Create a Jira ticket.
 
@@ -736,8 +736,12 @@ class LibraryCreate(TemplateView):
                 'description': description,
                 'issuetype': {'name': 'Task'},
                 'reporter': {'name': reporter},
-                'assignee': {'name': assignee}
             }
+
+            # Add in an (optional) assignee
+            if assignee:
+                issue_dict['assignee'] = {'name': assignee}
+
             new_issue = jira.create_issue(fields=issue_dict)
         except JIRAError:
             raise JIRAError(
