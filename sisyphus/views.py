@@ -137,17 +137,12 @@ class AnalysisInformationCreate(CreateView):
             issue_dict = {
                 'project': {'id': 11220},
                 'summary': title,
-                'issuetype': {'name': 'Task'},
+                'issuetype': {'name': 'Sub-task'},
                 'priority': {'name':'Medium'},
-                'assignee':{'name':'sochan'}
+                'assignee': {'name':'sochan'},
+                'parent': {'id': str(library.jira_ticket)},
             }
             new_issue = jira.create_issue(fields=issue_dict)
-            # Link the analysis jira ticket with the initial library ticket
-            issue_link = jira.create_issue_link(
-                type="relates to",
-                inwardIssue=str(new_issue),
-                outwardIssue=str(library.jira_ticket),
-            )
             return str(new_issue)
         except JIRAError:
             return None
