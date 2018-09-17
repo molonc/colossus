@@ -134,6 +134,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
         'sample__sample_id',
         'jira_ticket',
         'failed',
+        'projects__name',
     )
 
 

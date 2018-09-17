@@ -88,9 +88,17 @@ class SequencingSerializer(serializers.ModelSerializer):
         )
 
 
+class TagSerializerField(serializers.ListField):
+    child = serializers.CharField()
+
+    def to_representation(self, data):
+        return data.values_list('name', flat=True)
+
+
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer(read_only=True)
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
+    projects = TagSerializerField()
     class Meta:
         model = DlpLibrary
         fields = (
@@ -107,6 +115,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'title',
             'quality',
             'failed',
+            'projects',
         )
 
 class SublibraryInformationSerializer(serializers.ModelSerializer):
