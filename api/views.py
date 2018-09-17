@@ -137,7 +137,7 @@ class AnalysisInformationFilter(django_filters.FilterSet):
     DateFromToRangeFiler() :it uses datetime format values instead of numerical values.
     It can be used with DateTimeField.
     """
-    analysis_run__last_updated = django_filters.DateFromToRangeFilter(name='analysis_run__last_updated')
+    analysis_run__last_updated = django_filters.DateTimeFromToRangeFilter()
 
     class Meta:
         model = DlpAnalysisInformation
@@ -150,7 +150,8 @@ class AnalysisInformationFilter(django_filters.FilterSet):
         'analysis_run',
         'id',
         'analysis_run__run_status',
-         'library__pool_id'
+        'analysis_run__last_updated',
+        'library__pool_id'
         ]
 
 
