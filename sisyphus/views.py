@@ -113,11 +113,13 @@ class AnalysisInformationCreate(CreateView):
         self.library = get_object_or_404(DlpLibrary, pk=kwargs.get('from_library'))
         form = self.get_form()
         if form.is_valid():
-            analysis_jira_ticket = self.create_jira(form)
-
-            if not analysis_jira_ticket:
-                msg = "Please provide correct JIRA credentials."
-                messages.error(request, msg)
+            # Try creating a Jira ticket
+            try:
+                analysis_jira_ticket = self.create_jira(form)
+            except JIRAError as e:
+                # Failed to create Jira ticket. Show a message
+                # containing what went wrong
+                messages.error(request, e.text)
                 return HttpResponseRedirect(request.get_full_path())
 
             # need to save analysis information in order to set many-to-many field
@@ -142,24 +144,22 @@ class AnalysisInformationCreate(CreateView):
     def create_jira(self, form):
         #  Get authentication info for the JIRA login
         auth = self.get_credentials(form['jira_user'].value(), form['jira_password'].value())
-        try:
-            # Create the JIRA ticket
-            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
-            library = form['library'].value()
-            library = get_object_or_404(DlpLibrary, id=library)
-            title = "Analysis of " + str(library)
-            issue_dict = {
-                'project': {'id': 11220},
-                'summary': title,
-                'issuetype': {'name': 'Sub-task'},
-                'priority': {'name':'Medium'},
-                'assignee': {'name':'sochan'},
-                'parent': {'id': str(library.jira_ticket)},
-            }
-            new_issue = jira.create_issue(fields=issue_dict)
-            return str(new_issue)
-        except JIRAError:
-            return None
+
+        # Create the JIRA ticket
+        jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
+        library = form['library'].value()
+        library = get_object_or_404(DlpLibrary, id=library)
+        title = "Analysis of " + str(library)
+        issue_dict = {
+            'project': {'id': 11220},
+            'summary': title,
+            'issuetype': {'name': 'Sub-task'},
+            'priority': {'name': 'Medium'},
+            'assignee': {'name': 'sochan'},
+            'parent': {'id': str(library.jira_ticket)},
+        }
+        new_issue = jira.create_issue(fields=issue_dict)
+        return str(new_issue)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
