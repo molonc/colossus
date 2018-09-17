@@ -21,6 +21,7 @@ from .serializers import (
     LibrarySerializer,
     LaneSerializer,
     SequencingSerializer,
+    SequencingDetailSerializer,
     SublibraryInformationSerializer,
     AnalysisInformationSerializer,
     AnalysisRunSerializer,
@@ -31,6 +32,7 @@ from core.models import (
     Sample,
     DlpLibrary,
     DlpSequencing,
+    DlpSequencingDetail,
     DlpLane,
     SublibraryInformation,
     ChipRegion
@@ -97,6 +99,18 @@ class SequencingViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
         'dlpsequencingdetail__gsc_library_id',
+    )
+
+class SequencingDetailsViewSet(viewsets.ModelViewSet):
+    """
+    View for Sequencing Details.
+    """
+    queryset = DlpSequencingDetail.objects.all()
+    serializer_class = SequencingDetailSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_fields = (
+        'gsc_library_id',
+        'sequencing_center',
     )
 
 

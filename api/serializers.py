@@ -60,9 +60,12 @@ class SequencingDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DlpSequencingDetail
         fields = (
+            'id',
             'gsc_library_id',
             'sequencing_center',
             'rev_comp_override',
+            'lanes_requested',
+            'lanes_received',
         )
 
 

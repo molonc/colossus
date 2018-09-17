@@ -1186,6 +1186,16 @@ class SequencingDetail(models.Model, FieldValue):
     )
 
     # fields
+    lanes_requested = models.BooleanField(
+        "Lanes Requested",
+        default=False,
+        blank=False
+    )
+    lanes_received = models.BooleanField(
+        "Lanes Received",
+        default=False,
+        blank=False
+    )
     gsc_library_id = create_chrfield("GSC library ID")
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
@@ -1277,7 +1287,6 @@ class Lane(models.Model, FieldValue):
 
     path_to_archive = create_chrfield(
         "Path to archive",
-        blank=False,
         max_length=150
     )
 
