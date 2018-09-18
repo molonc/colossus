@@ -247,6 +247,12 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     description = create_textfield("Description")
     result = create_textfield("Result")
 
+    failed = models.BooleanField(
+        "Failed",
+        default=False,
+        blank=False
+    )
+
     def __str__(self):
         return 'LIB_' + self.get_library_id()
 

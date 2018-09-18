@@ -130,6 +130,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
         'pool_id',
         'sample__sample_id',
         'jira_ticket',
+        'failed',
     )
 
 

@@ -104,7 +104,8 @@ class LibrarySerializer(serializers.ModelSerializer):
             'relates_to_tenx',
             'dlpsequencing_set',
             'title',
-            'quality'
+            'quality',
+            'failed',
         )
 
 class SublibraryInformationSerializer(serializers.ModelSerializer):
