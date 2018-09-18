@@ -222,6 +222,7 @@ class AbstractAnalysisInformation(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ['pk']
 
 
 class DlpAnalysisInformation(AbstractAnalysisInformation):
