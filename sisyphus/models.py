@@ -5,6 +5,7 @@ Created on July 6, 2017
 """
 
 from __future__ import unicode_literals
+import datetime
 #============================
 # Django imports
 #----------------------------
@@ -199,7 +200,7 @@ class AbstractAnalysisInformation(models.Model):
     analysis_submission_date = models.DateField(
         "Analysis submission date",
         null=True,
-        default=timezone.now
+        default=datetime.date.today, # this needs to be a date (not datetime)
     )
 
     reference_genome = models.ForeignKey(
@@ -261,8 +262,3 @@ class TenxAnalysisInformation(AbstractAnalysisInformation):
         verbose_name="Analysis Version",
         on_delete=models.CASCADE,
     )
-
-
-
-
-

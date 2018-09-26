@@ -24,6 +24,7 @@ from .serializers import (
     SequencingDetailSerializer,
     SublibraryInformationSerializer,
     AnalysisInformationSerializer,
+    AnalysisInformationCreateSerializer,
     AnalysisRunSerializer,
     ChipRegionSerializer
 )
@@ -189,9 +190,15 @@ class AnalysisInformationViewSet(viewsets.ModelViewSet):
     Analysis Objects are queryable by Jira ticket
     """
     queryset = DlpAnalysisInformation.objects.all()
-    serializer_class = AnalysisInformationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_class = AnalysisInformationFilter
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return AnalysisInformationCreateSerializer
+
+        # Use serializer with lots of nesting
+        return AnalysisInformationSerializer
 
 
 class AnalysisRunViewSet(viewsets.ModelViewSet):

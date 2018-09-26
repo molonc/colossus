@@ -195,6 +195,24 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
         return instance
 
 
+class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpAnalysisInformation
+        fields = (
+            'id',
+            'library',
+            'priority_level',
+            'analysis_jira_ticket',
+            'version',
+            'analysis_submission_date',
+            'sequencings',
+            'reference_genome',
+            'analysis_run',
+            'aligner',
+            'smoothing',
+        )
+
+
 class MetadataSerializer(serializers.ModelSerializer):
 
     class Meta:
