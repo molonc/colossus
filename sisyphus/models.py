@@ -156,7 +156,7 @@ class AbstractAnalysisInformation(models.Model):
     analysis_jira_ticket = create_chrfield("Jira ticket", blank=False)
 
     # database relationships
-    analysis_run = models.OneToOneField(AnalysisRun, null=True)
+    analysis_run = models.OneToOneField(AnalysisRun, blank=True, null=True)
 
     # choices
     priority_level_choices = (
