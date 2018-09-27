@@ -52,6 +52,7 @@ Please check off the task list below as you complete the data transfers, and *do
 TENX_UNFORMATTED_TEMPLATE = """￼ Upload the web_summary.html file to the ticket 
 
 Reference: {reference_genome}
+Pool: {pool}
 
 ￼(x) Temp path to raw data on GSC server (must be transferred to our servers):
 /home/aldente/private/Projects/Sam_Aparicio/
@@ -92,20 +93,24 @@ def generate_dlp_jira_description(reference_genome):
     """Generate a DLP Jira description.
 
     Arg:
-        reference_gemone: A string containing the reference genome.
+        reference_genome: A string containing the reference genome.
             Should be either hg19 or mm10.
     Returns:
         A string containing the formatted Jira description.
     """
     return DLP_UNFORMATTED_TEMPLATE.format(reference_genome=reference_genome)
 
-def generate_tenx_jira_description(reference_genome):
+def generate_tenx_jira_description(reference_genome, pool):
     """Generate a Tenx Jira description.
 
-    Arg:
-        reference_gemone: A string containing the reference genome.
+    Args:
+        reference_genome: A string containing the reference genome.
             Should be either hg19 or mm10.
+        pool: A string containing the pool ID.
     Returns:
         A string containing the formatted Jira description.
     """
-    return TENX_UNFORMATTED_TEMPLATE.format(reference_genome=reference_genome)
+    return TENX_UNFORMATTED_TEMPLATE.format(
+        reference_genome=reference_genome,
+        pool=pool,
+    )

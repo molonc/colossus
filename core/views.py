@@ -623,8 +623,10 @@ class LibraryCreate(TemplateView):
                                     instance=instance,
                                     title=additional_title,
                                     description=generate_tenx_jira_description(
-                                        get_reference_genome_from_sample_id(
-                                            instance.sample.sample_id)),
+                                        reference_genome=get_reference_genome_from_sample_id(
+                                            instance.sample.sample_id),
+                                        pool=instance.tenxlibraryconstructioninformation.pool,
+                                    ),
                                     reporter='coflanagan',
                                     assignee='coflanagan',
                                     watchers=[
