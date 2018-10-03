@@ -76,6 +76,7 @@ class SequencingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DlpSequencing
         fields = (
+            'id',
             'library',
             'adapter',
             'read_type',

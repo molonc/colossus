@@ -99,6 +99,7 @@ class SequencingViewSet(viewsets.ModelViewSet):
     serializer_class = SequencingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
+        'id',
         'library',
         'dlpsequencingdetail__gsc_library_id',
     )
