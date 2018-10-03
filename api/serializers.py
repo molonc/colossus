@@ -150,6 +150,22 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
             'last_updated'
         )
 
+    def save(self, **kwargs):
+        """Make sure associated analysis info is saved."""
+        # Save the analysis run
+        analysis_run = super(AnalysisRunSerializer, self).save(**kwargs)
+
+        # Update the analysis information
+        related_dlp_analysis_info = (
+            self.validated_data['dlpanalysisinformation'])
+
+        if related_dlp_analysis_info:
+            related_dlp_analysis_info.analysis_run = analysis_run
+            related_dlp_analysis_info.save()
+
+        # Return the analysis run we saved
+        return analysis_run
+
 
 class DlpAnalysisVersionSerializer(serializers.ModelSerializer):
     class Meta:
