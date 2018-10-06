@@ -1,0 +1,11 @@
+{% extends "rest_framework/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}{% if name %}{{ name }} – {% endif %}Colossus{% endblock %}
+
+{% block branding %}
+    <a class='navbar-brand' rel="nofollow" href='{% url "index" %}'>
+        Colossus Single Cell Database
+    </a>
+{% endblock %}
