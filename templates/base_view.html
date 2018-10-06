@@ -48,9 +48,16 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="collapse-icon">
                     <ul class="nav navbar-nav navbar-right">
-                        <a class="navbar-brand" style="color: white;" href="{% url 'admin:index' %}">Admin</a>
-                        <a class="navbar-brand" style="color: white;" href="{% url 'api:api-root' %}">API</a>
-                        <a class="navbar-brand" style="color: white;" href="{% url 'api:schema-redoc' %}">API Reference</a>
+                        <li>
+                            <a style="color: white;" href="{% url 'admin:index' %}">Admin</a>
+                        </li>
+                        <li>
+                            <a style="color: white;" href="{% url 'api:api-root' %}">API</a>
+                        </li>
+                        <li>
+                            <a style="color: white;" href="{% url 'api:schema-redoc' %}">API Reference</a>
+                        </li>
+
                         <form name="search-form" class="navbar-form navbar-right" action="{% url 'search' %}" role="search">
                             <div class="form-group right-inner-addon">
                                 <i class="icon-search"></i>
