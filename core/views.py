@@ -978,6 +978,30 @@ class ProjectDelete(TemplateView):
 
 
 @method_decorator(login_required, name='dispatch')
+class ProjectCreate(TemplateView):
+
+    """
+    Project create page.
+    """
+
+    template_name = "core/project_create.html"
+
+    def get_context_data(self):
+        context = {
+            'form': ProjectForm(),
+        }
+        return context
+
+    def post(self, request):
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+            msg = "Successfully created the %s project." % instance.name
+            messages.success(request, msg)
+            return HttpResponseRedirect(reverse('core:project_list'))
+
+
+@method_decorator(login_required, name='dispatch')
 class ProjectUpdate(TemplateView):
 
     """

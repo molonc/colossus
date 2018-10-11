@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^sample/update/(?P<pk>\d+)$', views.SampleUpdate.as_view(), name='sample_update'),
     url(r'^sample/delete/(?P<pk>\d+)$', views.SampleDelete.as_view(), name='sample_delete'),
     url(r'^project/list$', views.ProjectList.as_view(), name='project_list'),
+    url(r'^project/create$', views.ProjectCreate.as_view(), name='project_create'),
     url(r'^project/update/(?P<pk>\d+)$', views.ProjectUpdate.as_view(), name='project_update'),
     url(r'^project/delete/(?P<pk>\d+)$', views.ProjectDelete.as_view(), name='project_delete')
 ]
