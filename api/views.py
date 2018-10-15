@@ -102,6 +102,8 @@ class SequencingViewSet(viewsets.ModelViewSet):
         'id',
         'library',
         'dlpsequencingdetail__gsc_library_id',
+        'dlpsequencingdetail__lanes_requested',
+        'dlpsequencingdetail__sequencing_center',
     )
 
 class SequencingDetailsViewSet(viewsets.ModelViewSet):
