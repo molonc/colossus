@@ -1430,17 +1430,21 @@ def dlp_sequencing_get_samplesheet(request, pk):
     return response
 
 
-def dlp_sequencing_get_queried_samplesheet(request, pool_id, flowcell):
+def dlp_sequencing_get_queried_samplesheet(request, flowcell):
 
     """
     Makes downloading samplesheets from flowcell possible.
     """
 
     try:
-        pk = DlpLane.objects.get(flow_cell_id=flowcell, sequencing__library__pool_id=pool_id).pk
+        pk = DlpLane.objects.get(flow_cell_id=flowcell).pk
         return dlp_sequencing_get_samplesheet(request, pk)
     except DlpSequencing.DoesNotExist:
-        msg = "Sorry, no sequencing with flowcell {} and chip id {} found.".format(flowcell, pool_id)
+        msg = "Sorry, no sequencing with flowcell {} found.".format(flowcell)
+        messages.warning(request, msg)
+        return HttpResponseRedirect(reverse('index'))
+    except DlpSequencing.MultipleObjectsReturned:
+        msg = "Multiple flowcells with ID {} found.".format(flowcell)
         messages.warning(request, msg)
         return HttpResponseRedirect(reverse('index'))
 
