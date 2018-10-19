@@ -17,6 +17,7 @@ from rest_framework import serializers
 from core.models import (
     DlpLibrary,
     Sample,
+    AdditionalSampleInformation,
     SublibraryInformation,
     DlpSequencing,
     DlpSequencingDetail,
@@ -33,7 +34,19 @@ from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun
 #----------------------------
 
 
+class AdditionalSampleInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdditionalSampleInformation
+        fields = (
+            'pathology_disease_name',
+            'additional_pathology_info',
+        )
+
+
 class SampleSerializer(serializers.ModelSerializer):
+    additionalsampleinformation = (
+        AdditionalSampleInformationSerializer(read_only=True)
+    )
     class Meta:
         model = Sample
         fields = (
@@ -42,7 +55,8 @@ class SampleSerializer(serializers.ModelSerializer):
             'sample_id',
             'sample_type',
             'taxonomy_id',
-            'xenograft_id'
+            'xenograft_id',
+            'additionalsampleinformation',
         )
 
 
