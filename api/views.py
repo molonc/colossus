@@ -9,6 +9,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 # Django & Django rest framework imports
 #----------------------------
 import django_filters
+import rest_framework.exceptions
 from rest_framework import pagination, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
@@ -52,7 +53,39 @@ class SmallResultsSetPagination(pagination.PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
-class SampleViewSet(viewsets.ModelViewSet):
+class RestrictedQueryMixin(object):
+    """Cause view to fail on invalid filter query parameter.
+
+    Thanks to rrauenza on Stack Overflow for their post here:
+    https://stackoverflow.com/questions/27182527/how-can-i-stop-django-rest-framework-to-show-all-records-if-query-parameter-is-w/50957733#50957733
+    """
+    def get_queryset(self):
+        paging = set(['limit', 'offset', 'page', 'page_size'])
+
+        qs = super(RestrictedQueryMixin, self).get_queryset()
+
+        if hasattr(self, 'filter_fields') and hasattr(self, 'filter_class'):
+            raise RuntimeError("%s has both filter_fields and filter_class" % self)
+
+        if hasattr(self, 'filter_class'):
+            filter_class = getattr(self, 'filter_class', None)
+            filters = set(filter_class.get_filters().keys())
+        elif hasattr(self, 'filter_fields'):
+            filters = set(getattr(self, 'filter_fields', []))
+        else:
+            filters = set()
+
+        for key in self.request.GET.keys():
+            if key in paging:
+                continue
+            if key not in filters:
+                raise rest_framework.exceptions.APIException(
+                    'no filter %s' % key)
+
+        return qs
+
+
+class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Sample that is queryable by sample_ID.
     Try adding "?sample_id=SA928" without the quotes to the end of the url.
@@ -66,7 +99,7 @@ class SampleViewSet(viewsets.ModelViewSet):
     )
 
 
-class LaneViewSet(viewsets.ModelViewSet):
+class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Lanes.
 
@@ -85,7 +118,7 @@ class LaneViewSet(viewsets.ModelViewSet):
     )
 
 
-class SequencingViewSet(viewsets.ModelViewSet):
+class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Sequencings.
 
@@ -103,10 +136,11 @@ class SequencingViewSet(viewsets.ModelViewSet):
         'library',
         'dlpsequencingdetail__gsc_library_id',
         'dlpsequencingdetail__lanes_requested',
+        'dlpsequencingdetail__lanes_received',
         'dlpsequencingdetail__sequencing_center',
     )
 
-class SequencingDetailsViewSet(viewsets.ModelViewSet):
+class SequencingDetailsViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Sequencing Details.
     """
@@ -119,7 +153,7 @@ class SequencingDetailsViewSet(viewsets.ModelViewSet):
     )
 
 
-class LibraryViewSet(viewsets.ModelViewSet):
+class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Library that is queryable by pool_id (aka chip ID) and sample it belongs to.
 
@@ -140,7 +174,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
     )
 
 
-class SublibraryViewSet(viewsets.ModelViewSet):
+class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Library's Sublibraries that is queryable by Library's pool_id (aka chip id)
     """
@@ -188,7 +222,7 @@ class AnalysisInformationFilter(django_filters.FilterSet):
         ]
 
 
-class AnalysisInformationViewSet(viewsets.ModelViewSet):
+class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Analysis Objects
     Analysis Objects are queryable by Jira ticket
@@ -205,7 +239,7 @@ class AnalysisInformationViewSet(viewsets.ModelViewSet):
         return AnalysisInformationSerializer
 
 
-class AnalysisRunViewSet(viewsets.ModelViewSet):
+class AnalysisRunViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for AnalaysisRun Objects
     Should be be AllowAll so that Sisyphus can modify it
@@ -222,7 +256,7 @@ class AnalysisRunViewSet(viewsets.ModelViewSet):
     )
 
 
-class ExperimentalMetadata(viewsets.ModelViewSet):
+class ExperimentalMetadata(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for ChipRegion Objects
     ChipRegion Objects are queryable by Jira ticket or library pool id
