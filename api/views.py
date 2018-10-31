@@ -60,7 +60,7 @@ class RestrictedQueryMixin(object):
     https://stackoverflow.com/questions/27182527/how-can-i-stop-django-rest-framework-to-show-all-records-if-query-parameter-is-w/50957733#50957733
     """
     def get_queryset(self):
-        paging = set(['limit', 'offset', 'page', 'page_size'])
+        non_filter_params = set(['limit', 'offset', 'page', 'page_size', 'format'])
 
         qs = super(RestrictedQueryMixin, self).get_queryset()
 
@@ -76,7 +76,7 @@ class RestrictedQueryMixin(object):
             filters = set()
 
         for key in self.request.GET.keys():
-            if key in paging:
+            if key in non_filter_params:
                 continue
             if key not in filters:
                 raise rest_framework.exceptions.APIException(
