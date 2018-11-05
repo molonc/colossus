@@ -619,13 +619,18 @@ class LibraryCreate(TemplateView):
                                     jira_user=jira_user,
                                     jira_password=jira_password)
                             elif context['library_type'] == 'tenx':
+                                # TODO(mwiens91): this is ugly. Is there
+                                # a better way of getting the pool ID
+                                # from the form?
+                                pool = request.POST['tenxlibraryconstructioninformation-0-pool']
+
                                 instance.jira_ticket= self.create_jira(
                                     instance=instance,
                                     title=additional_title,
                                     description=generate_tenx_jira_description(
                                         reference_genome=get_reference_genome_from_sample_id(
                                             instance.sample.sample_id),
-                                        pool=instance.tenxlibraryconstructioninformation.pool,
+                                        pool=pool,
                                     ),
                                     reporter='coflanagan',
                                     assignee='coflanagan',
