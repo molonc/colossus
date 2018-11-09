@@ -69,7 +69,14 @@ class RestrictedQueryMixin(object):
 
         if hasattr(self, 'filter_class'):
             filter_class = getattr(self, 'filter_class', None)
-            filters = set(filter_class.get_filters().keys())
+            filters_dict = filter_class.get_filters()
+            filters = set(filters_dict.keys())
+
+            # Deal with DateFromToRangeFilters
+            for filter_name, filter_inst in filters_dict.iteritems():
+                if type(filter_inst) == django_filters.filters.DateFromToRangeFilter:
+                    filters.update({filter_name + '_0', filter_name + '_1'})
+
         elif hasattr(self, 'filter_fields'):
             filters = set(getattr(self, 'filter_fields', []))
         else:
