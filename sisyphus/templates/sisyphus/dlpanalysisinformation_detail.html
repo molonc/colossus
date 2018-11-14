@@ -52,10 +52,6 @@
             <th id="thid">Reference:</th>
             <td id="tdid">{{ object.reference_genome }}</td>
         </tr>
-        <tr>
-            <th id="thid">Submission Date:</th>
-            <td id="tdid">{{ object.analysis_submission_date }}</td>
-        </tr>
         {% for field, value in object.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
