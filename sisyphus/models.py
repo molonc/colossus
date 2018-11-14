@@ -154,7 +154,7 @@ class AbstractAnalysisInformation(models.Model):
         ('L','loess'),
     )
 
-    analysis_jira_ticket = create_chrfield("Jira ticket", blank=False)
+    analysis_jira_ticket = create_chrfield("Analysis Jira ticket", blank=False)
 
     # database relationships
     analysis_run = models.OneToOneField(AnalysisRun, blank=True, null=True)
