@@ -159,6 +159,10 @@ class AnalysisInformationCreate(CreateView):
             'parent': {'id': str(library.jira_ticket)},
         }
         new_issue = jira.create_issue(fields=issue_dict)
+
+        # Add Emma as watcher
+        jira.add_watcher(new_issue.id, 'elaks')
+
         return str(new_issue)
 
     def get_success_url(self):
