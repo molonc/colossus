@@ -423,20 +423,22 @@
                         <thead>
                             <tr>
                                 <th>Analysis ID</th>
-                                <th>Priority Level</th>
-                                <th>Jira ticket:</th>
+                                <th>Jira ticket</th>
+                                <th>Montage</th>
                                 <th>Pipeline version</th>
                                 <th>Analysis run status</th>
+                                <th>Submission date</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for analysis in analyses %}
                                 <tr>
-                                    <td><a href="{{ analysis.get_absolute_url }}">{{ analysis }}</a></td>
-                                    <td>{{ analysis.get_priority_level_display }}</td>
+                                    <td><a href="{{ analysis.get_absolute_url }}">{{ analysis.id }}</a></td>
                                     <td><a href="https://www.bcgsc.ca/jira/browse/{{ analysis.analysis_jira_ticket }}">{{ analysis.analysis_jira_ticket }}</a></td>
+                                    <td><a href="https://52.235.35.201/?dashboard={{ analysis.analysis_jira_ticket }}">{{ analysis.analysis_jira_ticket }}</a></td>
                                     <td>{{ analysis.version.version }}</td>
-                                    <td>{{ analysis.analysisrun.get_run_status_display }}</td>
+                                    <td>{{ analysis.analysis_run.get_run_status_display }}</td>
+                                    <td>{{ analysis.analysis_submission_date }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
