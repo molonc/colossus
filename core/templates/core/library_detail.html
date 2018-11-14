@@ -239,7 +239,7 @@
         <h4>Experimental Condition Metadata</h4>
             {% if chip_metadata %}
                 <div class="table-responsive">
-                    <table class="table-striped table-bordered">
+                    <table id="experimental-condition-datatable" class="table-striped table-bordered">
                         <thead>
                             <tr>
                                 {% if library_type == 'dlp' %}
@@ -291,7 +291,7 @@
 
         {% if library.sublibraryinformation_set.all %}
             <div class="table-responsive">
-                <table id="datatable" class="table-striped table-bordered" style="text-align: center;">
+                <table id="sublibrary-datatable" class="table-striped table-bordered" style="text-align: center;">
                     <thead>
                         <tr>
                             <th>cell_id</th>
@@ -332,9 +332,10 @@
 <!-- Sequencing Information -->
 <div class="container detail-bordered-container">
     <h4>Sequencing Information</h4>
+
     {% if library.dlpsequencing_set.all %}
-        <div class="table">
-            <table class="table">
+        <div class="table-responsive">
+            <table id="sequencing-datatable" class="table-striped table-bordered">
                 <thead>
                     <tr>
                         <th>Sample ID</th>
@@ -358,8 +359,8 @@
             </table>
         </div>
     {% elif library.pbalsequencing_set.all %}
-        <div class="table">
-            <table class="table">
+        <div class="table-responsive">
+            <table id="sequencing-datatable" class="table-striped table-bordered">
                 <thead>
                     <tr>
                         <th>Sample ID</th>
@@ -381,8 +382,8 @@
             </table>
         </div>
     {% elif library.tenxsequencing_set.all %}
-        <div class="table">
-            <table class="table">
+        <div class="table-responsive">
+            <table id="sequencing-datatable" class="table-striped table-bordered">
                 <thead>
                     <tr>
                         <th>Sample ID</th>
@@ -417,8 +418,8 @@
         <h4>Analysis Information</h4>
 
         {% if analyses %}
-              <div class="table">
-                    <table class="table">
+            <div class="table-responsive">
+                <table id="analysis-datatable" class="table-striped table-bordered">
                         <thead>
                             <tr>
                                 <th>Analysis ID</th>
@@ -460,4 +461,43 @@
 <br>
 <!-- end of footer bottons -->
 
+{% endblock %}
+
+{% block datatables_script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#experimental-condition-datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "orderable": false,
+                        "targets": "no-sort-col",
+                    }
+                ]
+            });
+            $("#sublibrary-datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "orderable": false,
+                        "targets": "no-sort-col",
+                    }
+                ]
+            });
+            $("#sequencing-datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "orderable": false,
+                        "targets": "no-sort-col",
+                    }
+                ]
+            });
+            $("#analysis-datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "orderable": false,
+                        "targets": "no-sort-col",
+                    }
+                ]
+            });
+        });
+    </script>
 {% endblock %}
