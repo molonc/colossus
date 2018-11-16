@@ -21,17 +21,9 @@
             {% endif %}
         </tr>
         {% for field, value in library_dict.items %}
-            {% if library_type == 'dlp' %}
-                <tr>
-                    {% if field == "Jira ticket" %}
-                        <th id="thid">Montage:</th>
-                        <td id="tdid"><a href="https://52.235.35.201/?dashboard={{ value }}">{{ value }}</a></td>
-                    {% endif %}
-                </tr>
-            {% endif %}
-
             <tr>
                 <th id="thid">{{ field }}:</th>
+
                 {% if field == "Jira ticket" %}
                     <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{ value }}">{{ value }}</a></td>
                 {% else %}
