@@ -191,19 +191,11 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
         return analysis_run
 
 
-class DlpAnalysisVersionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DlpAnalysisVersion
-        fields = (
-            'version',
-        )
-
-
 class AnalysisInformationSerializer(serializers.ModelSerializer):
     library = LibrarySerializer(read_only=True)
     analysis_run = AnalysisRunSerializer(read_only=True)
     reference_genome = ReferenceGenomeSerializer(read_only=True)
-    version = DlpAnalysisVersionSerializer(read_only=True)
+    version = serializers.CharField(source='version.version')
 
     class Meta:
         model = DlpAnalysisInformation
@@ -236,6 +228,8 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
 
 
 class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
+    version = serializers.CharField(source='version.version')
+
     class Meta:
         model = DlpAnalysisInformation
         fields = (
@@ -251,6 +245,26 @@ class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
             'aligner',
             'smoothing',
         )
+
+    def create(self, validated_data):
+        """Handle version field in here."""
+        validated_data['version'], _ = (
+            DlpAnalysisVersion.objects.get_or_create(
+                version=validated_data['version']['version'],
+            )
+        )
+
+        # Remove many-to-many field and re-add in after we have a pk for
+        # our instance (required for many-to-many field)
+        sequencings = validated_data.pop('sequencings')
+
+        instance = DlpAnalysisInformation.objects.create(**validated_data)
+
+        # Re-add many-to-many field
+        instance.sequencings = sequencings
+        instance.save()
+
+        return instance
 
 
 class MetadataSerializer(serializers.ModelSerializer):
