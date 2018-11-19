@@ -122,6 +122,7 @@ class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     filter_fields = (
         'flow_cell_id',
         'sequencing',
+        'sequencing__library__pool_id',
     )
 
 
