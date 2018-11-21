@@ -266,6 +266,22 @@ class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
 
         return instance
 
+    def update(self, instance, validated_data):
+        """Handle version field in here."""
+        if 'version' in validated_data:
+            validated_data['version'], _ = (
+                DlpAnalysisVersion.objects.get_or_create(
+                    version=validated_data['version']['version'],
+                )
+            )
+        else:
+            validated_data['version'] = instance.version
+
+        for attr, value in validated_data.iteritems():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 class MetadataSerializer(serializers.ModelSerializer):
 
