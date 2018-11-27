@@ -1919,7 +1919,7 @@ def dlp_get_cell_graph(request):
     with open(output_plots_path, 'r') as plots_pdf:
 
         response = HttpResponse(plots_pdf, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename=%s' % ("cell_count-" + today)
+        response['Content-Disposition'] = 'attachment; filename=%s' % ("cell_count-" + today + ".pdf")
     os.remove(output_csv_path)
     os.remove(output_plots_path)
 
