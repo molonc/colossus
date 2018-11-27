@@ -1901,7 +1901,7 @@ def dlp_get_cell_graph(request):
 
     df = pd.DataFrame(data)
     # TODO: change time to just only include date
-    today = str(timezone.now().strftime('%b-%d-%Y'))
+    today = str(timezone.now().strftime('%Y-%m-%d'))
     ofilename = os.path.join("cell_count-" + today + ".csv")
     output_csv_path = os.path.join(settings.MEDIA_ROOT, ofilename)
     df.to_csv(output_csv_path, index=False)
@@ -1919,7 +1919,7 @@ def dlp_get_cell_graph(request):
     with open(output_plots_path, 'r') as plots_pdf:
 
         response = HttpResponse(plots_pdf, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename=%s' % ("cell_count-" + today + ".pdf")
+        response['Content-Disposition'] = 'attachment; filename=%s' % ("cell-count_" + today + ".pdf")
     os.remove(output_csv_path)
     os.remove(output_plots_path)
 
