@@ -1,4 +1,6 @@
 library(ggplot2)
+library(viridis)
+
 args <- commandArgs(TRUE)
 input <- read.csv(args[1])
 output <- args[2]
@@ -31,7 +33,15 @@ print(g)
 filtered$pool_id <- factor(filtered$pool_id, levels = filtered$pool_id)
 g <- ggplot(filtered, aes(pool_id, count)) + geom_col() + scale_y_continuous("Cells Sequenced") + scale_x_discrete("Library (Chronological)") + theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5, size = 7))
 print(g)
+
+# Histogram
 g <- ggplot(filtered, aes(count)) + geom_histogram(bins = 50) + scale_y_continuous("Number of Libraries") + scale_x_continuous("Cells Sequenced per Library")
+print(g)
+
+# Coloured histogram by year
+filtered_subset <- filtered[c("count", "submission_date")]
+filtered_subset$submission_date <- format(filtered$submission_date, "%Y")
+g <- ggplot(filtered_subset, aes(count, fill = submission_date)) + geom_histogram(position = "stack", bins = 50) + scale_y_continuous("Number of Libraries") + scale_x_continuous("Cells Sequenced per Library") + scale_fill_viridis(discrete = TRUE, name = "Year")
 print(g)
 
 # ggsave(filename = output, width = w, height = h)
