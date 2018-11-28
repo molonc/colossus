@@ -92,6 +92,11 @@ class Sample(models.Model, FieldValue):
         "Xenograft recipient taxonomy ID",
         default="10090",
     )
+    xenograft_treatment_status = create_chrfield(
+        "Xenograft treatment status",
+        default="",
+        null=False,
+    )
     strain = create_chrfield("Strain")
     xenograft_biopsy_date = models.DateField(
         "Xenograft biopsy date",
