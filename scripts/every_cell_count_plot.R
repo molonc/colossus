@@ -31,7 +31,7 @@ print(g)
 filtered$pool_id <- factor(filtered$pool_id, levels = filtered$pool_id)
 g <- ggplot(filtered, aes(pool_id, count)) + geom_col() + scale_y_continuous("Cells Sequenced") + scale_x_discrete("Library (Chronological)") + theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5, size = 7))
 print(g)
-g <- ggplot(filtered, aes(count)) + geom_histogram(bins = 50) + scale_y_continuous("Num libraries") + scale_x_continuous("Cells sequenced")
+g <- ggplot(filtered, aes(count)) + geom_histogram(bins = 50) + scale_y_continuous("Number of Libraries") + scale_x_continuous("Cells Sequenced per Library")
 print(g)
 
 # ggsave(filename = output, width = w, height = h)
