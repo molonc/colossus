@@ -5,6 +5,31 @@
 {% block title %}Library Details{% endblock %}
 
 {% block body %}
+
+<div class="container" style="padding: 0 0; margin-top: 0.7em; margin-bottom: 1em;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="margin: 0 0 0 5px; color: #5D4037;">
+                {% if library_type == 'dlp' %}
+                    {{ library.pool_id }}
+                {% elif library_type == 'tenx' %}
+                    {{library.get_id}}
+                {% else %}
+                    {{ library.id }}
+                {% endif %}
+            </h2>
+        </div>
+
+        <div>
+            <a class="btn btn-warning" style="margin-right: 5px;" href="{% url library_type|add:':library_update' pk=library.pk %}">Edit</a>
+            <a class="btn btn-danger" href="{% url library_type|add:':library_delete' pk=library.pk %}">Delete</a>
+        </div>
+    </div>
+</div>
+
+{# This is so that the detail container colours start at the right colour #}
+<div></div>
+
 <!-- Meta Information -->
 <div class="container detail-container">
     <h4>Library Detail</h4>
@@ -447,8 +472,6 @@
 
 <!-- footer bottons -->
 <div class="container" style="margin-bottom:5px;">
-    <a class="btn btn-warning btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':library_update' pk=library.pk %}">Edit</a>
-    <a class="btn btn-danger btn-sm" style="float:left; margin:5px;" href="{% url library_type|add:':library_delete' pk=library.pk %}">Delete</a>
     <a style="float:right; margin:5px;" href="{% url library_type|add:':library_list' %}"><i class="fa fa-arrow-circle-left"></i> Libraries</a>
 </div>
 
