@@ -181,9 +181,9 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
 
         # Update the analysis information
         related_dlp_analysis_info = (
-            self.validated_data['dlpanalysisinformation'])
+            self.validated_data.get('dlpanalysisinformation', None))
 
-        if related_dlp_analysis_info:
+        if related_dlp_analysis_info is not None:
             related_dlp_analysis_info.analysis_run = analysis_run
             related_dlp_analysis_info.save()
 
