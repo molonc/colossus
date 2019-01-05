@@ -1197,16 +1197,11 @@ class SequencingDetail(models.Model, FieldValue):
     )
 
     # fields
-    lanes_requested = models.BooleanField(
-        "Lanes Requested",
-        default=False,
-        blank=False
+
+    Number_Of_Lanes_Requested = models.PositiveIntegerField(
+        default=0,
     )
-    lanes_received = models.BooleanField(
-        "Lanes Received",
-        default=False,
-        blank=False
-    )
+
     gsc_library_id = create_chrfield("GSC library ID")
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
