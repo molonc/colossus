@@ -1198,7 +1198,7 @@ class SequencingDetail(models.Model, FieldValue):
 
     # fields
 
-    Number_Of_Lanes_Requested = models.PositiveIntegerField(
+    number_of_lanes_requested = models.PositiveIntegerField(
         default=0,
     )
 

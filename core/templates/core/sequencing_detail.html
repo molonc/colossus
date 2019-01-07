@@ -61,9 +61,9 @@
         <table class="table-condensed">
             {% if library_type == 'dlp' %}
                 {% for field, value in sequencing.dlpsequencingdetail.get_field_values.items %}
-                    {% if field == 'Number Of Lanes Requested' %}
+                    {% if field == 'number of lanes requested' %}
                         <tr>
-                            <th id="thid">{{ field }}:</th>
+                            <th id="thid">{{ 'Number Of Lanes Requested' }}:</th>
                             <td id="tdid" class="notes">{{sequencing.dlplane_set.all.count}}</td>
                         </tr>
                     {% else %}
