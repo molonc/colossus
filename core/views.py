@@ -290,8 +290,6 @@ class LibraryList(TemplateView):
 
     template_name = "core/library_list.html"
 
-
-
     def get_context_data(self):
         context = {
             'libraries': self.library_class.objects.all().order_by(self.order),
