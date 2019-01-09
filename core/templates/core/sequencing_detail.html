@@ -61,10 +61,10 @@
         <table class="table-condensed">
             {% if library_type == 'dlp' %}
                 {% for field, value in sequencing.dlpsequencingdetail.get_field_values.items %}
-                    <tr>
-                        <th id="thid">{{ field }}:</th>
-                        <td id="tdid" class="notes">{{ value }}</td>
-                    </tr>
+                     <tr>
+                         <th id="thid">{{ field }}:</th>
+                         <td id="tdid" class="notes">{{ value }}</td>
+                     </tr>
                 {% endfor %}
             {% elif library_type == 'pbal' %}
                 {% for field, value in sequencing.pbalsequencingdetail.get_field_values.items %}
