@@ -290,6 +290,8 @@ class LibraryList(TemplateView):
 
     template_name = "core/library_list.html"
 
+
+
     def get_context_data(self):
         context = {
             'libraries': self.library_class.objects.all().order_by(self.order),
@@ -1095,21 +1097,6 @@ class SequencingDetail(TemplateView):
 
     template_name = "core/sequencing_detail.html"
 
-    def update_number_of_lanes_requested(self):
-        sequences = self.sequencing_class.objects.all()
-        for l in sequences:
-           if l.library_type == 'dlp':
-               if hasattr(l,'dlpsequencingdetail'):
-                   if l.dlpsequencingdetail.number_of_lanes_requested < l.dlplane_set.all().count():
-                       l.dlpsequencingdetail.number_of_lanes_requested=l.dlplane_set.all().count()
-                       l.dlpsequencingdetail.save()
-                   else:
-                       pass
-               else:
-                   pass
-           else:
-               pass
-
     def get(self, request, pk):
         key = "gsc_form_metadata_%s" % pk
         download = False
@@ -1121,8 +1108,6 @@ class SequencingDetail(TemplateView):
             'download': download,
             'library_type': self.library_type,
         }
-
-        self.update_number_of_lanes_requested()
 
         return render(request, self.template_name, context)
 
