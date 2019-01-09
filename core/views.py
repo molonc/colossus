@@ -1106,7 +1106,6 @@ class SequencingDetail(TemplateView):
             'download': download,
             'library_type': self.library_type,
         }
-
         return render(request, self.template_name, context)
 
 
