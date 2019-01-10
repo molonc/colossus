@@ -1213,14 +1213,11 @@ class SequencingCreate(TemplateView):
 
     def update_jira(self, library, sequencing_center, jira_user, jira_password):
         auth = self.get_credentials(jira_user, jira_password)
-        options = {
-            'server': 'https://www.bcgsc.ca/jira/'
-        }
         try:
             jira = JIRA('https://www.bcgsc.ca/jira/', auth=auth, max_retries=0)
         except JIRAError as e:
             return HttpResponse('Unauthorized JIRA access', status=401)
-            
+
         issue = jira.issue(str(library.jira_ticket))
 
         #Possible error with permissions on adding other watchers? I can add myself but can't add other people, leading to errors
