@@ -10,6 +10,7 @@ import os
 import collections
 import subprocess
 from jira import JIRA, JIRAError
+from sets import Set
 
 #============================
 # Django imports
@@ -1212,26 +1213,41 @@ class SequencingCreate(TemplateView):
 
     def update_jira(self, library, sequencing_center, jira_user, jira_password):
         auth = self.get_credentials(jira_user, jira_password)
+        options = {
+            'server': 'https://www.bcgsc.ca/jira/'
+        }
         try:
-            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
-            issue = jira.search_issues('issue =' + str(library.jira_ticket))
-            new_watchers = self.get_watchers(sequencing_center)
-            if new_watchers:
-                for watcher in new_watchers['watcher_list']:
-                    jira.add_watcher(issue[0], watcher)
-            return HttpResponse('Successful JIRA access', status=200)
+            jira = JIRA('https://www.bcgsc.ca/jira/', auth=auth, max_retries=0)
         except JIRAError as e:
             return HttpResponse('Unauthorized JIRA access', status=401)
+            
+        issue = jira.issue(str(library.jira_ticket))
 
-    def get_watchers(self, seq):
+        #Possible error with permissions on adding other watchers? I can add myself but can't add other people, leading to errors
+        '''current_watchers = []
+        for watcher in jira.watchers(issue).watchers:
+            current_watchers.append(watcher.name)
+
+        new_watchers = self.get_watchers(sequencing_center, Set(current_watchers))
+
+        if new_watchers:
+            for watcher in new_watchers:
+                print('starting watcher {}'.format(watcher))
+                jira.add_watcher(issue, watcher)
+                print('finished watcher {}'.format(watcher))'''
+        return HttpResponse('Successful JIRA access', status=200)
+
+    def get_watchers(self, seq, current_watchers):
         if seq == 'BCCAGSC':
             # Watcher list for BCCAGSC. This might be updated in the future
-            watchers = {"watcher_list":["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "yma","dcheng", "twong", "ktse", "sochan", "coflanagan"]}
-            return watchers
+            watchers = Set(["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "yma","dcheng", "twong", "ktse", "sochan", "coflanagan"])
+            new_watchers = watchers.difference(current_watchers)
+            return list(new_watchers)
         elif seq == 'UBCBRC':
             # Watcher list for UBCBRC. This might be updated in the future
-            watchers = {"watcher_list":["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "sochan","coflanagan"]}
-            return watchers
+            watchers = Set(["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "sochan","coflanagan"])
+            new_watchers = watchers.difference(current_watchers)
+            return list(new_watchers)
 
 
 class DlpSequencingCreate(SequencingCreate):
