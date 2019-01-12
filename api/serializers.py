@@ -64,8 +64,10 @@ class LaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = DlpLane
         fields = (
+            'id',
             'sequencing',
             'flow_cell_id',
+            'sequencing_date',
             'path_to_archive',
         )
 
