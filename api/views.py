@@ -143,8 +143,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'id',
         'library',
         'dlpsequencingdetail__gsc_library_id',
-        'dlpsequencingdetail__lanes_requested',
-        'dlpsequencingdetail__lanes_received',
+        'dlpsequencingdetail__number_of_lanes_requested',
         'dlpsequencingdetail__sequencing_center',
     )
 
