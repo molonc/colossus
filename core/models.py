@@ -1296,7 +1296,6 @@ class Lane(models.Model, FieldValue):
         max_length=150
     )
 
-
     sequencing_date = models.DateTimeField(
         null=True
     )
