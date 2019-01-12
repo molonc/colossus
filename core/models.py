@@ -1296,6 +1296,11 @@ class Lane(models.Model, FieldValue):
         max_length=150
     )
 
+
+    sequencing_date = models.DateTimeField(
+        null=True
+    )
+
     def __str__(self):
         return self.flow_cell_id
 
