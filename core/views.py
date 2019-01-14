@@ -1047,10 +1047,21 @@ class SequencingList(TemplateView):
     template_name = "core/sequencing_list.html"
 
     def get_context_data(self):
+
+        sequencing_list = self.sequencing_class.objects.all().order_by('library')
+        for sequencing in sequencing_list:
+            try:
+                sequencing.most_recent_lane = sequencing.dlplane_set.order_by('-id')[0].sequencing_date.strftime('%b. %d, %Y')
+            except IndexError:
+                sequencing.most_recent_lane = None
+            except AttributeError:
+                sequencing.most_recent_lane = None
+
         context = {
-            'sequencings': self.sequencing_class.objects.all().order_by('library'),
+            'sequencings': sequencing_list,
             'library_type': self.library_type,
         }
+        
         return context
 
 

@@ -24,6 +24,7 @@
                     {% endif %}
 
                     <th>Submission date</th>
+                    <th>Most Recent Lane Received </th>
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -74,6 +75,11 @@
                         {% endif %}
 
                         <td>{{ sequencing.submission_date }}</td>
+                        {% if sequencing.most_recent_lane %}
+                            <td>{{sequencing.most_recent_lane}}</td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
                         <td>
                             <div style="float: right; min-width: 69px">
                                 <a style="margin-right: 2px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
@@ -92,6 +98,7 @@
 {% block datatables_script %}
     <script type="text/javascript">
         $(document).ready(function() {
+            //$.fn.dataTable.moment('HH:mm MMM/DD/YYYY');
             $("#datatable").DataTable({
                 "columnDefs": [
                     {
@@ -101,7 +108,7 @@
                     {
                         "orderable": false,
                         "targets": "no-sort-col",
-                    }
+                    },
                 ]
             });
         });
