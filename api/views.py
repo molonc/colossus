@@ -102,6 +102,7 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = SampleSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
+        'id',
         'sample_id',
     )
 
@@ -120,6 +121,7 @@ class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = LaneSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
+        'id',
         'flow_cell_id',
         'sequencing',
         'sequencing__library__pool_id',
@@ -155,6 +157,7 @@ class SequencingDetailsViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = SequencingDetailSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
+        'id',
         'gsc_library_id',
         'sequencing_center',
     )
@@ -189,6 +192,7 @@ class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = SublibraryInformationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
+        'id',
         'library__pool_id',
     )
 
@@ -272,6 +276,7 @@ class ExperimentalMetadata(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = ChipRegionSerializer
     permission_classes = (AllowAny,)
     filter_fields = (
+        'id',
         'library__jira_ticket',
         'library__pool_id',
     )
