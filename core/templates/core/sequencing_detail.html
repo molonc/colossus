@@ -53,41 +53,6 @@
 </div>
 <!-- end of Meta Information -->
 
-<!-- Sequencing Detail -->
-<div class="container detail-container">
-    <h4>Sequencing Details</h4>
-
-    {% if sequencing.has_sequencing_detail %}
-        <table class="table-condensed">
-            {% if library_type == 'dlp' %}
-                {% for field, value in sequencing.dlpsequencingdetail.get_field_values.items %}
-                     <tr>
-                         <th id="thid">{{ field }}:</th>
-                         <td id="tdid" class="notes">{{ value }}</td>
-                     </tr>
-                {% endfor %}
-            {% elif library_type == 'pbal' %}
-                {% for field, value in sequencing.pbalsequencingdetail.get_field_values.items %}
-                    <tr>
-                        <th id="thid">{{ field }}:</th>
-                        <td id="tdid" class="notes">{{ value }}</td>
-                    </tr>
-                {% endfor %}
-            {% elif library_type == 'tenx' %}
-                {% for field, value in sequencing.tenxsequencingdetail.get_field_values.items %}
-                    <tr>
-                        <th id="thid">{{ field }}:</th>
-                        <td id="tdid" class="notes">{{ value }}</td>
-                    </tr>
-                {% endfor %}
-            {% endif %}
-        </table>
-    {% else %}
-        <h5><i class="text-warning">There are no sequencing details for this library!</i></h5>
-    {% endif %}
-</div>
-<!-- end of Sequencing Detail -->
-
 <!-- Lane Detail -->
 <div class="container detail-bordered-container">
     <h4>Lane Details</h4>

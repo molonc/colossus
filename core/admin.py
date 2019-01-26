@@ -10,7 +10,7 @@ from .models import Sample, AdditionalSampleInformation
 from .models import DlpLibrary, SublibraryInformation, DlpLibrarySampleDetail
 from .models import DlpLibraryConstructionInformation
 from .models import DlpLibraryQuantificationAndStorage
-from .models import DlpSequencing, DlpSequencingDetail
+from .models import DlpSequencing
 from .models import TenxLibrary, TenxCondition, TenxLibrarySampleDetail
 from .models import TenxLibraryConstructionInformation
 from .models import TenxLibraryQuantificationAndStorage
@@ -108,12 +108,9 @@ class TenxLibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     list_filter = ['jira_ticket']
 
 
-# Sequencing information
-class DlpSequencingDetailInline(admin.StackedInline):
-    model = DlpSequencingDetail
-
 class DlpSequencingAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
-    inlines = [DlpSequencingDetailInline]
+  pass
+
 
 
 # Tag information (Project information)
@@ -132,7 +129,6 @@ admin.site.register(SublibraryInformation)
 admin.site.register(DlpLibrarySampleDetail)
 admin.site.register(DlpLibraryConstructionInformation)
 admin.site.register(DlpLibraryQuantificationAndStorage)
-admin.site.register(DlpSequencingDetail)
 admin.site.register(ChipRegion)
 admin.site.register(ChipRegionMetadata)
 admin.site.register(MetadataField)

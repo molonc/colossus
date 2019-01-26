@@ -27,7 +27,6 @@ from jira import JIRA, JIRAError
 from core.helpers import *
 from core.models import (
     DlpLibrary,
-    DlpSequencingDetail,
     DlpLane)
 from .forms import *
 from .models import *
