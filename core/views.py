@@ -71,11 +71,8 @@ from .forms import (
     TenxLibraryQuantificationAndStorageInlineFormset,
     SublibraryForm,
     DlpSequencingForm,
-    DlpSequencingDetailInlineFormset,
     PbalSequencingForm,
-    PbalSequencingDetailInlineFormset,
     TenxSequencingForm,
-    TenxSequencingDetailInlineFormset,
     DlpLaneForm,
     PbalLaneForm,
     TenxLaneForm,
@@ -1151,7 +1148,7 @@ class SequencingCreate(TemplateView):
 
     template_name = "core/sequencing_create.html"
 
-    def get_context_and_render(self, request, from_library, form, seqdetail_formset):
+    def get_context_and_render(self, request, from_library, form):
         if from_library:
             library = get_object_or_404(self.library_class, pk=from_library)
         else:
@@ -1159,7 +1156,6 @@ class SequencingCreate(TemplateView):
 
         context = {
             'form': form,
-            'seqdetail_formset': seqdetail_formset,
             'library': str(library),
             'library_id': from_library,
             'related_seqs': self.sequencing_class.objects.all(),
@@ -1169,59 +1165,60 @@ class SequencingCreate(TemplateView):
 
     def get(self, request, from_library=None):
         form = self.form_class()
-        seqdetail_formset = self.seqdetail_formset_class()
-        return self.get_context_and_render(request, from_library, form, seqdetail_formset)
+        return self.get_context_and_render(request, from_library, form)
 
     def post(self, request, from_library=None):
         form = self.form_class(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            library = instance.library
+
+            if library.library_type == 'dlp':
+                jira_user = form['jira_user'].value()
+                jira_password = form['jira_password'].value()
+                sequencing_center = instance.sequencing_center
+
+                if self.update_jira(library, sequencing_center, jira_user, jira_password).status_code == 401:
+                    msg = "Please provide correct JIRA credentials."
+                    app = resolve(request.path_info).app_name
+                    current_url = resolve(request.path_info).url_name
+                    messages.error(request, msg)
+                    link = str(app) + ":" + str(current_url)
+                    return HttpResponseRedirect(reverse(link))
+                elif self.update_jira(library, sequencing_center, jira_user, jira_password).status_code == 402:
+                    msg = "Could not add watchers."
+                    app = resolve(request.path_info).app_name
+                    current_url = resolve(request.path_info).url_name
+                    messages.error(request, msg)
+                    link = str(app) + ":" + str(current_url)
+                    return HttpResponseRedirect(reverse(link))
+
             instance.save()
-            form.save_m2m()
-            seqdetail_formset = self.seqdetail_formset_class(
-                request.POST,
-                instance=instance,
-            )
-            if seqdetail_formset.is_valid():
-                library = instance.library
-                if library.library_type == 'dlp':
-                    jira_user = form['jira_user'].value()
-                    jira_password = form['jira_password'].value()
-                    sequencing_center = seqdetail_formset[0]['sequencing_center'].value()
-                    if self.update_jira(library, sequencing_center, jira_user, jira_password).status_code == 401:
-                        msg = "Please provide correct JIRA credentials."
-                        app = resolve(request.path_info).app_name
-                        current_url = resolve(request.path_info).url_name
-                        messages.error(request, msg)
-                        link = str(app) + ":" + str(current_url)
-                        return HttpResponseRedirect(reverse(link))
-                seqdetail_formset.save()
+            #form.save_m2m()
             msg = "Successfully created the Sequencing."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
             msg = "Failed to create the sequencing. Please fix the errors below."
             messages.error(request, msg)
-            seqdetail_formset = self.seqdetail_formset_class()
-            return self.get_context_and_render(request, from_library, form, seqdetail_formset)
+            return self.get_context_and_render(request, from_library, form)
 
-    def get_credentials(self, jira_user, jira_password):
-        username = str(jira_user)
-        password = str(jira_password)
-        return username, password
 
     def update_jira(self, library, sequencing_center, jira_user, jira_password):
-        auth = self.get_credentials(jira_user, jira_password)
+        auth = (jira_user, jira_password)
         try:
-            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth)
-            issue = jira.search_issues('issue =' + str(library.jira_ticket))
+            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth, max_retries=0)
+            issue = jira.issue(str(library.jira_ticket))
             new_watchers = self.get_watchers(sequencing_center)
-            if new_watchers:
-                for watcher in new_watchers['watcher_list']:
-                    jira.add_watcher(issue[0], watcher)
-            return HttpResponse('Successful JIRA access', status=200)
         except JIRAError as e:
             return HttpResponse('Unauthorized JIRA access', status=401)
+        if new_watchers:
+            for watcher in new_watchers['watcher_list']:
+                try:
+                    jira.add_watcher(issue, watcher)
+                except JIRAError as e:
+                    continue
+                return HttpResponse('Successful JIRA access', status=200)
 
     def get_watchers(self, seq):
         if seq == 'BCCAGSC':
@@ -1243,7 +1240,6 @@ class DlpSequencingCreate(SequencingCreate):
     library_class = DlpLibrary
     sequencing_class = DlpSequencing
     form_class = DlpSequencingForm
-    seqdetail_formset_class = DlpSequencingDetailInlineFormset
     library_type = 'dlp'
 
 
@@ -1256,7 +1252,6 @@ class PbalSequencingCreate(SequencingCreate):
     library_class = PbalLibrary
     sequencing_class = PbalSequencing
     form_class = PbalSequencingForm
-    seqdetail_formset_class = PbalSequencingDetailInlineFormset
     library_type = 'pbal'
 
 
@@ -1269,7 +1264,6 @@ class TenxSequencingCreate(SequencingCreate):
     library_class = TenxLibrary
     sequencing_class = TenxSequencing
     form_class = TenxSequencingForm
-    seqdetail_formset_class = TenxSequencingDetailInlineFormset
     library_type = 'tenx'
 
 
@@ -1285,11 +1279,10 @@ class SequencingUpdate(TemplateView):
 
     template_name = "core/sequencing_update.html"
 
-    def get_context_and_render(self, request, sequencing, form, seqdetail_formset):
+    def get_context_and_render(self, request, sequencing, form):
         context = {
             'pk': sequencing.pk,
             'form': form,
-            'seqdetail_formset': seqdetail_formset,
             'related_seqs': self.sequencing_class.objects.all(),
             'selected_related_seqs': sequencing.relates_to.only(),
             'library_type': self.library_type,
@@ -1299,8 +1292,7 @@ class SequencingUpdate(TemplateView):
     def get(self, request, pk):
         sequencing = get_object_or_404(self.sequencing_class, pk=pk)
         form = self.form_class(instance=sequencing)
-        seqdetail_formset = self.seqdetail_formset_class(instance=sequencing)
-        return self.get_context_and_render(request, sequencing, form, seqdetail_formset)
+        return self.get_context_and_render(request, sequencing, form)
 
     def post(self, request, pk):
         sequencing = get_object_or_404(self.sequencing_class, pk=pk)
@@ -1309,12 +1301,6 @@ class SequencingUpdate(TemplateView):
             instance = form.save(commit=False)
             instance.save()
             form.save_m2m()
-            seqdetail_formset = self.seqdetail_formset_class(
-                request.POST,
-                instance=instance,
-            )
-            if seqdetail_formset.is_valid():
-                seqdetail_formset.save()
 
             msg = "Successfully updated the Sequencing."
             messages.success(request, msg)
@@ -1322,8 +1308,7 @@ class SequencingUpdate(TemplateView):
         else:
             msg = "Failed to update the sequencing. Please fix the errors below."
             messages.error(request, msg)
-            seqdetail_formset = self.seqdetail_formset_class(instance=sequencing)
-            return self.get_context_and_render(request, sequencing, form, seqdetail_formset)
+            return self.get_context_and_render(request, sequencing, form)
 
 
 class DlpSequencingUpdate(SequencingUpdate):
@@ -1334,7 +1319,6 @@ class DlpSequencingUpdate(SequencingUpdate):
 
     sequencing_class = DlpSequencing
     form_class = DlpSequencingForm
-    seqdetail_formset_class = DlpSequencingDetailInlineFormset
     library_type = 'dlp'
 
 
@@ -1346,7 +1330,6 @@ class PbalSequencingUpdate(SequencingUpdate):
 
     sequencing_class = PbalSequencing
     form_class = PbalSequencingForm
-    seqdetail_formset_class = PbalSequencingDetailInlineFormset
     library_type = 'pbal'
 
 
@@ -1358,7 +1341,6 @@ class TenxSequencingUpdate(SequencingUpdate):
 
     sequencing_class = TenxSequencing
     form_class = TenxSequencingForm
-    seqdetail_formset_class = TenxSequencingDetailInlineFormset
     library_type = 'tenx'
 
 

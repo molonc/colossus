@@ -46,17 +46,6 @@
 
          <br>
 
-        <fieldset>
-            <legend>Sequencing Details</legend>
-            <table class="table-condensed">
-                <thead>
-                    {{ seqdetail_formset }}
-                </thead>
-            </table>
-         </fieldset>
-
-         <br>
-
         <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
         <a class="btn btn-default btn-sm" href="{% url library_type|add:':sequencing_list' %}">Cancel</a>
     </form>

@@ -20,7 +20,6 @@ from core.models import (
     AdditionalSampleInformation,
     SublibraryInformation,
     DlpSequencing,
-    DlpSequencingDetail,
     DlpLane,
     ChipRegionMetadata,
     MetadataField,
@@ -72,20 +71,8 @@ class LaneSerializer(serializers.ModelSerializer):
         )
 
 
-class SequencingDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DlpSequencingDetail
-        fields = (
-            'id',
-            'gsc_library_id',
-            'sequencing_center',
-            'rev_comp_override',
-            'number_of_lanes_requested',
-        )
-
 
 class SequencingSerializer(serializers.ModelSerializer):
-    dlpsequencingdetail = SequencingDetailSerializer(read_only=True)
     library = serializers.SlugRelatedField(read_only=True, slug_field='pool_id')
     dlplane_set = LaneSerializer(many=True, read_only=True)
     class Meta:
@@ -99,7 +86,10 @@ class SequencingSerializer(serializers.ModelSerializer):
             'sequencing_instrument',
             'submission_date',
             'dlplane_set',
-            'dlpsequencingdetail',
+            'gsc_library_id',
+            'sequencing_center',
+            'rev_comp_override',
+            'number_of_lanes_requested',
         )
 
 

@@ -50,11 +50,8 @@ from .models import (
     TenxLibraryConstructionInformation,
     TenxLibraryQuantificationAndStorage,
     DlpSequencing,
-    DlpSequencingDetail,
     PbalSequencing,
-    PbalSequencingDetail,
     TenxSequencing,
-    TenxSequencingDetail,
     DlpLane,
     PbalLane,
     TenxLane,
@@ -540,39 +537,17 @@ class DlpSequencingForm(SequencingForm):
     class Meta(SequencingForm.Meta):
         model = DlpSequencing
 
-DlpSequencingDetailInlineFormset = inlineformset_factory(
-    DlpSequencing,
-    DlpSequencingDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-)
 
 
 class PbalSequencingForm(SequencingForm):
     class Meta(SequencingForm.Meta):
         model = PbalSequencing
 
-PbalSequencingDetailInlineFormset = inlineformset_factory(
-    PbalSequencing,
-    PbalSequencingDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-)
 
 
 class TenxSequencingForm(SequencingForm):
     class Meta(SequencingForm.Meta):
         model = TenxSequencing
-
-TenxSequencingDetailInlineFormset = inlineformset_factory(
-    TenxSequencing,
-    TenxSequencingDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-)
 
 
 #===========================

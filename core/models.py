@@ -1112,6 +1112,25 @@ class Sequencing(models.Model, FieldValue):
         blank=True,
     )
 
+    SEQ_CENTER = (
+        ('BCCAGSC', 'BCCAGSC'),
+        ('UBCBRC', 'UBCBRC'),
+    )
+
+    number_of_lanes_requested = models.PositiveIntegerField(
+        default=0,
+    )
+
+    gsc_library_id = create_chrfield("GSC library ID")
+    sequencer_id = create_chrfield("Sequencer ID")
+    sequencing_center = create_chrfield(
+        "Sequencing center",
+        choices=SEQ_CENTER,
+        default='BCCAGSC',
+        blank=False
+    )
+    sequencer_notes = create_textfield("Sequencing notes")
+
     objects = SequencingManager()
 
     def __str__(self):
@@ -1141,6 +1160,22 @@ class DlpSequencing(Sequencing):
         verbose_name="Library",
         on_delete=models.CASCADE,
     )
+
+    # fields
+    rev_comp_override_choices = (
+        ('i7,i5', 'No Reverse Complement'),
+        ('i7,rev(i5)', 'Reverse Complement i5'),
+        ('rev(i7),i5', 'Reverse Complement i7'),
+        ('rev(i7),rev(i5)', 'Reverse Complement i7 and i5'),
+    )
+
+    rev_comp_override = create_chrfield(
+        "Reverse Complement Override",
+        choices=rev_comp_override_choices,
+        default=None,
+        null=True,
+    )
+
 
 
 class PbalSequencing(Sequencing):
@@ -1177,99 +1212,6 @@ class TenxSequencing(Sequencing):
         TenxLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
-    )
-
-
-class SequencingDetail(models.Model, FieldValue):
-
-    """
-    Sequencing details base class.
-    """
-
-    class Meta:
-        abstract = True
-
-    fields_to_exclude = ['ID', 'Sequencing']
-    values_to_exclude = ['id', 'sequencing']
-    SEQ_CENTER = (
-        ('BCCAGSC', 'BCCAGSC'),
-        ('UBCBRC', 'UBCBRC'),
-    )
-
-    # fields
-
-    number_of_lanes_requested = models.PositiveIntegerField(
-        default=0,
-    )
-
-    gsc_library_id = create_chrfield("GSC library ID")
-    sequencer_id = create_chrfield("Sequencer ID")
-    sequencing_center = create_chrfield(
-        "Sequencing center",
-        choices=SEQ_CENTER,
-        default='BCCAGSC',
-        blank=False
-    )
-    sequencer_notes = create_textfield("Sequencing notes")
-
-
-class DlpSequencingDetail(SequencingDetail):
-
-    """
-    DLP sequencing details.
-    """
-
-    # database relationships
-    sequencing = models.OneToOneField(
-        DlpSequencing,
-        verbose_name="Sequencing",
-        on_delete=models.CASCADE,
-        null=True,
-    )
-
-    # fields
-    rev_comp_override_choices = (
-        ('i7,i5', 'No Reverse Complement'),
-        ('i7,rev(i5)', 'Reverse Complement i5'),
-        ('rev(i7),i5', 'Reverse Complement i7'),
-        ('rev(i7),rev(i5)', 'Reverse Complement i7 and i5'),
-    )
-
-    rev_comp_override = create_chrfield(
-        "Reverse Complement Override",
-        choices=rev_comp_override_choices,
-        default=None,
-        null=True,
-    )
-
-
-class PbalSequencingDetail(SequencingDetail):
-
-    """
-    PBAL sequencing details.
-    """
-
-    # database relationships
-    sequencing = models.OneToOneField(
-        PbalSequencing,
-        verbose_name="Sequencing",
-        on_delete=models.CASCADE,
-        null=True,
-    )
-
-
-class TenxSequencingDetail(SequencingDetail):
-
-    """
-    10x sequencing details.
-    """
-
-    # database relationships
-    sequencing = models.OneToOneField(
-        TenxSequencing,
-        verbose_name="Sequencing",
-        on_delete=models.CASCADE,
-        null=True,
     )
 
 
