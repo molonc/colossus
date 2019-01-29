@@ -98,7 +98,6 @@
 {% block datatables_script %}
     <script type="text/javascript">
         $(document).ready(function() {
-            //$.fn.dataTable.moment('HH:mm MMM/DD/YYYY');
             $("#datatable").DataTable({
                 "columnDefs": [
                     {
@@ -108,7 +107,7 @@
                     {
                         "orderable": false,
                         "targets": "no-sort-col",
-                    },
+                    }
                 ]
             });
         });
