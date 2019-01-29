@@ -23,7 +23,8 @@ from core.models import (
     DlpLane,
     ChipRegionMetadata,
     MetadataField,
-    ChipRegion
+    ChipRegion,
+    DlpLibraryConstructionInformation,
 )
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
@@ -100,8 +101,15 @@ class TagSerializerField(serializers.ListField):
         return data.values_list('name', flat=True)
 
 
+class DlpLibraryConstructionInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpLibraryConstructionInformation
+        fields = '__all__'
+
+
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer(read_only=True)
+    dlplibraryconstructioninformation = DlpLibraryConstructionInformationSerializer()
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
     projects = TagSerializerField()
     class Meta:
@@ -121,6 +129,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'quality',
             'failed',
             'projects',
+            'dlplibraryconstructioninformation',
         )
 
 class SublibraryInformationSerializer(serializers.ModelSerializer):
