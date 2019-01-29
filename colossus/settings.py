@@ -29,12 +29,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('COLOSSUS_SECRET_KEY')
+SECRET_KEY = "docker_secret"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get('COLOSSUS_DEBUG', False))
 
-ALLOWED_HOSTS = os.environ.get('COLOSSUS_ALLOWED_HOSTS', '127.0.0.1').split()
+ALLOWED_HOSTS = '127.0.0.1'
 
 
 # Application definition
@@ -100,10 +100,11 @@ DATABASES = {
     'default': {
         # for older django versions use ".postgresql_psycopg2"
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('COLOSSUS_POSTGRESQL_NAME'),
-        'USER': os.environ.get('COLOSSUS_POSTGRESQL_USER'),
-        'PASSWORD': os.environ.get('COLOSSUS_POSTGRESQL_PASSWORD'),
-        'HOST': '10.9.215.82',
+        'NAME': 'colossus_dev',
+        'USER': 'amcpherson',
+        'PASSWORD': 'shahlab',
+        'HOST': 'db_colossus',
+        'PORT': '5432',
         'PORT': '5432',
     }
 }
