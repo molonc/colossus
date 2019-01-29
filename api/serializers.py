@@ -132,6 +132,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'dlplibraryconstructioninformation',
         )
 
+
 class SublibraryInformationSerializer(serializers.ModelSerializer):
     sample_id = SampleSerializer(read_only=True)
     library = LibrarySerializer(read_only=True)
@@ -151,6 +152,12 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
             'pick_met',
             'library',
         )
+
+
+class SublibraryInformationSerializerBrief(serializers.ModelSerializer):
+    class Meta:
+        model = SublibraryInformation
+        fields = '__all__'
 
 
 class ReferenceGenomeSerializer(serializers.ModelSerializer):

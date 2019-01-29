@@ -23,6 +23,7 @@ from .serializers import (
     LaneSerializer,
     SequencingSerializer,
     SublibraryInformationSerializer,
+    SublibraryInformationSerializerBrief,
     AnalysisInformationSerializer,
     AnalysisInformationCreateSerializer,
     AnalysisRunSerializer,
@@ -176,6 +177,25 @@ class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = SublibraryInformation.objects.all()
     serializer_class = SublibraryInformationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_fields = (
+        'id',
+        'library__pool_id',
+    )
+
+
+class LargeResultsSetPagination(pagination.PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = 'page_size'
+
+
+class SublibraryViewSetBrief(RestrictedQueryMixin, viewsets.ModelViewSet):
+    """
+    View for Library's Sublibraries that is queryable by Library's pool_id (aka chip id)
+    """
+    queryset = SublibraryInformation.objects.all()
+    serializer_class = SublibraryInformationSerializerBrief
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = LargeResultsSetPagination
     filter_fields = (
         'id',
         'library__pool_id',
