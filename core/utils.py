@@ -180,7 +180,7 @@ class SampleSheet(object):
         # Only the NextSeq & HX requires the i5 to be reverse complemented
         if self._si == "N550" or self._si!='HX':
             self._rev_comp_i5 = True
-        rev_comp_override = self._lane.sequencing.dlpsequencingdetail.rev_comp_override
+        rev_comp_override = self._lane.sequencing.rev_comp_override
         if rev_comp_override is not None:
             self._rev_comp_i7 = ('rev(i7)' in rev_comp_override)
             self._rev_comp_i5 = ('rev(i5)' in rev_comp_override)
