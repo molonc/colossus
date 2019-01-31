@@ -23,7 +23,7 @@ services:
       image: docker_colossus
       stdin_open: true
       tty: true
-      command: bash -c "python docker/wait.py && python manage.py makemigrations && python manage.py migrate && python manage.py createsuperuserargs --username simong --password pinchpinch --noinput --email 'simong@crab.com' && python manage.py runserver 0.0.0.0:80001"
+      command: bash -c "python wait-for-it.py && python manage.py makemigrations && python manage.py migrate && python manage.py createsuperuserargs --username simong --password pinchpinch --noinput --email 'simong@crab.com' && python manage.py runserver 0.0.0.0:80001"
       volumes:
         - .:/colossus
       ports:
