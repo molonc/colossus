@@ -3,11 +3,9 @@ version: '2.1'
 services:
     db_colossus:
       image: postgres
-      ports:
-        - "5432:5432"
       environment:
-        - POSTGRES_USER=amcpherson
-        - POSTGRES_PASSWORD=shahlab
+        - POSTGRES_USER=simong
+        - POSTGRES_PASSWORD=pinchpinch
         - POSTGRES_DB=colossus_dev
       healthcheck:
         test: ["CMD", "curl", "-f", "http://db_colossus:5432"]
@@ -23,7 +21,7 @@ services:
       image: docker_colossus
       stdin_open: true
       tty: true
-      command: ["python", "manage.py", "runserver", "8001"]
+      command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py createsuperuserargs --username simong --password pinchpinch --noinput --email 'simong@crab.com' && python manage.py runserver 0.0.0.0:8001"
       volumes:
         - .:/colossus
       ports:
