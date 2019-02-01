@@ -11,18 +11,20 @@ def combine_sequencings(apps, schema_editor):
 
     for library in DlpLibrary.objects.all():
         if(library.dlpsequencing_set.filter(sequencing_center='BCCAGSC').count() >= 2):
-            base_sequencing = library.dlpsequencing_set.filter(sequencing_center='BCCAGSC').first()
+            sequencings = library.dlpsequencing_set.filter(sequencing_center='BCCAGSC')
+            base_sequencing = sequencings.first()
 
-            for sequence in library.dlpsequencing_set.filter(sequencing_center='BCCAGSC')[1:]:
+            for sequence in sequencings[1:]:
                 for lane in sequence.dlplane_set.all():
                     if(lane not in base_sequencing.dlplane_set.all()):
                         base_sequencing.dlplane_set.add(lane)
                 sequence.delete()
 
         if(library.dlpsequencing_set.filter(sequencing_center='UBCBRC').count() >= 2):
-            base_sequencing = library.dlpsequencing_set.filter(sequencing_center='UBCBRC').first()
+            sequencings = library.dlpsequencing_set.filter(sequencing_center='UBCBRC')
+            base_sequencing = sequencings.first()
 
-            for sequence in library.dlpsequencing_set.filter(sequencing_center='UBCBRC')[1:]:
+            for sequence in sequencings[1:]:
                 for lane in sequence.dlplane_set.all():
                     if(lane not in base_sequencing.dlplane_set.all()):
                         base_sequencing.dlplane_set.add(lane)

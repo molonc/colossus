@@ -19,4 +19,9 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(default=112358, on_delete=django.db.models.deletion.CASCADE, to='core.DlpSequencing', verbose_name='Sequencing'),
             preserve_default=False,
         ),
+        migrations.AlterField(
+            model_name='dlplane',
+            name='path_to_archive',
+            field=models.CharField(max_length=150, null=True),
+        ),
     ]
