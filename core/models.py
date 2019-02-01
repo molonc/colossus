@@ -1235,7 +1235,8 @@ class Lane(models.Model, FieldValue):
 
     path_to_archive = create_chrfield(
         "Path to archive",
-        max_length=150
+        max_length=150,
+        blank=True,
     )
 
     sequencing_date = models.DateTimeField(
