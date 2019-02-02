@@ -1030,6 +1030,7 @@ class Sequencing(models.Model, FieldValue):
 
     class Meta:
         abstract = True
+        unique_together = ('library', 'sequencing_center')
 
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
@@ -1235,7 +1236,9 @@ class Lane(models.Model, FieldValue):
 
     path_to_archive = create_chrfield(
         "Path to archive",
-        max_length=150
+        max_length=150,
+        null=True,
+        blank=True,
     )
 
     sequencing_date = models.DateTimeField(
