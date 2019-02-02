@@ -18,6 +18,7 @@ def combine_sequencings(apps, schema_editor):
             for sequence in sequencings[1:]:
                 for lane in sequence.dlplane_set.all():
                     lane.sequencing = base_sequencing
+                    lane.save()
                 sequence.delete()
 
         if(library.dlpsequencing_set.filter(sequencing_center='UBCBRC').count() >= 2):
@@ -27,6 +28,7 @@ def combine_sequencings(apps, schema_editor):
             for sequence in sequencings[1:]:
                 for lane in sequence.dlplane_set.all():
                     lane.sequencing = base_sequencing
+                    lane.save()
                 sequence.delete()
 
 
