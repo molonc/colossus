@@ -1,0 +1,31 @@
+version: '2.1'
+
+services:
+    db_colossus:
+      image: postgres
+      environment:
+        - POSTGRES_USER=simong
+        - POSTGRES_PASSWORD=pinchpinch
+        - POSTGRES_DB=colossus_dev
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://db_colossus:5432"]
+        interval: 30s
+        timeout: 10s
+        retries: 2
+
+    django:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: colossus
+      image: docker_colossus
+      stdin_open: true
+      tty: true
+      command: bash -c "sleep 5 && python manage.py makemigrations && python manage.py migrate && python manage.py createsuperuserargs --username simong --password pinchpinch --noinput --email 'simong@crab.com' && python manage.py runserver 0.0.0.0:8001"
+      volumes:
+        - .:/colossus
+      ports:
+        - "8001:8001"
+      depends_on:
+        - db_colossus
+
