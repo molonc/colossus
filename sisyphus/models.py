@@ -92,12 +92,17 @@ class AnalysisRun(models.Model):
     RUNNING = 'running'
     ARCHIVING = 'archiving'
     COMPLETE = 'complete'
+    ALIGN_COMPLETE= 'align_complete'
+    HMMCOPY_COMPLETE = 'hmmcopy_complete'
+    
     RUN_STATUS_CHOICES = (
         (IDLE, 'Idle'),
         (ERROR, 'Error'),
         (RUNNING, 'Running'),
         (ARCHIVING, 'Archiving'),
         (COMPLETE, 'Complete'),
+        (ALIGN_COMPLETE, 'Align Complete'),
+        (HMMCOPY_COMPLETE, 'Hmmcopy Complete'),
     )
 
     last_updated = models.DateTimeField(

@@ -58,11 +58,11 @@
                         </td>
                         <td>
                             {% if library_type == 'dlp' %}
-                                {{ sequencing.dlpsequencingdetail.gsc_library_id }}
+                                {{ sequencing.gsc_library_id }}
                             {% elif library_type == 'pbal' %}
-                                {{ sequencing.pbalsequencingdetail.gsc_library_id }}
+                                {{ sequencing.gsc_library_id }}
                             {% elif library_type == 'tenx' %}
-                                {{ sequencing.tenxsequencingdetail.gsc_library_id }}
+                                {{ sequencing.gsc_library_id }}
                             {% endif %}
                         </td>
 

@@ -132,7 +132,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     View for Sequencings.
 
     Sequencings are queryable by GSC library id.
-    Try adding "?sequencingdetail__gsc_library_id=PX0566" without the quotes to the end of the url.
+    Try adding "?gsc_library_id=PX0566" without the quotes to the end of the url.
 
     See documentation here:
     https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI

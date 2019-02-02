@@ -154,7 +154,7 @@ class AnalysisInformationCreate(CreateView):
             'summary': title,
             'issuetype': {'name': 'Sub-task'},
             'priority': {'name': 'Medium'},
-            'assignee': {'name': 'sochan'},
+            'assignee': {'name': 'jpham'},
             'parent': {'id': str(library.jira_ticket)},
         }
         new_issue = jira.create_issue(fields=issue_dict)
