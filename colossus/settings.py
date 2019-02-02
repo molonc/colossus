@@ -103,7 +103,7 @@ DATABASES = {
         'NAME': os.environ.get('COLOSSUS_POSTGRESQL_NAME'),
         'USER': os.environ.get('COLOSSUS_POSTGRESQL_USER'),
         'PASSWORD': os.environ.get('COLOSSUS_POSTGRESQL_PASSWORD'),
-        'HOST': '10.9.215.82',
+        'HOST': os.environ.get('COLOSSUS_POSTGRESQL_HOST', 'localhost'),
         'PORT': '5432',
     }
 }
