@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 
+
 def combine_sequencings(apps, schema_editor):
     DlpLibrary= apps.get_model('core', 'DlpLibrary')
     DlpSequencing = apps.get_model('core', 'DlpSequencing')
@@ -16,8 +17,7 @@ def combine_sequencings(apps, schema_editor):
 
             for sequence in sequencings[1:]:
                 for lane in sequence.dlplane_set.all():
-                    if(lane not in base_sequencing.dlplane_set.all()):
-                        base_sequencing.dlplane_set.add(lane)
+                    lane.sequencing = base_sequencing
                 sequence.delete()
 
         if(library.dlpsequencing_set.filter(sequencing_center='UBCBRC').count() >= 2):
@@ -26,9 +26,9 @@ def combine_sequencings(apps, schema_editor):
 
             for sequence in sequencings[1:]:
                 for lane in sequence.dlplane_set.all():
-                    if(lane not in base_sequencing.dlplane_set.all()):
-                        base_sequencing.dlplane_set.add(lane)
+                    lane.sequencing = base_sequencing
                 sequence.delete()
+
 
 class Migration(migrations.Migration):
 
@@ -37,10 +37,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='dlplane',
-            name='sequencing',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.DlpSequencing', verbose_name='Sequencing'),
-        ),
         migrations.RunPython(combine_sequencings),
     ]

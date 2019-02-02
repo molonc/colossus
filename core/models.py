@@ -1238,6 +1238,7 @@ class Lane(models.Model, FieldValue):
         "Path to archive",
         max_length=150,
         null=True,
+        blank=True,
     )
 
     sequencing_date = models.DateTimeField(
