@@ -731,3 +731,23 @@ class GSCFormSubmitterInfo(Form):
         choices=at_completion_choices,
         initial='R',
     )
+
+class RememberMeForm(Form):
+    #Checkbox used hopefully for cookies to remember JIRA username/password
+    username = CharField(
+        label='Jira Username',
+        max_length=150,
+        required=False,
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(render_value=True),
+        label='Jira Password',
+        required=False,
+    )
+
+    remember_me = BooleanField(
+        label='Remember Me',
+        initial=False,
+        required=False,
+    )
