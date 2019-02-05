@@ -23,6 +23,7 @@ from django.core.validators import RegexValidator
 from .constants import (
     TENX_LIBRARY_TYPE_CHOICES,
     TENX_INDEX_CHOICES,
+    CHEMISTRY_VERSION_CHOICES,
 )
 from .helpers import *
 
@@ -841,6 +842,14 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
         null=True,
         blank=True,
         verbose_name="DNA concentration (nM)",
+    )
+
+    chemistry_version = models.CharField(
+        null=True,
+        choices=CHEMISTRY_VERSION_CHOICES,
+        verbose_name="Chemistry Version",
+        max_length=3,
+        default="VERSION_2"
     )
 
 
