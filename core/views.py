@@ -81,6 +81,7 @@ from .forms import (
     TenxConditionFormset,
     ProjectForm,
     PlateForm,
+    RememberMeForm,
 )
 from .utils import (
     create_sublibrary_models,
@@ -1294,14 +1295,20 @@ class SequencingUpdate(TemplateView):
         abstract = True
 
     template_name = "core/sequencing_update.html"
+    remember_me_form = RememberMeForm
 
     def get_context_and_render(self, request, sequencing, form):
+        if('jira_username' in request.session and 'jira_password' in request.session):
+            remember_form = self.remember_me_form(initial={'username': request.session['jira_username'], 'password': request.session['jira_password'], 'remember_me': True})
+        else:
+            remember_form = self.remember_me_form
         context = {
             'pk': sequencing.pk,
             'form': form,
             'related_seqs': self.sequencing_class.objects.all(),
             'selected_related_seqs': sequencing.relates_to.only(),
             'library_type': self.library_type,
+            'remember_me': remember_form,
         }
         return render(request, self.template_name, context)
 
@@ -1310,11 +1317,47 @@ class SequencingUpdate(TemplateView):
         form = self.form_class(instance=sequencing)
         return self.get_context_and_render(request, sequencing, form)
 
+    #Return error if JIRAError happens, else return nothing
+    def jira_integration(self, username, password, ticket_to_update, new_count, old_count):
+        auth = (username, password)
+        try:
+            # Connect to the API
+            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth, max_retries=0)
+            issue = jira.issue(ticket_to_update)
+            jira.add_comment(issue, 'Number of Lanes Requested has been updated to {} from {}'.format(new_count, old_count))
+        except JIRAError as e:
+            return e.response
+
     def post(self, request, pk):
         sequencing = get_object_or_404(self.sequencing_class, pk=pk)
+        old_count = sequencing.number_of_lanes_requested
         form = self.form_class(request.POST, instance=sequencing)
+        remember_form = self.remember_me_form(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            #Don't require JIRA integration if not updating the number of lanes field
+            if(old_count != instance.number_of_lanes_requested):
+                if(remember_form.is_valid()):
+                    if(remember_form.cleaned_data['remember_me']):
+                        request.session.set_expiry(28800) #Expires in 8 hours
+                        request.session['jira_username'] = remember_form.cleaned_data['username']
+                        request.session['jira_password'] = remember_form.cleaned_data['password']
+                    error_code = self.jira_integration(
+                        remember_form.cleaned_data['username'], 
+                        remember_form.cleaned_data['password'], 
+                        instance.library.jira_ticket, 
+                        instance.number_of_lanes_requested, 
+                        old_count
+                    )
+                    if error_code is not None:
+                        #Jira errors are returned as HTML code with the error message in between <title> tags
+                        messages.error(request, "JIRA Error {}: {}".format(error_code.status_code, error_code.reason))
+                        return self.get_context_and_render(request, sequencing, form)
+                else:
+                    msg = "Failed to update the sequencing. Please fix the errors below."
+                    messages.error(request, msg)
+                    return self.get_context_and_render(request, sequencing, form)
+
             instance.save()
             form.save_m2m()
 
