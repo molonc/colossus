@@ -1089,7 +1089,7 @@ class Sequencing(models.Model, FieldValue):
         "Read2 length",
         default=150,
     )
-    sequencing_goal = create_chrfield("Sequencing goal (# lanes)")
+
     sequencing_instrument = create_chrfield(
         "Sequencing instrument",
         choices=sequencing_instrument_choices,
@@ -1120,6 +1120,7 @@ class Sequencing(models.Model, FieldValue):
 
     number_of_lanes_requested = models.PositiveIntegerField(
         default=0,
+        verbose_name="Sequencing Goal"
     )
 
     gsc_library_id = create_chrfield("GSC library ID")
