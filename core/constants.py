@@ -11,10 +11,16 @@ THREE_PRIME = "3'"
 VDJ = "V(D)J"
 CNV = "CNV"
 
+
 TENX_LIBRARY_TYPE_CHOICES = (
     (FIVE_PRIME, FIVE_PRIME),
     (THREE_PRIME, THREE_PRIME),
     (VDJ, VDJ),
+)
+
+CHEMISTRY_VERSION_CHOICES = (
+    ("VERSION_2", "v2"),
+    ("VERSION_3", "v3")
 )
 
 # Enumeration for TenxLibraryConstructionInformation library_type
