@@ -848,7 +848,7 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
         null=True,
         choices=CHEMISTRY_VERSION_CHOICES,
         verbose_name="Chemistry Version",
-        max_length=3,
+        max_length=150,
         default="VERSION_2"
     )
 
