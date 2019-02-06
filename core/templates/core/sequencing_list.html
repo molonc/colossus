@@ -23,8 +23,11 @@
                         <th class="jiraticket">Jira Ticket</th>
                     {% endif %}
 
-                    <th>Submission date</th>
+                    <th>Submission Date</th>
                     <th>Most Recent Lane Received </th>
+                    {% if library_type == 'dlp' %}
+                        <th>Imported</th>
+                    {% endif %}
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -80,6 +83,13 @@
                         {% else %}
                             <td></td>
                         {% endif %}
+                        {% if library_type == 'dlp' %}
+                            {% if sequencing.number_of_lanes_requested == sequencing.dlplane_set.all.count %}
+                                <td>&#10004;</td>
+                            {% else %}
+                                <td>&times;</td>
+                            {% endif %}
+                        {% endif %}
                         <td>
                             <div style="float: right; min-width: 69px">
                                 <a style="margin-right: 2px;" href="{% url library_type|add:':sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
@@ -99,6 +109,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $("#datatable").DataTable({
+                stateSave: true,
                 "columnDefs": [
                     {
                         "type": "natural",

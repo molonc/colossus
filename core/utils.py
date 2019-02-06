@@ -85,7 +85,8 @@ def create_sublibrary_models(library, sublib_results, region_metadata):
         if sample_id is None:
             raise ValueError('No sample id for region {}'.format(code))
         try:
-            sample = Sample.objects.get(sample_id=sample_id)
+            #Need to encode as ascii and ignore special characters, otherwise we get sample IDs like 'SA1151\xa0' instead of 'SA1151'
+            sample = Sample.objects.get(sample_id=sample_id.encode('ascii', 'ignore'))
         except Sample.DoesNotExist:
             raise ValueError('Unrecognized sample {}'.format(sample_id))
         for idx, row in sublib_results[sublib_results['condition'] == code].iterrows():

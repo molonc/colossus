@@ -680,6 +680,7 @@ class LibraryCreate(TemplateView):
                         region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                         sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
                         if region_metadata is not None and sublib_results is not None:
+                            print(region_metadata, sublib_results)
                             instance.sublibraryinformation_set.all().delete()
                             instance.chipregion_set.all().delete()
                             create_sublibrary_models(instance, sublib_results, region_metadata)
@@ -688,7 +689,11 @@ class LibraryCreate(TemplateView):
                         messages.success(request, "Successfully created the Library.")
                         return HttpResponseRedirect(instance.get_absolute_url())
         except ValueError as e:
-            error_message = ' '.join(e.args)
+            #Can't join into a string when some args are ints, so convert them first
+            for arg in e.args:
+                if(type(arg) is int):
+                    arg = str(arg)
+                error_message += arg.encode('ascii', 'ignore') + ' '
 
         error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
         messages.error(request, error_message)
