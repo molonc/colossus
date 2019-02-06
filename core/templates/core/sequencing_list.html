@@ -23,8 +23,9 @@
                         <th class="jiraticket">Jira Ticket</th>
                     {% endif %}
 
-                    <th>Submission date</th>
+                    <th>Submission Date</th>
                     <th>Most Recent Lane Received </th>
+                    <th>Imported</th>
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -79,6 +80,11 @@
                             <td>{{sequencing.most_recent_lane}}</td>
                         {% else %}
                             <td></td>
+                        {% endif %}
+                        {% if sequencing.number_of_lanes_requested == sequencing.dlplane_set.all.count %}
+                            <td>&#10004;</td>
+                        {% else %}
+                            <td>&times;</td>
                         {% endif %}
                         <td>
                             <div style="float: right; min-width: 69px">
