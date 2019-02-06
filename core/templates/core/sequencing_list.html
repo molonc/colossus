@@ -25,7 +25,9 @@
 
                     <th>Submission Date</th>
                     <th>Most Recent Lane Received </th>
-                    <th>Imported</th>
+                    {% if library_type == 'dlp' %}
+                        <th>Imported</th>
+                    {% endif %}
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -81,10 +83,12 @@
                         {% else %}
                             <td></td>
                         {% endif %}
-                        {% if sequencing.number_of_lanes_requested == sequencing.dlplane_set.all.count %}
-                            <td>&#10004;</td>
-                        {% else %}
-                            <td>&times;</td>
+                        {% if library_type == 'dlp' %}
+                            {% if sequencing.number_of_lanes_requested == sequencing.dlplane_set.all.count %}
+                                <td>&#10004;</td>
+                            {% else %}
+                                <td>&times;</td>
+                            {% endif %}
                         {% endif %}
                         <td>
                             <div style="float: right; min-width: 69px">
