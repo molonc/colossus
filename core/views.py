@@ -94,6 +94,8 @@ from .jira_templates.templates import (
     generate_tenx_jira_description,
 )
 
+from .jira_templates.jira_wrapper import JiraWrapper
+
 
 
 #============================
