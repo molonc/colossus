@@ -23,11 +23,13 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
+from django.forms.models import model_to_dict
 
 import pandas as pd
 from django.conf import settings
 from django.utils import timezone
 from itertools import chain
+import json
 
 
 #============================
@@ -82,6 +84,7 @@ from .forms import (
     ProjectForm,
     PlateForm,
     RememberMeForm,
+    JiraConfirmationForm,
 )
 from .utils import (
     create_sublibrary_models,
@@ -94,7 +97,7 @@ from .jira_templates.templates import (
     generate_tenx_jira_description,
 )
 
-from .jira_templates.jira_wrapper import JiraWrapper
+from .jira_templates.jira_wrapper import *
 
 
 
@@ -527,6 +530,26 @@ class TenxLibraryDelete(LibraryDelete):
 
 
 @method_decorator(login_required, name='dispatch')
+class JiraTicketConfirm(TemplateView):
+
+    template_name = 'core/jira_ticket_confirm.html'
+
+    def get(self, request):
+        projects = get_projects(request.session['jira_user'], request.session['jira_password'])
+        form = JiraConfirmationForm()
+        form.fields['title'].initial = request.session['additional_title']
+        if(request.session['library_type'] == 'dlp'):
+            form.fields['description'].initial = generate_dlp_jira_description(get_reference_genome_from_sample_id(request.session['sample_id']))
+        elif(request.session['library_type'] == 'tenx'):
+            pass
+        form.fields['project'].choices = [(project.id, project.name) for project in projects]
+        form.fields['project'].initial = get_project_id_from_name(request.session['jira_user'], request.session['jira_password'], 'Single Cell')
+        context = {
+            'form': form,
+        }
+        return render(request, self.template_name, context)
+
+@method_decorator(login_required, name='dispatch')
 class LibraryCreate(TemplateView):
 
     """
@@ -568,9 +591,34 @@ class LibraryCreate(TemplateView):
         return self._post(request, context)
 
     def _post(self, request, context, library=None):
+        lib_form = self.lib_form_class(request.POST, instance=library)
+        sublib_form = SublibraryForm(request.POST, request.FILES or None)
+        context['lib_form'] = lib_form
+        context['sublib_form'] = sublib_form
+
+        error_message = ''
+        try:
+            with transaction.atomic():
+                if lib_form.is_valid() and sublib_form.is_valid():
+                    instance = lib_form.save(commit=False)
+                    jira_user = lib_form['jira_user'].value()
+                    jira_password = lib_form['jira_password'].value()
+                    additional_title = lib_form['additional_title'].value()
+                    request.session['jira_user'] = jira_user
+                    request.session['jira_password'] = jira_password
+                    request.session['additional_title'] = additional_title
+                    request.session['sample_id'] = instance.sample.sample_id
+                    request.session['library_type'] = context['library_type']
+        except ValueError as e:
+            #Can't join into a string when some args are ints, so convert them first
+            for arg in e.args:
+                if(type(arg) is int):
+                    arg = str(arg)
+                error_message += arg.encode('ascii', 'ignore') + ' '
+        return HttpResponseRedirect(reverse('dlp:jira-ticket-confirm'))
         # this is becaues of this django feature:
         # https://code.djangoproject.com/ticket/1130
-        _mutable = request.POST._mutable
+        '''_mutable = request.POST._mutable
         request.POST._mutable = True
         request.POST['projects'] = ','.join(request.POST.getlist('projects'))
         request.POST._mutable = _mutable
@@ -603,6 +651,7 @@ class LibraryCreate(TemplateView):
                         additional_title = lib_form['additional_title'].value()
                         jira_user = lib_form['jira_user'].value()
                         jira_password = lib_form['jira_password'].value()
+                        jira_project = lib_form['associated_jira_project'].value()
 
                         try:
                             # TODO(mwiens91): define custom behavior in
@@ -617,7 +666,9 @@ class LibraryCreate(TemplateView):
                                     reporter='elaks',
                                     assignee=None,
                                     jira_user=jira_user,
-                                    jira_password=jira_password)
+                                    jira_password=jira_password,
+                                    jira_project=jira_project,
+                                    )
                             elif context['library_type'] == 'tenx':
                                 # TODO(mwiens91): this is ugly. Is there
                                 # a better way of getting the pool ID
@@ -715,6 +766,7 @@ class LibraryCreate(TemplateView):
             reporter,
             jira_user,
             jira_password,
+            jira_project,
             assignee=None,
             watchers=None,):
         """Create a Jira ticket.
@@ -803,7 +855,7 @@ class LibraryCreate(TemplateView):
             if not formset.is_valid():
                 all_valid = False
             formsets[k] = formset
-        return all_valid, formsets
+        return all_valid, formsets'''
 
 
 class DlpLibraryCreate(LibraryCreate):

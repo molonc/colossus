@@ -55,10 +55,13 @@ from .models import (
     DlpLane,
     PbalLane,
     TenxLane,
-    Plate
+    Plate,
+    JiraUser,
 )
 from .utils import parse_smartchipapp_results_file
-
+from .jira_templates.jira_wrapper import *
+from jira import JIRA, JIRAError
+from colossus.settings import JIRA_URL
 
 #===========================
 # 3rd-party app imports
@@ -155,6 +158,24 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     },
 )
 
+'''
+JIRA Ticket Creation Confirmation Form For Library Creation
+'''
+
+class JiraConfirmationForm(Form):
+    title = forms.CharField(max_length=1000)
+    description = forms.CharField(widget=forms.Textarea)
+    project = forms.ChoiceField()
+    #Default empty choice for user_list
+    user_list = [('', '------')]
+    for user in JiraUser.objects.all().order_by('name'):
+        user_list.append((user.username, user.name))
+
+    reporter = forms.ChoiceField(choices=user_list)
+    assignee = forms.ChoiceField(choices=user_list)
+    watchers = forms.ChoiceField(widget=forms.SelectMultiple, choices=user_list[1:])
+
+
 
 #===========================
 # Library forms
@@ -178,6 +199,7 @@ class DlpLibraryForm(LibraryForm):
         'additional_title',
         'jira_user',
         'jira_password',
+        'associated_jira_project',
     ]
 
     def __init__(self,*args, **kwargs):
@@ -187,6 +209,15 @@ class DlpLibraryForm(LibraryForm):
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+            username = os.environ.get('JIRA_USERNAME')
+            password = os.environ.get('JIRA_PASSWORD')
+            '''PROJECT_CHOICES = []
+            for project in jira_wrapper.projects():
+                PROJECT_CHOICES.append((project.id, project.name))
+
+            self.fields['associated_jira_project'] = forms.ChoiceField(widget=forms.Select, choices=PROJECT_CHOICES, label='Associated Jira Project')
+            self.initial['associated_jira_project'] = '11220'
+            '''
 
             # Remove the field which allows explicitly setting the Jira
             # ticket ID (since it's done automatically)

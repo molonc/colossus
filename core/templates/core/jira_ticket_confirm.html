@@ -1,0 +1,19 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}Confirm JIRA Ticket Details{% endblock %}
+
+{% block body %}
+<div class="container graybg">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Jira Ticket Details</legend>
+            <table class="table-condensed">
+                <thead>
+                    {{ form }}
+                </thead>
+            </table>
+         </fieldset>
+
+{% endblock %}

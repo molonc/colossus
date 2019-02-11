@@ -1358,3 +1358,10 @@ class Plate(models.Model, FieldValue):
         choices=plate_type_choices,
     )
     plate_location = create_textfield("Plate location")
+
+class JiraUser(models.Model):
+    username = models.CharField(max_length=150)
+    name = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.name
