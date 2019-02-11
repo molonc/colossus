@@ -109,53 +109,51 @@
 {% endblock %}
 
 {% block datatables_script %}
-    <script type="text/javascript">
-        var table;
-        $(document).ready(function() {
-            table = $("#datatable").DataTable({
-                stateSave: true,
-                "columnDefs": [
-                    {
-                        "type": "natural",
-                        "targets": "jiraticket",
-                    },
-                    {
-                        "orderable": false,
-                        "targets": "no-sort-col",
-                    }
-                ]
-            });
-            table.column( 8 ).search("✔|×",true,false).draw();
-            console.log("INNER");
+<script type="text/javascript">
+    var table;
+    $(document).ready(function() {
+        table = $("#datatable").DataTable({
+            stateSave: true,
+            "columnDefs": [
+                {
+                    "type": "natural",
+                    "targets": "jiraticket",
+                },
+                {
+                    "orderable": false,
+                    "targets": "no-sort-col",
+                }
+            ]
         });
+        table.column( 8 ).search("✔|×",true,false).draw();
+    });
 
 
-        function importOnClick()
-        {
-            console.log("INNER LOOP")
-            var elem = document.getElementById("import-button");
-            if(elem.innerHTML == "All"){
-                console.log("LOOP 1")
-                elem.innerHTML = "Imported";
-                $(elem).removeClass("btn-primary").addClass("btn-success");
-               table
-                .column( 8 )
-                .search("✔").draw();
-            }
-
-            else if(elem.innerHTML == "Imported" ){
-                elem.innerHTML = "Not Imported";
-                $(elem).removeClass("btn-success").addClass("btn-danger");
-                table
-                .column( 8 )
-                .search("×").draw();
-            }
-
-            else if(elem.innerHTML == "Not Imported" ){
-                elem.innerHTML = "All";
-                $(elem).removeClass("btn-danger").addClass("btn-primary");
-                table.column( 8 ).search("✔|×",true,false).draw();
-            }
+    function importOnClick()
+    {
+        var elem = document.getElementById("import-button");
+        if(elem.innerHTML == "All"){
+            console.log("LOOP 1")
+            elem.innerHTML = "Imported";
+            $(elem).removeClass("btn-primary").addClass("btn-success");
+           table
+            .column( 8 )
+            .search("✔").draw();
         }
-    </script>
+
+        else if(elem.innerHTML == "Imported" ){
+            elem.innerHTML = "Not Imported";
+            $(elem).removeClass("btn-success").addClass("btn-danger");
+            table
+            .column( 8 )
+            .search("×").draw();
+        }
+
+        else if(elem.innerHTML == "Not Imported" ){
+            elem.innerHTML = "All";
+            $(elem).removeClass("btn-danger").addClass("btn-primary");
+            table.column( 8 ).search("✔|×",true,false).draw();
+        }
+    }
+</script>
 {% endblock %}
