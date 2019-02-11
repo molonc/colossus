@@ -6,6 +6,7 @@
 
 {% block body %}
 <div class="container graybg">
+    <form action="{% url 'dlp:jira-ticket-confirm' %}" method="POST">
         {% csrf_token %}
         <fieldset>
             <legend>Jira Ticket Details</legend>
@@ -15,5 +16,8 @@
                 </thead>
             </table>
          </fieldset>
+        <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" href="{% url 'dlp:library_create' %}">Cancel</a>
+    </form>
 
 {% endblock %}

@@ -173,7 +173,7 @@ class JiraConfirmationForm(Form):
 
     reporter = forms.ChoiceField(choices=user_list)
     assignee = forms.ChoiceField(choices=user_list)
-    watchers = forms.ChoiceField(widget=forms.SelectMultiple, choices=user_list[1:])
+    watchers = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=user_list[1:])
 
 
 
@@ -209,8 +209,6 @@ class DlpLibraryForm(LibraryForm):
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
-            username = os.environ.get('JIRA_USERNAME')
-            password = os.environ.get('JIRA_PASSWORD')
             '''PROJECT_CHOICES = []
             for project in jira_wrapper.projects():
                 PROJECT_CHOICES.append((project.id, project.name))

@@ -541,13 +541,45 @@ class JiraTicketConfirm(TemplateView):
         if(request.session['library_type'] == 'dlp'):
             form.fields['description'].initial = generate_dlp_jira_description(get_reference_genome_from_sample_id(request.session['sample_id']))
         elif(request.session['library_type'] == 'tenx'):
+            #TODO
             pass
-        form.fields['project'].choices = [(project.id, project.name) for project in projects]
+        form.fields['project'].choices = [(str(project.id), project.name) for project in projects]
         form.fields['project'].initial = get_project_id_from_name(request.session['jira_user'], request.session['jira_password'], 'Single Cell')
         context = {
             'form': form,
         }
         return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = JiraConfirmationForm(request.POST)
+        projects = get_projects(request.session['jira_user'], request.session['jira_password'])
+        form.fields['project'].choices = [(str(project.id), project.name) for project in projects]
+        print(form.fields['watchers'].choices)
+        if form.is_valid():
+            try:
+                new_issue = create_ticket(username=request.session['jira_user'],
+                      password=request.session['jira_password'],
+                      project=form['project'].value(),
+                      title=form['title'].value(),
+                      description=form['description'].value(),
+                      reporter=form['reporter'].value(),
+                      assignee=form['assignee'],
+                      watchers=form['watchers'],
+                    )
+            except JIRAError as e:
+                #Do Something
+                error_message = "Failed to create the Jira Ticket. {}".format(e.text)
+                messages.error(request, error_message)
+                return render(request, self.template_name)
+            if(request.session['library_type'] == 'dlp'):
+                library = DlpLibrary.objects.get(id=request.session['library_id'])
+                library.jira_ticket = new_issue
+                library.save()
+            elif(request.session['library_type'] == 'tenx'):
+                #TODO
+                pass
+            return HttpResponseRedirect('/dlp/library/{}'.format(library.id))
+
 
 @method_decorator(login_required, name='dispatch')
 class LibraryCreate(TemplateView):
@@ -601,21 +633,92 @@ class LibraryCreate(TemplateView):
             with transaction.atomic():
                 if lib_form.is_valid() and sublib_form.is_valid():
                     instance = lib_form.save(commit=False)
+
+                    all_valid, formsets = self._validate_formsets(request, instance)
+                    context.update(formsets)
+                    if all_valid:
+                        # Save the library
+                        instance.save()
+
+                        # Save 10x conditions
+                        if context['library_type'] == 'tenx':
+                            condition_formset = TenxConditionFormset(request.POST)
+
+                            # Save each condition
+                            idx = 1
+                            for condition_form in condition_formset:
+                                # If a condition_form was left blank,
+                                # skip it
+                                if not condition_form.has_changed():
+                                    continue
+
+                                # Save the condition
+                                condition = condition_form.save(commit=False)
+                                condition.condition_id = idx
+                                condition.library = instance
+                                condition.sample = instance.sample
+                                condition.save()
+
+                                # Increment the index counter
+                                idx += 1
+
+                        # save the ManyToMany field.
+                        lib_form.save_m2m()
+                        # Add information from SmartChipApp files
+                        region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
+                        sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                        if region_metadata is not None and sublib_results is not None:
+                            print(region_metadata, sublib_results)
+                            instance.sublibraryinformation_set.all().delete()
+                            instance.chipregion_set.all().delete()
+                            create_sublibrary_models(instance, sublib_results, region_metadata)
+                        # save the formsets.
+                        [formset.save() for formset in formsets.values()]
+
                     jira_user = lib_form['jira_user'].value()
                     jira_password = lib_form['jira_password'].value()
                     additional_title = lib_form['additional_title'].value()
+
                     request.session['jira_user'] = jira_user
                     request.session['jira_password'] = jira_password
                     request.session['additional_title'] = additional_title
                     request.session['sample_id'] = instance.sample.sample_id
                     request.session['library_type'] = context['library_type']
+                    request.session['library_id'] = instance.id
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
             for arg in e.args:
                 if(type(arg) is int):
                     arg = str(arg)
                 error_message += arg.encode('ascii', 'ignore') + ' '
+            error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
+            messages.error(request, error_message)
+            return render(request, self.template_name, context)
+
         return HttpResponseRedirect(reverse('dlp:jira-ticket-confirm'))
+
+    def _validate_formsets(self, request, instance):
+        all_valid = True
+        formsets = {
+            'libdetail_formset': self.libdetail_formset_class(
+                request.POST,
+                instance=instance,
+            ),
+            'libcons_formset': self.libcons_formset_class(
+                request.POST,
+                instance=instance,
+            ),
+            'libqs_formset': self.libqs_formset_class(
+                request.POST,
+                request.FILES or None,
+                instance=instance,
+            ),
+        }
+        for k, formset in formsets.items():
+            if not formset.is_valid():
+                all_valid = False
+            formsets[k] = formset
+        return all_valid, formsets
         # this is becaues of this django feature:
         # https://code.djangoproject.com/ticket/1130
         '''_mutable = request.POST._mutable
