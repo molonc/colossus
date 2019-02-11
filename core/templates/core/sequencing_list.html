@@ -7,8 +7,10 @@
 {% block body %}
 <div class="container" style="padding: 0; margin-bottom: 5px;">
     <h4 style="float: left;">Select a sequencing to view its details</h4>
-     <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url library_type|add:':sequencing_create' %}">Add Sequencing</a>
-     <a class="btn btn-primary btn-sm" id="import-button" onclick="importOnClick()" style="float: right; margin-right: 5px; margin-top: 5px;">All</a>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url library_type|add:':sequencing_create' %}">Add Sequencing</a>
+    {% if library_type == 'dlp' %}
+        <a class="btn btn-primary btn-sm" id="import-button" onclick="importOnClick()" style="float: right; margin-right: 5px; margin-top: 5px;">All</a>
+    {% endif %}
 </div>
 <div class="container" style="background-color: #F5F5F5;">
     <div class="table-responsive">
@@ -110,50 +112,52 @@
 
 {% block datatables_script %}
 <script type="text/javascript">
-        var table;
-        $(document).ready(function() {
-            table = $("#datatable").DataTable({
-                    stateSave: true,
-                    "columnDefs": [
-                        {
-                            "type": "natural",
-                            "targets": "jiraticket",
-                        },
-                        {
-                            "orderable": false,
-                            "targets": "no-sort-col",
-                        }
-                    ]
-                });
-
-                table.column( 7 ).search("✔|×",true,false).draw();
-            });
-
-            function importOnClick()
-            {
-                var elem = document.getElementById("import-button");
-                if(elem.innerHTML == "All"){
-                    elem.innerHTML = "Imported";
-                    $(elem).removeClass("btn-primary").addClass("btn-success");
-                   table
-                    .column( 7 )
-                    .search("✔").draw();
+    var table;
+    $(document).ready(function() {
+        table = $("#datatable").DataTable({
+            stateSave: true,
+            "columnDefs": [
+                {
+                    "type": "natural",
+                    "targets": "jiraticket",
+                },
+                {
+                    "orderable": false,
+                    "targets": "no-sort-col",
                 }
+            ]
+        });
 
-                else if(elem.innerHTML == "Imported" ){
-                    elem.innerHTML = "Not Imported";
-                    $(elem).removeClass("btn-success").addClass("btn-danger");
-                    table
-                    .column( 7 )
-                    .search("×").draw();
-                }
+        if("{{library_type}}" == 'dlp'){
+            table.search('').columns().search('').draw();
+        }
+    });
 
-                else if(elem.innerHTML == "Not Imported" ){
-                    elem.innerHTML = "All";
-                    $(elem).removeClass("btn-danger").addClass("btn-primary");
-                    table.column( 7 ).search("✔|×",true,false).draw();
-                }
-            }
-    </script>
 
+    function importOnClick()
+    {
+        var elem = document.getElementById("import-button");
+        if(elem.innerHTML == "All"){
+            elem.innerHTML = "Imported";
+            $(elem).removeClass("btn-primary").addClass("btn-success");
+           table
+            .column( 8 )
+            .search("✔").draw();
+        }
+
+        else if(elem.innerHTML == "Imported" ){
+            elem.innerHTML = "Not Imported";
+            $(elem).removeClass("btn-success").addClass("btn-danger");
+            table
+            .column( 8 )
+            .search("×").draw();
+        }
+
+        else if(elem.innerHTML == "Not Imported" ){
+            elem.innerHTML = "All";
+            $(elem).removeClass("btn-danger").addClass("btn-primary");
+            table.search('').columns().search('').draw();
+        }
+    }
+</script>
 {% endblock %}
