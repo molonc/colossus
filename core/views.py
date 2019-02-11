@@ -576,9 +576,10 @@ class JiraTicketConfirm(TemplateView):
                 library.jira_ticket = new_issue
                 library.save()
             elif(request.session['library_type'] == 'tenx'):
-                #TODO
-                pass
-            return HttpResponseRedirect('/dlp/library/{}'.format(library.id))
+                library = TenxLibrary.objects.get(id=request.session['library_id'])
+                library.jira_ticket = new_issue
+                library.save()
+            return HttpResponseRedirect('/{}/library/{}'.format(request.session['library_type'], library.id))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -637,9 +638,22 @@ class LibraryCreate(TemplateView):
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     if all_valid:
+                        jira_user = lib_form['jira_user'].value()
+                        jira_password = lib_form['jira_password'].value()
+                        additional_title = lib_form['additional_title'].value()
+
+                        if(validate_credentials(jira_user, jira_password)):
+                            request.session['jira_user'] = jira_user
+                            request.session['jira_password'] = jira_password
+                            request.session['additional_title'] = additional_title
+                            request.session['sample_id'] = instance.sample.sample_id
+                            request.session['library_type'] = context['library_type']
+                        else:
+                            messages.error(request, 'Invalid Jira Credentials')
+                            return render(request, self.template_name, context)
                         # Save the library
                         instance.save()
-
+                        request.session['library_id'] = instance.id
                         # Save 10x conditions
                         if context['library_type'] == 'tenx':
                             condition_formset = TenxConditionFormset(request.POST)
@@ -668,23 +682,12 @@ class LibraryCreate(TemplateView):
                         region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                         sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
                         if region_metadata is not None and sublib_results is not None:
-                            print(region_metadata, sublib_results)
                             instance.sublibraryinformation_set.all().delete()
                             instance.chipregion_set.all().delete()
                             create_sublibrary_models(instance, sublib_results, region_metadata)
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
-
-                    jira_user = lib_form['jira_user'].value()
-                    jira_password = lib_form['jira_password'].value()
-                    additional_title = lib_form['additional_title'].value()
-
-                    request.session['jira_user'] = jira_user
-                    request.session['jira_password'] = jira_password
-                    request.session['additional_title'] = additional_title
-                    request.session['sample_id'] = instance.sample.sample_id
-                    request.session['library_type'] = context['library_type']
-                    request.session['library_id'] = instance.id
+                        return HttpResponseRedirect(reverse('{}:jira-ticket-confirm'.format(context['library_type'])))
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
             for arg in e.args:
@@ -694,8 +697,6 @@ class LibraryCreate(TemplateView):
             error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
             messages.error(request, error_message)
             return render(request, self.template_name, context)
-
-        return HttpResponseRedirect(reverse('dlp:jira-ticket-confirm'))
 
     def _validate_formsets(self, request, instance):
         all_valid = True

@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^library/create/(?P<pk>\d+)$', views.TenxLibraryCreate.as_view(), name='library_create_from_sample'),
     url(r'^library/update/(?P<pk>\d+)$', views.TenxLibraryUpdate.as_view(), name='library_update'),
     url(r'^library/delete/(?P<pk>\d+)$', views.TenxLibraryDelete.as_view(), name='library_delete'),
+    url(r'^library/create/confirm$', views.JiraTicketConfirm.as_view(), name='jira-ticket-confirm'),
     url(r'^library/delete-conditions/(?P<pk>\d+)$', views.TenxConditionsDelete.as_view(), name='library_conditions_delete'),
     url(r'^sequencing/(?P<pk>\d+)$', views.TenxSequencingDetail.as_view(), name='sequencing_detail'),
     url(r'^sequencing/list$', views.TenxSequencingList.as_view(), name='sequencing_list'),
