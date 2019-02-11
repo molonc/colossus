@@ -1132,6 +1132,11 @@ class Sequencing(models.Model, FieldValue):
         verbose_name="Sequencing Goal"
     )
 
+    #Set to the last time number_of_lanes_requested was updated
+    lane_requested_date = models.DateField(
+        null=True,
+    )
+
     gsc_library_id = create_chrfield("GSC library ID")
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
@@ -1144,6 +1149,13 @@ class Sequencing(models.Model, FieldValue):
 
     objects = SequencingManager()
 
+    def __init__(self, *args, **kwargs):
+        super(Sequencing, self).__init__(*args, **kwargs)
+        self.old_number_of_lanes_requested = self.number_of_lanes_requested
+        if not self.lane_requested_date:
+            self.lane_requested_date = self.submission_date
+
+
     def __str__(self):
         return 'SEQ_' + self.library.get_library_id() +"_" + str(self.id)
 
@@ -1152,6 +1164,12 @@ class Sequencing(models.Model, FieldValue):
 
     def get_absolute_url(self):
         return reverse(self.library_type + ":sequencing_detail", kwargs={"pk": self.pk})
+
+    def save(self, *args, **kwargs):
+        if self.number_of_lanes_requested != self.old_number_of_lanes_requested:
+            self.old_number_of_lanes_requested = self.number_of_lanes_requested
+            self.lane_requested_date = datetime.date.today()
+        super(Sequencing, self).save(*args,**kwargs)
 
 
 class DlpSequencing(Sequencing):
