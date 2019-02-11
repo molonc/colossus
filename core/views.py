@@ -734,10 +734,10 @@ class LibraryCreate(TemplateView):
             if hasattr(instance, 'pool_id'):
                 # Use the DLP pool ID
                 title = (str(instance.sample)
-                         + "-" + str(instance.pool_id)
-                         + "-" + str(title))
+                         + " - " + str(instance.pool_id)
+                         + " - " + str(title))
             else:
-                title = str(instance.sample) + "-" + str(title)
+                title = str(instance.sample) + " - " + str(title)
 
             issue_dict = {
                 'project': {'id': 11220},
