@@ -12,6 +12,8 @@
                 <th>Project</th>
                 <th class="no-sort-col">Libraries</th>
                 <th class="no-sort-col">Library Type</th>
+                <th class="no-sort-col">Library Description</th>
+                <th class="no-sort-col">JIRA Ticket</th>
                 <th>Number of Libraries</th>
                 <th class="no-sort-col"></th>
             </thead>
@@ -32,6 +34,16 @@
                         {% endfor %}
                     </td>
                     <td>
+                        {% for library in project.get_libraries %}
+                            <p style="margin: 0" title="{{library.description}}" class="description">{{ library.description }}</p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for library in project.get_libraries %}
+                            <p style="margin: 0"><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{ library.jira_ticket }}</a></p>
+                        {% endfor %}
+                    </td>
+                    <td>
                         {{ project.get_libraries|length }}
                     </td>
                     <td>
@@ -47,4 +59,16 @@
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block datatables_script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".description").each(function() {
+                if(this.innerHTML.length > 35){
+                    this.innerHTML = this.innerHTML.substr(0, 35) + '...'
+                }
+            });
+        });
+    </script>
 {% endblock %}
