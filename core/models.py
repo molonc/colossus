@@ -1152,9 +1152,6 @@ class Sequencing(models.Model, FieldValue):
     def __init__(self, *args, **kwargs):
         super(Sequencing, self).__init__(*args, **kwargs)
         self.old_number_of_lanes_requested = self.number_of_lanes_requested
-        if not self.lane_requested_date:
-            self.lane_requested_date = self.submission_date
-
 
     def __str__(self):
         return 'SEQ_' + self.library.get_library_id() +"_" + str(self.id)

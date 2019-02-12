@@ -511,7 +511,7 @@ class SequencingForm(ModelForm):
 
     class Meta:
         abstract = True
-        exclude = ['pool_id']
+        exclude = ['pool_id', 'lane_requested_date']
         widgets = {
             'submission_date': SelectDateWidget(
                 years=range(2000,2020),
