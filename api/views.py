@@ -142,7 +142,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
         'id',
-        'library',
+        'library__pool_id',
         'gsc_library_id',
         'number_of_lanes_requested',
         'sequencing_center',
