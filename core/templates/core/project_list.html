@@ -15,7 +15,7 @@
                 <th class="no-sort-col">Library Description</th>
                 <th class="no-sort-col">Status</th>
                 <th class="no-sort-col">JIRA Ticket</th>
-                <th>Number of Libraries</th>
+                <th>Count</th>
                 <th class="no-sort-col"></th>
             </thead>
             <tbody>
@@ -82,8 +82,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $(".description").each(function() {
-                if(this.innerHTML.length > 25){
-                    this.innerHTML = this.innerHTML.substr(0, 25) + '...'
+                if(this.innerHTML.length > 42){
+                    this.innerHTML = this.innerHTML.substr(0, 42) + '...'
                 }
             });
         });
