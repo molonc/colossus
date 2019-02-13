@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^sequencing/(?P<pk>\d+)$', views.TenxSequencingDetail.as_view(), name='sequencing_detail'),
     url(r'^sequencing/list$', views.TenxSequencingList.as_view(), name='sequencing_list'),
     url(r'^sequencing/create/$', views.TenxSequencingCreate.as_view(), name='sequencing_create'),
+    url(r'^sequencing/create/confirm$', views.AddWatchers.as_view(), name='add_watchers'),
     url(r'^sequencing/create/(?P<from_library>\d+)$', views.TenxSequencingCreate.as_view(), name='sequencing_create_from_library'),
     url(r'^sequencing/update/(?P<pk>\d+)$', views.TenxSequencingUpdate.as_view(), name='sequencing_update'),
     url(r'^sequencing/delete/(?P<pk>\d+)$', views.TenxSequencingDelete.as_view(), name='sequencing_delete'),

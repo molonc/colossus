@@ -173,7 +173,6 @@ class JiraConfirmationForm(Form):
 
     reporter = forms.ChoiceField(choices=user_list)
     assignee = forms.ChoiceField(choices=user_list)
-    watchers = forms.MultipleChoiceField(widget=forms.SelectMultiple, choices=user_list[1:])
 
 
 
@@ -531,6 +530,16 @@ class ProjectForm(ModelForm):
     class Meta:
         model = Tag
         fields = ['name']
+
+
+class AddWatchersForm(Form):
+    jira_ticket = forms.CharField(max_length=20, disabled=True)
+    #Default empty choice for user_list
+    user_list = []
+    for user in JiraUser.objects.all().order_by('name'):
+        user_list.append((user.username, user.name))
+
+    watchers = forms.MultipleChoiceField(choices=user_list)
 
 
 #===========================

@@ -65,3 +65,18 @@ def validate_credentials(username, password):
         return True
     except JIRAError as e:
         return False
+
+'''
+Validates the usernames provided in the Django Database when displaying users
+'''
+def validate_all_users(username, password, *usernames):
+    valid_users = []
+    invalid_users = []
+    Jira = JIRA(JIRA_URL, basic_auth=(username, password), max_retries=0)
+    for user in usernames:
+        try:
+            user = Jira.user(user)
+            vaild_users.append(user)
+        except JIRAError as e:
+            invalid_users.append(user)
+    return valid_users, invalid_users
