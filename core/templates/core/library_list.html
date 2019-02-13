@@ -42,10 +42,6 @@
 
                     <th>Project</th>
 
-                    {% if library_type == 'dlp' %}
-                        <th>Library Location</th>
-                    {% endif %}
-
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
                         <th>#Sublibraries</th>
                     {% endif %}
@@ -101,10 +97,6 @@
                                 <br>
                             {% endfor %}
                         </td>
-
-                        {% if library_type == 'dlp' %}
-                            <td>{{ library.dlplibraryquantificationandstorage.library_location }}</td>
-                        {% endif %}
 
                         {% if library_type == 'dlp' or library_type == 'tenx' %}
                             <td style="text-align: center;">{{ library.num_sublibraries }}</td>
