@@ -13,6 +13,7 @@
                 <th class="no-sort-col">Libraries</th>
                 <th class="no-sort-col">Library Type</th>
                 <th class="no-sort-col">Library Description</th>
+                <th class="no-sort-col">Status</th>
                 <th class="no-sort-col">JIRA Ticket</th>
                 <th>Number of Libraries</th>
                 <th class="no-sort-col"></th>
@@ -36,6 +37,22 @@
                     <td>
                         {% for library in project.get_libraries %}
                             <p style="margin: 0" title="{{library.description}}" class="description">{{ library.description }}</p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for library in project.get_libraries %}
+                            {% if library.dlplibraryquantificationandstorage.qc_check == 'P' %}
+                                {% if library.library_type == 'dlp' and library.get_last_analysis_status %}
+                                    <p style="margin: 0">Done</p>
+                                {% else %}
+                                    <p style="margin: 0">Underway</p>
+                                {% endif %}
+                            {% elif library.dlplibraryquantificationandstorage.qc_check == 'N' %}
+                                <p style="margin: 0">Won't Do</p>
+                            {% else %}
+                                <p style="margin: 0">Undefined</p>
+                            {% endif %}
+                            
                         {% endfor %}
                     </td>
                     <td>
@@ -65,8 +82,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $(".description").each(function() {
-                if(this.innerHTML.length > 35){
-                    this.innerHTML = this.innerHTML.substr(0, 35) + '...'
+                if(this.innerHTML.length > 25){
+                    this.innerHTML = this.innerHTML.substr(0, 25) + '...'
                 }
             });
         });

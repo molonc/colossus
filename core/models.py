@@ -302,6 +302,13 @@ class DlpLibrary(Library):
     def has_sublibrary_info(self):
         return self.sublibraryinformation_set.exists()
 
+    def get_last_analysis_status(self):
+        last_analysis = self.dlpanalysisinformation_set.order_by('analysis_submission_date').last()
+        if(last_analysis is None):
+            return False
+        if(str(last_analysis.analysis_run.run_status) == 'hmmcopy_complete' or str(last_analysis.analysis_run.run_status) == 'complete'):
+            return True
+        return False
 
 class PbalLibrary(Library):
 
