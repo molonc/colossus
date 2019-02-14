@@ -17,11 +17,10 @@
     <!-- action list -->
     {% if library_type == 'dlp' %}
         <div style="float: right; margin-top: 5px;">
-            {% if not sequencing.library.has_sublibrary_info %}
                 <h5><i class="text-warning">No Sublibrary Information available!</i></h5>
-            {% else %}
+
                 <a class="btn btn-primary btn-sm" href="{% url library_type|add:':sequencing_create_gsc_form' pk=sequencing.pk %}">Create GSC submission form</a>
-            {% endif %}
+
         </div>
     {% endif %}
     <!-- end of action list -->
