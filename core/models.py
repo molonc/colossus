@@ -1359,9 +1359,16 @@ class Plate(models.Model, FieldValue):
     )
     plate_location = create_textfield("Plate location")
 
+
 class JiraUser(models.Model):
     username = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
-
+    choices = (
+        ('dlp', 'DLP'),
+        ('tenx', 'TenX'),
+    )
+    associated_with_dlp = models.BooleanField(default=True)
+    associated_with_tenx = models.BooleanField(default=True)
+    
     def __str__(self):
         return self.name

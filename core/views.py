@@ -53,7 +53,8 @@ from .models import (
     ChipRegionMetadata,
     MetadataField,
     Plate,
-    Library
+    Library,
+    JiraUser,
 )
 from sisyphus.models import *
 from .forms import (
@@ -1094,9 +1095,12 @@ class AddWatchers(TemplateView):
     template_name = "core/add_watchers.html"
 
     def get(self, request):
-        form = AddWatchersForm()
         if request.session['library_type'] == 'dlp':
+            #Set initial checkboxes to every Jira User associated with DLP
+            form = AddWatchersForm(initial={'watchers': list(JiraUser.objects.filter(associated_with_dlp=True).values_list('username', flat=True))})
             form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])
+        else:
+            form = AddWatchersForm()
         context = {
             'form': form,
             'library_type': request.session['library_type'],
