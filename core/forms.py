@@ -198,7 +198,6 @@ class DlpLibraryForm(LibraryForm):
         'additional_title',
         'jira_user',
         'jira_password',
-        'associated_jira_project',
     ]
 
     def __init__(self,*args, **kwargs):
@@ -208,13 +207,6 @@ class DlpLibraryForm(LibraryForm):
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
-            '''PROJECT_CHOICES = []
-            for project in jira_wrapper.projects():
-                PROJECT_CHOICES.append((project.id, project.name))
-
-            self.fields['associated_jira_project'] = forms.ChoiceField(widget=forms.Select, choices=PROJECT_CHOICES, label='Associated Jira Project')
-            self.initial['associated_jira_project'] = '11220'
-            '''
 
             # Remove the field which allows explicitly setting the Jira
             # ticket ID (since it's done automatically)
