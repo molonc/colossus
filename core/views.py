@@ -83,7 +83,6 @@ from .forms import (
     TenxConditionFormset,
     ProjectForm,
     PlateForm,
-    RememberMeForm,
     JiraConfirmationForm,
     AddWatchersForm,
 )
