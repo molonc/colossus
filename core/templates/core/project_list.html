@@ -81,6 +81,10 @@
 {% block datatables_script %}
     <script type="text/javascript">
         $(document).ready(function() {
+            $("#datatable").DataTable({
+                "columnDefs": [
+                ]
+            });
             $(".description").each(function() {
                 if(this.innerHTML.length > 42){
                     this.innerHTML = this.innerHTML.substr(0, 42) + '...'
