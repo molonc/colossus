@@ -103,6 +103,8 @@ from .jira_templates.jira_wrapper import (
     get_projects,
     get_project_id_from_name,
     validate_credentials,
+    add_watchers,
+    add_jira_comment,
 )
 
 
@@ -547,7 +549,7 @@ class JiraTicketConfirm(TemplateView):
         #If default value can't be found, no error will be thrown, and the field will just be empty by default
         if(request.session['library_type'] == 'dlp'):
             form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
-            form.fields['description'].initial = generate_dlp_jira_description(get_reference_genome_from_sample_id(request.session['sample_id']))
+            form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
             form.fields['reporter'].initial = 'elaks'                                                                                    
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
@@ -576,7 +578,6 @@ class JiraTicketConfirm(TemplateView):
                       description=form['description'].value(),
                       reporter=form['reporter'].value(),
                       assignee=form['assignee'].value(),
-                      watchers=form['watchers'].value(),
                     )
             except JIRAError as e:
                 #Do Something
@@ -659,6 +660,7 @@ class LibraryCreate(TemplateView):
                             #For DLP Libaries
                             if(context['library_type'] == 'dlp'):
                                 request.session['pool_id'] = str(instance.pool_id)
+                                request.session['description'] = instance.description
                             elif(context['library_type'] == 'tenx'):
                                 request.session['pool'] = request.POST['tenxlibraryconstructioninformation-0-pool']
                             request.session['jira_user'] = jira_user
@@ -705,7 +707,6 @@ class LibraryCreate(TemplateView):
                             create_sublibrary_models(instance, sublib_results, region_metadata)
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
-                        print('hi')
                         return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
@@ -1095,41 +1096,27 @@ class AddWatchers(TemplateView):
 
     def get(self, request):
         form = AddWatchersForm()
-        form.fields['jira_ticket'].initial = request.session['jira_ticket']
+        if request.session['library_type'] == 'dlp':
+            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])
         context = {
             'form': form,
-            'library_type': request.session['library_type']
+            'library_type': request.session['library_type'],
+            'jira_ticket': request.session['jira_ticket'],
         }
         return render(request, self.template_name, context)
 
     def post(self, request):
-        return HttpResponseRedirect('/')
-        '''form = AddWatchersForm(request.POST)
+        form = AddWatchersForm(request.POST)
         if form.is_valid():
             try:
-                new_issue = create_ticket(username=request.session['jira_user'],
-                      password=request.session['jira_password'],
-                      project=form['project'].value(),
-                      title=form['title'].value(),
-                      description=form['description'].value(),
-                      reporter=form['reporter'].value(),
-                      assignee=form['assignee'].value(),
-                      watchers=form['watchers'].value(),
-                    )
+                add_watchers(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['watchers'])
+                add_jira_comment(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['comment'])
             except JIRAError as e:
-                #Do Something
-                error_message = "Failed to create the Jira Ticket. {}".format(e.text)
-                messages.error(request, error_message)
-                return render(request, self.template_name)
-            if(request.session['library_type'] == 'dlp'):
-                library = DlpLibrary.objects.get(id=request.session['library_id'])
-                library.jira_ticket = new_issue
-                library.save()
-            elif(request.session['library_type'] == 'tenx'):
-                library = TenxLibrary.objects.get(id=request.session['library_id'])
-                library.jira_ticket = new_issue
-                library.save()
-            return HttpResponseRedirect('/{}/library/{}'.format(request.session['library_type'], library.id))'''
+                msg = e.text
+                messages.error(request, msg)
+                return self.get(request)
+        return HttpResponseRedirect('/{}/sequencing/{}'.format(request.session['library_type'], request.session['sequencing_id']))
+
 
 @method_decorator(login_required, name='dispatch')
 class SequencingCreate(TemplateView):
@@ -1167,66 +1154,26 @@ class SequencingCreate(TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
             library = instance.library
-            request.session['jira_ticket'] = library.jira_ticket
-            request.session['library_type'] = library.library_type
-            return HttpResponseRedirect(reverse('{}:add_watchers'.format(library.library_type)))
-
-            if library.library_type == 'dlp':
-                jira_user = form['jira_user'].value()
-                jira_password = form['jira_password'].value()
-                sequencing_center = instance.sequencing_center
-
-                if self.update_jira(library, sequencing_center, jira_user, jira_password).status_code == 401:
-                    msg = "Please provide correct JIRA credentials."
-                    app = resolve(request.path_info).app_name
-                    current_url = resolve(request.path_info).url_name
-                    messages.error(request, msg)
-                    link = str(app) + ":" + str(current_url)
-                    return HttpResponseRedirect(reverse(link))
-                elif self.update_jira(library, sequencing_center, jira_user, jira_password).status_code == 402:
-                    msg = "Could not add watchers."
-                    app = resolve(request.path_info).app_name
-                    current_url = resolve(request.path_info).url_name
-                    messages.error(request, msg)
-                    link = str(app) + ":" + str(current_url)
-                    return HttpResponseRedirect(reverse(link))
+            if(validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password'])):
+                request.session['jira_user'] = form.cleaned_data['jira_user']
+                request.session['jira_password'] = form.cleaned_data['jira_password']
+                request.session['jira_ticket'] = library.jira_ticket
+                request.session['library_type'] = library.library_type
+                request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
+            else:
+                messages.error(request, 'Invalid Jira Credentials')
+                return self.get_context_and_render(request, from_library, form)
 
             instance.save()
+            request.session['sequencing_id'] = instance.id
             #form.save_m2m()
             msg = "Successfully created the Sequencing."
             messages.success(request, msg)
-            return HttpResponseRedirect(instance.get_absolute_url())
+            return HttpResponseRedirect(reverse('{}:add_watchers'.format(library.library_type)))
         else:
             msg = "Failed to create the sequencing. Please fix the errors below."
             messages.error(request, msg)
             return self.get_context_and_render(request, from_library, form)
-
-
-    def update_jira(self, library, sequencing_center, jira_user, jira_password):
-        auth = (jira_user, jira_password)
-        try:
-            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth, max_retries=0)
-            issue = jira.issue(str(library.jira_ticket))
-            new_watchers = self.get_watchers(sequencing_center)
-        except JIRAError as e:
-            return HttpResponse('Unauthorized JIRA access', status=401)
-        if new_watchers:
-            for watcher in new_watchers['watcher_list']:
-                try:
-                    jira.add_watcher(issue, watcher)
-                except JIRAError as e:
-                    continue
-                return HttpResponse('Successful JIRA access', status=200)
-
-    def get_watchers(self, seq):
-        if seq == 'BCCAGSC':
-            # Watcher list for BCCAGSC. This might be updated in the future
-            watchers = {"watcher_list":["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "yma","dcheng", "twong", "ktse", "sochan", "coflanagan"]}
-            return watchers
-        elif seq == 'UBCBRC':
-            # Watcher list for UBCBRC. This might be updated in the future
-            watchers = {"watcher_list":["jbiele", "elaks", "danlai", "sshah", "saparicio", "jedwards", "jbwang", "sochan","coflanagan"]}
-            return watchers
 
 
 class DlpSequencingCreate(SequencingCreate):
@@ -1276,20 +1223,14 @@ class SequencingUpdate(TemplateView):
         abstract = True
 
     template_name = "core/sequencing_update.html"
-    remember_me_form = RememberMeForm
 
     def get_context_and_render(self, request, sequencing, form):
-        if('jira_username' in request.session and 'jira_password' in request.session):
-            remember_form = self.remember_me_form(initial={'username': request.session['jira_username'], 'password': request.session['jira_password'], 'remember_me': True})
-        else:
-            remember_form = self.remember_me_form
         context = {
             'pk': sequencing.pk,
             'form': form,
             'related_seqs': self.sequencing_class.objects.all(),
             'selected_related_seqs': sequencing.relates_to.only(),
             'library_type': self.library_type,
-            'remember_me': remember_form,
         }
         return render(request, self.template_name, context)
 
@@ -1298,44 +1239,24 @@ class SequencingUpdate(TemplateView):
         form = self.form_class(instance=sequencing)
         return self.get_context_and_render(request, sequencing, form)
 
-    #Return error if JIRAError happens, else return nothing
-    def jira_integration(self, username, password, ticket_to_update, new_count, old_count):
-        auth = (username, password)
-        try:
-            # Connect to the API
-            jira = JIRA('https://www.bcgsc.ca/jira/', basic_auth=auth, max_retries=0)
-            issue = jira.issue(ticket_to_update)
-            jira.add_comment(issue, 'Number of Lanes Requested has been updated to {} from {}'.format(new_count, old_count))
-        except JIRAError as e:
-            return e.response
-
     def post(self, request, pk):
         sequencing = get_object_or_404(self.sequencing_class, pk=pk)
         old_count = sequencing.number_of_lanes_requested
         form = self.form_class(request.POST, instance=sequencing)
-        remember_form = self.remember_me_form(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             #Don't require JIRA integration if not updating the number of lanes field
             if(old_count != instance.number_of_lanes_requested):
-                if(remember_form.is_valid()):
-                    if(remember_form.cleaned_data['remember_me']):
-                        request.session.set_expiry(28800) #Expires in 8 hours
-                        request.session['jira_username'] = remember_form.cleaned_data['username']
-                        request.session['jira_password'] = remember_form.cleaned_data['password']
-                    error_code = self.jira_integration(
-                        remember_form.cleaned_data['username'], 
-                        remember_form.cleaned_data['password'], 
-                        instance.library.jira_ticket, 
-                        instance.number_of_lanes_requested, 
-                        old_count
+                jira_comment = "Sequencing Goal has been updated from {} to {} for this [Sequencing|http://colossus.bcgsc.ca/{}/sequencing/{}]".format(old_count, instance.number_of_lanes_requested, self.library_type, pk)
+                try:
+                    add_jira_comment(
+                        form.cleaned_data['jira_user'],
+                        form.cleaned_data['jira_password'],
+                        instance.library.jira_ticket,
+                        jira_comment
                     )
-                    if error_code is not None:
-                        #Jira errors are returned as HTML code with the error message in between <title> tags
-                        messages.error(request, "JIRA Error {}: {}".format(error_code.status_code, error_code.reason))
-                        return self.get_context_and_render(request, sequencing, form)
-                else:
-                    msg = "Failed to update the sequencing. Please fix the errors below."
+                except JIRAError as e:
+                    msg = "JIRA Error: {}".format(e.response.reason)
                     messages.error(request, msg)
                     return self.get_context_and_render(request, sequencing, form)
 

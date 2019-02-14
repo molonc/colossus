@@ -533,13 +533,13 @@ class ProjectForm(ModelForm):
 
 
 class AddWatchersForm(Form):
-    jira_ticket = forms.CharField(max_length=20, disabled=True)
     #Default empty choice for user_list
     user_list = []
     for user in JiraUser.objects.all().order_by('name'):
         user_list.append((user.username, user.name))
 
-    watchers = forms.MultipleChoiceField(choices=user_list)
+    watchers = forms.MultipleChoiceField(choices=user_list, widget=forms.CheckboxSelectMultiple())
+    comment = forms.CharField(widget=forms.Textarea(attrs={'style': 'height: 80px;'}))
 
 
 #===========================
@@ -571,6 +571,9 @@ class DlpSequencingForm(SequencingForm):
         if not self.instance.pk:
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+        else:
+            self.fields['jira_user'] = forms.CharField(max_length=100, required=False)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, required=False)
 
     class Meta(SequencingForm.Meta):
         model = DlpSequencing
@@ -770,22 +773,3 @@ class GSCFormSubmitterInfo(Form):
         initial='R',
     )
 
-class RememberMeForm(Form):
-    #Checkbox used hopefully for cookies to remember JIRA username/password
-    username = CharField(
-        label='Jira Username',
-        max_length=150,
-        required=False,
-    )
-
-    password = forms.CharField(
-        widget=forms.PasswordInput(render_value=True),
-        label='Jira Password',
-        required=False,
-    )
-
-    remember_me = BooleanField(
-        label='Remember Me',
-        initial=False,
-        required=False,
-    )

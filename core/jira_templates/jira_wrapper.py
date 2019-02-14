@@ -25,12 +25,13 @@ def create_ticket(username,
             'assignee': {'name': assignee},
         }
         new_issue = Jira.create_issue(fields=issue_dict)
-        for watcher in watchers:
-            jira.add_watcher(new_issue.id, watcher)
+        if watchers is not None:
+            for watcher in watchers:
+                jira.add_watcher(new_issue.id, watcher)
         Jira.kill_session()
         return str(new_issue)
     except JIRAError as e:
-        raise JIRAError(text="JIRA Error {}: {}".format(e.response.status_code, e.response.reason))
+        raise JIRAError()
 
 
 '''
@@ -54,7 +55,33 @@ def get_project_id_from_name(username, password, name):
                 return project.id
         return None
     except JIRAError as e:
+        raise JIRAError()
+
+
+'''
+Given a list of watchers, add them to the provided JIRA Issue
+'''
+
+def add_watchers(username, password, issue, watchers):
+    Jira = JIRA(JIRA_URL, basic_auth=(username, password), max_retries=0)
+    try:
+        jira_issue = Jira.issue(issue)
+    except JIRAError as e:
+        raise JIRAError()
+    for watcher in watchers:
+        Jira.add_watcher(jira_issue, watcher)
+
+'''
+Given a comment, add it to the provided JIRA Issue
+'''
+
+def add_jira_comment(username, password, issue, comment):
+    Jira = JIRA(JIRA_URL, basic_auth=(username, password), max_retries=0)
+    try:
+        jira_issue = Jira.issue(issue)
+    except JIRAError as e:
         raise JIRAError(text="JIRA Error {}: {}".format(e.response.status_code, e.response.reason))
+    Jira.add_comment(jira_issue, comment)
 
 '''
 Checks whether the provided username/password combo are valid, returns true if valid
