@@ -30,6 +30,7 @@ router.register(r'sublibraries_brief', views.SublibraryViewSetBrief, base_name='
 router.register(r'analysis_information', views.AnalysisInformationViewSet, base_name='analysis_information')
 router.register(r'analysis_run', views.AnalysisRunViewSet, base_name='analysis_run')
 router.register(r'experimental_metadata', views.ExperimentalMetadata, base_name='experimental_metadata')
+router.register(r'jira_users', views.JiraUserViewSet, base_name='jira_user')
 app_name='api'
 urlpatterns = [
     url(r'^', include(router.urls)),
