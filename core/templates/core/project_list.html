@@ -36,7 +36,7 @@
                     </td>
                     <td>
                         {% for library in project.get_libraries %}
-                            <p style="margin: 0" title="{{library.description}}" class="description">{{ library.description }}</p>
+                            <p style="margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;" title="{{library.description}}" class="description">{{ library.description }}</p>
                         {% endfor %}
                     </td>
                     <td>
@@ -82,13 +82,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $("#datatable").DataTable({
-                "columnDefs": [
+                "columnDefs": [ 
                 ]
-            });
-            $(".description").each(function() {
-                if(this.innerHTML.length > 42){
-                    this.innerHTML = this.innerHTML.substr(0, 42) + '...'
-                }
             });
         });
     </script>
