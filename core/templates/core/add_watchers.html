@@ -1,0 +1,42 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}JIRA Ticket: {{jira_ticket}}{% endblock %}
+
+{% block body %}
+    {% if library_type == 'dlp' %}
+        <div class="container graybg">
+            <form action="{% url 'dlp:add_watchers' %}" method="POST">
+                {% csrf_token %}
+                <fieldset>
+                    <legend>Select Watchers to Be Added</legend>
+                    <table class="table-condensed">
+                        <thead>
+                            {{ form }}
+                        </thead>
+                    </table>
+                 </fieldset>
+                <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+                <a class="btn btn-default btn-sm" href="{% url 'dlp:sequencing_create' %}">Cancel</a>
+            </form>
+        </div>
+    {% elif library_type == 'tenx' %}
+        <div class="container graybg">
+            <form action="{% url 'tenx:add_watchers' %}" method="POST">
+                {% csrf_token %}
+                <fieldset>
+                    <legend>Select Watchers to Be Added</legend>
+                    <table class="table-condensed">
+                        <thead>
+                            {{ form }}
+                        </thead>
+                    </table>
+                 </fieldset>
+                <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+                <a class="btn btn-default btn-sm" href="{% url 'tenx:sequencing_create' %}">Cancel</a>
+            </form>
+        </div>
+    {% endif %}
+
+{% endblock %}

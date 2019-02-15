@@ -16,6 +16,7 @@ from .models import TenxLibraryConstructionInformation
 from .models import TenxLibraryQuantificationAndStorage
 from .models import ChipRegion, ChipRegionMetadata
 from .models import MetadataField
+from .models import JiraUser
 
 # third-party apps
 from simple_history.admin import SimpleHistoryAdmin
@@ -112,7 +113,6 @@ class DlpSequencingAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
   pass
 
 
-
 # Tag information (Project information)
 class CustomTagAdmin(SimpleHistoryAdmin, TagAdmin):
     list_display = ['name', 'slug']
@@ -122,6 +122,7 @@ admin.site.register(Sample, SampleAdmin)
 admin.site.register(DlpLibrary, DlpLibraryAdmin)
 admin.site.register(TenxLibrary, TenxLibraryAdmin)
 admin.site.register(DlpSequencing, DlpSequencingAdmin)
+admin.site.register(JiraUser)
 
 # extra admin only information
 admin.site.register(AdditionalSampleInformation)

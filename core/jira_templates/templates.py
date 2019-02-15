@@ -6,46 +6,11 @@ from core.models import Sample
 
 # Provided by Emma Laks on 2018-08-17 and modified *just a touch* by
 # Matt Wiens on 2018-08-18
-DLP_UNFORMATTED_TEMPLATE = """Query the [Single Cell Database|http://colossus.bcgsc.ca] for detailed information.
+# Completely gutted by Mike Yue 2019-02-14 due to request by Justina (Steps are now obsolete)
+DLP_UNFORMATTED_TEMPLATE = """{description}
 
-Please check off the task list below as you complete the data transfers, and *do not resolve the ticket* until you have completed these tasks.
+Query [Colossus|http://colossus.bcgsc.ca/dlp/library/{id}] for detailed information.
 
-(x) Reference genome: {reference_genome}
-
-(x) Raw data is available on BRC server (must be transferred to our servers)
-
-(x) Data transferred to our servers
-
-(x) Path to results on Genesis:
-{{noformat}}
-/projects/sftp/shahlab/singlecell/<jira_ticket_number>/
-{{noformat}}
-
-(x) Path to results in blob:
-
-(x) Upload to Montage
-
-
----------
-
-
-
-Query the [Single Cell Database|http://colossus.bcgsc.ca] for detailed information.
-
-Please check off the task list below as you complete the data transfers, and *do not resolve the ticket* until you have completed these tasks.
-
-(x) Reference genome: {reference_genome}
-
-(x) Raw data is available on GSC server
-
-(x) Path to results on Genesis:
-{{noformat}}
-/projects/sftp/shahlab/singlecell/<jira_ticket_number>/
-{{noformat}}
-
-(x) Path to results in blob:
-
-(x) Upload to Montage
 """
 
 # Provided by Ciara O'Flanagan on 2018-08-17
@@ -89,7 +54,7 @@ def get_reference_genome_from_sample_id(sample_id):
     return TAXONOMY_TO_REF_GENOME[taxonomy_id]
 
 
-def generate_dlp_jira_description(reference_genome):
+def generate_dlp_jira_description(library_description, library_id):
     """Generate a DLP Jira description.
 
     Arg:
@@ -98,7 +63,7 @@ def generate_dlp_jira_description(reference_genome):
     Returns:
         A string containing the formatted Jira description.
     """
-    return DLP_UNFORMATTED_TEMPLATE.format(reference_genome=reference_genome)
+    return DLP_UNFORMATTED_TEMPLATE.format(description=library_description, id=library_id)
 
 def generate_tenx_jira_description(reference_genome, pool):
     """Generate a Tenx Jira description.

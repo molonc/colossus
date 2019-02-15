@@ -55,10 +55,13 @@ from .models import (
     DlpLane,
     PbalLane,
     TenxLane,
-    Plate
+    Plate,
+    JiraUser,
 )
 from .utils import parse_smartchipapp_results_file
-
+from .jira_templates.jira_wrapper import *
+from jira import JIRA, JIRAError
+from colossus.settings import JIRA_URL
 
 #===========================
 # 3rd-party app imports
@@ -154,6 +157,23 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
         'pathology_disease_name': ('*Pathology/disease name (for diseased samples only)')
     },
 )
+
+'''
+JIRA Ticket Creation Confirmation Form For Library Creation
+'''
+
+class JiraConfirmationForm(Form):
+    title = forms.CharField(max_length=1000)
+    description = forms.CharField(widget=forms.Textarea)
+    project = forms.ChoiceField()
+    #Default empty choice for user_list
+    user_list = [('', '------')]
+    for user in JiraUser.objects.all().order_by('name'):
+        user_list.append((user.username, user.name))
+
+    reporter = forms.ChoiceField(choices=user_list)
+    assignee = forms.ChoiceField(choices=user_list)
+
 
 
 #===========================
@@ -504,6 +524,16 @@ class ProjectForm(ModelForm):
         fields = ['name']
 
 
+class AddWatchersForm(Form):
+    #Default empty choice for user_list
+    user_list = []
+    for user in JiraUser.objects.all().order_by('name'):
+        user_list.append((user.username, user.name))
+
+    watchers = forms.MultipleChoiceField(choices=user_list, widget=forms.CheckboxSelectMultiple())
+    comment = forms.CharField(widget=forms.Textarea(attrs={'style': 'height: 80px;'}))
+
+
 #===========================
 # Sequencing forms
 #---------------------------
@@ -533,6 +563,9 @@ class DlpSequencingForm(SequencingForm):
         if not self.instance.pk:
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+        else:
+            self.fields['jira_user'] = forms.CharField(max_length=100, required=False)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, required=False)
 
     class Meta(SequencingForm.Meta):
         model = DlpSequencing
@@ -731,3 +764,4 @@ class GSCFormSubmitterInfo(Form):
         choices=at_completion_choices,
         initial='R',
     )
+

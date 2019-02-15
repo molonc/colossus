@@ -172,3 +172,5 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 
 }
+
+JIRA_URL = 'https://www.bcgsc.ca/jira/'
