@@ -555,7 +555,6 @@ class JiraTicketConfirm(TemplateView):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
             form.fields['description'].initial = generate_tenx_jira_description(reference_genome=get_reference_genome_from_sample_id(request.session['sample_id']), pool=request.session['pool'],)
             form.fields['reporter'].initial = 'coflanagan'
-            form.fields['assignee'].initial = 'coflanagan'
 
         form.fields['project'].choices = [(str(project.id), project.name) for project in projects]
         form.fields['project'].initial = get_project_id_from_name(request.session['jira_user'], request.session['jira_password'], 'Single Cell')
@@ -577,7 +576,6 @@ class JiraTicketConfirm(TemplateView):
                       title=form['title'].value(),
                       description=form['description'].value(),
                       reporter=form['reporter'].value(),
-                      assignee=form['assignee'].value(),
                     )
             except JIRAError as e:
                 #Do Something
@@ -647,7 +645,8 @@ class LibraryCreate(TemplateView):
             with transaction.atomic():
                 if lib_form.is_valid() and sublib_form.is_valid():
                     instance = lib_form.save(commit=False)
-
+                    if instance.pk is None:
+                        create = True
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     if all_valid and create:

@@ -164,6 +164,7 @@ def get_user_list():
     user_list = [('', '------')]
     for user in JiraUser.objects.all().order_by('name'):
         user_list.append((user.username, user.name))
+    return user_list
 
 
 '''
@@ -173,8 +174,7 @@ class JiraConfirmationForm(Form):
     title = forms.CharField(max_length=1000)
     description = forms.CharField(widget=forms.Textarea)
     project = forms.ChoiceField()
-    reporter = forms.ChoiceField(choices=get_user_list)
-    assignee = forms.ChoiceField(choices=get_user_list)
+    reporter = forms.ChoiceField(choices=get_user_list())
 
 
 
