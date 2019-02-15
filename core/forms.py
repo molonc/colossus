@@ -158,21 +158,23 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
     },
 )
 
-'''
-JIRA Ticket Creation Confirmation Form For Library Creation
-'''
 
-class JiraConfirmationForm(Form):
-    title = forms.CharField(max_length=1000)
-    description = forms.CharField(widget=forms.Textarea)
-    project = forms.ChoiceField()
+def get_user_list():
     #Default empty choice for user_list
     user_list = [('', '------')]
     for user in JiraUser.objects.all().order_by('name'):
         user_list.append((user.username, user.name))
 
-    reporter = forms.ChoiceField(choices=user_list)
-    assignee = forms.ChoiceField(choices=user_list)
+
+'''
+JIRA Ticket Creation Confirmation Form For Library Creation
+'''
+class JiraConfirmationForm(Form):
+    title = forms.CharField(max_length=1000)
+    description = forms.CharField(widget=forms.Textarea)
+    project = forms.ChoiceField()
+    reporter = forms.ChoiceField(choices=get_user_list)
+    assignee = forms.ChoiceField(choices=get_user_list)
 
 
 
@@ -525,12 +527,7 @@ class ProjectForm(ModelForm):
 
 
 class AddWatchersForm(Form):
-    #Default empty choice for user_list
-    user_list = []
-    for user in JiraUser.objects.all().order_by('name'):
-        user_list.append((user.username, user.name))
-
-    watchers = forms.MultipleChoiceField(choices=user_list, widget=forms.CheckboxSelectMultiple())
+    watchers = forms.MultipleChoiceField(choices=get_user_list, widget=forms.CheckboxSelectMultiple())
     comment = forms.CharField(widget=forms.Textarea(attrs={'style': 'height: 80px;'}))
 
 
