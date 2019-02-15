@@ -19,6 +19,7 @@ django-taggit==0.19.1
 django-taggit-templatetags==0.2.5
 django-templatetag-sugar==1.0
 django-widget-tweaks==1.4.1
+django-crispy-forms==1.7.2
 djangorestframework==3.8.2
 drf-yasg==1.10.0
 elasticsearch==2.3.0
