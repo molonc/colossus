@@ -636,7 +636,7 @@ class LibraryCreate(TemplateView):
         context = self.get_context_data(pk)
         return self._post(request, context)
 
-    def _post(self, request, context, library=None):
+    def _post(self, request, context, library=None, create=False):
         lib_form = self.lib_form_class(request.POST, instance=library)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
         context['lib_form'] = lib_form
@@ -650,7 +650,7 @@ class LibraryCreate(TemplateView):
 
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
-                    if all_valid:
+                    if all_valid and create:
                         jira_user = lib_form['jira_user'].value()
                         jira_password = lib_form['jira_password'].value()
                         additional_title = lib_form['additional_title'].value()
@@ -708,6 +708,41 @@ class LibraryCreate(TemplateView):
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
                         return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
+                    elif all_valid and not create:
+                        instance.save()
+                        if context['library_type'] == 'tenx':
+                            condition_formset = TenxConditionFormset(request.POST)
+
+                            # Save each condition
+                            idx = 1
+                            for condition_form in condition_formset:
+                                # If a condition_form was left blank,
+                                # skip it
+                                if not condition_form.has_changed():
+                                    continue
+
+                                # Save the condition
+                                condition = condition_form.save(commit=False)
+                                condition.condition_id = idx
+                                condition.library = instance
+                                condition.sample = instance.sample
+                                condition.save()
+
+                                # Increment the index counter
+                                idx += 1
+
+                        # save the ManyToMany field.
+                        lib_form.save_m2m()
+                        # Add information from SmartChipApp files
+                        region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
+                        sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                        if region_metadata is not None and sublib_results is not None:
+                            instance.sublibraryinformation_set.all().delete()
+                            instance.chipregion_set.all().delete()
+                            create_sublibrary_models(instance, sublib_results, region_metadata)
+                        # save the formsets.
+                        [formset.save() for formset in formsets.values()]
+                        return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
             for arg in e.args:
@@ -824,7 +859,7 @@ class LibraryUpdate(LibraryCreate):
         }
         return context
 
-    def post(self, request, pk):
+    def post(self, request, pk, create=False):
         context = self.get_context_data(pk)
         library = get_object_or_404(self.library_class, pk=pk)
         return self._post(request, context, library=library)

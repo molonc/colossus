@@ -197,9 +197,6 @@ class DlpLibraryForm(LibraryForm):
         'relates_to_dlp',
         'relates_to_tenx',
         'projects',
-        'additional_title',
-        'jira_user',
-        'jira_password',
     ]
 
     def __init__(self,*args, **kwargs):
