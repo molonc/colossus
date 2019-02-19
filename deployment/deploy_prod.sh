@@ -1,5 +1,5 @@
-<<EOF
-  cd ~/colossus
+ssh root@13.71.161.241 <<EOF
+  cd colossus
   git pull
   source bin/activate
   pip install -r requirements.txt
