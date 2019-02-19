@@ -9,7 +9,8 @@ node {
             slackSend color: "warning", message: "Started `${env.JOB_NAME}#${env.BUILD_NUMBER}`\n\n_The changes:_\n${lastChanges}"
         stage 'Deploy'
             sh 'pwd'
-            sh 'ssh myue@13.71.161.241'
+            sh 'ssh myue@crcssh.bccrc.ca'
+            sh 'ssh myue@momac31.bccrc.ca'
 
         stage 'Publish results'
             slackSend color: "good", message: "Build successful: `${env.JOB_NAME}#${env.BUILD_NUMBER}` <${env.BUILD_URL}|Open in Jenkins>"
