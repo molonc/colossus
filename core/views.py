@@ -828,7 +828,13 @@ def LibraryFlowchart(request, pk):
 
     template = "core/ant_colony/ant_colony.html"
     library = get_object_or_404(DlpLibrary, pk=pk)
-    context = {"library" : library}
+
+    sequencing_list=library.dlpsequencing_set.order_by('id')
+    for s in sequencing_list:
+        for l in  s.dlplane_set.all():
+            print l
+    print list(library.dlpsequencing_set.all())
+    context = {"library" : library, "list" : sequencing_list}
     print "HELLO"
     return render(request, template, context)
 

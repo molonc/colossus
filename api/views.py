@@ -234,7 +234,7 @@ class AnalysisInformationFilter(django_filters.FilterSet):
         'id',
         'analysis_run__run_status',
         'analysis_run__last_updated',
-        'library__pool_id'
+        'library__pool_id',
         ]
 
 

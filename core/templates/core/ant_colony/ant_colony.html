@@ -25,25 +25,28 @@
                     </div>
                 </div>
             </div>
-            {% for sequencing in library.dlpsequencing_set.all %}
-            <div class="row">
-                <div  class="col-mb-3 offset-md-2">
-                    <div class="card-body text-secondary">
-                        <h5>Sequence {{sequencing.id}}</h5>
-                        <h6>   {{sequencing.sequencing_center}}</h6>
+
+            {% for sequencing in list.all %}
+            <div id="Sequence_{{sequencing.id}}">
+                 <div class="row">
+                    <div  class="col-mb-3 offset-md-2">
+                        <div class="card-body text-secondary">
+                            <h5>Sequence {{sequencing.id}}</h5>
+                            <h6>   {{sequencing.sequencing_center}}</h6>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% for lane in sequencing.dlplane_set.all %}
-            <div class="row">
-                <div  class="col-mb-3  offset-md-4">
-                    <div class="card-body text-secondary">
-                        <h5>Lane {{lane.id}}</h5>
-                        <h6>   {{lane.flow_cell_id}}</h6>
+                {% for lane in sequencing.dlplane_set.all %}
+                <div class="row">
+                    <div  class="col-mb-3  offset-md-4">
+                        <div class="card-body text-secondary">
+                            <h5>Lane {{lane.id}}</h5>
+                            <h6>   {{lane.flow_cell_id}}</h6>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
             {% endfor%}
 
 
@@ -60,7 +63,10 @@
 
 </html>
 
-<script type="text/javascript">
 
-
-</script>
+{% block datatables_script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+        });
+    </script>
+{% endblock %}
