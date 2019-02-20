@@ -553,7 +553,7 @@ class JiraTicketConfirm(TemplateView):
             form.fields['reporter'].initial = 'elaks'                                                                                    
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
-            form.fields['description'].initial = generate_tenx_jira_description(reference_genome=get_reference_genome_from_sample_id(request.session['sample_id']), pool=request.session['pool'],)
+            form.fields['description'].initial = 'Awaiting first sequencing...'
             form.fields['reporter'].initial = 'coflanagan'
 
         form.fields['project'].choices = [(str(project.id), project.name) for project in projects]
