@@ -34,4 +34,5 @@ urlpatterns = [
     url(r'^summary$', views.dlp_summary_view, name='summary'),
     url(r'summary/graph_cell_counts/$', views.dlp_get_cell_graph, name='summary_graph'),
     url(r'^library/(?P<pk>\d+)/export', views.export_sublibrary_csv, name='export_sublibrary_csv'),
+    url(r'^flowchart/(?P<pk>\d+)/$', views.LibraryFlowchart, name='ant_colony'),
 ]

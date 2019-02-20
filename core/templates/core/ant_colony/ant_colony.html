@@ -1,0 +1,66 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+
+
+<html lang="en">
+<head>
+        <link rel="stylesheet" href="{% static 'core/ant_colony/ant_colony.css' %}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="shortcut icon" type="image/png" href="{% static 'core/favicon.ico' %}"/>
+        <title>Colossus</title>
+    </head>
+
+    <body>
+
+         <div class='container' >
+             <div class="row">
+                <div  class="col-mb-3">
+                    <div class="card-body text-secondary">
+                        <h5>Library {{library.pool_id}}</h5>
+                        <h6>   {{library.jira_ticket}}</h6>
+                    </div>
+                </div>
+            </div>
+            {% for sequencing in library.dlpsequencing_set.all %}
+            <div class="row">
+                <div  class="col-mb-3 offset-md-2">
+                    <div class="card-body text-secondary">
+                        <h5>Sequence {{sequencing.id}}</h5>
+                        <h6>   {{sequencing.sequencing_center}}</h6>
+                    </div>
+                </div>
+            </div>
+            {% for lane in sequencing.dlplane_set.all %}
+            <div class="row">
+                <div  class="col-mb-3  offset-md-4">
+                    <div class="card-body text-secondary">
+                        <h5>Lane {{lane.id}}</h5>
+                        <h6>   {{lane.flow_cell_id}}</h6>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endfor%}
+
+
+
+            <div class="row">
+                <div class="col-mb-3 mb-3 offset-md-6">
+                    <div class="card-body text-secondary">
+                        <h5 class="card-title">Analysis</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>
+
+<script type="text/javascript">
+
+
+</script>

@@ -823,6 +823,14 @@ class TenxLibraryCreate(LibraryCreate):
 
         return context
 
+def LibraryFlowchart(request, pk):
+    # template_name= "core/ant_colony/ant_colony.html"
+
+    template = "core/ant_colony/ant_colony.html"
+    library = get_object_or_404(DlpLibrary, pk=pk)
+    context = {"library" : library}
+    print "HELLO"
+    return render(request, template, context)
 
 class LibraryUpdate(LibraryCreate):
 

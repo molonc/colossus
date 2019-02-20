@@ -1,0 +1,17 @@
+body {
+    position: relative;
+    background-size: 2rem 2rem;
+    background-image: radial-gradient(circle, #000000 1px, rgba(0, 0, 0, 0) 1px);)
+}
+
+.col-mb-3 {
+    background-color: #f5f3f3;
+    margin: 10px;
+    height: 80px;
+    width: 220px;
+    border-radius: 15px 15px 15px 15px;
+}
+
+.library {
+
+}
