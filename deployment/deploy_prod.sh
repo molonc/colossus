@@ -1,11 +1,11 @@
 #!/bin/bash
 
-ssh -t myue@crcssh.bccrc.ca -t ssh myue@momac31.bccrc.ca <<EOF
-  cd ~/Documents/single_cell_lims/
+ssh -t myue@colossusmskcc.canadacentral.cloudapp.azure.com <<EOF
+  cd /home/zeus/colossus
   git pull
-  source activate colossus
   pip install -r requirements.txt
   python manage.py migrate
-  python manage.py runserver
+  cp ../settings.py colossus/settings.py
+  python manage.py runserver 0.0.0.0:8000 &
   exit
 EOF
