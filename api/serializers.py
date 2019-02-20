@@ -203,7 +203,7 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
     analysis_run = AnalysisRunSerializer(read_only=True)
     reference_genome = ReferenceGenomeSerializer(read_only=True)
     version = serializers.CharField(source='version.version')
-
+    lanes = serializers
     class Meta:
         model = DlpAnalysisInformation
         fields = (
@@ -218,6 +218,7 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
             'analysis_run',
             'aligner',
             'smoothing',
+            'lanes'
         )
 
     def create(self, validated_data):
@@ -251,6 +252,7 @@ class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
             'analysis_run',
             'aligner',
             'smoothing',
+            'lanes'
         )
 
     def create(self, validated_data):

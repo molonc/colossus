@@ -122,6 +122,7 @@ class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     filter_fields = (
         'id',
         'flow_cell_id',
+        'flow_cell_id',
         'sequencing',
         'sequencing__library__pool_id',
     )
@@ -234,7 +235,7 @@ class AnalysisInformationFilter(django_filters.FilterSet):
         'id',
         'analysis_run__run_status',
         'analysis_run__last_updated',
-        'library__pool_id'
+        'library__pool_id',
         ]
 
 
