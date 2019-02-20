@@ -101,10 +101,7 @@ def generate_tenx_jira_description(sequencing_center, reference_genome, pool):
             pool=pool,
         )
     elif(sequencing_center == 'UBCBRC'):
-        print('tenx yay')
         return TENX_BRC_UNFORMATTED_TEMPLATE.format(
             reference_genome=reference_genome,
             pool=pool,
         )
-    else:
-        print('uh oh')
