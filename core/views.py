@@ -105,6 +105,7 @@ from .jira_templates.jira_wrapper import (
     validate_credentials,
     add_watchers,
     add_jira_comment,
+    update_description,
 )
 
 
@@ -553,7 +554,7 @@ class JiraTicketConfirm(TemplateView):
             form.fields['reporter'].initial = 'elaks'                                                                                    
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
-            form.fields['description'].initial = generate_tenx_jira_description(reference_genome=get_reference_genome_from_sample_id(request.session['sample_id']), pool=request.session['pool'],)
+            form.fields['description'].initial = 'Awaiting first sequencing...'
             form.fields['reporter'].initial = 'coflanagan'
 
         form.fields['project'].choices = [(str(project.id), project.name) for project in projects]
@@ -1145,6 +1146,15 @@ class AddWatchers(TemplateView):
     def post(self, request):
         form = AddWatchersForm(request.POST)
         if form.is_valid():
+            if request.session['library_type'] == 'tenx':
+                reference_genome = get_reference_genome_from_sample_id(request.session['sample_id'])
+                updated_description = generate_tenx_jira_description(request.session['sequencing_center'], reference_genome, request.session['pool_id'])
+                try:
+                    update_description(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], updated_description)
+                except JIRAError as e:
+                    msg = e.text
+                    messages.error(request, msg)
+                    return self.get(request)
             try:
                 add_watchers(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['watchers'])
                 add_jira_comment(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['comment'])
@@ -1196,7 +1206,10 @@ class SequencingCreate(TemplateView):
                 request.session['jira_password'] = form.cleaned_data['jira_password']
                 request.session['jira_ticket'] = library.jira_ticket
                 request.session['library_type'] = library.library_type
+                request.session['pool_id'] = library.tenxlibraryconstructioninformation.pool
+                request.session['sample_id'] = library.sample.sample_id
                 request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
+                request.session['sequencing_center'] = instance.sequencing_center
             else:
                 messages.error(request, 'Invalid Jira Credentials')
                 return self.get_context_and_render(request, from_library, form)
