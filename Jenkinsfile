@@ -1,7 +1,7 @@
 node {
 
     try {
-        stage('Checkout'){
+        stage('checkout'){
             checkout scm
 
             sh 'git log HEAD^..HEAD --pretty="%h %an - %s" > GIT_CHANGES'
