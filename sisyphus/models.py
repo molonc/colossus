@@ -246,7 +246,7 @@ class DlpAnalysisInformation(AbstractAnalysisInformation):
         on_delete=models.CASCADE,
     )
 
-    lanes = models.ManyToManyField(DlpLane)
+    lanes = models.ManyToManyField(DlpLane, blank=True)
 
 
 class PbalAnalysisInformation(AbstractAnalysisInformation):

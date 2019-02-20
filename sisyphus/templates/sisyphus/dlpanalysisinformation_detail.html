@@ -41,6 +41,10 @@
             <td id="tdid">{{ object.version }}</td>
         </tr>
         <tr>
+            <th id="thid">Lanes</th>
+            <td id="tdid">{{ object.lanes.all.count }}</td>
+        </tr>
+        <tr>
             <th id="thid">Aligner Option:</th>
             <td id="tdid">{{ object.get_aligner_display }}</td>
         </tr>
@@ -77,6 +81,35 @@
             </tr>
         </table>
     </div>
+ <div class="container detail-bordered-container">
+    <table class="table">
+            {% if object.lanes.all %}
+                <thead>
+                    <tr>
+                        <th><h4>Lanes</h4></th>
+                    </tr>
+                    <tr>
+                        <th>Flowcell ID</th>
+                        <th>Path to Archive</th>
+                        <th>Sequencing Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lane in object.lanes.all %}
+                        <tr>
+                            <td>{{ lane.flow_cell_id }}</td>
+                            <td>{{ lane.path_to_archive }}</td>
+                            <td>{{ lane.sequencing_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% else %}
+                <tr><h5><i class="text-warning">There is no lane for this analysis</i></h5></tr>
+            {% endif %}
+
+        </table>
+ </div>
+
     <br/>
     <br/>
     <div class="container">
