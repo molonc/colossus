@@ -25,6 +25,7 @@ from core.models import (
     MetadataField,
     ChipRegion,
     DlpLibraryConstructionInformation,
+    JiraUser,
 )
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
@@ -324,3 +325,9 @@ class ChipRegionSerializer(serializers.ModelSerializer):
             'region_code',
             'chipregionmetadata_set'
         )
+
+
+class JiraUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JiraUser
+        fields = '__all__'

@@ -27,7 +27,8 @@ from .serializers import (
     AnalysisInformationSerializer,
     AnalysisInformationCreateSerializer,
     AnalysisRunSerializer,
-    ChipRegionSerializer
+    ChipRegionSerializer,
+    JiraUserSerializer,
 )
 
 from core.models import (
@@ -36,7 +37,8 @@ from core.models import (
     DlpSequencing,
     DlpLane,
     SublibraryInformation,
-    ChipRegion
+    ChipRegion,
+    JiraUser,
 )
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
@@ -285,3 +287,9 @@ class ExperimentalMetadata(RestrictedQueryMixin, viewsets.ModelViewSet):
         'library__jira_ticket',
         'library__pool_id',
     )
+
+
+class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    queryset = JiraUser.objects.all()
+    serializer_class = JiraUserSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
