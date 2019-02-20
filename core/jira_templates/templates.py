@@ -14,7 +14,7 @@ Query [Colossus|http://colossus.bcgsc.ca/dlp/library/{id}] for detailed informat
 """
 
 # Provided by Ciara O'Flanagan on 2018-08-17
-TENX_UNFORMATTED_TEMPLATE = """￼ Upload the web_summary.html file to the ticket 
+TENX_GSC_UNFORMATTED_TEMPLATE = """￼ Upload the web_summary.html file to the ticket 
 
 Reference: {reference_genome}
 Pool: {pool}
@@ -31,6 +31,25 @@ Pool: {pool}
 (x)￼ Path to raw data on our server (must be backed up):
 /shahlab/archive/single_cell_indexing/TENX/
 """
+
+TENX_BRC_UNFORMATTED_TEMPLATE = """￼ Upload the web_summary.html file to the ticket 
+
+Reference: {reference_genome}
+Pool: {pool}
+
+￼(x) Temp path to raw data on BRC server (must be transferred to our servers):
+/brcwork/patientdata/
+
+￼ (x) Temp path to Cellranger results (must be transferred to our servers):
+/brcwork/patientdata/
+
+￼ (x) Temp path to Sample Sheet:
+/brcwork/patientdata/
+
+(x)￼ Path to raw data on our server (must be backed up):
+/shahlab/archive/single_cell_indexing/TENX/AparicioLab
+"""
+
 
 
 def get_reference_genome_from_sample_id(sample_id):
@@ -65,17 +84,27 @@ def generate_dlp_jira_description(library_description, library_id):
     """
     return DLP_UNFORMATTED_TEMPLATE.format(description=library_description, id=library_id)
 
-def generate_tenx_jira_description(reference_genome, pool):
+def generate_tenx_jira_description(sequencing_center, reference_genome, pool):
     """Generate a Tenx Jira description.
 
     Args:
+        sequencing_center: Either BCCAGSC or UBCBRC
         reference_genome: A string containing the reference genome.
             Should be either hg19 or mm10.
         pool: A string containing the pool ID.
     Returns:
         A string containing the formatted Jira description.
     """
-    return TENX_UNFORMATTED_TEMPLATE.format(
-        reference_genome=reference_genome,
-        pool=pool,
-    )
+    if(sequencing_center == 'BCCAGSC'):
+        return TENX_GSC_UNFORMATTED_TEMPLATE.format(
+            reference_genome=reference_genome,
+            pool=pool,
+        )
+    elif(sequencing_center == 'UBCBRC'):
+        print('tenx yay')
+        return TENX_BRC_UNFORMATTED_TEMPLATE.format(
+            reference_genome=reference_genome,
+            pool=pool,
+        )
+    else:
+        print('uh oh')

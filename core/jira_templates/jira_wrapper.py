@@ -35,6 +35,16 @@ def create_ticket(username,
         raise JIRAError()
 
 
+def update_description(username, password, issue, new_description):
+    try:
+        Jira = JIRA(JIRA_URL, basic_auth=(username, password), max_retries=0)
+        existing_issue = Jira.issue(issue)
+        existing_issue.update(description=new_description)
+        Jira.kill_session()
+    except JIRAError as e:
+        raise JIRAError()
+
+
 def get_projects(username, password):
     '''
     Returns a list of Jira Projects, sorted alphabetically

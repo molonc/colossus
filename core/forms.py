@@ -573,9 +573,18 @@ class PbalSequencingForm(SequencingForm):
 
 
 class TenxSequencingForm(SequencingForm):
+
+    def __init__(self,*args,**kwargs):
+        super(TenxSequencingForm,self).__init__(*args,**kwargs)
+        if not self.instance.pk:
+            self.fields['jira_user'] = forms.CharField(max_length=100)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+        else:
+            self.fields['jira_user'] = forms.CharField(max_length=100, required=False)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, required=False)
+            
     class Meta(SequencingForm.Meta):
         model = TenxSequencing
-
 
 #===========================
 # Lane forms
