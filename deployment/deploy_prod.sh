@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ssh -t myue@colossusmskcc.canadacentral.cloudapp.azure.com <<EOF
+ssh -t zeus@colossusmskcc.canadacentral.cloudapp.azure.com <<EOF
   cd /home/zeus/colossus
   git pull
   pip install -r requirements.txt
