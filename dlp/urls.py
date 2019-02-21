@@ -35,4 +35,5 @@ urlpatterns = [
     url(r'summary/graph_cell_counts/$', views.dlp_get_cell_graph, name='summary_graph'),
     url(r'^library/(?P<pk>\d+)/export', views.export_sublibrary_csv, name='export_sublibrary_csv'),
     url(r'^flowchart/(?P<pk>\d+)/$', views.LibraryFlowchart, name='ant_colony'),
+    url(r'^flowchart_ajax/$', views.FlowchartAjaxHandler, name='ant_colony_ajax'),
 ]

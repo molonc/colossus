@@ -9,6 +9,8 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import os
 import collections
 import subprocess
+
+from django.db.models import Max
 from jira import JIRA, JIRAError
 
 #============================
@@ -24,7 +26,8 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
 from django.forms.models import model_to_dict
-
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 import pandas as pd
 from django.conf import settings
 from django.utils import timezone
@@ -828,15 +831,41 @@ def LibraryFlowchart(request, pk):
 
     template = "core/ant_colony/ant_colony.html"
     library = get_object_or_404(DlpLibrary, pk=pk)
+    analyses =  DlpAnalysisInformation.objects.filter(library__pool_id=library.pool_id).order_by('-id')
 
-    sequencing_list=library.dlpsequencing_set.order_by('id')
-    for s in sequencing_list:
-        for l in  s.dlplane_set.all():
-            print l
-    print list(library.dlpsequencing_set.all())
-    context = {"library" : library, "list" : sequencing_list}
+    sequencings=library.dlpsequencing_set.order_by('id')
+    lanes = []
+    for sequencing in sequencings:
+        lanes.extend(sequencing.dlplane_set.order_by('id'))
+
+    analyses_tuple = []
+    print list(analyses)
+    # for analysis in analyses:
+    #     print analysis.id
+    #     print analysis.library.dlpsequencing_set.aggregate((Max('dlplane_set')))
+    #     # for analysis_sequencing in analysis.library.dlpsequencing_set.all():
+    #     #     print analysis.id
+    #     #     print analysis_sequencing.dlplane_set.aggregate(Max('id'))
+    #     # analyses_tuple.extend(analysis)
+
+    context = {"library" : library,
+               "sequencings" : sequencings,
+               "lanes" : lanes,
+               "analyses" : analyses,
+               }
     print "HELLO"
     return render(request, template, context)
+
+@csrf_exempt
+def FlowchartAjaxHandler(request):
+    if request.is_ajax() or request.method == 'POST':
+
+        try:
+            analysis = DlpAnalysisInformation.objects.filter(id=int(request.POST.get("id")))
+            return JsonResponse({'ids' : list(analysis[0].lanes.all().values_list('id', flat=True))})
+        except:
+            return HttpResponse("FAILED")
+
 
 class LibraryUpdate(LibraryCreate):
 

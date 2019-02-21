@@ -7,7 +7,7 @@
 <head>
         <link rel="stylesheet" href="{% static 'core/ant_colony/ant_colony.css' %}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <link rel="shortcut icon" type="image/png" href="{% static 'core/favicon.ico' %}"/>
@@ -15,58 +15,164 @@
     </head>
 
     <body>
-
-         <div class='container' >
-             <div class="row">
-                <div  class="col-mb-3">
-                    <div class="card-body text-secondary">
-                        <h5>Library {{library.pool_id}}</h5>
-                        <h6>   {{library.jira_ticket}}</h6>
-                    </div>
-                </div>
-            </div>
-
-            {% for sequencing in list.all %}
-            <div id="Sequence_{{sequencing.id}}">
-                 <div class="row">
-                    <div  class="col-mb-3 offset-md-2">
-                        <div class="card-body text-secondary">
-                            <h5>Sequence {{sequencing.id}}</h5>
-                            <h6>   {{sequencing.sequencing_center}}</h6>
-                        </div>
-                    </div>
-                </div>
-                {% for lane in sequencing.dlplane_set.all %}
-                <div class="row">
-                    <div  class="col-mb-3  offset-md-4">
-                        <div class="card-body text-secondary">
-                            <h5>Lane {{lane.id}}</h5>
-                            <h6>   {{lane.flow_cell_id}}</h6>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% endfor%}
-
-
-
-            <div class="row">
-                <div class="col-mb-3 mb-3 offset-md-6">
-                    <div class="card-body text-secondary">
-                        <h5 class="card-title">Analysis</h5>
-                    </div>
-                </div>
+        <div id="info_page" class='container col-6'>
+            <div id="Info Card" class="card-head text-secondary">
+                <h4>.</h4>
             </div>
         </div>
+         <div id="display_page" class='container' >
+             <div class="row">
+                <div  class="col-mb-3">
+                    <div id="library_{{library.id}}" class="card-body text-secondary">
+                        <h5>Library {{library.pool_id}}</h5>
+                        <h6>{{library.jira_ticket}}</h6>
+                    </div>
+                </div>
+                 <h3 class="text-secondary">HELLO</h3>
+            </div>
+
+            {% for sequencing in sequencings.all %}
+            <div>
+                 <div class="row">
+                    <div  class="col-mb-3 offset-md-2">
+                        <div id="sequence_{{sequencing.id}}" class="card-body text-secondary">
+                            <h5>Sequence {{sequencing.id}}</h5>
+                            <h6>{{sequencing.sequencing_center}}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row offset-md-3">
+               <div  class="col-mb-3">
+                {% for lane in lanes %}
+                    {% if lane.sequencing.id == sequencing.id %}
+                    <div class="row">
+                        <div id="lane_{{lane.id}}-s_{{sequencing.id}}" class="card-body text-secondary">
+                                <h5>Lane {{lane.id}}</h5>
+                                <h6>{{lane.flow_cell_id}}</h6>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+               </div>
+               <div class="col-mb-3" style="margin-left: 15px">
+                {% for analysis in analyses %}
+                   {% for analysis_sequencing in analysis.library.dlpsequencing_set.all %}
+                       {% if analysis_sequencing.id == sequencing.id and analysis_sequencing.dlplane_set.all %}
+                       <div class="row">
+                            <div id="analysis_{{analysis.id}}" class="card-body text-secondary" >
+                                    <h5>Analysis {{analysis.id}}</h5>
+                                    <h6>{{analysis.library.jira_ticket}}</h6>
+                            </div>
+                        </div>
+                        {% endif %}
+                   {% endfor %}
+                {% endfor %}
+               </div>
+            </div>
+            {% endfor %}
+            </div>
     </body>
 
 </html>
 
 
 {% block datatables_script %}
-    <script type="text/javascript">
+<script type="text/javascript">
+
+        var li_hover_on_cl='#8eafbc';
+        var se_hover_on_cl='#9ebbc6';
+        var la_hover_on_cl='#aec6cf';
+        var an_hover_on_cl='#bed1d8';
+        var hover_out_cl='#dce4e8';
+
+
         $(document).ready(function() {
+            $("[id*='library']").hover(function(){
+                library(this)
+            },
+            function(){
+                hoveroff()
+            }
+            );
+            $("[id*='sequence']").hover(function(){
+                sequence(this)
+            },
+            function(){
+                hoveroff()
+            }
+            );
+            $("[id*='lane']").hover(function(){
+                lane(this)
+            },
+            function(){
+                hoveroff()
+            }
+            );
+            $("[id*='analysis']").hover(function(){
+                analysis(this)
+            },
+            function(){
+                hoveroff()
+            }
+            );
+
         });
+
+        function hoveroff() {
+        var elements = document.querySelectorAll("[id*='_']"), i = 0;
+        for (; i < elements.length; i++)
+            colour(elements[i],hover_out_cl)
+        }
+
+        function colour(elem,cl){
+            $(elem).css("background-color", cl);
+        }
+
+        function id_getter(str){
+            return str.match(/\d+/g)[0]
+        }
+
+        function type_getter(str){
+            return str.match(/[a-zA-Z]+/g)[0]
+        }
+
+
+        function library(elem){
+            colour(elem,li_hover_on_cl)
+        }
+
+        function sequence(elem){
+            colour(elem,se_hover_on_cl)
+            colour(document.getElementById("library_" + {{library.id}}), li_hover_on_cl)
+        }
+
+        function lane(elem){
+            colour(elem,la_hover_on_cl)
+            var ids = elem.id.split("-")
+            sequence(document.getElementById("sequence_" + id_getter(ids[1])))
+        }
+
+        function analysis(elem){
+            colour(elem,an_hover_on_cl)
+            $.ajax({
+                url: '{% url "dlp"|add:':ant_colony_ajax' %}',
+                data: { id : id_getter(elem.id),
+                        type: type_getter(elem.id)
+                        },
+                type: "POST",
+                success: function (data) {
+                    for (var i = 0; i< data.ids.length; i++){
+                        var temp = 'lane_' + data.ids[i]
+                        console.log(temp)
+                        lane(document.querySelector("[id*=" + temp + "]"))
+                    }
+
+                },
+            });
+        }
+
+
+
     </script>
 {% endblock %}
