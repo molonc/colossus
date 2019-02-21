@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ssh -t zeus@colossusmskcc.canadacentral.cloudapp.azure.com <<EOF
+ssh zeus@colossusmskcc.canadacentral.cloudapp.azure.com <<EOF
   cd /home/zeus/colossus
   git pull
   source activate colossus
