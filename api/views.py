@@ -169,6 +169,7 @@ class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'jira_ticket',
         'failed',
         'projects__name',
+        'exclude_from_analysis',
     )
 
 

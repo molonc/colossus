@@ -131,6 +131,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'failed',
             'projects',
             'dlplibraryconstructioninformation',
+            'exclude_from_analysis',
         )
 
 
