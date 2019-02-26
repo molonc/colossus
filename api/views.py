@@ -29,7 +29,10 @@ from .serializers import (
     AnalysisRunSerializer,
     ChipRegionSerializer,
     JiraUserSerializer,
-)
+    TenxConditionSerializer,
+    TenxLibrarySerializer,
+    TenxLaneSerializer,
+    TenxSequencingSerializer)
 
 from core.models import (
     Sample,
@@ -39,6 +42,10 @@ from core.models import (
     SublibraryInformation,
     ChipRegion,
     JiraUser,
+    TenxLibrary,
+    TenxSequencing,
+    TenxCondition,
+    TenxLane,
 )
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
@@ -151,7 +158,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 
-class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
     """
     View for Library that is queryable by pool_id (aka chip ID) and sample it belongs to.
 
@@ -161,7 +168,6 @@ class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = (
         'id',
         'pool_id',
@@ -293,3 +299,55 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = JiraUser.objects.all()
     serializer_class = JiraUserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+
+class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+    queryset = TenxLibrary.objects.all()
+    serializer_class = TenxLibrarySerializer
+    filter_fields = (
+        'id',
+        'jira_ticket',
+        'projects__name',
+        'failed',
+        'sample'
+    )
+
+class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    queryset = TenxSequencing.objects.all()
+    serializer_class = TenxSequencingSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_fields = (
+        'id',
+        'library',
+        'read_type',
+        'gsc_library_id',
+        'number_of_lanes_requested',
+        'sequencing_center',
+    )
+
+class TenxConditionViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    queryset = TenxCondition.objects.all()
+    serializer_class = TenxConditionSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_fields = (
+        'id',
+        'library',
+        'sample',
+        'condition_id',
+        'experimental_condition',
+        'enzyme',
+        'digestion_temperature',
+        'live_dead',
+        'cells_targeted'
+    )
+
+class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    queryset = TenxLane.objects.all()
+    serializer_class = TenxLaneSerializer
+    # permission_classes = (ReadOnly,)
+    filter_fields = (
+        'id',
+        'flow_cell_id',
+        'sequencing',
+    )
