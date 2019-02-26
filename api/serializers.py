@@ -26,6 +26,10 @@ from core.models import (
     ChipRegion,
     DlpLibraryConstructionInformation,
     JiraUser,
+    TenxLibrary,
+    TenxSequencing,
+    TenxCondition,
+    TenxLane,
 )
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
@@ -331,3 +335,70 @@ class JiraUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = JiraUser
         fields = '__all__'
+
+
+
+class TenxLaneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxLane
+        fields = '__all__'
+
+class TenxSequencingSerializer(serializers.ModelSerializer):
+    tenxlane_set = TenxLaneSerializer(many=True, read_only=True)
+    class Meta:
+        model = TenxSequencing
+        fields = (
+            'id',
+            'library',
+            'format_for_data_submission',
+            'adapter',
+            'read_type',
+            'read1_length',
+            'read2_length',
+            'index_read_type',
+            'index_read1_length',
+            'index_read2_length',
+            'sequencing_instrument',
+            'sequencing_output_mode',
+            'short_description_of_submission',
+            'relates_to',
+            'submission_date',
+            'tenxlane_set',
+            'gsc_library_id',
+            'sequencer_id',
+            'sequencing_center',
+            'lane_requested_date',
+            'number_of_lanes_requested',
+            'sequencer_notes',
+        )
+
+
+
+class TenxConditionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxCondition
+        fields = '__all__'
+
+
+class TenxLibrarySerializer(serializers.ModelSerializer):
+    tenxcondition_set = TenxConditionSerializer(many=True, read_only=True)
+    tenxsequencing_set = TenxSequencingSerializer(many=True, read_only=True)
+    sample = SampleSerializer()
+    projects = TagSerializerField()
+    class Meta:
+        editable = False,
+        model = TenxLibrary
+        fields = (
+            'id',
+            'jira_ticket',
+            'num_sublibraries',
+            'tenxsequencing_set',
+            'tenxcondition_set',
+            'projects',
+            'sample',
+            'relates_to_dlp',
+            'relates_to_tenx',
+            'description',
+            'result',
+            'failed',
+        )
