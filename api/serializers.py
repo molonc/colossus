@@ -113,7 +113,7 @@ class DlpLibraryConstructionInformationSerializer(serializers.ModelSerializer):
 
 
 class LibrarySerializer(serializers.ModelSerializer):
-    sample = SampleSerializer()
+    sample = SampleSerializer(read_only=True)
     dlplibraryconstructioninformation = DlpLibraryConstructionInformationSerializer()
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
     projects = TagSerializerField()
