@@ -1046,7 +1046,7 @@ class Sequencing(models.Model, FieldValue):
 
     class Meta:
         abstract = True
-        unique_together = ('library', 'sequencing_center')
+        unique_together = ('library', 'sequencing_center', 'sequencing_instrument')
 
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
