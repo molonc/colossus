@@ -341,13 +341,7 @@ class JiraUserSerializer(serializers.ModelSerializer):
 class TenxLaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenxLane
-        fields = (
-            'id',
-            'sequencing',
-            'flow_cell_id',
-            'sequencing_date',
-            'path_to_archive',
-        )
+        fields = '__all__'
 
 class TenxSequencingSerializer(serializers.ModelSerializer):
     tenxlane_set = TenxLaneSerializer(many=True, read_only=True)
@@ -383,17 +377,7 @@ class TenxSequencingSerializer(serializers.ModelSerializer):
 class TenxConditionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenxCondition
-        fields = (
-            'id',
-            'library',
-            'sample',
-            'condition_id',
-            'experimental_condition',
-            'enzyme',
-            'digestion_temperature',
-            'live_dead',
-            'cells_targeted'
-        )
+        fields = '__all__'
 
 
 class TenxLibrarySerializer(serializers.ModelSerializer):
