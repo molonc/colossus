@@ -76,6 +76,12 @@
                 {% endfor %}
             </td>
         </tr>
+         <tr>
+            {% if library_type == 'dlp' %}
+                <th id="thid">Excluded From Analysis</th>
+                <td id="tdid" class="notes">{{ library.exclude_from_analysis }}</td>
+            {% endif %}
+        </tr>
     </table>
 </div>
 <!-- end of Meta Information -->

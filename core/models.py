@@ -293,6 +293,12 @@ class DlpLibrary(Library):
         "Number of sublibraries",
         default=0,
     )
+
+    exclude_from_analysis = models.BooleanField(
+        default=False,
+        null=False,
+    )
+
     title = create_textfield("Title")
     quality = models.DecimalField("Quality", max_digits=10, decimal_places=2, default=0.75)
 
