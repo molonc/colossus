@@ -1206,7 +1206,8 @@ class SequencingCreate(TemplateView):
                 request.session['jira_password'] = form.cleaned_data['jira_password']
                 request.session['jira_ticket'] = library.jira_ticket
                 request.session['library_type'] = library.library_type
-                request.session['pool_id'] = library.tenxlibraryconstructioninformation.pool
+                if(library.library_type == 'tenx'):
+                    request.session['pool_id'] = library.tenxlibraryconstructioninformation.pool
                 request.session['sample_id'] = library.sample.sample_id
                 request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
                 request.session['sequencing_center'] = instance.sequencing_center
