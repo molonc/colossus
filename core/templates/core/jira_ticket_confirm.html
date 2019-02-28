@@ -2,41 +2,21 @@
 
 {% load staticfiles %}
 
-{% block title %}Confirm JIRA Ticket Details{% endblock %}
+{% block title %}JIRA Ticket Creation{% endblock %}
+
+{% load crispy_forms_tags %}
 
 {% block body %}
-    {% if library_type == 'dlp' %}
-        <div class="container graybg">
-            <form action="{% url 'dlp:jira_ticket_confirm' %}" method="POST">
-                {% csrf_token %}
-                <fieldset>
-                    <legend>DLP Jira Ticket Details</legend>
-                    <table class="table-condensed">
-                        <thead>
-                            {{ form }}
-                        </thead>
-                    </table>
-                 </fieldset>
-                <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
-                <a class="btn btn-default btn-sm" href="{% url 'dlp:library_create' %}">Cancel</a>
-            </form>
-        </div>
-    {% elif library_type == 'tenx' %}
-        <div class="container graybg">
-            <form action="{% url 'tenx:jira_ticket_confirm' %}" method="POST">
-                {% csrf_token %}
-                <fieldset>
-                    <legend>TenX Jira Ticket Details</legend>
-                    <table class="table-condensed">
-                        <thead>
-                            {{ form }}
-                        </thead>
-                    </table>
-                 </fieldset>
-                <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
-                <a class="btn btn-default btn-sm" href="{% url 'tenx:library_create' %}">Cancel</a>
-            </form>
-        </div>
-    {% endif %}
+
+<div class="container graybg" style="margin-bottom:10px; border-radius: 10px; box-shadow: 0px 0px 5px grey;">
+
+   <legend style="padding-top: 5px">{{library_type.upper}} Jira Ticket Detail</legend>
+    <form action="{% url 'dlp:jira_ticket_confirm' %}" method="POST" style="padding: 0px 10px 10px 10px">
+        {% csrf_token %}
+        {{form|crispy}}
+        <input class="btn btn-primary btn-sm" style="margin: 10px 0px 20px 10px" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" style="margin: 10px 10px 20px 0px"  href="{% url 'dlp:library_create' %}">Cancel</a>
+    </form>
+</div>
 
 {% endblock %}
