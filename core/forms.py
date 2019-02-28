@@ -161,7 +161,7 @@ AdditionalSampleInfoInlineFormset =  inlineformset_factory(
 
 def get_user_list():
     #Default empty choice for user_list
-    user_list = [('', '------')]
+    user_list = []
     for user in JiraUser.objects.all().order_by('name'):
         user_list.append((user.username, user.name))
     return user_list

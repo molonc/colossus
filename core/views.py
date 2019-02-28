@@ -1134,6 +1134,9 @@ class AddWatchers(TemplateView):
             #Set initial checkboxes to every Jira User associated with DLP
             form = AddWatchersForm(initial={'watchers': list(JiraUser.objects.filter(associated_with_dlp=True).values_list('username', flat=True))})
             form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])
+        elif request.session['library_type'] == 'tenx':
+            form = AddWatchersForm(initial={'watchers': list(JiraUser.objects.filter(associated_with_tenx=True).values_list('username', flat=True))})
+            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])  
         else:
             form = AddWatchersForm()
         context = {
