@@ -334,14 +334,36 @@ class PbalLibrary(Library):
         return '_'.join([self.sample.sample_id])
 
 
-class TenxLibrary(Library):
+class TenxChip(models.Model, FieldValue):
 
+    # Chip Model for TenX Libraries
+
+    LAB_NAMES = (
+        ("SA", "Sam Aparicio"),
+        ("DH", "David Huntsman")
+    )
+
+    lab_name = create_chrfield(
+        "Lab Name",
+        choices=LAB_NAMES,
+        blank = True
+    )
+
+    def get_id(self):
+        return "CHIP" + format(self.id, "04")
+
+class TenxLibrary(Library):
     """
     10x library contains several Cell objects.
     """
 
     class Meta:
         ordering = ['sample']
+
+    name = create_chrfield(
+        "Library Name",
+        blank=True,
+    )
 
     library_type = 'tenx'
 
@@ -353,11 +375,18 @@ class TenxLibrary(Library):
         "Jira ticket",
         blank=True,
     )
+
     num_sublibraries = create_intfield(
         "Number of sublibraries",
         default=0,
     )
 
+    chips = models.ForeignKey(
+        TenxChip,
+        verbose_name="Chip",
+        on_delete=models.CASCADE,
+        null=True
+    )
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
 

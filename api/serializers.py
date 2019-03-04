@@ -30,6 +30,7 @@ from core.models import (
     TenxSequencing,
     TenxCondition,
     TenxLane,
+    TenxChip
 )
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
@@ -392,6 +393,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'jira_ticket',
+            'chips',
             'num_sublibraries',
             'tenxsequencing_set',
             'tenxcondition_set',
@@ -402,4 +404,16 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'description',
             'result',
             'failed',
+        )
+
+class TenxChipSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="get_id")
+    tenxlibrary_set = TenxLibrarySerializer(many=True, read_only=True)
+    class Meta:
+        model = TenxChip
+        fields = (
+            'id',
+            'lab_name',
+            'name',
+            'tenxlibrary_set',
         )
