@@ -194,42 +194,6 @@ class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 
-class AnalysisInformationFilter(django_filters.FilterSet):
-    """"
-    https://django-filter.readthedocs.io/en/latest/guide/usage.html
-    DateFromToRangeFiler() :it uses datetime format values instead of numerical values.
-    It can be used with DateTimeField.
-    """
-    analysis_run__last_updated = django_filters.DateFromToRangeFilter(
-        method='filter_analysis_run__last_updated')
-
-    def filter_analysis_run__last_updated(self, queryset, name, value):
-        if value.start:
-            queryset = queryset.filter(
-                analysis_run__last_updated__gte=value.start)
-
-        if value.stop:
-            queryset = queryset.filter(
-                analysis_run__last_updated__lte=value.stop)
-
-        return queryset
-
-    class Meta:
-        model = DlpAnalysisInformation
-        fields = [
-        'priority_level',
-        'analysis_jira_ticket',
-        'version',
-        'analysis_submission_date',
-        'reference_genome',
-        'analysis_run',
-        'id',
-        'analysis_run__run_status',
-        'analysis_run__last_updated',
-        'library__pool_id'
-        ]
-
-
 class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Analysis Objects
@@ -237,7 +201,7 @@ class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = DlpAnalysisInformation.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    filter_class = AnalysisInformationFilter
+    filter_fields = "__all__"
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
