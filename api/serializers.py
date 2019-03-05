@@ -394,6 +394,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'id',
             'jira_ticket',
             'chips',
+            'chip_well',
             'num_sublibraries',
             'tenxsequencing_set',
             'tenxcondition_set',
