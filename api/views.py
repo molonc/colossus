@@ -12,7 +12,6 @@ import django_filters
 import rest_framework.exceptions
 from rest_framework import pagination, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
-from django_filters import rest_framework as filters
 
 #============================
 # App imports
@@ -211,7 +210,7 @@ class SublibraryViewSetBrief(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 
-class AnalysisInformationFilter(filters.FilterSet):
+class AnalysisInformationFilter(django_filters.rest_framework.FilterSet):
     """"
     https://django-filter.readthedocs.io/en/latest/guide/usage.html
     DateFromToRangeFiler() :it uses datetime format values instead of numerical values.
