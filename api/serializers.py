@@ -392,6 +392,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
         model = TenxLibrary
         fields = (
             'id',
+            'name',
             'jira_ticket',
             'chips',
             'chip_well',
