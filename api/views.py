@@ -211,7 +211,7 @@ class SublibraryViewSetBrief(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 
-class AnalysisInformationFilter(django_filters.FilterSet):
+class AnalysisInformationFilter(django_filters.rest_framework.FilterSet):
     """"
     https://django-filter.readthedocs.io/en/latest/guide/usage.html
     DateFromToRangeFiler() :it uses datetime format values instead of numerical values.
@@ -311,7 +311,7 @@ class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
         'jira_ticket',
         'projects__name',
         'failed',
-        'sample'
+        'sample__sample_id'
     )
 
 class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
