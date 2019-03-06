@@ -120,6 +120,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td><a href="{% url 'core:tenx_project' %}">Projects</a> <i class="counter">{{ tenx_library_size }}</i></td>
+                    <td>
+                        <p style="float: right;">
+                            <a href="{% url 'tenx:library_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i> Add</a>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
                     <td><a href="{% url 'tenx:sequencing_list' %}">Sequencings</a> <i class="counter">{{ tenx_sequencing_size }}</i></td>
                     <td>
                         <p style="float: right;">

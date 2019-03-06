@@ -31,6 +31,7 @@ from django.utils import timezone
 from itertools import chain
 import json
 
+import core.models
 
 #============================
 # App imports
@@ -341,6 +342,39 @@ class TenxLibraryList(LibraryList):
     order = 'sample_id'
     library_class = TenxLibrary
     library_type = 'tenx'
+
+class ProjectDetail(TemplateView):
+
+    """
+    Library detail base class.
+    """
+
+    class Meta:
+        abstract = True
+
+    template_name = "core/project_table.html"
+    model =core.models.TenXProject
+
+    def get_context_data(self):
+        args = core.models.TenXProject.objects.filter(id=7)[0].args
+
+        if args:
+            args = args["vals"]
+            arg_keys = args[0].keys()
+        else:
+            arg_keys = []
+
+
+        context = {
+            'project': core.models.TenXProject.objects.filter(id=7)[0].tenxlibrary_set.all(),
+            'fixed_list' : ["id", "sample id", "patient id", "sample type", "cancer type", "Jira"],
+            'arg_keys' : arg_keys,
+            'args' : args,
+            'jsondump' : json.dumps(args),
+            'jsondump_key': json.dumps(arg_keys)
+        }
+        return context
+
 
 
 class LibraryDetail(TemplateView):

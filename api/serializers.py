@@ -30,7 +30,8 @@ from core.models import (
     TenxSequencing,
     TenxCondition,
     TenxLane,
-    TenxChip
+    TenxChip,
+    TenXProject
 )
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
@@ -417,5 +418,15 @@ class TenxChipSerializer(serializers.ModelSerializer):
             'id',
             'lab_name',
             'name',
+            'tenxlibrary_set',
+        )
+
+class TenxProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenXProject
+        fields = (
+            "id",
+            "name",
+            "args",
             'tenxlibrary_set',
         )

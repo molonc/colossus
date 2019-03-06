@@ -159,6 +159,17 @@
             {% endfor %}
         {% endif %}
     </table>
+        {% if library.sample %}
+            <h5 id="expand_info">Cilck here to Expand/Collapse Additional Information</h5>
+            <table  id="additional_information" class="table-condensed" >
+            {% for field, value in library.sample.additionalsampleinformation.get_field_values.items %}
+                <tr>
+                    <th id="thid">{{ field }}:</th>
+                    <td id="tdid" class="notes">{{ value }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% endif %}
     {% else %}
         <h5><i class="text-warning">There is no library sample detail for this library!</i></h5>
     {% endif %}
@@ -523,5 +534,7 @@
                 ]
             });
         });
+
+
     </script>
 {% endblock %}

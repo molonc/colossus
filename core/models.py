@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 # Django imports
 #----------------------------
 import datetime
+from  django.contrib.postgres.fields import JSONField
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
@@ -165,7 +166,30 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         ('UN','Unknown'),
     )
 
+    TISSUE_STATE = (
+        ('NONE', 'None'),
+        ('FROZ', 'Frozen'),
+        ('FRES', 'Fresh'),
+        ('DIG-FRES', 'Digested-Fresh'),
+
+    )
+
     # fields
+
+    tissue_state  = create_chrfield(
+        "Tissue State",
+        choices=TISSUE_STATE,
+        default='NONE',
+    )
+
+    cancer_type = create_chrfield(
+        "Cancer Type",
+        blank= True
+    )
+    cancer_subtype = create_chrfield(
+        "Cancer Subtype",
+        blank= True
+    )
     disease_condition_health_status = create_chrfield("Disease condition/health status")
     sex = create_chrfield(
         "Sex",
@@ -333,6 +357,18 @@ class PbalLibrary(Library):
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
 
+class TenXProject(models.Model, FieldValue):
+
+    name = create_chrfield(
+        "Project Name",
+        blank=True,
+    )
+
+    args = JSONField(
+        null=True,
+        blank=True,
+    )
+
 
 class TenxChip(models.Model, FieldValue):
 
@@ -393,6 +429,13 @@ class TenxLibrary(Library):
         default=0,
     )
 
+    project = models.ForeignKey(
+        TenXProject,
+        verbose_name="Project",
+        on_delete=models.CASCADE,
+        null=True
+    )
+
     chips = models.ForeignKey(
         TenxChip,
         verbose_name="Chip",
@@ -400,12 +443,15 @@ class TenxLibrary(Library):
         null=True
     )
 
-
     chip_well = models.IntegerField(
         default=0,
         choices=CHIP_WELL
     )
 
+    condition = create_chrfield(
+        "Condition",
+        blank=True,
+    )
 
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
@@ -1291,6 +1337,11 @@ class TenxSequencing(Sequencing):
     """
 
     library_type = 'tenx'
+
+    filepath = create_chrfield(
+        "Filepath",
+        blank=True
+    )
 
     # track history
     history = HistoricalRecords(table_name='tenx_history_sequencing')

@@ -1,0 +1,103 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}Library Details{% endblock %}
+
+{% block body %}
+
+<div class="container" style="overflow: scroll;">
+<!-- Editable table -->
+<div class="card">
+  <h3 class="card-header text-center font-weight-bold text-uppercase py-4my-0">Project Detail</h3>
+  <span class="btn btn-primary btn-rounded btn-sm column-add">Add Column</span>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr id="header_row">
+          <th class="text-center"></th>
+          {% for item in fixed_list %}
+           <th class="text-center">{{item}}</th>
+          {% endfor %}
+
+        </tr>
+        {% for library in project %}
+        <tr id="id_{{library.id}}">
+           <td>
+            <span class="table-remove"><button type="button" class="btn btn-danger btn-rounded btn-sm my-0">X</button></span>
+          </td>
+
+            <td class="pt-3-half">{{library.id}}</td>
+            <td class="pt-3-half">{{library.sample.sample_id}}</td>
+            <td class="pt-3-half">{{library.sample.anonymous_patient_id}}</td>
+            <td class="pt-3-half">{{library.sample.sample_type}}</td>
+            <td class="pt-3-half">{{library.sample.additionalsampleinformation.cancer_type}}</td>
+            <td class="pt-3-half">{{library.jira_ticket}}</td>
+        </tr>
+        {% endfor %}
+
+      </table>
+    </div>
+  </div>
+  <span class="btn btn-success btn-rounded btn-sm update-data" style="float: right;">SAVE</span>
+</div>
+<!-- Editable table -->
+</div>
+
+
+
+{% endblock %}
+
+{% block datatables_script %}
+    <script type="text/javascript">
+var $TABLE = $('#table');
+var $BTN = $('#export-btn');
+var $EXPORT = $('#export');
+
+$(document).ready(function() {
+  var json_dict = {{ jsondump | safe }};
+  const keys = Object.keys(json_dict[0]);
+
+  for (var key of keys) {
+    if ( key != "id") {
+      console.log(key)
+      $('#header_row').append('<th class="text-center" contenteditable="true">' + key + '</td>')
+      }
+  }
+
+  for (var library of json_dict) {
+    var row = $("#id_" + library["id"]);
+    for (var i = 0; i < keys.length; i++) {
+      if ( keys[i] != "id") {
+        row.append('<td class="pt-3-half" contenteditable="true">' + library[keys[i]] + '</td>');
+      }
+    }
+  }
+});
+
+$('.table-add').click(function () {
+var $clone = $TABLE.find('tr.hide').clone(true).removeClass('hide table-line');
+$TABLE.find('table').append($clone);
+});
+
+$('.column-add').click(function () {
+$TABLE.find('tr').each(function(){
+         var trow = $(this);
+         if(trow.index() === 0){
+             trow.append('<th class="text-center" contenteditable="true"> New Col </th>');
+         }else{
+             trow.append('<td class="pt-3-half" contenteditable="true"></td>');
+         }
+     });
+});
+
+
+$('.table-remove').click(function () {
+$(this).parents('tr').detach();
+});
+
+$('.update_data').click(function () {
+$(this).parents('tr').detach();
+});
+    </script>
+{% endblock %}

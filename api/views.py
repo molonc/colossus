@@ -33,7 +33,8 @@ from .serializers import (
     TenxLibrarySerializer,
     TenxLaneSerializer,
     TenxSequencingSerializer,
-    TenxChipSerializer)
+    TenxChipSerializer,
+    TenxProjectSerializer)
 
 from core.models import (
     Sample,
@@ -47,7 +48,8 @@ from core.models import (
     TenxSequencing,
     TenxCondition,
     TenxLane,
-    TenxChip
+    TenxChip,
+    TenXProject
 )
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
@@ -314,7 +316,7 @@ class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
         'projects__name',
         'failed',
         'sample',
-        'chips'
+        'chips',
     )
 
 class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
@@ -359,4 +361,10 @@ class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 class TenxChipViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxChip.objects.all()
     serializer_class = TenxChipSerializer
+    # permission_classes = (ReadOnly,)
+
+
+class TenxProjectViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    queryset = TenXProject.objects.all()
+    serializer_class = TenxProjectSerializer
     # permission_classes = (ReadOnly,)
