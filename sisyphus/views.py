@@ -161,6 +161,10 @@ class AnalysisInformationCreate(CreateView):
 
         # Add Emma as watcher
         jira.add_watcher(new_issue.id, 'elaks')
+        jira.add_watcher(new_issue.id, 'jbiele')
+        jira.add_watcher(new_issue.id, 'jbwang')
+        jira.add_watcher(new_issue.id, 'jedwards')
+
 
         return str(new_issue)
 
