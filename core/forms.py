@@ -255,6 +255,8 @@ class PbalLibraryForm(LibraryForm):
 
 class TenxLibraryForm(LibraryForm):
     field_order = [
+        'name',
+        'chips',
         'sample',
         'description',
         'result',

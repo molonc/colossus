@@ -20,7 +20,11 @@
                         </th>
                         <td>
                             {{ field.errors }}
-
+                            {% if library_type == 'tenx' %}
+                                {% if field.name == "name" %}
+                                    <h4 id="tenx_name"> Set Chip and Well </h4>
+                                {% endif %}
+                            {% endif %}
                             {% if field.name == "projects" %}
                                 <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
                                     {% for project in projects %}
@@ -145,6 +149,13 @@
 
 {% block scripts %}
     <script>
+        var tenx_library_naming = ['SCRNA10X', ' ', ' ',  '0000']
+        $(document).ready(function() {
+            if ("{{ library_type }}" == "tenx")
+                this.getElementById('id_name').style.display = 'none';
+        });
+
+
         $('#add_more').click(function() {
             var form_idx = $('#id_form-TOTAL_FORMS').val();
 
@@ -155,5 +166,26 @@
             $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
             $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
         });
+        function name_assignment() {
+            name =  tenx_library_naming.join("_");
+            document.getElementById('id_name').value = name;
+            document.getElementById('tenx_name').innerHTML =  name;
+        }
+
+        document.getElementById('id_chip_well').onchange = function() {
+            var index = this.selectedIndex;
+            var text = this.children[index].innerHTML.trim()
+            var inputText = (text != "NOT SET") ? text.split("_")[1] : '0';
+            tenx_library_naming[3] = "000" + inputText;
+            name_assignment()
+        }
+
+        document.getElementById('id_chips').onchange = function() {
+            var index = this.selectedIndex;
+            var inputText = this.children[index].innerHTML.trim().split("_");
+            tenx_library_naming[2] = inputText[0];
+            tenx_library_naming[1] = inputText[1];
+            name_assignment()
+        }
     </script>
 {% endblock %}

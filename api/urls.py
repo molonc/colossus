@@ -35,6 +35,7 @@ router.register(r'tenxlibrary', views.TenxLibraryViewSet, base_name='tenxlibrary
 router.register(r'tenxsequencing', views.TenxSequencingViewSet, base_name='tenxsequencing')
 router.register(r'tenxcondition', views.TenxConditionViewSet, base_name='tenxcondition')
 router.register(r'tenxlane', views.TenxLaneViewSet, base_name='tenxlane')
+router.register(r'tenxchip', views.TenxChipViewSet, base_name='tenxchip')
 app_name='api'
 urlpatterns = [
     url(r'^', include(router.urls)),

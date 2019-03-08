@@ -743,6 +743,9 @@ class LibraryCreate(TemplateView):
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
                         return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
+                else:
+                    if context['library_type'] == 'tenx':
+                        return HttpResponseRedirect(reverse('tenx:library_create'), {'lib_form' : lib_form, 'sublib_form' : sublib_form})
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
             for arg in e.args:
@@ -814,6 +817,7 @@ class TenxLibraryCreate(LibraryCreate):
     libcons_formset_class = TenxLibraryConstructionInfoInlineFormset
     libqs_formset_class = TenxLibraryQuantificationAndStorageInlineFormset
     library_type = 'tenx'
+
 
     def get_context_data(self, pk=None):
         """Add in 10x condition forms."""

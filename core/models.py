@@ -14,7 +14,7 @@ from __future__ import unicode_literals
 import datetime
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 
 
 #============================
@@ -334,14 +334,48 @@ class PbalLibrary(Library):
         return '_'.join([self.sample.sample_id])
 
 
-class TenxLibrary(Library):
+class TenxChip(models.Model, FieldValue):
 
+    # Chip Model for TenX Libraries
+
+    LAB_NAMES = (
+        ("SA", "Sam Aparicio"),
+        ("DH", "David Huntsman"),
+    )
+
+    lab_name = create_chrfield(
+        "Lab Name",
+        default = "SA",
+        choices=LAB_NAMES,
+        blank = True
+    )
+
+    #TenXLibrary name depend on below methods, so please be mindful when making changes
+    def get_id(self):
+        return "CHIP" + format(self.id, "04")
+
+    def __str__(self):
+        return self.get_id() +"_" + self.lab_name
+
+
+
+class TenxLibrary(Library):
     """
     10x library contains several Cell objects.
     """
 
+    CHIP_WELL = (
+        (0, 'NOT SET'), (1, 'WELL_1'), (2, 'WELL_2'), (3, 'WELL_3'), (4, 'WELL_4'),
+        (5, 'WELL_5'), (6, 'WELL_6'), (7, 'WELL_7'), (8, 'WELL_8')
+    )
+
     class Meta:
         ordering = ['sample']
+
+    name = create_chrfield(
+        "Library Name",
+        blank=True,
+    )
 
     library_type = 'tenx'
 
@@ -353,10 +387,25 @@ class TenxLibrary(Library):
         "Jira ticket",
         blank=True,
     )
+
     num_sublibraries = create_intfield(
         "Number of sublibraries",
         default=0,
     )
+
+    chips = models.ForeignKey(
+        TenxChip,
+        verbose_name="Chip",
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+
+    chip_well = models.IntegerField(
+        default=0,
+        choices=CHIP_WELL
+    )
+
 
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
