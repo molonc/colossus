@@ -6,16 +6,6 @@ import core.helpers
 from django.db import migrations, models
 import django.db.models.deletion
 
-def create_chip(apps, schema_editor):
-    Chips = apps.get_model('core', 'TenxChip')
-    TenxLibrary = apps.get_model('core', 'TenxLibrary')
-    db_alias = schema_editor.connection.alias
-    for i in range(1,77):
-        chip = Chips.objects.using(db_alias).create()
-        library = TenxLibrary.objects.filter(id=i)
-        if library:
-            library[0].chips = chip
-            library[0].save()
 
 class Migration(migrations.Migration):
 
@@ -62,7 +52,5 @@ class Migration(migrations.Migration):
             name='chips',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.TenxChip', verbose_name='Chip'),
         ),
-
-        migrations.RunPython(create_chip),
     ]
 
