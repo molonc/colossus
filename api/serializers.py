@@ -43,10 +43,7 @@ from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun
 class AdditionalSampleInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalSampleInformation
-        fields = (
-            'pathology_disease_name',
-            'additional_pathology_info',
-        )
+        fields = "__all__"
 
 
 class SampleSerializer(serializers.ModelSerializer):
@@ -396,6 +393,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'jira_ticket',
             'chips',
             'chip_well',
+            'condition',
             'num_sublibraries',
             'tenxsequencing_set',
             'tenxcondition_set',

@@ -310,6 +310,7 @@ class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = TenxLibrarySerializer
     filter_fields = (
         'id',
+        'name',
         'jira_ticket',
         'projects__name',
         'failed',

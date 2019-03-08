@@ -164,8 +164,27 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         ('NA','N/A'),
         ('UN','Unknown'),
     )
+    TISSUE_STATES = (
+        ('NONE', 'None'),
+        ('FROZ', 'Frozen'),
+        ('FRES', 'Fresh'),
+        ('DIG-FRES', 'Digested-Fresh'),
 
+    )
     # fields
+    tissue_state = create_chrfield(
+        "Tissue State",
+        choices=TISSUE_STATES,
+        default='NONE',
+    )
+    cancer_type = create_chrfield(
+        "Cancer Type",
+        blank=True
+    )
+    cancer_subtype = create_chrfield(
+        "Cancer Subtype",
+        blank=True
+    )
     disease_condition_health_status = create_chrfield("Disease condition/health status")
     sex = create_chrfield(
         "Sex",
@@ -406,12 +425,16 @@ class TenxLibrary(Library):
         choices=CHIP_WELL
     )
 
+    condition = create_chrfield(
+        "Condition",
+        blank=True,
+    )
 
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
 
     def get_id(self):
-        return "TENX" + format(self.id, "04")
+        return self.name
 
 
 class TenxCondition(models.Model, FieldValue):
