@@ -62,6 +62,7 @@ class Migration(migrations.Migration):
             name='chips',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.TenxChip', verbose_name='Chip'),
         ),
+
         migrations.RunPython(create_chip),
     ]
 
