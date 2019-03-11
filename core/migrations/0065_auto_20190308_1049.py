@@ -13,6 +13,7 @@ def create_chip(apps, schema_editor):
         chip = Chips.objects.create()
         library = TenxLibrary.objects.filter(id=i)
         if library:
+            library[0].name = "TENX" + str(chip.id).zfill(3)
             library[0].chips = chip
             library[0].save()
 

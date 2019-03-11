@@ -262,6 +262,11 @@ class PbalAnalysisInformation(AbstractAnalysisInformation):
 class TenxAnalysisInformation(AbstractAnalysisInformation):
     sequencings = models.ManyToManyField(TenxSequencing)
 
+    genome = create_chrfield(
+        "Genome",
+        blank=True,
+    )
+
     version = models.ForeignKey(
         TenxAnalysisVersion,
         verbose_name="Analysis Version",
