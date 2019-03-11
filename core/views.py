@@ -651,23 +651,25 @@ class LibraryCreate(TemplateView):
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     if all_valid and create:
-                        jira_user = lib_form['jira_user'].value()
-                        jira_password = lib_form['jira_password'].value()
-                        additional_title = lib_form['additional_title'].value()
+                        if context['library_type'] != 'pbal':
+                            jira_user = lib_form['jira_user'].value()
+                            jira_password = lib_form['jira_password'].value()
+                            additional_title = lib_form['additional_title'].value()
 
                         #Add these fields into Session so the JiraTicketConfirm View can access them
-                        if(validate_credentials(jira_user, jira_password)):
+                        if(context['library_type'] == 'pbal' or validate_credentials(jira_user, jira_password)):
                             #For DLP Libaries
                             if(context['library_type'] == 'dlp'):
                                 request.session['pool_id'] = str(instance.pool_id)
                                 request.session['description'] = instance.description
                             elif(context['library_type'] == 'tenx'):
                                 request.session['pool'] = request.POST['tenxlibraryconstructioninformation-0-pool']
-                            request.session['jira_user'] = jira_user
-                            request.session['jira_password'] = jira_password
-                            request.session['additional_title'] = additional_title
-                            request.session['sample_id'] = instance.sample.sample_id
-                            request.session['library_type'] = context['library_type']
+                            if context['library_type'] != 'pbal':
+                                request.session['jira_user'] = jira_user
+                                request.session['jira_password'] = jira_password
+                                request.session['additional_title'] = additional_title
+                                request.session['sample_id'] = instance.sample.sample_id
+                                request.session['library_type'] = context['library_type']
                         else:
                             messages.error(request, 'Invalid Jira Credentials')
                             return render(request, self.template_name, context)
@@ -707,7 +709,10 @@ class LibraryCreate(TemplateView):
                             create_sublibrary_models(instance, sublib_results, region_metadata)
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
-                        return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
+                        if context["library_type"] == "pbal":
+                            return HttpResponseRedirect(instance.get_absolute_url())
+                        else:
+                            return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
                     elif all_valid and not create:
                         instance.save()
                         if context['library_type'] == 'tenx':
