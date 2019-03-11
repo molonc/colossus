@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^lane/update/(?P<pk>\d+)$', views.PbalLaneUpdate.as_view(), name='lane_update'),
     url(r'^lane/delete/(?P<pk>\d+)$', views.PbalLaneDelete.as_view(), name='lane_delete'),
     url(r'^plate/create/(?P<from_library>\d+)$', views.plate_create, name='plate_create_from_library'),
+    url(r'^plate/create$', views.plate_create, name='plate_create'),
     url(r'^plate/update/(?P<pk>\d+)$', views.plate_update, name='plate_update'),
     url(r'^plate/delete/(?P<pk>\d+)$', views.plate_delete, name='plate_delete')
 ]
