@@ -27,7 +27,6 @@ drf-yasg==1.10.0
 elasticsearch==2.3.0
 enum34==1.1.6
 flex==6.13.2
-functools32==3.2.3.post2
 future==0.16.0
 idna==2.7
 inflection==0.3.1
@@ -41,7 +40,6 @@ jsonpointer==1.14
 jsonschema==2.6.0
 kombu==4.0.1
 MarkupSafe==1.0
-mod-wsgi==4.5.2
 model-mommy==1.2.6
 names==0.3.0
 numpy==1.11.0
@@ -53,7 +51,7 @@ pbr==4.2.0
 pexpect==4.6.0
 pickleshare==0.7.5
 prompt-toolkit==1.0.15
-psycopg2==2.6.1
+psycopg2==2.7.7
 ptyprocess==0.6.0
 pycparser==2.18
 Pygments==2.3.1
