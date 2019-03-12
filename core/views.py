@@ -632,54 +632,34 @@ class LibraryCreate(TemplateView):
         return render(request, self.template_name, context)
 
     def post(self, request, pk=None):
+        #true if creating an instance
+        create = False
+        #context is saved to rerender the page incase form is invalid
         context = self.get_context_data(pk)
-        return self._post(request, context)
-
-    def _post(self, request, context, library=None, create=False):
-        lib_form = self.lib_form_class(request.POST, instance=library)
+        lib_form = self.lib_form_class(request.POST)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
+        #context is updated with the form containing error message when the form is invalid
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
+        error_message = ""
 
-        error_message = ''
         try:
             with transaction.atomic():
                 if lib_form.is_valid() and sublib_form.is_valid():
                     instance = lib_form.save(commit=False)
+                    #if pk is not none, its an update
                     if instance.pk is None:
                         create = True
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
-                    if all_valid and create:
-                        if context['library_type'] != 'pbal':
-                            jira_user = lib_form['jira_user'].value()
-                            jira_password = lib_form['jira_password'].value()
-                            additional_title = lib_form['additional_title'].value()
 
-                        #Add these fields into Session so the JiraTicketConfirm View can access them
-                        if(context['library_type'] == 'pbal' or validate_credentials(jira_user, jira_password)):
-                            #For DLP Libaries
-                            if(context['library_type'] == 'dlp'):
-                                request.session['pool_id'] = str(instance.pool_id)
-                                request.session['description'] = instance.description
-                            elif(context['library_type'] == 'tenx'):
-                                request.session['pool'] = request.POST['tenxlibraryconstructioninformation-0-pool']
-                            if context['library_type'] != 'pbal':
-                                request.session['jira_user'] = jira_user
-                                request.session['jira_password'] = jira_password
-                                request.session['additional_title'] = additional_title
-                                request.session['sample_id'] = instance.sample.sample_id
-                                request.session['library_type'] = context['library_type']
-                        else:
-                            messages.error(request, 'Invalid Jira Credentials')
-                            return render(request, self.template_name, context)
-                        # Save the library
+                    if all_valid:
                         instance.save()
                         request.session['library_id'] = instance.id
+
                         # Save 10x conditions
                         if context['library_type'] == 'tenx':
                             condition_formset = TenxConditionFormset(request.POST)
-
                             # Save each condition
                             idx = 1
                             for condition_form in condition_formset:
@@ -700,6 +680,7 @@ class LibraryCreate(TemplateView):
 
                         # save the ManyToMany field.
                         lib_form.save_m2m()
+
                         # Add information from SmartChipApp files
                         region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                         sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
@@ -707,59 +688,61 @@ class LibraryCreate(TemplateView):
                             instance.sublibraryinformation_set.all().delete()
                             instance.chipregion_set.all().delete()
                             create_sublibrary_models(instance, sublib_results, region_metadata)
+
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
-                        if context["library_type"] == "pbal":
-                            return HttpResponseRedirect(instance.get_absolute_url())
+
+                        #if pbal no jira ticket is created
+                        if context['library_type'] == 'pbal':
+                            return HttpResponseRedirect(instance.get_absolute_url)
+
+                        #jira implementation
                         else:
-                            return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
-                    elif all_valid and not create:
-                        instance.save()
-                        if context['library_type'] == 'tenx':
-                            condition_formset = TenxConditionFormset(request.POST)
+                            if create:
+                                if context['library_type'] != 'pbal':
+                                    jira_user = lib_form['jira_user'].value()
+                                    jira_password = lib_form['jira_password'].value()
+                                    additional_title = lib_form['additional_title'].value()
 
-                            # Save each condition
-                            idx = 1
-                            for condition_form in condition_formset:
-                                # If a condition_form was left blank,
-                                # skip it
-                                if not condition_form.has_changed():
-                                    continue
+                                # Add these fields into Session so the JiraTicketConfirm View can access them
+                                if (context['library_type'] == 'pbal' or validate_credentials(jira_user,
+                                                                                              jira_password)):
+                                    # For DLP Libaries
+                                    if (context['library_type'] == 'dlp'):
+                                        request.session['pool_id'] = str(instance.pool_id)
+                                        request.session['description'] = instance.description
+                                    elif (context['library_type'] == 'tenx'):
+                                        request.session['pool'] = request.POST[
+                                            'tenxlibraryconstructioninformation-0-pool']
+                                    if context['library_type'] != 'pbal':
+                                        request.session['jira_user'] = jira_user
+                                        request.session['jira_password'] = jira_password
+                                        request.session['additional_title'] = additional_title
+                                        request.session['sample_id'] = instance.sample.sample_id
+                                        request.session['library_type'] = context['library_type']
+                                else:
+                                    messages.error(request, 'Invalid Jira Credentials')
+                                    return render(request, self.template_name, context)
 
-                                # Save the condition
-                                condition = condition_form.save(commit=False)
-                                condition.condition_id = idx
-                                condition.library = instance
-                                condition.sample = instance.sample
-                                condition.save()
 
-                                # Increment the index counter
-                                idx += 1
-
-                        # save the ManyToMany field.
-                        lib_form.save_m2m()
-                        # Add information from SmartChipApp files
-                        region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
-                        sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                        if region_metadata is not None and sublib_results is not None:
-                            instance.sublibraryinformation_set.all().delete()
-                            instance.chipregion_set.all().delete()
-                            create_sublibrary_models(instance, sublib_results, region_metadata)
-                        # save the formsets.
-                        [formset.save() for formset in formsets.values()]
-                        return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
+                            return HttpResponseRedirect(
+                                reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
+                    else:
+                        raise Exception('Invalid Non-Library Forms')
                 else:
-                    if context['library_type'] == 'tenx':
-                        return HttpResponseRedirect(reverse('tenx:library_create'), {'lib_form' : lib_form, 'sublib_form' : sublib_form})
+                    raise Exception('Invalid Library Form')
+
         except ValueError as e:
-            #Can't join into a string when some args are ints, so convert them first
+            # Can't join into a string when some args are ints, so convert them first
             for arg in e.args:
-                if(type(arg) is int):
+                if (type(arg) is int):
                     arg = str(arg)
                 error_message += arg.encode('ascii', 'ignore') + ' '
             error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
             messages.error(request, error_message)
             return render(request, self.template_name, context)
+
+
 
     def _validate_formsets(self, request, instance):
         all_valid = True

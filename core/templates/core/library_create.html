@@ -5,146 +5,146 @@
 {% block title %}Create Library{% endblock %}
 
 {% block body %}
-<div class="container graybg">
-    <form action="{% url library_type|add:':library_create' %}" method="POST", enctype="multipart/form-data">
-        {% csrf_token %}
+
+<form action="{% url library_type|add:':library_create' %}" method="POST", enctype="multipart/form-data">
+    <div class="container graybg index-container">
+    {% csrf_token %}
         <fieldset>
-            <legend>Library Information</legend>
+            <legend >Library Information</legend>
             <table class="table-condensed">
                 <thead>
-
                 {% for field in lib_form %}
-                    <tr>
-                        <th>
-                            {{ field.label_tag }}
-                        </th>
-                        <td>
-                            {{ field.errors }}
-                            {% if library_type == 'tenx' %}
-                                {% if field.name == "name" %}
-                                    <h4 id="tenx_name"> Set Chip and Well </h4>
-                                {% endif %}
-                            {% endif %}
-                            {% if field.name == "projects" %}
-                                <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
-                                    {% for project in projects %}
-                                        <option>{{ project }}</option>
-                                    {% endfor %}
-
-                                </select>
-                            {% elif field.name == "sample" and sample_id %}
-                                <select id="id_sample" name="sample">
-                                    <option value="{{ sample_id }}" selected="selected">{{ sample }}</option>
-                                </select>
-                            {% elif field.name == "relates_to_dlp" %}
-                                <select class="selectpicker" data-live-search="True" id="id_relates_to_dlp" name="relates_to_dlp" multiple data-none-selected-text="--------">
-                                    {% for lib in related_dlp_libs %}
-                                        <option value={{ lib.id }}>{{ lib }}</option>
-                                    {% endfor %}
-                                </select>
-                            {% elif field.name == "relates_to_tenx" %}
-                                <select class="selectpicker" data-live-search="True" id="id_relates_to_tenx" name="relates_to_tenx" multiple data-none-selected-text="--------">
-                                    {% for lib in related_tenx_libs %}
-                                        <option value={{ lib.id }}>{{ lib }}</option>
-                                    {% endfor %}
-                                </select>
-                            {% else %}
-                                {{ field }}
-                            {% endif %}
-
-                            {% if field.help_text %}
-                                <p class="helptext">{{ field.help_text }}</p>
-                            {% endif %}
-                            </td>
-                    </tr>
+                <tr>
+                <th>
+                {{ field.label_tag }}
+                </th>
+                <td>
+                {{ field.errors }}
+                {% if library_type == 'tenx' %}
+                {% if field.name == "name" %}
+                <h4 id="tenx_name"> Set Chip and Well </h4>
+                {% endif %}
+                {% endif %}
+                {% if field.name == "projects" %}
+                <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
+                {% for project in projects %}
+                <option>{{ project }}</option>
                 {% endfor %}
-
+                </select>
+                {% elif field.name == "sample" and sample_id %}
+                <select id="id_sample" name="sample">
+                <option value="{{ sample_id }}" selected="selected">{{ sample }}</option>
+                </select>
+                {% elif field.name == "relates_to_dlp" %}
+                <select class="selectpicker" data-live-search="True" id="id_relates_to_dlp" name="relates_to_dlp" multiple data-none-selected-text="--------">
+                {% for lib in related_dlp_libs %}
+                <option value={{ lib.id }}>{{ lib }}</option>
+                {% endfor %}
+                </select>
+                {% elif field.name == "relates_to_tenx" %}
+                <select class="selectpicker" data-live-search="True" id="id_relates_to_tenx" name="relates_to_tenx" multiple data-none-selected-text="--------">
+                {% for lib in related_tenx_libs %}
+                <option value={{ lib.id }}>{{ lib }}</option>
+                {% endfor %}
+                </select>
+                {% else %}
+                {{ field }}
+                {% endif %}
+                {% if field.help_text %}
+                <p class="helptext">{{ field.help_text }}</p>
+                {% endif %}
+                </td>
+                </tr>
+                {% endfor %}
                 </thead>
             </table>
-         </fieldset>
+        </fieldset>
+    </div>
 
-         <br>
+    {% if library_type == 'dlp' %}
+    <div class="container graybg index-container" >
+    <br>
+        <fieldset>
+        <legend href="#subinfo_collapse" data-toggle="collapse">Sublibrary Information</legend>
+            <table class="table-condensed collapse" id="subinfo_collapse" >
+            <thead>
+            {{ sublib_form }}
+            </thead>
+        </table>
+        </fieldset>
+    </div>
+    {% endif %}
 
-         {% if library_type == 'dlp' %}
-             <fieldset>
-                <legend>Sublibrary Information</legend>
-                <table class="table-condensed">
+    <div class="container graybg index-container">
+        <br>
+        <fieldset>
+        <legend  href="#sampleinfo_collapse" data-toggle="collapse">Library Sample Details</legend>
+        <table class="table-condensed collapse" id="sampleinfo_collapse">
+            <thead>
+            {{ libdetail_formset }}
+            </thead>
+        </table>
+        </fieldset>
+    </div>
+
+    {% if library_type == 'tenx' %}
+    <div class="container graybg index-container">
+    <br>
+        <fieldset>
+        <legend  href="#condi_collapse" data-toggle="collapse">Conditions</legend>
+            <div class="table-condensed collapse" id="condi_collapse">
+            {{ tenx_condition_formset.management_form }}
+                <div id="form_set">
+                {% for condition_form in tenx_condition_formset %}
+                <table>
                     <thead>
-                    {{ sublib_form }}
+                    {{ condition_form }}
                     </thead>
                 </table>
-             </fieldset>
-
-             <br>
-         {% endif %}
-
-         <fieldset>
-            <legend>Library Sample Details</legend>
-            <table class="table-condensed">
-                <thead>
-                    {{ libdetail_formset }}
-                </thead>
-            </table>
-         </fieldset>
-
-         {% if library_type == 'tenx' %}
-             <fieldset>
-                <legend>Conditions</legend>
-
-                {{ tenx_condition_formset.management_form }}
-
-                <div id="form_set">
-                    {% for condition_form in tenx_condition_formset %}
-                        <table class="table-condensed">
-                            <thead>
-                                {{ condition_form }}
-                            </thead>
-                        </table>
-                    {% endfor %}
+                {% endfor %}
                 </div>
-
                 <input type="button" class="btn btn-primary btn-sm" style="margin-top: 1.3em" value="Add condition" id="add_more">
-
                 <div id="empty_form" style="display:none">
-                    <table class='no_error'>
-                        {{ tenx_condition_formset.empty_form.as_table }}
-                    </table>
+                <table class='no_error'>
+                    {{ tenx_condition_formset.empty_form.as_table }}
+                </table>
                 </div>
-             </fieldset>
+            </div>
+        </fieldset>
+    </div>
+    {% endif %}
 
-             <br>
-         {% endif %}
-
-         <br>
-
-         <fieldset>
-            <legend>Library Construction Information</legend>
-            <table class="table-condensed">
+    <div class="container graybg index-container">
+    <br>
+        <fieldset>
+            <legend href="#constinfo_collapse" data-toggle="collapse" >Library Construction Information</legend>
+            <table class="table-condensed collapse" id="constinfo_collapse">
                 <thead>
-                    {{ libcons_formset }}
+                {{ libcons_formset }}
                 </thead>
             </table>
-         </fieldset>
+        </fieldset>
+    </div>
 
-         <br>
-
-         <fieldset>
-            <legend>Library Quantification and Storage</legend>
-            <table class="table-condensed">
+    <div class="container graybg index-container">
+    <br>
+        <fieldset>
+            <legend  href="#quant_collapse" data-toggle="collapse">Library Quantification and Storage</legend>
+            <table class="table-condensed collapse" id="quant_collapse">
                 <thead>
-                    {{ libqs_formset }}
+                {{ libqs_formset }}
                 </thead>
             </table>
-         </fieldset>
-
-         <br>
-
-        <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
-        <a class="btn btn-default btn-sm" href="{% url library_type|add:':library_list' %}">Cancel</a>
-    </form>
+        </fieldset>
+    </div>
 
     <br>
-</div>
+    <input class="btn btn-primary btn-sm" type="submit" name="create" value="Create">
+    <a class="btn btn-default btn-sm" href="{% url library_type|add:':library_list' %}">Cancel</a>
+</form>
+
+
+
 {% endblock %}
 
 {% block scripts %}
