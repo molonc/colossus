@@ -699,15 +699,13 @@ class LibraryCreate(TemplateView):
                         #jira implementation
                         else:
                             if create:
-                                if context['library_type'] != 'pbal':
-                                    jira_user = lib_form['jira_user'].value()
-                                    jira_password = lib_form['jira_password'].value()
-                                    additional_title = lib_form['additional_title'].value()
+                                jira_user = lib_form['jira_user'].value()
+                                jira_password = lib_form['jira_password'].value()
+                                additional_title = lib_form['additional_title'].value()
 
                                 # Add these fields into Session so the JiraTicketConfirm View can access them
-                                if (context['library_type'] == 'pbal' or validate_credentials(jira_user,
-                                                                                              jira_password)):
-                                    # For DLP Libaries
+                                if (validate_credentials(jira_user, jira_password)):
+                                    #information is loaded into request to be accessed by jira form
                                     if (context['library_type'] == 'dlp'):
                                         request.session['pool_id'] = str(instance.pool_id)
                                         request.session['description'] = instance.description
