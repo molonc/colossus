@@ -351,7 +351,6 @@ class TenxConditionViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxLane.objects.all()
     serializer_class = TenxLaneSerializer
-    # permission_classes = (ReadOnly,)
     filter_fields = (
         'id',
         'flow_cell_id',
@@ -361,4 +360,8 @@ class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 class TenxChipViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxChip.objects.all()
     serializer_class = TenxChipSerializer
-    # permission_classes = (ReadOnly,)
+    filter_fields = (
+        "id",
+        "lab_name"
+    )
+

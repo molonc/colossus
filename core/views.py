@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required #, permission_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, render_to_response
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
 from django.forms.models import model_to_dict
@@ -44,6 +44,7 @@ from .models import (
     PbalSequencing,
     TenxLibrary,
     TenxCondition,
+    TenxChip,
     TenxSequencing,
     DlpLane,
     PbalLane,
@@ -86,7 +87,7 @@ from .forms import (
     PlateForm,
     JiraConfirmationForm,
     AddWatchersForm,
-)
+    TenxChipForm)
 from .utils import (
     create_sublibrary_models,
     generate_samplesheet,
@@ -146,6 +147,7 @@ class IndexView(TemplateView):
             'pbal_sequencing_size': PbalSequencing.objects.count(),
             'tenx_library_size': TenxLibrary.objects.count(),
             'tenx_sequencing_size': TenxSequencing.objects.count(),
+            'tenx_chips_size': TenxChip.objects.count(),
             'analysisinformation_size':DlpAnalysisInformation.objects.count(),
             'analysisrun_size':AnalysisRun.objects.count(),
         }
@@ -1732,6 +1734,94 @@ class TenxLaneDelete(LaneDelete):
     lane_class = TenxLane
     library_type = 'tenx'
 
+
+#============================
+# TenxChip views
+#----------------------------
+@method_decorator(login_required, name='dispatch')
+class TenxChipCreate(TemplateView):
+    template_name = "core/tenx/tenxchip_create.html"
+    def get_context_data(self, **kwargs):
+        context = {
+            "form" : TenxChipForm
+        }
+        return context
+
+    def post(self, request):
+        form = TenxChipForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+            print instance.id
+            print instance.get_absolute_url
+            return HttpResponseRedirect(instance.get_absolute_url())
+        else:
+            return render_to_response('my_template.html', {'form': form})
+
+
+class TenxChipList(TemplateView):
+    template_name = "core/tenx/tenxchip_list.html"
+
+    def get_context_data(self):
+        context = {
+            'chips': TenxChip.objects.all().order_by('id'),
+        }
+        return context
+
+class TenxChipDetail(TemplateView):
+    template_name = "core/tenx/tenxchip_detail.html"
+
+    def get_context_data(self, pk):
+        context = {
+            'chip': get_object_or_404(TenxChip, pk=pk),
+            'pk': pk,
+        }
+
+        return context
+
+class TenxChipUpdate(TemplateView):
+
+    template_name = "core/tenx/tenxchip_update.html"
+
+    def get_context_data(self, pk):
+        chip = get_object_or_404(TenxChip, pk=pk)
+        form=TenxChipForm(instance=chip)
+        context = {
+            "form" : form,
+            "pk" : pk
+        }
+        return  context
+
+    def post(self, request, pk):
+        chip = get_object_or_404(TenxChip, pk=pk)
+        form = TenxChipForm(request.POST, instance=chip)
+
+        if form.is_valid():
+            form.save()
+            msg = "Successfully updated the Chip."
+            messages.success(request, msg)
+            return HttpResponseRedirect(chip.get_absolute_url())
+
+        msg = "Failed to update the Chip. Please fix the errors below."
+        messages.error(request, msg)
+        return self.get_context_and_render(request, form, pk=pk)
+
+
+@method_decorator(login_required, name='dispatch')
+class TenxChipDelete(TemplateView):
+
+    template_name = "core/tenx/tenxchip_delete.html"
+
+    def get_context_data(self, pk):
+        context = {
+            'chip': get_object_or_404(TenxChip, pk=pk),
+        }
+        return context
+
+    def post(self, request, pk):
+        get_object_or_404(TenxChip, pk=pk).delete()
+        msg = "Successfully deleted the Chip."
+        messages.success(request, msg)
+        return HttpResponseRedirect(reverse('tenx:chip_list'))
 
 #============================
 # Plate views
