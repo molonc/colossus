@@ -1751,8 +1751,6 @@ class TenxChipCreate(TemplateView):
         form = TenxChipForm(request.POST)
         if form.is_valid():
             instance = form.save()
-            print instance.id
-            print instance.get_absolute_url
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
             return render_to_response('my_template.html', {'form': form})

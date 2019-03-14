@@ -17,6 +17,8 @@ from django.contrib.postgres.fields import JSONField
 #============================
 # App imports
 #----------------------------
+from simple_history.models import HistoricalRecords
+
 from core.models import DlpSequencing,PbalSequencing,TenxSequencing,DlpLibrary,PbalLibrary,TenxLibrary,DlpLane
 from core.helpers import *
 
@@ -34,6 +36,7 @@ class DlpAnalysisVersion(AbstractVersion):
     """
     Keeps track of the available analysis software versions.
     """
+    history = HistoricalRecords(table_name='dlp_history_analysis_version')
     version = create_chrfield(
         "DlpAnalysis Version",
         blank=False,
@@ -48,6 +51,7 @@ class PbalAnalysisVersion(AbstractVersion):
     """
     Keeps track of the available analysis software versions.
     """
+    history = HistoricalRecords(table_name='pbal_history_analysis_version')
     version = create_chrfield(
         "PbalAnalysis Version",
         blank=False,
@@ -62,6 +66,7 @@ class TenxAnalysisVersion(AbstractVersion):
     """
     Keeps track of the available analysis software versions.
     """
+    history = HistoricalRecords(table_name='tenx_history_analysis_version')
     version = create_chrfield(
         "TenxAnalysis Version",
         blank=False,
@@ -76,6 +81,8 @@ class ReferenceGenome(models.Model):
     """
     The Reference genome to be used by the single cell pipeline
     """
+    history = HistoricalRecords(table_name='ref_genome_history')
+
     reference_genome = create_chrfield("reference_genome", blank=False, null=False)
 
     def __str__(self):
@@ -104,6 +111,8 @@ class AnalysisRun(models.Model):
         (ALIGN_COMPLETE, 'Align Complete'),
         (HMMCOPY_COMPLETE, 'Hmmcopy Complete'),
     )
+
+    history = HistoricalRecords(table_name='analysis_run_history')
 
     last_updated = models.DateTimeField(
         "Analysis last updated date/time",
@@ -232,6 +241,8 @@ class AbstractAnalysisInformation(models.Model):
 
 
 class DlpAnalysisInformation(AbstractAnalysisInformation):
+    history = HistoricalRecords(table_name='dlp_analysis_info_history')
+
     library = models.ForeignKey(
         DlpLibrary,
         verbose_name="Library",
@@ -250,6 +261,8 @@ class DlpAnalysisInformation(AbstractAnalysisInformation):
 
 
 class PbalAnalysisInformation(AbstractAnalysisInformation):
+    history = HistoricalRecords(table_name='pbal_analysis_info_history')
+
     sequencings = models.ManyToManyField(PbalSequencing)
 
     version = models.ForeignKey(
@@ -260,6 +273,8 @@ class PbalAnalysisInformation(AbstractAnalysisInformation):
 
 
 class TenxAnalysisInformation(AbstractAnalysisInformation):
+    history = HistoricalRecords(table_name='tenx_analysis_info_history')
+
     sequencings = models.ManyToManyField(TenxSequencing)
 
     genome = create_chrfield(
