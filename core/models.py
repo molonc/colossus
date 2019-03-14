@@ -376,6 +376,9 @@ class TenxChip(models.Model, FieldValue):
     def __str__(self):
         return self.get_id() +"_" + self.lab_name
 
+    def get_absolute_url(self):
+        return reverse("tenx" + ":chip_detail", kwargs={"pk": self.pk})
+
 
 
 class TenxLibrary(Library):

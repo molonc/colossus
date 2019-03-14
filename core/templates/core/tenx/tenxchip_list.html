@@ -1,0 +1,47 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}List of TenX Chips{% endblock %}
+
+{% block body %}
+<div class="container" style="padding: 0; margin-bottom: 5px;">
+    <h4 style="float: left;">Select a chip to view its details</h4>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'tenx:chip_create' %}">Add TenxChip</a>
+</div>
+<div class="container" style="background-color: #F5F5F5;">
+    <div class="table-responsive">
+        <table id="datatable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Chip ID</th>
+                    <th>Name</th>
+                    <th>Lab Name</th>
+                    <th>Number of Tenx Libraries</th>
+                    <th class="no-sort-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <br/>
+
+                {% for chip in chips %}
+                    <tr>
+                        <td><a href="{% url 'tenx:chip_detail' chip.id %}" >{{ chip.id }}</a></td>
+                        <td>{{ chip.get_id }}</td>
+                        <td>{{ chip.lab_name }}</td>
+                        <td>{{ chip.tenxlibrary_set.count }}</td>
+                        <td>
+                            <div style="float: right; min-width: 69px">
+                                <a href="{% url 'tenx:chip_update' chip.pk %}"style="margin-right: 2px;" ><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
+                                <br>
+                                <a href="{% url 'tenx:chip_delete' chip.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -39,6 +39,7 @@ from .models import (
     PbalLibrary,
     TenxLibrary,
     TenxCondition,
+    TenxChip,
     SublibraryInformation,
     DlpLibrarySampleDetail,
     DlpLibraryConstructionInformation,
@@ -176,6 +177,13 @@ class JiraConfirmationForm(Form):
     project = forms.ChoiceField()
     reporter = forms.ChoiceField(choices=get_user_list())
 
+
+class TenxChipForm(ModelForm):
+    class Meta:
+        model = TenxChip
+        fields = "__all__"
+
+    # lab_name = forms.ChoiceField(choices=(("SA", "Sam Aparacio"), ("DH", "David Huntsman")))
 
 
 #===========================

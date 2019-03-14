@@ -1,0 +1,25 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %} TenX Chip Creation{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+<div class="container graybg" style="margin-bottom:10px; border-radius: 10px; box-shadow: 0px 0px 5px grey;">
+
+   <legend style="padding-top: 5px">TenX Chip Detail</legend>
+    <div class="alert alert-info" role="alert">
+        Chip Name and Id are automatically generated
+    </div>
+    <form action="{% url 'tenx:chip_create' %}" method="POST" style="padding: 0px 10px 10px 10px">
+        {% csrf_token %}
+        {{form|crispy}}
+        <input class="btn btn-primary btn-sm" style="margin: 10px 0px 20px 10px" type="submit" name="create" value="Create">
+        <a class="btn btn-default btn-sm" style="margin: 10px 10px 20px 0px"  href="{% url 'dlp:library_create' %}">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}

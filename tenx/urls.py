@@ -27,5 +27,10 @@ urlpatterns = [
     url(r'^lane/create/$', views.TenxLaneCreate.as_view(), name='lane_create'),
     url(r'^lane/create/(?P<from_sequencing>\d+)$', views.TenxLaneCreate.as_view(), name='lane_create_from_sequencing'),
     url(r'^lane/update/(?P<pk>\d+)$', views.TenxLaneUpdate.as_view(), name='lane_update'),
-    url(r'^lane/delete/(?P<pk>\d+)$', views.TenxLaneDelete.as_view(), name='lane_delete')
+    url(r'^lane/delete/(?P<pk>\d+)$', views.TenxLaneDelete.as_view(), name='lane_delete'),
+    url(r'^chip/list$', views.TenxChipList.as_view(), name='chip_list'),
+    url(r'^chip/detail/(?P<pk>\d+)$', views.TenxChipDetail.as_view(), name='chip_detail'),
+    url(r'^chip/create$', views.TenxChipCreate.as_view(), name='chip_create'),
+    url(r'^chip/update/(?P<pk>\d+)$', views.TenxChipUpdate.as_view(), name='chip_update'),
+    url(r'^chip/delete/(?P<pk>\d+)$', views.TenxChipDelete.as_view(), name='chip_delete'),
 ]
