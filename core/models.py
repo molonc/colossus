@@ -222,6 +222,8 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     )
     family_information = create_chrfield("Family information")
 
+    history = HistoricalRecords(table_name='additional_sample_information_history')
+
     def __str__(self):
         res = '_'.join([self.sample.sample_id, 'additional_information'])
         return res
@@ -356,6 +358,7 @@ class PbalLibrary(Library):
 class TenxChip(models.Model, FieldValue):
 
     # Chip Model for TenX Libraries
+    history = HistoricalRecords(table_name='tenx_history_chip')
 
     LAB_NAMES = (
         ("SA", "Sam Aparicio"),
@@ -458,6 +461,8 @@ class TenxCondition(models.Model, FieldValue):
         null=True,
     )
 
+    history = HistoricalRecords(table_name='tenx_history_condition')
+
     condition_id = create_intfield("Condition_ID")
     experimental_condition = create_chrfield("Experimental_condition")
     enzyme = create_chrfield("Enzyme")
@@ -488,6 +493,8 @@ class ChipRegion(models.Model, FieldValue):
 
     region_code = create_chrfield("region_code")
 
+    history = HistoricalRecords(table_name='chip_region_history')
+
     def __str__(self):
         return "{}".format(self.region_code)
 
@@ -498,6 +505,8 @@ class SublibraryInformation(models.Model, FieldValue):
     Sublibrary Information from the SmartChipApp output file.
     It's technically a table of cell information. DLP only.
     """
+
+    history = HistoricalRecords(table_name='sub_library_information_history')
 
     fields_to_exclude = ['ID', 'Library', 'Sample_ID', 'Chip_Region']
     values_to_exclude = ['id', 'library', 'sample_id', 'chip_region']
@@ -567,6 +576,8 @@ class MetadataField(models.Model):
     added new fields in table. DLP only.
     """
 
+    history = HistoricalRecords(table_name='metadata_history')
+
     field = create_chrfield(
         "Metadata key",
         blank=False,
@@ -582,6 +593,8 @@ class ChipRegionMetadata(models.Model, FieldValue):
     """
     Library/Sublibrary Metadata. DLP only.
     """
+
+    history = HistoricalRecords(table_name='chip_region_metadata_history')
 
     fields_to_exclude = ['ID', 'Chip_Region']
     values_to_exclude = ['id', 'chip_region']
@@ -650,6 +663,8 @@ class DlpLibrarySampleDetail(LibrarySampleDetail):
     DLP library sample details.
     """
 
+    history = HistoricalRecords(table_name='dlp_history_library_sample_detail')
+
     # database relationships
     library = models.OneToOneField(
         DlpLibrary,
@@ -683,6 +698,8 @@ class PbalLibrarySampleDetail(LibrarySampleDetail):
     """
     PBAL library sample details.
     """
+
+    history = HistoricalRecords(table_name='pbal_history_library_sample_detail')
 
     # database relationships
     library = models.OneToOneField(
@@ -718,6 +735,7 @@ class TenxLibrarySampleDetail(LibrarySampleDetail):
     """
     10x library sample details.
     """
+    history = HistoricalRecords(table_name='tenx_history_library_sample_detail')
 
     # database relationships
     library = models.OneToOneField(
@@ -763,6 +781,8 @@ class DlpLibraryConstructionInformation(LibraryConstructionInformation):
     """
     DLP library construction information.
     """
+
+    history = HistoricalRecords(table_name='dlp_history_library_construction_information')
 
     # database relationships
     library = models.OneToOneField(
@@ -822,6 +842,8 @@ class PbalLibraryConstructionInformation(LibraryConstructionInformation):
     PBAL library construction information.
     """
 
+    history = HistoricalRecords(table_name='pbal_history_library_construction_information')
+
     # database relationships
     library = models.OneToOneField(
         PbalLibrary,
@@ -860,6 +882,7 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
     """
     10x library construction information.
     """
+    history = HistoricalRecords(table_name='tenx_history_library_construction_information')
 
     # database relationships
     library = models.OneToOneField(
@@ -969,6 +992,7 @@ class DlpLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
     """
     DLP library quantification and storage.
     """
+    history = HistoricalRecords(table_name='dlp_history_library_q_and_s')
 
     fields_to_exclude = [
         'ID',
@@ -1066,6 +1090,7 @@ class PbalLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
     """
     PBAL library quantification and storage.
     """
+    history = HistoricalRecords(table_name='pbal_history_library_q_and_s')
 
     fields_to_exclude = ['ID', 'Library']
 
@@ -1086,6 +1111,7 @@ class TenxLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
     """
     10x library quantification and storage.
     """
+    history = HistoricalRecords(table_name='tenx_history_library_q_and_s')
 
     fields_to_exclude = ['ID', 'Library']
 
@@ -1367,6 +1393,7 @@ class DlpLane(Lane):
     """
     Dlp lane information.
     """
+    history = HistoricalRecords(table_name='dlp_history_lane')
 
     # database relationships
     sequencing = models.ForeignKey(
@@ -1381,7 +1408,7 @@ class PbalLane(Lane):
     """
     PBAL lane information.
     """
-
+    history = HistoricalRecords(table_name='pbal_history_lane')
     # database relationships
     sequencing = models.ForeignKey(
         PbalSequencing,
@@ -1395,7 +1422,7 @@ class TenxLane(Lane):
     """
     10x lane information.
     """
-
+    history = HistoricalRecords(table_name='tenx_history_lane')
     # database relationships
     sequencing = models.ForeignKey(
         TenxSequencing,
@@ -1409,6 +1436,8 @@ class Plate(models.Model, FieldValue):
     """
     PBAL plate information.
     """
+
+    history = HistoricalRecords(table_name='pbal_plate_history')
 
     fields_to_exclude = ['ID', 'Plate']
     values_to_exclude = ['id', 'plate']
@@ -1442,6 +1471,7 @@ class Plate(models.Model, FieldValue):
 
 
 class JiraUser(models.Model):
+    history = HistoricalRecords(table_name='jira_user_history')
     username = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
     choices = (
