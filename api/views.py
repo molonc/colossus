@@ -83,7 +83,7 @@ class RestrictedQueryMixin(object):
             filters = set(filters_dict.keys())
 
             # Deal with DateFromToRangeFilters
-            for filter_name, filter_inst in filters_dict.iteritems():
+            for filter_name, filter_inst in filters_dict.items():
                 if type(filter_inst) == django_filters.filters.DateFromToRangeFilter:
                     filters.update({filter_name + '_0', filter_name + '_1'})
 
