@@ -72,7 +72,7 @@ class RestrictedQueryMixin(object):
     def get_queryset(self):
         non_filter_params = set(['limit', 'offset', 'page', 'page_size', 'format'])
 
-        qs = super(RestrictedQueryMixin, self).get_queryset()
+        qs = super(RestrictedQueryMixin, self).get_queryset().order_by('id')
 
         if hasattr(self, 'filter_fields') and hasattr(self, 'filter_class'):
             raise RuntimeError("%s has both filter_fields and filter_class" % self)
