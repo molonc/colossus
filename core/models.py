@@ -1162,6 +1162,7 @@ class Sequencing(models.Model, FieldValue):
     sequencing_instrument_choices = (
         ('HX','HiSeqX'),
         ('H2500','HiSeq2500'),
+        ('N500', 'NextSeq500'),
         ('N550','NextSeq550'),
         ('MI','MiSeq'),
         ('O','other'),
