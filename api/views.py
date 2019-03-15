@@ -33,7 +33,9 @@ from .serializers import (
     TenxLibrarySerializer,
     TenxLaneSerializer,
     TenxSequencingSerializer,
-    TenxChipSerializer)
+    TenxChipSerializer,
+    ProjectSerializer
+)
 
 from core.models import (
     Sample,
@@ -47,7 +49,8 @@ from core.models import (
     TenxSequencing,
     TenxCondition,
     TenxLane,
-    TenxChip
+    TenxChip,
+    Project
 )
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
@@ -100,6 +103,21 @@ class RestrictedQueryMixin(object):
                     'no filter %s' % key)
 
         return qs
+
+
+class ProjectViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    """
+    View for Sample that is queryable by sample_ID.
+    Try adding "?sample_id=SA928" without the quotes to the end of the url.
+    """
+
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_fields = (
+        'id',
+        'name',
+    )
 
 
 class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
@@ -336,6 +354,7 @@ class TenxConditionViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxCondition.objects.all()
     serializer_class = TenxConditionSerializer
     permission_classes = (IsAuthenticated, )
+
     filter_fields = (
         'id',
         'library',

@@ -21,6 +21,7 @@ schema_view = get_schema_view(
 )
 
 router = routers.DefaultRouter()
+router.register(r'project', views.ProjectViewSet,base_name='project')
 router.register(r'sample', views.SampleViewSet)
 router.register(r'lane', views.LaneViewSet)
 router.register(r'sequencing', views.SequencingViewSet)

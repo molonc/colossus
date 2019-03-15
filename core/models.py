@@ -31,13 +31,8 @@ from .helpers import *
 #============================
 # 3rd-party app imports
 #----------------------------
-from taggit.managers import TaggableManager
-from taggit.models import Tag
 from simple_history.models import HistoricalRecords
-from simple_history import register
 
-# register taggit for tracking its history
-register(Tag)
 
 
 #============================
@@ -46,6 +41,32 @@ register(Tag)
 class SequencingManager(models.Manager):
     def with_data(self):
         return [obj for obj in self.get_queryset() if obj.library.is_sequenced()]
+
+#============================
+# Project models
+#----------------------------
+class Project(models.Model, FieldValue):
+
+    name = models.CharField(
+        max_length=100
+    )
+
+    description = models.TextField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("core:project_detail", kwargs={"pk": self.pk})
+
+    def get_libraries(self):
+        return list(self.dlplibrary_set.all()) + list(self.pballibrary_set.all()) + list(self.tenxlibrary_set.all())
+
+    class Meta:
+        ordering = ['name']
 
 
 #============================
@@ -244,11 +265,10 @@ class Library(models.Model, FieldValue, LibraryAssistant):
     fields_to_exclude = ['ID', 'Primary Sample']
     values_to_exclude = ['id', 'primary sample']
 
-    # taggit
-    projects = TaggableManager(
+    projects = models.ManyToManyField(
+        Project,
         verbose_name="Project",
-        help_text="A comma-separated list of project names.",
-        blank=True,
+        blank=True
     )
 
     # related sample
@@ -433,6 +453,12 @@ class TenxLibrary(Library):
 
     condition = create_chrfield(
         "Condition",
+        blank=True,
+    )
+
+    google_sheet = create_chrfield(
+        "Google Sheet Link",
+        null=True,
         blank=True,
     )
 

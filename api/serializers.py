@@ -30,7 +30,8 @@ from core.models import (
     TenxSequencing,
     TenxCondition,
     TenxLane,
-    TenxChip
+    TenxChip,
+    Project
 )
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
@@ -44,6 +45,19 @@ class AdditionalSampleInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalSampleInformation
         fields = "__all__"
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = (
+            'id',
+            'name',
+            'description',
+            'dlplibrary_set',
+            'pballibrary_set',
+            'tenxlibrary_set'
+        )
 
 
 class SampleSerializer(serializers.ModelSerializer):

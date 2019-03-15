@@ -5,70 +5,38 @@
 {% block title %}List of Projects{% endblock %}
 
 {% block body %}
+<div class="container" style="padding: 0; margin-bottom: 5px;">
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'core:project_create' %}">Add Project</a>
+</div>
+
 <div class="container" style="background-color:#F5F5F5;">
     <div class="table-responsive">
         <table id="datatable" class="table table-striped">
             <thead>
                 <th>Project</th>
-                <th class="no-sort-col">Libraries</th>
-                <th class="no-sort-col">Library Type</th>
-                <th class="no-sort-col">Library Description</th>
-                <th class="no-sort-col">Status</th>
-                <th class="no-sort-col">JIRA Ticket</th>
-                <th>Count</th>
-                <th class="no-sort-col"></th>
+                <th class="no-sort-col">Dlp Library</th>
+                <th class="no-sort-col">Pbal Library</th>
+                <th class="no-sort-col">Tenx Library</th>
+                <th class="no-sort-col">Total Count</th>
+
             </thead>
             <tbody>
             {% for project in projects %}
                 <tr>
                     <td>
-                        {{ project }}
+                        <p style="margin: 0;"><a href="{{ project.get_absolute_url }}">{{ project }}</a></p>
                     </td>
                     <td>
-                        {% for library in project.get_libraries %}
-                            <p style="margin: 0;"><a href="{{ library.get_absolute_url }}">{{ library }}</a></p>
-                        {% endfor %}
+                        {{ project.dlplibrary_set.count }}
                     </td>
                     <td>
-                        {% for library in project.get_libraries %}
-                            <p style="margin: 0">{{ library.library_type|upper }}</p>
-                        {% endfor %}
+                        {{ project.pballibrary_set.count }}
                     </td>
                     <td>
-                        {% for library in project.get_libraries %}
-                            <p style="margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;" title="{{library.description}}" class="description">{{ library.description }}</p>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% for library in project.get_libraries %}
-                            {% if library.dlplibraryquantificationandstorage.qc_check == 'P' %}
-                                {% if library.library_type == 'dlp' and library.get_last_analysis_status %}
-                                    <p style="margin: 0">Done</p>
-                                {% else %}
-                                    <p style="margin: 0">Underway</p>
-                                {% endif %}
-                            {% elif library.dlplibraryquantificationandstorage.qc_check == 'N' %}
-                                <p style="margin: 0">Won't Do</p>
-                            {% else %}
-                                <p style="margin: 0"></p>
-                            {% endif %}
-                            
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% for library in project.get_libraries %}
-                            <p style="margin: 0"><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{ library.jira_ticket }}</a></p>
-                        {% endfor %}
+                        {{ project.tenxlibrary_set.count }}
                     </td>
                     <td>
                         {{ project.get_libraries|length }}
-                    </td>
-                    <td>
-                        <div style="float: right; min-width: 69px">
-                            <a style="margin-right: 2px;" href="{% url 'core:project_update' pk=project.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange"></i> edit</a>
-                            <br>
-                            <a href="{% url 'core:project_delete' pk=project.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
-                        </div>
                     </td>
                 </tr>
             {% endfor %}
