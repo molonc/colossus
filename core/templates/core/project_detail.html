@@ -1,0 +1,78 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}Library Details{% endblock %}
+
+{% block body %}
+
+<div class="container" style="padding: 0 0; margin-top: 0.7em; margin-bottom: 1em;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="margin: 0 0 0 5px; color: #5D4037;">{{project}}</h2>
+        </div>
+
+        <div>
+            <a class="btn btn-warning" style="margin-right: 5px;" href="{% url 'core:project_update' pk=project.pk %}">Edit</a>
+            <a class="btn btn-danger" href="{% url 'core:project_delete' pk=project.pk %}">Delete</a>
+        </div>
+    </div>
+</div>
+
+<div class="container detail-container">
+    <h4>Project Detail</h4>
+
+    <table class="table-condensed">
+        <tr>
+            <th id="thid"> Name : {{project.name}}</th>
+        </tr>
+        <tr>
+            <th id="thid"> Description : {{project.description}}</th>
+        </tr>
+    </table>
+</div>
+
+
+
+<div class="container detail-bordered-container">
+    <h4>Experimental Condition Metadata</h4>
+        <div class="table-responsive">
+            <table id="experimental-condition-datatable" class="table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th> Library </th>
+                        <th> Type </th>
+                        <th> Description </th>
+                        <th> Google Sheet </th>
+                        <th> JIRA </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for library in project.get_libraries %}
+                        <tr>
+                            <td><a href="{{ library.get_absolute_url }}">{{ library }}</a></td>
+                            <td>
+                                <p style="margin: 0">{{ library.library_type|upper }}</p>
+                            </td>
+                            <td>{{ library.description }}</td>
+                            <td>N/A</td>
+                            <td>
+                                <p style="margin: 0"><a href="https://www.bcgsc.ca/jira/browse/{{library.jira_ticket}}">{{ library.jira_ticket }}</a></p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+
+<div class="container" style="margin-bottom: 5px;">
+    <a class="btn btn-warning btn-sm" style="float: left; margin: 5px;" href="{% url 'core:project_update' pk=project.pk %}">Edit</a>
+    <a class="btn btn-danger btn-sm" style="float: left; margin: 5px;" href="{% url 'core:project_delete' pk=project.pk %}">Delete</a>
+</div>
+
+
+
+
+{% endblock %}
+

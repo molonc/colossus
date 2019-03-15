@@ -10,6 +10,13 @@
         {% csrf_token %}
         <fieldset>
             <legend>Library Information</legend>
+            {% if lib_form.errors or sublib_form.errors %}
+            <div class="alert alert-danger" role="alert">
+                ERROR!
+                {{ lib_form.errors }}
+                {{ sublib_form.errors }}
+            </div>
+            {% endif %}
             <table class="table-condensed">
                 <thead>
                     {% for field in lib_form %}
@@ -24,9 +31,9 @@
                                     <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
                                         {% for project in projects %}
                                             {% if project in selected_projects %}
-                                                <option selected="{{ project }}">{{ project }}</option>
+                                                <option selected="{{ project }}" value={{ project.id }}>{{ project }}</option>
                                             {% else %}
-                                                <option>{{ project }}</option>
+                                                <option value={{ project.id }}>{{ project }}</option>
                                             {% endif %}
                                         {% endfor %}
 

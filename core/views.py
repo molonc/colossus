@@ -57,7 +57,7 @@ from .models import (
     Plate,
     Library,
     JiraUser,
-)
+    Project)
 from sisyphus.models import *
 from .forms import (
     SampleForm,
@@ -114,21 +114,7 @@ from colossus.settings import LOGIN_URL
 
 
 
-#============================
-# 3rd-party app imports
-#----------------------------
-from taggit.models import Tag
-
-
-#============================
-# Helpers
-#----------------------------
-def get_libraries(self):
-    return list(chain(DlpLibrary.objects.filter(projects__name=self.name), PbalLibrary.objects.filter(projects__name=self.name), TenxLibrary.objects.filter(projects__name=self.name)))
-
-# add a method to get the list of libraries for each project name
-Tag.get_libraries = get_libraries
-
+from colossus.settings import LOGIN_URL
 
 #============================
 # Index page
@@ -618,7 +604,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             'libdetail_formset': self.libdetail_formset_class(),
             'libcons_formset': self.libcons_formset_class(),
             'libqs_formset': self.libqs_formset_class(),
-            'projects': [t.name for t in Tag.objects.all()],
+            'projects': Project.objects.all(),
             'sample': str(sample),
             'sample_id': pk,
             'related_dlp_libs': DlpLibrary.objects.all(),
@@ -749,8 +735,11 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         [formset.save() for formset in formsets.values()]
                         return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
                 else:
-                    if context['library_type'] == 'tenx':
-                        return HttpResponseRedirect(reverse('tenx:library_create'), {'lib_form' : lib_form, 'sublib_form' : sublib_form})
+                    if create:
+                        return HttpResponseRedirect(reverse(context['library_type'] + ':library_create'), {'lib_form' : lib_form, 'sublib_form' : sublib_form})
+                    else:
+                        return HttpResponseRedirect(reverse(context['library_type'] + ':library_update', kwargs={'pk': library.pk }), {'lib_form' : lib_form, 'sublib_form' : sublib_form})
+
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
             for arg in e.args:
@@ -847,7 +836,7 @@ class LibraryUpdate(LibraryCreate):
 
     def get_context_data(self, pk):
         library = get_object_or_404(self.library_class, pk=pk)
-        selected_projects = library.projects.names()
+        selected_projects = [p.name for p in library.projects.all()]
         selected_related_dlp_libs = library.relates_to_dlp.all()
         selected_related_tenx_libs = library.relates_to_tenx.all()
 
@@ -858,7 +847,7 @@ class LibraryUpdate(LibraryCreate):
             'libdetail_formset': self.libdetail_formset_class(instance=library),
             'libcons_formset': self.libcons_formset_class(instance=library),
             'libqs_formset': self.libqs_formset_class(instance=library),
-            'projects': [t.name for t in Tag.objects.all()],
+            'projects': Project.objects.all(),
             'selected_projects': selected_projects,
             'related_dlp_libs': DlpLibrary.objects.all(),
             'related_tenx_libs': TenxLibrary.objects.all(),
@@ -939,7 +928,17 @@ class ProjectList(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self):
         context = {
-            'projects': Tag.objects.all().order_by('name'),
+            'projects': Project.objects.all().order_by('name'),
+        }
+        return context
+
+class ProjectDetail(TemplateView):
+
+    template_name = "core/project_detail.html"
+
+    def get_context_data(self, pk):
+        context = {
+            'project': get_object_or_404(Project, pk=pk),
         }
         return context
 
@@ -954,13 +953,13 @@ class ProjectDelete(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, pk):
         context = {
-            'project': get_object_or_404(Tag, pk=pk),
+            'project': get_object_or_404(Project, pk=pk),
             'pk': pk,
         }
         return context
 
     def post(self, request, pk):
-        get_object_or_404(Tag, pk=pk).delete()
+        get_object_or_404(Project, pk=pk).delete()
         msg = "Successfully deleted the Project."
         messages.success(request, msg)
         return HttpResponseRedirect(reverse('core:project_list'))
@@ -986,7 +985,7 @@ class ProjectCreate(LoginRequiredMixin,TemplateView):
             instance = form.save()
             msg = "Successfully created the %s project." % instance.name
             messages.success(request, msg)
-            return HttpResponseRedirect(reverse('core:project_list'))
+            return HttpResponseRedirect(instance.get_absolute_url())
 
 
 class ProjectUpdate(LoginRequiredMixin, TemplateView):
@@ -1000,18 +999,18 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
     def get_context_data(self, pk):
         context = {
             'pk': pk,
-            'form': ProjectForm(instance=get_object_or_404(Tag, pk=pk)),
+            'form': ProjectForm(instance=get_object_or_404(Project, pk=pk)),
         }
         return context
 
     def post(self, request, pk):
-        form = ProjectForm(request.POST, instance=get_object_or_404(Tag, pk=pk))
+        form = ProjectForm(request.POST, instance=get_object_or_404(Project, pk=pk))
         if form.is_valid():
             instance = form.save(commit=False)
             instance.save()
             msg = "Successfully updated the Project."
             messages.success(request, msg)
-            return HttpResponseRedirect(reverse('core:project_list'))
+            return HttpResponseRedirect(instance.get_absolute_url())
 
 
 #============================

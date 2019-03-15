@@ -58,7 +58,7 @@ from .models import (
     TenxLane,
     Plate,
     JiraUser,
-)
+    Project)
 from .utils import parse_smartchipapp_results_file
 from .jira_templates.jira_wrapper import *
 from jira import JIRA, JIRAError
@@ -529,8 +529,8 @@ TenxConditionFormset = forms.modelformset_factory(
 #---------------------------
 class ProjectForm(ModelForm):
     class Meta:
-        model = Tag
-        fields = ['name']
+        model = Project
+        fields = ['name', 'description']
 
 
 class AddWatchersForm(Form):

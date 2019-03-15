@@ -28,7 +28,7 @@
                             {% if field.name == "projects" %}
                                 <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
                                     {% for project in projects %}
-                                        <option>{{ project }}</option>
+                                        <option value={{ project.id }} >{{ project }}</option>
                                     {% endfor %}
 
                                 </select>
