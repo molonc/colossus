@@ -290,7 +290,7 @@ class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
         else:
             validated_data['version'] = instance.version
 
-        for attr, value in validated_data.iteritems():
+        for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
