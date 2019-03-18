@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView
 from django.utils.decorators import method_decorator
 from django.views.generic.detail import DetailView
@@ -31,11 +32,14 @@ from core.models import (
 from .forms import *
 from .models import *
 
+from colossus.settings import LOGIN_URL
+
 
 #============================
 # Home page of the app
 #----------------------------
 @Render("sisyphus/home.html")
+@login_required
 def home_view(request):
     """home page of the app."""
     context = {}
@@ -45,7 +49,7 @@ def home_view(request):
 # Analysis Information (for general User) Views
 #----------------------------
 @Render("sisyphus/analysisinformation_choose_library.html")
-@login_required()
+@login_required
 def analysisinformation_create_choose_library(request):
     """ Library selection before proceding with analysis information creation """
     if request.method == 'POST':
@@ -64,8 +68,10 @@ def analysisinformation_create_choose_library(request):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-class AnalysisInformationCreate(CreateView):
+
+class AnalysisInformationCreate(LoginRequiredMixin, CreateView):
+
+    login_url = LOGIN_URL
     form_class = AnalysisInformationForm
     template_name = 'sisyphus/analysisinformation_create.html'
 
@@ -187,10 +193,10 @@ class AnalysisInformationCreate(CreateView):
         return self.render_to_response(self.get_context_data(form=form, **kwargs))
 
 
-@method_decorator(login_required, name='dispatch')
-class AnalysisInformationUpdate(UpdateView):
+class AnalysisInformationUpdate(LoginRequiredMixin, UpdateView):
     """ Analysis update view """
 
+    login_url = LOGIN_URL
     form_class = AnalysisInformationForm
     template_name = 'sisyphus/analysisinformation_update.html'
 
@@ -224,7 +230,7 @@ class AnalysisInformationUpdate(UpdateView):
 
 
 @Render("sisyphus/analysis_delete.html")
-@login_required()
+@login_required
 def analysis_delete(request, pk):
     """analysis delete page."""
     analysis = get_object_or_404(DlpAnalysisInformation, pk=pk)
@@ -243,6 +249,7 @@ def analysis_delete(request, pk):
 
 
 @Render("sisyphus/analysisinformation_list.html")
+@login_required
 def analysisinformation_list(request):
     """list of analysis information."""
 

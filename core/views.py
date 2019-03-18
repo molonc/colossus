@@ -16,6 +16,7 @@ from jira import JIRA, JIRAError
 #----------------------------
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required #, permission_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse, resolve
@@ -109,6 +110,8 @@ from .jira_templates.jira_wrapper import (
     update_description,
 )
 
+from colossus.settings import LOGIN_URL
+
 
 
 #============================
@@ -130,12 +133,11 @@ Tag.get_libraries = get_libraries
 #============================
 # Index page
 #----------------------------
-class IndexView(TemplateView):
-
+class IndexView(LoginRequiredMixin, TemplateView):
     """
     Home page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/index.html"
 
     def get_context_data(self):
@@ -157,12 +159,11 @@ class IndexView(TemplateView):
 #============================
 # Sample views
 #----------------------------
-class SampleList(TemplateView):
-
+class SampleList(LoginRequiredMixin, TemplateView):
     """
     List of samples.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/sample_list.html"
 
     def get_context_data(self):
@@ -181,12 +182,11 @@ class Inventory(SampleList):
     template_name = "core/inventory.html"
 
 
-class SampleDetail(TemplateView):
-
+class SampleDetail(LoginRequiredMixin, TemplateView):
     """
     Sample detail page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/sample_detail.html"
 
     def get_context_data(self, pk):
@@ -198,13 +198,11 @@ class SampleDetail(TemplateView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-class SampleCreate(TemplateView):
-
+class SampleCreate(LoginRequiredMixin, TemplateView):
     """
     Sample create page.
     """
-
+    login_url = LOGIN_URL
     template_name="core/sample_create.html"
 
     def get_context_and_render(self, request, form, formset, pk=None):
@@ -267,13 +265,12 @@ class SampleUpdate(SampleCreate):
         return self.get_context_and_render(request, form, formset, pk=pk)
 
 
-@method_decorator(login_required, name='dispatch')
-class SampleDelete(TemplateView):
+class SampleDelete(LoginRequiredMixin, TemplateView):
 
     """
     Sample delete page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/sample_delete.html"
 
     def get_context_data(self, pk):
@@ -293,12 +290,12 @@ class SampleDelete(TemplateView):
 #============================
 # Library views
 #----------------------------
-class LibraryList(TemplateView):
+class LibraryList(LoginRequiredMixin, TemplateView):
 
     """
     Library list base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -345,12 +342,12 @@ class TenxLibraryList(LibraryList):
     library_type = 'tenx'
 
 
-class LibraryDetail(TemplateView):
+class LibraryDetail(LoginRequiredMixin, TemplateView):
 
     """
     Library detail base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -470,9 +467,10 @@ class TenxLibraryDetail(LibraryDetail):
         )
 
 
-@method_decorator(login_required, name='dispatch')
-class TenxConditionsDelete(View):
+class TenxConditionsDelete(LoginRequiredMixin, View):
     """Delete 10x library conditions metadata."""
+    login_url = LOGIN_URL
+
     def post(self, request, pk):
         """Delete the 10x library's conditions."""
         library = get_object_or_404(TenxLibrary, pk=pk)
@@ -483,13 +481,12 @@ class TenxConditionsDelete(View):
         return HttpResponseRedirect(reverse('tenx:library_detail', kwargs=dict(pk=pk)))
 
 
-@method_decorator(login_required, name='dispatch')
-class LibraryDelete(TemplateView):
+class LibraryDelete(LoginRequiredMixin, TemplateView):
 
     """
     Library delete base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -540,8 +537,9 @@ class TenxLibraryDelete(LibraryDelete):
     library_type = 'tenx'
 
 
-@method_decorator(login_required, name='dispatch')
-class JiraTicketConfirm(TemplateView):
+class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
+
+    login_url = LOGIN_URL
 
     template_name = 'core/jira_ticket_confirm.html'
 
@@ -596,12 +594,12 @@ class JiraTicketConfirm(TemplateView):
             return HttpResponseRedirect('/{}/library/{}'.format(request.session['library_type'], library.id))
 
 
-@method_decorator(login_required, name='dispatch')
-class LibraryCreate(TemplateView):
+class LibraryCreate(LoginRequiredMixin, TemplateView):
 
     """
     Library create base class.
     """
+    login_url = LOGIN_URL
 
     class Meta:
         abstract = True
@@ -931,12 +929,12 @@ class TenxLibraryUpdate(LibraryUpdate):
 #============================
 # Project views
 #----------------------------
-class ProjectList(TemplateView):
+class ProjectList(LoginRequiredMixin, TemplateView):
 
     """
     Project detail page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/project_list.html"
 
     def get_context_data(self):
@@ -946,13 +944,12 @@ class ProjectList(TemplateView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-class ProjectDelete(TemplateView):
+class ProjectDelete(LoginRequiredMixin, TemplateView):
 
     """
     Project delete page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/project_delete.html"
 
     def get_context_data(self, pk):
@@ -969,13 +966,12 @@ class ProjectDelete(TemplateView):
         return HttpResponseRedirect(reverse('core:project_list'))
 
 
-@method_decorator(login_required, name='dispatch')
-class ProjectCreate(TemplateView):
+class ProjectCreate(LoginRequiredMixin,TemplateView):
 
     """
     Project create page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/project_create.html"
 
     def get_context_data(self):
@@ -993,13 +989,12 @@ class ProjectCreate(TemplateView):
             return HttpResponseRedirect(reverse('core:project_list'))
 
 
-@method_decorator(login_required, name='dispatch')
-class ProjectUpdate(TemplateView):
+class ProjectUpdate(LoginRequiredMixin, TemplateView):
 
     """
     Project update page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/project_update.html"
 
     def get_context_data(self, pk):
@@ -1022,12 +1017,12 @@ class ProjectUpdate(TemplateView):
 #============================
 # Sequencing views
 #----------------------------
-class SequencingList(TemplateView):
+class SequencingList(LoginRequiredMixin, TemplateView):
 
     """
     Sequencing list base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -1082,12 +1077,12 @@ class TenxSequencingList(SequencingList):
     library_type = 'tenx'
 
 
-class SequencingDetail(TemplateView):
+class SequencingDetail(LoginRequiredMixin, TemplateView):
 
     """
     Sequencing detail base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -1136,8 +1131,10 @@ class TenxSequencingDetail(SequencingDetail):
     sequencing_class = TenxSequencing
     library_type = 'tenx'
 
-@method_decorator(login_required, name='dispatch')
-class AddWatchers(TemplateView):
+
+class AddWatchers(LoginRequiredMixin, TemplateView):
+
+    login_url = LOGIN_URL
     template_name = "core/add_watchers.html"
 
     def get(self, request):
@@ -1179,13 +1176,13 @@ class AddWatchers(TemplateView):
         return HttpResponseRedirect('/{}/sequencing/{}'.format(request.session['library_type'], request.session['sequencing_id']))
 
 
-@method_decorator(login_required, name='dispatch')
-class SequencingCreate(TemplateView):
+
+class SequencingCreate(LoginRequiredMixin, TemplateView):
 
     """
     Sequencing create base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -1277,13 +1274,12 @@ class TenxSequencingCreate(SequencingCreate):
     library_type = 'tenx'
 
 
-@method_decorator(login_required, name='dispatch')
-class SequencingUpdate(TemplateView):
+class SequencingUpdate(LoginRequiredMixin, TemplateView):
 
     """
     Sequencing update base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -1370,13 +1366,12 @@ class TenxSequencingUpdate(SequencingUpdate):
     library_type = 'tenx'
 
 
-@method_decorator(login_required, name='dispatch')
-class SequencingDelete(TemplateView):
+class SequencingDelete(LoginRequiredMixin, TemplateView):
 
     """
     Sequencing delete base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -1427,6 +1422,7 @@ class TenxSequencingDelete(SequencingDelete):
     library_type = 'tenx'
 
 
+@login_required
 def dlp_sequencing_get_samplesheet(request, pk):
 
     """
@@ -1443,6 +1439,7 @@ def dlp_sequencing_get_samplesheet(request, pk):
     return response
 
 
+@login_required
 def dlp_sequencing_get_queried_samplesheet(request, flowcell):
 
     """
@@ -1462,13 +1459,12 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
         return HttpResponseRedirect(reverse('index'))
 
 
-@method_decorator(login_required, name='dispatch')
-class DlpSequencingCreateGSCFormView(TemplateView):
+class DlpSequencingCreateGSCFormView(LoginRequiredMixin, TemplateView):
 
     """
     Sequencing GSC submission form.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/sequencing_create_gsc_form.html"
 
     def get_context_data(self, pk):
@@ -1503,6 +1499,7 @@ class DlpSequencingCreateGSCFormView(TemplateView):
         return render(request, self.template_name, context)
 
 
+@login_required
 def dlp_sequencing_get_gsc_form(request, pk):
 
     """
@@ -1523,13 +1520,12 @@ def dlp_sequencing_get_gsc_form(request, pk):
 #============================
 # Lane views
 #----------------------------
-@method_decorator(login_required, name='dispatch')
-class LaneCreate(TemplateView):
+class LaneCreate(LoginRequiredMixin, TemplateView):
 
     """
     Lane create page.
     """
-
+    login_url = LOGIN_URL
     template_name = "core/lane_create.html"
 
     def get_context_and_render(self, request, from_sequencing, form):
@@ -1596,13 +1592,12 @@ class TenxLaneCreate(LaneCreate):
     library_type = 'tenx'
 
 
-@method_decorator(login_required, name='dispatch')
-class LaneUpdate(TemplateView):
+class LaneUpdate(LoginRequiredMixin, TemplateView):
 
     """
     Lane update base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -1670,13 +1665,12 @@ class TenxLaneUpdate(LaneUpdate):
     library_type = 'tenx'
 
 
-@method_decorator(login_required, name='dispatch')
-class LaneDelete(TemplateView):
+class LaneDelete(LoginRequiredMixin, TemplateView):
 
     """
     Lane delete base class.
     """
-
+    login_url = LOGIN_URL
     class Meta:
         abstract = True
 
@@ -1738,9 +1732,11 @@ class TenxLaneDelete(LaneDelete):
 #============================
 # TenxChip views
 #----------------------------
-@method_decorator(login_required, name='dispatch')
-class TenxChipCreate(TemplateView):
+class TenxChipCreate(LoginRequiredMixin, TemplateView):
+
+    login_url = LOGIN_URL
     template_name = "core/tenx/tenxchip_create.html"
+
     def get_context_data(self, **kwargs):
         context = {
             "form" : TenxChipForm
@@ -1756,7 +1752,9 @@ class TenxChipCreate(TemplateView):
             return render_to_response('my_template.html', {'form': form})
 
 
-class TenxChipList(TemplateView):
+class TenxChipList(LoginRequiredMixin, TemplateView):
+
+    login_url = LOGIN_URL
     template_name = "core/tenx/tenxchip_list.html"
 
     def get_context_data(self):
@@ -1765,7 +1763,10 @@ class TenxChipList(TemplateView):
         }
         return context
 
-class TenxChipDetail(TemplateView):
+
+class TenxChipDetail(LoginRequiredMixin, TemplateView):
+
+    login_url = LOGIN_URL
     template_name = "core/tenx/tenxchip_detail.html"
 
     def get_context_data(self, pk):
@@ -1776,8 +1777,10 @@ class TenxChipDetail(TemplateView):
 
         return context
 
-class TenxChipUpdate(TemplateView):
 
+class TenxChipUpdate(LoginRequiredMixin, TemplateView):
+
+    login_url = LOGIN_URL
     template_name = "core/tenx/tenxchip_update.html"
 
     def get_context_data(self, pk):
@@ -1804,9 +1807,10 @@ class TenxChipUpdate(TemplateView):
         return self.get_context_and_render(request, form, pk=pk)
 
 
-@method_decorator(login_required, name='dispatch')
-class TenxChipDelete(TemplateView):
 
+class TenxChipDelete(LoginRequiredMixin, TemplateView):
+
+    login_url = LOGIN_URL
     template_name = "core/tenx/tenxchip_delete.html"
 
     def get_context_data(self, pk):
@@ -1821,11 +1825,12 @@ class TenxChipDelete(TemplateView):
         messages.success(request, msg)
         return HttpResponseRedirect(reverse('tenx:chip_list'))
 
+
 #============================
 # Plate views
 #----------------------------
 @Render("core/plate_create.html")
-@login_required()
+@login_required
 def plate_create(request, from_library=None):
 
     """
@@ -1859,7 +1864,7 @@ def plate_create(request, from_library=None):
 
 
 @Render("core/plate_update.html")
-@login_required()
+@login_required
 def plate_update(request, pk):
 
     """
@@ -1891,7 +1896,7 @@ def plate_update(request, pk):
 
 
 @Render("core/plate_delete.html")
-@login_required()
+@login_required
 def plate_delete(request, pk):
 
     """
@@ -1918,6 +1923,7 @@ def plate_delete(request, pk):
 #============================
 # Search view
 #----------------------------
+@login_required
 def search_view(request):
     query_str = request.GET.get('query_str')
     instance = None
@@ -1950,6 +1956,7 @@ def search_view(request):
 # Summary view
 #----------------------------
 @Render("core/summary.html")
+@login_required
 def dlp_summary_view(request):
 
     library_per_sample_count = {s.sample_id : s.dlplibrary_set.count() for s in Sample.objects.all()}
@@ -1965,7 +1972,7 @@ def dlp_summary_view(request):
     }
     return context
 
-
+@login_required
 def dlp_get_filtered_sublib_count(sublibs):
     unfiltered_count = sublibs.count()
 
@@ -1976,7 +1983,7 @@ def dlp_get_filtered_sublib_count(sublibs):
     filtered_count = unfiltered_count - blankwells_count
     return filtered_count
 
-
+@login_required
 def dlp_get_cell_graph(request):
 
     data = []
@@ -2019,7 +2026,7 @@ def dlp_get_cell_graph(request):
 
     return response
 
-
+@login_required
 def export_sublibrary_csv(request,pk):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="Sublibrary-info.csv"'

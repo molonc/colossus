@@ -11,7 +11,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import django_filters
 import rest_framework.exceptions
 from rest_framework import pagination, viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 #============================
@@ -110,7 +110,7 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 
     queryset = Sample.objects.all()
     serializer_class = SampleSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'sample_id',
@@ -129,7 +129,7 @@ class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = DlpLane.objects.all()
     serializer_class = LaneSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'flow_cell_id',
@@ -150,7 +150,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = DlpSequencing.objects.all()
     serializer_class = SequencingSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'library__pool_id',
@@ -167,7 +167,7 @@ class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
     See documentation here:
     https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
     """
-
+    permission_classes = (IsAuthenticated, )
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     filter_fields = (
@@ -187,7 +187,7 @@ class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = SublibraryInformation.objects.all()
     serializer_class = SublibraryInformationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'library__pool_id',
@@ -205,7 +205,7 @@ class SublibraryViewSetBrief(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = SublibraryInformation.objects.all()
     serializer_class = SublibraryInformationSerializerBrief
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     pagination_class = LargeResultsSetPagination
     filter_fields = (
         'id',
@@ -255,7 +255,7 @@ class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     Analysis Objects are queryable by Jira ticket
     """
     queryset = DlpAnalysisInformation.objects.all()
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     filter_class = AnalysisInformationFilter
 
     def get_serializer_class(self):
@@ -273,7 +273,7 @@ class AnalysisRunViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = AnalysisRun.objects.all()
     serializer_class = AnalysisRunSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'last_updated',
@@ -290,7 +290,7 @@ class ExperimentalMetadata(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = ChipRegion.objects.all()
     serializer_class = ChipRegionSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'library__jira_ticket',
@@ -301,11 +301,11 @@ class ExperimentalMetadata(RestrictedQueryMixin, viewsets.ModelViewSet):
 class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = JiraUser.objects.all()
     serializer_class = JiraUserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
 
 
 class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated, )
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
     filter_fields = (
@@ -322,7 +322,7 @@ class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
 class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxSequencing.objects.all()
     serializer_class = TenxSequencingSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'library',
@@ -335,7 +335,7 @@ class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 class TenxConditionViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxCondition.objects.all()
     serializer_class = TenxConditionSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     filter_fields = (
         'id',
         'library',
@@ -349,6 +349,7 @@ class TenxConditionViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
     queryset = TenxLane.objects.all()
     serializer_class = TenxLaneSerializer
     filter_fields = (
@@ -358,6 +359,7 @@ class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 class TenxChipViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
     queryset = TenxChip.objects.all()
     serializer_class = TenxChipSerializer
     filter_fields = (
