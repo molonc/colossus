@@ -10,13 +10,6 @@
         {% csrf_token %}
         <fieldset>
             <legend>Library Information</legend>
-            {% if lib_form.errors or sublib_form.errors %}
-            <div class="alert alert-danger" role="alert">
-                ERROR!
-                {{ lib_form.errors }}
-                {{ sublib_form.errors }}
-            </div>
-            {% endif %}
             <table class="table-condensed">
                 <thead>
                     {% for field in lib_form %}

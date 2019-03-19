@@ -622,6 +622,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         return self._post(request, context)
 
     def _post(self, request, context, library=None, create=False):
+
         lib_form = self.lib_form_class(request.POST, instance=library)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
         context['lib_form'] = lib_form
@@ -735,10 +736,9 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         [formset.save() for formset in formsets.values()]
                         return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
                 else:
-                    if create:
-                        return HttpResponseRedirect(reverse(context['library_type'] + ':library_create'), {'lib_form' : lib_form, 'sublib_form' : sublib_form})
-                    else:
-                        return HttpResponseRedirect(reverse(context['library_type'] + ':library_update', kwargs={'pk': library.pk }), {'lib_form' : lib_form, 'sublib_form' : sublib_form})
+                    messages.info(request, lib_form.errors)
+                    return HttpResponseRedirect(request.get_full_path())
+
 
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
