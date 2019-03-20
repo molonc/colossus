@@ -1943,6 +1943,11 @@ def search_view(request):
     elif TenxLibrary.objects.filter(jira_ticket__iexact=query_str):
         instance = TenxLibrary.objects.filter(jira_ticket__iexact=query_str)[0]
 
+    # search for jira ticket associated with DLP analysis
+    elif DlpAnalysisInformation.objects.filter(analysis_jira_ticket__iexact=query_str):
+        instance = DlpAnalysisInformation.objects.filter(analysis_jira_ticket__iexact=query_str)[0]
+
+
     if instance:
         return HttpResponseRedirect(instance.get_absolute_url())
     else:
