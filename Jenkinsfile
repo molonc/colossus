@@ -10,7 +10,7 @@ node {
 
         stage 'Test'
             slackSend color: "warning", message: "Started Testing `${env.JOB_NAME}#${env.BUILD_NUMBER}`"
-            sh "ssh ubuntu@ColossusTestVM bash -e /home/ubuntu/colossus/test/test_colossus.sh"
+            sh "ssh ubuntu@$ColossusTestVM bash -e /home/ubuntu/colossus/test/test_colossus.sh"
 
         stage 'Deploy'
             sh "ssh ubuntu@$ColossusVM_IP bash -e /home/ubuntu/colossus/deployment/deploy_production_colossus.sh"
