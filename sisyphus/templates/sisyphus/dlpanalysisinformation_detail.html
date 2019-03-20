@@ -56,6 +56,11 @@
             <th id="thid">Reference:</th>
             <td id="tdid">{{ object.reference_genome }}</td>
         </tr>
+        <tr>
+            <th id="thid">Aligner:</th>
+            <td id="tdid">{{ object.aligner }}</td>
+        </tr>
+
         {% for field, value in object.get_field_values.items %}
         <tr>
             <th id="thid">{{field}}:</th>
