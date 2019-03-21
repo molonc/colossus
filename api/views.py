@@ -178,7 +178,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 
-class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Library that is queryable by pool_id (aka chip ID) and sample it belongs to.
 
