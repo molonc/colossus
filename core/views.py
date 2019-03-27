@@ -288,8 +288,17 @@ class LibraryList(LoginRequiredMixin, TemplateView):
     template_name = "core/library_list.html"
 
     def get_context_data(self):
+        all_libraries = self.library_class.objects.all().order_by(self.order)
+        if self.library_type == 'dlp':
+            for library in all_libraries:
+                library.num_sequencings = library.dlpsequencing_set.count()
+                library.max_sequencing_analysis = 0
+                for analysis in library.dlpanalysisinformation_set.all():
+                    if analysis.sequencings.count() > library.max_sequencing_analysis:
+                        library.max_sequencing_analysis = analysis.sequencings.count()
+
         context = {
-            'libraries': self.library_class.objects.all().order_by(self.order),
+            'libraries': all_libraries,
             'library_type': self.library_type,
         }
         return context
