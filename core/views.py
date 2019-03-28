@@ -305,6 +305,22 @@ class DlpLibraryList(LibraryList):
     library_class = DlpLibrary
     library_type = 'dlp'
 
+    def get_context_data(self):
+        all_libraries = self.library_class.objects.all().order_by(self.order)
+
+        for library in all_libraries:
+            library.num_sequencings = library.dlpsequencing_set.count()
+            library.max_sequencing_analysis = 0
+            for analysis in library.dlpanalysisinformation_set.all():
+                if analysis.sequencings.count() > library.max_sequencing_analysis:
+                    library.max_sequencing_analysis = analysis.sequencings.count()
+
+        context = {
+            'libraries': all_libraries,
+            'library_type': self.library_type,
+        }
+        return context
+
 
 class PbalLibraryList(LibraryList):
 
