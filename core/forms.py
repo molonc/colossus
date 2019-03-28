@@ -175,7 +175,7 @@ class JiraConfirmationForm(Form):
     title = forms.CharField(max_length=1000)
     description = forms.CharField(widget=forms.Textarea)
     project = forms.ChoiceField()
-    reporter = forms.ChoiceField(choices=get_user_list())
+    reporter = forms.ChoiceField(choices=get_user_list)
 
 
 class TenxChipForm(ModelForm):
