@@ -64,7 +64,7 @@ def return_text_search(query):
             list(Sample.objects.filter(additionalsampleinformation__sex__icontains=sex_choices[query])))
     if partial_key_match(query,tissue_type_choices):
         context["core"]["Samples"].extend(
-            list(Sample.objects.filter(additionalsampleinformation__tissue_type=partial_key_match(query,tissue_type_choices.keys))))
+            list(Sample.objects.filter(additionalsampleinformation__tissue_type=partial_key_match(query,tissue_type_choices))))
     if partial_key_match(query, treatment_status_choices):
         context["core"]["Samples"].extend(
             list(Sample.objects.filter(additionalsampleinformation__treatment_status=partial_key_match(query, treatment_status_choices))))
@@ -113,21 +113,33 @@ def return_text_search(query):
             list(TenxSequencing.objects.filter(sequencing_output_mode=partial_key_match(query, sequencing_output_mode_choices))))
     if partial_key_match(query,read_type_choices):
         context["dlp"]["Sequencings"].extend(
-            list(DlpSequencing.objects.filter(read_type_choices=partial_key_match(query,read_type_choices))))
+            list(DlpSequencing.objects.filter(read_type=partial_key_match(query,read_type_choices))))
         context["pbal"]["Sequencings"].extend(
-            list(PbalSequencing.objects.filter(read_type_choices=partial_key_match(query,read_type_choices))))
+            list(PbalSequencing.objects.filter(read_type=partial_key_match(query,read_type_choices))))
         context["tenx"]["Sequencings"].extend(
-            list(TenxSequencing.objects.filter(read_type_choices=partial_key_match(query,read_type_choices))))
+            list(TenxSequencing.objects.filter(read_type=partial_key_match(query,read_type_choices))))
 
     rev_comp_override_choices = dict((y, x) for x, y in DlpSequencing.rev_comp_override_choices)
     if partial_key_match(query, rev_comp_override_choices):
         context["dlp"]["Sequencings"].extend(
-            list(DlpSequencing.objects.filter(rev_comp_override_choices=partial_key_match(query, rev_comp_override_choices))))
+            list(DlpSequencing.objects.filter(rev_comp_override=partial_key_match(query, rev_comp_override_choices))))
 
     aligner_choices = dict((y, x) for x, y in AbstractAnalysisInformation.aligner_choices)
+    smoothing_choices = dict((y, x) for x, y in AbstractAnalysisInformation.smoothing_choices)
+    priority_level_choices = dict((y, x) for x, y in AbstractAnalysisInformation.priority_level_choices)
+    verified_choices = dict((y, x) for x, y in AbstractAnalysisInformation.verified_choices)
     if partial_key_match(query, aligner_choices):
         context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(aligner=partial_key_match(query, aligner_choices))))
         context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(aligner=partial_key_match(query, aligner_choices))))
+    if partial_key_match(query, smoothing_choices):
+        context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(smoothing=partial_key_match(query, smoothing_choices))))
+        context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(smoothing=partial_key_match(query, smoothing_choices))))
+    if partial_key_match(query, priority_level_choices):
+        context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(priority_level=partial_key_match(query, priority_level_choices))))
+        context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(priority_level=partial_key_match(query, priority_level_choices))))
+    if partial_key_match(query, verified_choices):
+        context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(verified=partial_key_match(query, verified_choices))))
+        context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(verified=partial_key_match(query, verified_choices))))
 
     context = remove_duplicate(context)
 
