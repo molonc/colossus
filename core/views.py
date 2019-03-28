@@ -1903,7 +1903,7 @@ def plate_delete(request, pk):
 class SearchView(TemplateView):
 
     login_url = LOGIN_URL
-    template_name = "core/search/brittani_main.html"
+    template_name = "core/search/search_table.html"
 
 
     def get_context_data(self):
