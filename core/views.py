@@ -288,9 +288,8 @@ class LibraryList(LoginRequiredMixin, TemplateView):
     template_name = "core/library_list.html"
 
     def get_context_data(self):
-        all_libraries = self.library_class.objects.all().order_by(self.order)
         context = {
-            'libraries': all_libraries,
+            'libraries': self.library_class.objects.all().order_by(self.order),
             'library_type': self.library_type,
         }
         return context
