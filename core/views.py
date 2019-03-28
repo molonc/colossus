@@ -9,53 +9,35 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import os
 import collections
 import subprocess
-from jira import JIRA, JIRAError
+from jira import JIRAError
 
 #============================
 # Django imports
 #----------------------------
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required #, permission_required
-from django.utils.decorators import method_decorator
-from django.core.urlresolvers import reverse, resolve
-from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import get_object_or_404, render, render_to_response
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404, render_to_response
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
-from django.forms.models import model_to_dict
 
 import pandas as pd
 from django.conf import settings
-from django.utils import timezone
-from itertools import chain
-import json
-
 
 #============================
 # App imports
 #----------------------------
-from .helpers import Render
+from core.search_util.search_helper import return_text_search
 from .models import (
     Sample,
-    DlpLibrary,
-    DlpSequencing,
-    PbalLibrary,
-    PbalSequencing,
-    TenxLibrary,
     TenxCondition,
     TenxChip,
-    TenxSequencing,
-    DlpLane,
     PbalLane,
     TenxLane,
     SublibraryInformation,
-    ChipRegion,
-    ChipRegionMetadata,
     MetadataField,
     Plate,
-    Library,
     JiraUser,
     Project)
 from sisyphus.models import *
@@ -109,10 +91,6 @@ from .jira_templates.jira_wrapper import (
     add_jira_comment,
     update_description,
 )
-
-from colossus.settings import LOGIN_URL
-
-
 
 from colossus.settings import LOGIN_URL
 
@@ -1922,38 +1900,20 @@ def plate_delete(request, pk):
 #============================
 # Search view
 #----------------------------
-@login_required
-def search_view(request):
-    query_str = request.GET.get('query_str')
-    instance = None
+class SearchView(TemplateView):
 
-    # search for samples
-    if Sample.objects.filter(sample_id__iexact=query_str):
-        instance = Sample.objects.filter(sample_id__iexact=query_str)[0]
-
-    # search for dlp libraries
-    elif DlpLibrary.objects.filter(pool_id__iexact=query_str):
-        instance = DlpLibrary.objects.filter(pool_id__iexact=query_str)[0]
-
-    # search for jira ticket associated with dlp library
-    elif DlpLibrary.objects.filter(jira_ticket__iexact=query_str):
-        instance = DlpLibrary.objects.filter(jira_ticket__iexact=query_str)[0]
-
-    # search for jira ticket associated with tenx library
-    elif TenxLibrary.objects.filter(jira_ticket__iexact=query_str):
-        instance = TenxLibrary.objects.filter(jira_ticket__iexact=query_str)[0]
-
-    # search for jira ticket associated with DLP analysis
-    elif DlpAnalysisInformation.objects.filter(analysis_jira_ticket__iexact=query_str):
-        instance = DlpAnalysisInformation.objects.filter(analysis_jira_ticket__iexact=query_str)[0]
+    login_url = LOGIN_URL
+    template_name = "core/search/brittani_main.html"
 
 
-    if instance:
-        return HttpResponseRedirect(instance.get_absolute_url())
-    else:
-        msg = "Sorry, no match found."
-        messages.warning(request, msg)
-        return HttpResponseRedirect(reverse('index'))
+    def get_context_data(self):
+
+        query_str = self.request.GET.get('query_str')
+
+        if len(query_str) < 1:
+            return {"total" : 0}
+
+        return return_text_search(query_str)
 
 
 #============================

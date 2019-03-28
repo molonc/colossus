@@ -1,0 +1,57 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}Search Result{% endblock %}
+
+{% block body %}
+
+
+    <div id="main_table" class="container" style="text-align: center;">
+        <div class="row">
+        {% if total == 0 %}
+            <span class="pull-left"><h4>Hmm... Nothing found</h4></span>
+            <span class="pull-left"><h4>Make sure you are using the correct term and use more than one letter</h4></span>
+        </div>
+
+        {% else %}
+            <span class="pull-left"><h4>Total {{total}} match(es) "{{query}}"...</h4></span>
+
+        </div>
+
+        <div class="row">
+            {% include 'core/search/brittani_table.html' with name='Core' data=core %}
+            {% include 'core/search/brittani_table.html' with name='DLP' data=dlp %}
+            {% include 'core/search/brittani_table.html' with name='PBAL' data=pbal %}
+        </div>
+        <div class="row">
+            {% include 'core/search/brittani_table.html' with name='TenX' data=tenx %}
+        </div>
+        {% endif %}
+    </div>
+    <br>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    $('[data-toggle*="toggle"]').popover({
+        html: true,
+        content: function() {
+        return $('#' + this.id + '-popover').html();
+        }
+    });
+});
+
+$('html').on('mouseup', function(e) {
+    if(!$(e.target).closest('.popover').length) {
+        $('.popover').each(function(){
+            $(this.previousSibling).popover('hide');
+        });
+    }
+});
+</script>
+{% endblock %}
