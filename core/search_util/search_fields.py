@@ -83,6 +83,6 @@ DLP_SEQUENCING = ["rev_comp_override", "dlplane__flow_cell_id", "dlplane__path_t
 PBAL_SEQUENCING = ["pballane__flow_cell_id", "pballane__path_to_archive"]
 TENX_SEQUENCING = ["tenxlane__flow_cell_id", "tenxlane__path_to_archive"]
 
-CORE_ANALYSES = [ "priority_level", "smoothing", "verified", "reference_genome__reference_genome", "version__version"]
+CORE_ANALYSES = [ "priority_level", "smoothing", "verified", "reference_genome__reference_genome", "version__version", "analysis_jira_ticket"]
 
 TENX_ANALYSES = ["genome"]
