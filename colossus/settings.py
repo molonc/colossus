@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters', #filtering for rest_framework
     'django_extensions',
-    'taggit',
     'simple_history',
     'django.contrib.admin',
     'django.contrib.auth',
