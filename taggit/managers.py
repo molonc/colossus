@@ -15,7 +15,6 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from taggit.forms import TagField
-from taggit.models import CommonGenericTaggedItemBase, TaggedItem
 from taggit.utils import (_get_field, _related_model, _remote_field,
                           require_instance_manager)
 
@@ -136,8 +135,8 @@ class _TaggableManager(models.Manager):
         from django.db import connections
         db = self._db or router.db_for_read(instance.__class__, instance=instance)
 
-        fieldname = ('object_id' if issubclass(self.through, CommonGenericTaggedItemBase)
-                     else 'content_object')
+        fieldname = ""
+
         fk = self.through._meta.get_field(fieldname)
         query = {
             '%s__%s__in' % (self.through.tag_relname(), fk.name):
@@ -408,7 +407,7 @@ class TaggableManager(RelatedField, Field):
                  through=None, blank=False, related_name=None, to=None,
                  manager=_TaggableManager):
 
-        self.through = through or TaggedItem
+        self.through = through
         self.swappable = False
         self.manager = manager
 
@@ -522,7 +521,7 @@ class TaggableManager(RelatedField, Field):
             self.related = RelatedObject(cls, self.model, self)
 
         self.use_gfk = (
-            self.through is None or issubclass(self.through, CommonGenericTaggedItemBase)
+            self.through is None
         )
 
         # rel.to renamed to remote_field.model in Django 1.9

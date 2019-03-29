@@ -20,8 +20,6 @@ from .models import JiraUser
 
 # third-party apps
 from simple_history.admin import SimpleHistoryAdmin
-from taggit.models import Tag
-from taggit.admin import TagAdmin
 
 
 # Sample information
@@ -113,11 +111,6 @@ class DlpSequencingAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
   pass
 
 
-# Tag information (Project information)
-class CustomTagAdmin(SimpleHistoryAdmin, TagAdmin):
-    list_display = ['name', 'slug']
-
-
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(DlpLibrary, DlpLibraryAdmin)
 admin.site.register(TenxLibrary, TenxLibraryAdmin)
@@ -134,6 +127,3 @@ admin.site.register(ChipRegion)
 admin.site.register(ChipRegionMetadata)
 admin.site.register(MetadataField)
 
-# register Taggit
-admin.site.unregister(Tag)
-admin.site.register(Tag, CustomTagAdmin)
