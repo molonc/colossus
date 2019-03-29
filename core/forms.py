@@ -67,7 +67,7 @@ from colossus.settings import JIRA_URL
 #===========================
 # 3rd-party app imports
 #---------------------------
-from taggit.models import Tag
+
 
 
 #===========================
