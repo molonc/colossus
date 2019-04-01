@@ -32,7 +32,8 @@ from core.models import (
     TenxLane,
     TenxChip,
     Project,
-    TenxPool)
+    TenxPool,
+)
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
 
