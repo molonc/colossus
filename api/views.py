@@ -35,7 +35,8 @@ from .serializers import (
     TenxSequencingSerializer,
     TenxChipSerializer,
     ProjectSerializer,
-    TenxPoolSerializer)
+    TenxPoolSerializer,
+)
 
 from core.models import (
     Sample,
@@ -51,7 +52,8 @@ from core.models import (
     TenxLane,
     TenxChip,
     Project,
-    TenxPool)
+    TenxPool,
+)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
