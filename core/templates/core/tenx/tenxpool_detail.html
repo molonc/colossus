@@ -1,0 +1,103 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}{{chip.get_id}} Details{% endblock %}
+
+{% block body %}
+<div class="container detail-container">
+    <table class="table-condensed">
+            <br>
+            <tr>
+                <th id="thid">Name:</th>
+                <td id="tdid" class="notes">{{pool.pool_name}}</td>
+            </tr>
+            {% for field,value in pool.get_field_values.items %}
+            <tr>
+                <th id="thid">{{field}}:</th>
+                <td id="tdid" class="notes">{{value}}</td>
+            </tr>
+            {% endfor %}
+    </table>
+    <br>
+</div>
+
+<div class="container detail-bordered-container">
+    <div class="table">
+        <table class="table">
+            {% if pool.libraries.all %}
+                <thead>
+                    <tr>
+                        <th><h4>TenX Libraries</h4></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Library ID</th>
+                        <th>Sample</th>
+                        <th>JIRA Ticket</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for library in pool.libraries.all %}
+                        <tr>
+                            <td><a href="{{ library.get_absolute_url }}">{{ library.id }}</a></td>
+                            <td><a href="{{ library.sample_id.get_absolute_url }}">{{ library.sample.sample_id }}</a></td>
+                            <td><a href="https://www.bcgsc.ca/jira/browse/{{ library.jira_ticket }}">{{ library.jira_ticket }}</a></td>
+                            <td>{{ library.description }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% else %}
+                <tr><h5><i class="text-warning">There is no 10x library related to this Pool!</i></h5></tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<div class="container detail-bordered-container">
+    <div class="table">
+        <table class="table">
+            {% if pool.tenxsequencing_set.all %}
+                <thead>
+                    <tr>
+                        <th><h4>TenX Sequencings</h4></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>GSC ID</th>
+                        <th>Sequencing Centre</th>
+                        <th>Submission Date</th>
+                        <th>Library</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sequencing in pool.tenxsequencing_set.all %}
+                        <tr>
+                            <td><a href="{{ sequencing.get_absolute_url }}">{{ sequencing.id }}</a></td>
+
+                            <td>{{ sequencing.gsc_library_id }}</a></td>
+                            <td>{{ sequencing.sequencing_center }}</td>
+                            <td>{{ sequencing.submission_date }}</td>
+                            <td><a href="{{ sequencing.library.get_absolute_url }}">{{ sequencing.library }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% else %}
+                <tr><h5><i class="text-warning">There is no 10x sequencing related to this Pool!</i></h5></tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+<div class="container" style="margin-bottom: 5px;">
+    <a class="btn btn-warning btn-sm" style="float: left; margin: 5px;" href="{% url 'tenx:pool_update' pool.pk %}">Edit</a>
+    <a class="btn btn-danger btn-sm" style="float: left; margin: 5px;"  href="{% url 'tenx:pool_delete' pool.pk %}">Delete</a>
+</div>
+
+<br>
+
+
+{% endblock %}

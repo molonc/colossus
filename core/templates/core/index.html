@@ -120,6 +120,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td><a href="{% url 'tenx:pool_list' %}">Pool</a> <i class="counter">{{ tenx_pools_size }}</i></td>
+                    <td>
+                        <p style="float: right;">
+                            <a href="{% url 'tenx:pool_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i> Add</a>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
                     <td><a href="{% url 'tenx:library_list' %}">Libraries</a> <i class="counter">{{ tenx_library_size }}</i></td>
                     <td>
                         <p style="float: right;">
