@@ -56,6 +56,7 @@ from .models import (
     DlpLane,
     PbalLane,
     TenxLane,
+    TenxPool,
     Plate,
     JiraUser,
     Project)
@@ -183,7 +184,17 @@ class TenxChipForm(ModelForm):
         model = TenxChip
         fields = "__all__"
 
-    # lab_name = forms.ChoiceField(choices=(("SA", "Sam Aparacio"), ("DH", "David Huntsman")))
+
+class TenxPoolForm(ModelForm):
+    class Meta:
+        model = TenxPool
+        fields = "__all__"
+        widgets = {
+            'constructed_date': SelectDateWidget(
+                years=range(2000, 2020),
+                empty_label=('year', 'month', 'day'),
+            )
+        }
 
 
 #===========================
@@ -531,7 +542,6 @@ class ProjectForm(ModelForm):
     class Meta:
         model = Project
         fields = ['name', 'description']
-
 
 class AddWatchersForm(Form):
     watchers = forms.MultipleChoiceField(choices=get_user_list, widget=forms.CheckboxSelectMultiple())

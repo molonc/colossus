@@ -1,0 +1,46 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}List of TenX Chips{% endblock %}
+
+{% block body %}
+<div class="container" style="padding: 0; margin-bottom: 5px;">
+    <h4 style="float: left;">Select a chip to view its details</h4>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'tenx:pool_create' %}">Add TenxPool</a>
+</div>
+<div class="container" style="background-color: #F5F5F5;">
+    <div class="table-responsive">
+        <table id="datatable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Pool Name</th>
+                    <th>GSC Pool Name</th>
+                    <th>Number of Tenx Libraries</th>
+                    <th>Number of Tenx Sequencings</th>
+                    <th class="no-sort-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <br/>
+                {% for pool in pools %}
+                    <tr>
+                        <td><a  href="{% url 'tenx:pool_detail' pool.pk %}">{{ pool.pool_name }}</a></td>
+                        <td>{{ pool.gsc_pool_name }}</td>
+                        <td>{{ pool.libraries.count }}</td>
+                        <td>{{ pool.tenxsequencing_set.count }}</td>
+                        <td>
+                            <div style="float: right; min-width: 69px">
+                                <a href="{% url 'tenx:pool_update' pk=pool.pk %}"style="margin-right: 2px;" ><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
+                                <br>
+                                <a href="{% url 'tenx:pool_delete' pk=pool.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

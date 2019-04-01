@@ -468,6 +468,26 @@ class TenxLibrary(Library):
     def get_id(self):
         return self.name
 
+class TenxPool(models.Model, FieldValue):
+    LOCATION = (
+        ('BCCAGSC', 'GSC'),
+        ('UBCBRC', 'UBC'),
+    )
+
+    gsc_pool_name = create_chrfield("GSC Pool Name", null=True, blank=True)
+    construction_location = create_chrfield("Construction Location", choices=LOCATION, null=True, blank=True)
+    constructed_by = create_chrfield("Constructed By", null=True, blank=True)
+    constructed_date =models.DateField("Construction Date", null=True, blank=True)
+    libraries = models.ManyToManyField(TenxLibrary, blank=True)
+
+    def __str__(self):
+        return self.pool_name()
+
+    def pool_name(self):
+        return "TENXPOOL" + str(self.pk).zfill(3)
+
+    def get_absolute_url(self):
+        return reverse("tenx" + ":pool_detail", kwargs={"pk": self.pk})
 
 class TenxCondition(models.Model, FieldValue):
     """A 10x experimental condition."""
@@ -1380,6 +1400,8 @@ class TenxSequencing(Sequencing):
         verbose_name="Library",
         on_delete=models.CASCADE,
     )
+
+    tenx_pool = models.ForeignKey(TenxPool, null=True, blank=True)
 
 
 class Lane(models.Model, FieldValue):

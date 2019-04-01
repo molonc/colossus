@@ -34,7 +34,8 @@ from .serializers import (
     TenxLaneSerializer,
     TenxSequencingSerializer,
     TenxChipSerializer,
-    ProjectSerializer
+    ProjectSerializer,
+    TenxPoolSerializer,
 )
 
 from core.models import (
@@ -50,7 +51,8 @@ from core.models import (
     TenxCondition,
     TenxLane,
     TenxChip,
-    Project
+    Project,
+    TenxPool,
 )
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
@@ -385,4 +387,10 @@ class TenxChipViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         "id",
         "lab_name"
     )
+
+class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = TenxPool.objects.all()
+    serializer_class = TenxPoolSerializer
+    filter_fields = "__all__"
 

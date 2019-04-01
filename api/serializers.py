@@ -31,7 +31,8 @@ from core.models import (
     TenxCondition,
     TenxLane,
     TenxChip,
-    Project
+    Project,
+    TenxPool,
 )
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
@@ -462,3 +463,17 @@ class TenxChipSerializer(serializers.ModelSerializer):
             'name',
             'tenxlibrary_set',
         )
+
+class TenxPoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxPool
+        fields = (
+            'id',
+            'pool_name',
+            'gsc_pool_name',
+            'construction_location',
+            'constructed_date',
+            'libraries',
+            'tenxsequencing_set'
+        )
+

@@ -32,6 +32,7 @@ from core.search_util.search_helper import return_text_search
 from .models import (
     Sample,
     TenxCondition,
+    TenxPool,
     TenxChip,
     PbalLane,
     TenxLane,
@@ -70,7 +71,9 @@ from .forms import (
     PlateForm,
     JiraConfirmationForm,
     AddWatchersForm,
-    TenxChipForm)
+    TenxChipForm,
+    TenxPoolForm,
+)
 from .utils import (
     create_sublibrary_models,
     generate_samplesheet,
@@ -114,6 +117,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
             'tenx_library_size': TenxLibrary.objects.count(),
             'tenx_sequencing_size': TenxSequencing.objects.count(),
             'tenx_chips_size': TenxChip.objects.count(),
+            'tenx_pools_size': TenxPool.objects.count(),
             'analysisinformation_size':DlpAnalysisInformation.objects.count(),
             'analysisrun_size':AnalysisRun.objects.count(),
         }
@@ -1006,6 +1010,94 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
 
+
+#============================
+# TenxPool views
+#----------------------------
+class TenxPoolList(LoginRequiredMixin, TemplateView):
+    login_url = LOGIN_URL
+    template_name = "core/tenx/tenxpool_list.html"
+
+    def get_context_data(self):
+        context = {
+            'pools': TenxPool.objects.all().order_by('id'),
+        }
+        return context
+
+class TenxPoolDetail(TemplateView):
+
+    template_name = "core/tenx/tenxpool_detail.html"
+
+    def get_context_data(self, pk):
+        context = {
+            'pool': get_object_or_404(TenxPool, pk=pk),
+        }
+        return context
+
+
+class TenxPoolDelete(LoginRequiredMixin, TemplateView):
+    login_url = LOGIN_URL
+    template_name = "core/tenx/tenxpool_delete.html"
+
+    def get_context_data(self, pk):
+        context = {
+            'pool': get_object_or_404(TenxPool, pk=pk),
+            'pk': pk,
+        }
+        return context
+
+    def post(self, request, pk):
+        get_object_or_404(TenxPool, pk=pk).delete()
+        msg = "Successfully deleted the Pool."
+        messages.success(request, msg)
+        return HttpResponseRedirect(reverse('tenx:pool_list'))
+
+
+class TenxPoolCreate(LoginRequiredMixin,TemplateView):
+    login_url = LOGIN_URL
+    template_name = "core/tenx/tenxpool_create.html"
+
+    def get_context_data(self):
+        context = {
+            'form': TenxPoolForm(),
+        }
+        return context
+
+    def post(self, request):
+        form = TenxPoolForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+            msg = "Successfully created the %s pool." % instance.pool_name()
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.get_absolute_url())
+        else:
+            messages.info(request, form.errors)
+            return HttpResponseRedirect(request.get_full_path())
+
+
+class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
+    login_url = LOGIN_URL
+    template_name = "core/tenx/tenxpool_update.html"
+
+    def get_context_data(self, pk):
+        context = {
+            'pk': pk,
+            'form': TenxPoolForm(instance=get_object_or_404(TenxPool, pk=pk)),
+        }
+        return context
+
+    def post(self, request, pk):
+        form = TenxPoolForm(request.POST, instance=get_object_or_404(TenxPool, pk=pk))
+        if form.is_valid():
+            instance = form.save(commit=False)
+            form.save_m2m()
+            instance.save()
+            msg = "Successfully created the %s pool." % instance.pool_name()
+            messages.success(request, msg)
+            return HttpResponseRedirect(instance.get_absolute_url())
+        else:
+            messages.info(request, form.errors)
+            return HttpResponseRedirect(request.get_full_path())
 
 #============================
 # Sequencing views

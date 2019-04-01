@@ -1,0 +1,44 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}Delete Pool{% endblock %}
+
+{% block body %}
+<div class="container graybg">
+    <h5>Are you sure you want to delete Pool <i class="emph">{{ pool.pool_name }}</i>? All of the following related items will be deleted too:</h5>
+
+    {% if pool.libraries.all %}
+        <ul style="list-style-type: square">
+            {% for library in pool.libraries.all %}
+                <li><a href="{{ library.get_absolute_url }}">{{ library }}</a></li>
+
+                {% if library.tenxsequencing_set.all %}
+                    <ul style="list-style-type: disc">
+                        {% for sequencing in library.tenxsequencing_set.all %}
+                            <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            {% endfor %}
+            {% for sequencing in pool.tenxsequencing_set.all %}
+                <li><a href="{{ sequencing.get_absolute_url }}">{{ sequencing }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h5><i class="text-warning">There are no tenx items related to this object!</i></h5>
+    {% endif %}
+
+    <br>
+
+
+    <form action="{% url 'tenx:pool_delete' pk=pool.pk %}" method="POST">
+        {% csrf_token %}
+        <input class="btn btn-danger btn-sm" type="submit" name="delete" value="Yes, I'm sure">
+        <a class="btn btn-default btn-sm" href="{% url 'tenx:pool_detail' pk=pool.pk %}">Cancel</a>
+    </form>
+
+    <br>
+</div>
+{% endblock %}
