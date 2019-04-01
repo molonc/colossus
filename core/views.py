@@ -71,7 +71,9 @@ from .forms import (
     PlateForm,
     JiraConfirmationForm,
     AddWatchersForm,
-    TenxChipForm, TenxPoolForm)
+    TenxChipForm,
+    TenxPoolForm,
+)
 from .utils import (
     create_sublibrary_models,
     generate_samplesheet,
