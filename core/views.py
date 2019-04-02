@@ -1507,43 +1507,6 @@ class TenxSequencingDelete(SequencingDelete):
     library_type = 'tenx'
 
 
-@login_required
-def dlp_sequencing_get_samplesheet(request, pk):
-
-    """
-    Generates downloadable samplesheet.
-    """
-
-    ofilename, ofilepath = generate_samplesheet(pk)
-    response = HttpResponse(content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
-    ofile = open(ofilepath, 'r')
-    response.write(ofile.read())
-    ofile.close()
-    os.remove(ofilepath)
-    return response
-
-
-@login_required
-def dlp_sequencing_get_queried_samplesheet(request, flowcell):
-
-    """
-    Makes downloading samplesheets from flowcell possible.
-    """
-
-    try:
-        pk = DlpLane.objects.get(flow_cell_id=flowcell).pk
-        return dlp_sequencing_get_samplesheet(request, pk)
-    except DlpSequencing.DoesNotExist:
-        msg = "Sorry, no sequencing with flowcell {} found.".format(flowcell)
-        messages.warning(request, msg)
-        return HttpResponseRedirect(reverse('index'))
-    except DlpSequencing.MultipleObjectsReturned:
-        msg = "Multiple flowcells with ID {} found.".format(flowcell)
-        messages.warning(request, msg)
-        return HttpResponseRedirect(reverse('index'))
-
-
 class DlpSequencingCreateGSCFormView(LoginRequiredMixin, TemplateView):
 
     """
