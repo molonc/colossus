@@ -61,6 +61,7 @@ def parse_smartchipapp_results_file(filename):
 
     return results, region_metadata
 
+
 def create_sublibrary_models(library, sublib_results, region_metadata):
     """ Create sublibrary models from SmartChipApp Tables
     """
