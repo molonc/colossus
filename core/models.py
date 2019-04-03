@@ -1184,7 +1184,7 @@ class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
     )
     qc_notes = create_textfield("QC notes")
 
-class DlpSequencing(models.Model):
+class DlpSequencing(models.Model, FieldValue):
 
     """
     DLP sequencing information.
@@ -1321,7 +1321,7 @@ class DlpSequencing(models.Model):
 
 
 
-class PbalSequencing(models.Model):
+class PbalSequencing(models.Model, FieldValue):
 
     """
     PBAL sequencing information.
@@ -1449,7 +1449,7 @@ class PbalSequencing(models.Model):
             self.lane_requested_date = datetime.date.today()
         super(PbalSequencing, self).save(*args,**kwargs)
 
-class TenxSequencing(models.Model):
+class TenxSequencing(models.Model, FieldValue):
 
     """
     10x sequencing information.
