@@ -20,11 +20,7 @@ from django.core.validators import RegexValidator, MinValueValidator, MaxValueVa
 #============================
 # App imports
 #----------------------------
-from .constants import (
-    TENX_LIBRARY_TYPE_CHOICES,
-    TENX_INDEX_CHOICES,
-    CHEMISTRY_VERSION_CHOICES,
-)
+from .constants import *
 from .helpers import *
 
 
@@ -150,48 +146,6 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         on_delete=models.CASCADE,
     )
 
-    pathology_occurrence_choices = (
-        ('PR','Primary'),
-        ('RC','Recurrent or Relapse'),
-        ('ME','Metastatic'),
-        ('RM','Remission'),
-        ('UN','Undetermined'),
-        ('US','Unspecified'),
-    )
-
-    sex_choices = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('X', 'Mixed'),
-        ('U', 'Unknown'),
-    )
-
-    tissue_type_choices = (
-        ('N', 'Normal'),
-        ('B', 'Benign'),
-        ('PM', 'Pre-malignant'),
-        ('M', 'Malignant'),
-        ('NNP', 'Non-neoplastic Disease'),
-        ('U', 'Undetermined'),
-        ('HP', 'Hyperplasia'),
-        ('MP', 'Metaplasia'),
-        ('DP', 'Dysplasia'),
-    )
-
-    treatment_status_choices = (
-        ('PR','Pre-treatment'),
-        ('IN','In-treatment'),
-        ('PO','Post-treatment'),
-        ('NA','N/A'),
-        ('UN','Unknown'),
-    )
-    TISSUE_STATES = (
-        ('NONE', 'None'),
-        ('FROZ', 'Frozen'),
-        ('FRES', 'Fresh'),
-        ('DIG-FRES', 'Digested-Fresh'),
-
-    )
     # fields
     tissue_state = create_chrfield(
         "Tissue State",
@@ -250,64 +204,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         return res
 
 
-#============================
-# Library models
-#----------------------------
-class Library(models.Model, FieldValue, LibraryAssistant):
-
-    """
-    Library base class.
-    """
-
-    class Meta:
-        abstract = True
-
-    fields_to_exclude = ['ID', 'Primary Sample']
-    values_to_exclude = ['id', 'primary sample']
-
-    projects = models.ManyToManyField(
-        Project,
-        verbose_name="Project",
-        blank=True
-    )
-
-    # related sample
-    sample = models.ForeignKey(
-        Sample,
-        verbose_name="Primary Sample",
-        on_delete=models.CASCADE,
-    )
-
-    # related libraries
-    relates_to_dlp = models.ManyToManyField(
-        'DlpLibrary',   # DlpLibrary hasn't been seen yet
-        verbose_name="Relates to (DLP)",
-        blank=True,
-    )
-    relates_to_tenx = models.ManyToManyField(
-        'TenxLibrary',   # TenxLibrary hasn't been seen yet
-        verbose_name="Relates to (Tenx)",
-        blank=True,
-    )
-
-    # fields
-    description = create_textfield("Description")
-    result = create_textfield("Result")
-
-    failed = models.BooleanField(
-        "Failed",
-        default=False,
-        blank=False
-    )
-
-    def __str__(self):
-        return 'LIB_' + self.get_library_id()
-
-    def get_absolute_url(self):
-        return reverse(self.library_type + ":library_detail", kwargs={"pk": self.pk})
-
-
-class DlpLibrary(Library):
+class DlpLibrary(models.Model, FieldValue, LibraryAssistant):
 
     """
     DLP library contains several Cell objects.
@@ -356,8 +253,51 @@ class DlpLibrary(Library):
         if(str(last_analysis.analysis_run.run_status) == 'hmmcopy_complete' or str(last_analysis.analysis_run.run_status) == 'complete'):
             return True
         return False
+    fields_to_exclude = ['ID', 'Primary Sample']
+    values_to_exclude = ['id', 'primary sample']
 
-class PbalLibrary(Library):
+    projects = models.ManyToManyField(
+        Project,
+        verbose_name="Project",
+        blank=True
+    )
+
+    # related sample
+    sample = models.ForeignKey(
+        Sample,
+        verbose_name="Primary Sample",
+        on_delete=models.CASCADE,
+    )
+
+    # related libraries
+    relates_to_dlp = models.ManyToManyField(
+        'DlpLibrary',   # DlpLibrary hasn't been seen yet
+        verbose_name="Relates to (DLP)",
+        blank=True,
+    )
+    relates_to_tenx = models.ManyToManyField(
+        'TenxLibrary',   # TenxLibrary hasn't been seen yet
+        verbose_name="Relates to (Tenx)",
+        blank=True,
+    )
+
+    # fields
+    description = create_textfield("Description")
+    result = create_textfield("Result")
+
+    failed = models.BooleanField(
+        "Failed",
+        default=False,
+        blank=False
+    )
+
+    def __str__(self):
+        return 'LIB_' + self.get_library_id()
+
+    def get_absolute_url(self):
+        return reverse(self.library_type + ":library_detail", kwargs={"pk": self.pk})
+
+class PbalLibrary(models.Model, FieldValue, LibraryAssistant):
 
     """
     PBAL library contains several Cell objects.
@@ -374,6 +314,49 @@ class PbalLibrary(Library):
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
 
+    fields_to_exclude = ['ID', 'Primary Sample']
+    values_to_exclude = ['id', 'primary sample']
+
+    projects = models.ManyToManyField(
+        Project,
+        verbose_name="Project",
+        blank=True
+    )
+
+    # related sample
+    sample = models.ForeignKey(
+        Sample,
+        verbose_name="Primary Sample",
+        on_delete=models.CASCADE,
+    )
+
+    # related libraries
+    relates_to_dlp = models.ManyToManyField(
+        'DlpLibrary',   # DlpLibrary hasn't been seen yet
+        verbose_name="Relates to (DLP)",
+        blank=True,
+    )
+    relates_to_tenx = models.ManyToManyField(
+        'TenxLibrary',   # TenxLibrary hasn't been seen yet
+        verbose_name="Relates to (Tenx)",
+        blank=True,
+    )
+
+    # fields
+    description = create_textfield("Description")
+    result = create_textfield("Result")
+
+    failed = models.BooleanField(
+        "Failed",
+        default=False,
+        blank=False
+    )
+
+    def __str__(self):
+        return 'LIB_' + self.get_library_id()
+
+    def get_absolute_url(self):
+        return reverse(self.library_type + ":library_detail", kwargs={"pk": self.pk})
 
 class TenxChip(models.Model, FieldValue):
 
@@ -404,16 +387,10 @@ class TenxChip(models.Model, FieldValue):
 
 
 
-class TenxLibrary(Library):
+class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     """
     10x library contains several Cell objects.
     """
-
-    CHIP_WELL = (
-        (0, 'NOT SET'), (1, 'WELL_1'), (2, 'WELL_2'), (3, 'WELL_3'), (4, 'WELL_4'),
-        (5, 'WELL_5'), (6, 'WELL_6'), (7, 'WELL_7'), (8, 'WELL_8')
-    )
-
     class Meta:
         ordering = ['sample']
 
@@ -467,7 +444,49 @@ class TenxLibrary(Library):
 
     def get_id(self):
         return self.name
+    fields_to_exclude = ['ID', 'Primary Sample']
+    values_to_exclude = ['id', 'primary sample']
 
+    projects = models.ManyToManyField(
+        Project,
+        verbose_name="Project",
+        blank=True
+    )
+
+    # related sample
+    sample = models.ForeignKey(
+        Sample,
+        verbose_name="Primary Sample",
+        on_delete=models.CASCADE,
+    )
+
+    # related libraries
+    relates_to_dlp = models.ManyToManyField(
+        'DlpLibrary',   # DlpLibrary hasn't been seen yet
+        verbose_name="Relates to (DLP)",
+        blank=True,
+    )
+    relates_to_tenx = models.ManyToManyField(
+        'TenxLibrary',   # TenxLibrary hasn't been seen yet
+        verbose_name="Relates to (Tenx)",
+        blank=True,
+    )
+
+    # fields
+    description = create_textfield("Description")
+    result = create_textfield("Result")
+
+    failed = models.BooleanField(
+        "Failed",
+        default=False,
+        blank=False
+    )
+
+    def __str__(self):
+        return 'LIB_' + self.get_library_id()
+
+    def get_absolute_url(self):
+        return reverse(self.library_type + ":library_detail", kwargs={"pk": self.pk})
 class TenxPool(models.Model, FieldValue):
     LOCATION = (
         ('BCCAGSC', 'GSC'),
@@ -668,42 +687,8 @@ class ChipRegionMetadata(models.Model, FieldValue):
         )
 
 
-class LibrarySampleDetail(models.Model, FieldValue):
 
-    """
-    Library sample detail base class.
-    """
-
-    class Meta:
-        abstract = True
-
-    fields_to_exclude = ['ID', 'Library']
-    values_to_exclude = ['id', 'library']
-
-    # choices
-    cell_state_choices = (
-        ('C','Cells'),
-        ('N','Nuclei'),
-        ('M','Mixed'),
-        ('U','Unknown'),
-    )
-
-    # fields
-    cell_state = create_chrfield(
-        "Cell state",
-        choices=cell_state_choices,
-    )
-    estimated_percent_viability = create_intfield("Estimated percent viability")
-    label_of_original_sample_vial = create_chrfield("Label of original sample vial")
-    lims_vial_barcode = create_chrfield("LIMS vial barcode")
-    original_storage_temperature = create_intfield("Original storage temperature (C)")
-    passage_of_cell_line  = create_intfield("Passage")
-    sample_notes = create_textfield("Sample notes")
-    sample_preparation_method = create_textfield("Sample preparation method")
-    sample_preservation_method = create_chrfield("Sample preservation method")
-
-
-class DlpLibrarySampleDetail(LibrarySampleDetail):
+class DlpLibrarySampleDetail(models.Model, FieldValue):
 
     """
     DLP library sample details.
@@ -720,13 +705,6 @@ class DlpLibrarySampleDetail(LibrarySampleDetail):
         blank=True,
     )
 
-    spotting_location_choices = (
-        ('AD','Aparicio Lab - Deckard'),
-        ('AR','Aparicio Lab - Rachael'),
-        ('H','Hansen Lab'),
-        ('G','GSC'),
-    )
-
     # fields
     sample_spot_date = models.DateField(
         "Sample spot date",
@@ -738,13 +716,34 @@ class DlpLibrarySampleDetail(LibrarySampleDetail):
         choices=spotting_location_choices,
     )
 
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
 
-class PbalLibrarySampleDetail(LibrarySampleDetail):
+    # fields
+    cell_state = create_chrfield(
+        "Cell state",
+        choices=cell_state_choices,
+    )
+    estimated_percent_viability = create_intfield("Estimated percent viability")
+    label_of_original_sample_vial = create_chrfield("Label of original sample vial")
+    lims_vial_barcode = create_chrfield("LIMS vial barcode")
+    original_storage_temperature = create_intfield("Original storage temperature (C)")
+    passage_of_cell_line  = create_intfield("Passage")
+    sample_notes = create_textfield("Sample notes")
+    sample_preparation_method = create_textfield("Sample preparation method")
+    sample_preservation_method = create_chrfield("Sample preservation method")
+class PbalLibrarySampleDetail(models.Model, FieldValue):
 
     """
     PBAL library sample details.
     """
-
+    spotting_location_choices = (
+        ('AD','Aparicio Lab - Deckard'),
+        ('AR','Aparicio Lab - Rachael'),
+        ('H','Hansen Lab'),
+        ('G','GSC'),
+        ('T', 'TFL flow facility'),
+    )
     history = HistoricalRecords(table_name='pbal_history_library_sample_detail')
 
     # database relationships
@@ -756,14 +755,6 @@ class PbalLibrarySampleDetail(LibrarySampleDetail):
         blank=True,
     )
 
-    spotting_location_choices = (
-        ('AD','Aparicio Lab - Deckard'),
-        ('AR','Aparicio Lab - Rachael'),
-        ('H','Hansen Lab'),
-        ('G','GSC'),
-        ('T', 'TFL flow facility'),
-    )
-
     # fields
     sample_spot_date = models.DateField(
         "Sample spot date",
@@ -775,8 +766,25 @@ class PbalLibrarySampleDetail(LibrarySampleDetail):
         choices=spotting_location_choices,
     )
 
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
 
-class TenxLibrarySampleDetail(LibrarySampleDetail):
+
+    # fields
+    cell_state = create_chrfield(
+        "Cell state",
+        choices=cell_state_choices,
+    )
+    estimated_percent_viability = create_intfield("Estimated percent viability")
+    label_of_original_sample_vial = create_chrfield("Label of original sample vial")
+    lims_vial_barcode = create_chrfield("LIMS vial barcode")
+    original_storage_temperature = create_intfield("Original storage temperature (C)")
+    passage_of_cell_line  = create_intfield("Passage")
+    sample_notes = create_textfield("Sample notes")
+    sample_preparation_method = create_textfield("Sample preparation method")
+    sample_preservation_method = create_chrfield("Sample preservation method")
+
+class TenxLibrarySampleDetail(models.Model, FieldValue):
 
     """
     10x library sample details.
@@ -808,25 +816,31 @@ class TenxLibrarySampleDetail(LibrarySampleDetail):
         verbose_name="Number of cells targeted",
     )
 
-
-class LibraryConstructionInformation(models.Model, FieldValue):
-
-    """
-    Library construction information base class.
-    """
-
-    class Meta:
-        abstract = True
-
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
 
-class DlpLibraryConstructionInformation(LibraryConstructionInformation):
+    # fields
+    cell_state = create_chrfield(
+        "Cell state",
+        choices=cell_state_choices,
+    )
+    estimated_percent_viability = create_intfield("Estimated percent viability")
+    label_of_original_sample_vial = create_chrfield("Label of original sample vial")
+    lims_vial_barcode = create_chrfield("LIMS vial barcode")
+    original_storage_temperature = create_intfield("Original storage temperature (C)")
+    passage_of_cell_line  = create_intfield("Passage")
+    sample_notes = create_textfield("Sample notes")
+    sample_preparation_method = create_textfield("Sample preparation method")
+    sample_preservation_method = create_chrfield("Sample preservation method")
+class DlpLibraryConstructionInformation(models.Model, FieldValue):
 
     """
     DLP library construction information.
     """
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
 
     history = HistoricalRecords(table_name='dlp_history_library_construction_information')
 
@@ -837,21 +851,6 @@ class DlpLibraryConstructionInformation(LibraryConstructionInformation):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-    )
-
-    # choices
-    chip_format_choices = (
-        ('W','Wafergen'),
-        ('M','Microfluidic'),
-        ('B','Bulk'),
-        ('O','Other'),
-    )
-
-    spotting_location_choices = (
-        ('AD','Aparicio Lab - Deckard'),
-        ('AR','Aparicio Lab - Rachael'),
-        ('H','Hansen Lab'),
-        ('G','GSC'),
     )
 
     # fields
@@ -882,11 +881,15 @@ class DlpLibraryConstructionInformation(LibraryConstructionInformation):
     )
 
 
-class PbalLibraryConstructionInformation(LibraryConstructionInformation):
+class PbalLibraryConstructionInformation(models.Model, FieldValue):
 
     """
     PBAL library construction information.
     """
+
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
 
     history = HistoricalRecords(table_name='pbal_history_library_construction_information')
 
@@ -923,11 +926,15 @@ class PbalLibraryConstructionInformation(LibraryConstructionInformation):
     )
 
 
-class TenxLibraryConstructionInformation(LibraryConstructionInformation):
+class TenxLibraryConstructionInformation(models.Model, FieldValue):
 
     """
     10x library construction information.
     """
+
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
     history = HistoricalRecords(table_name='tenx_history_library_construction_information')
 
     # database relationships
@@ -937,14 +944,6 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-    )
-
-    # choices
-    chip_format_choices = (
-        ('W','Wafergen'),
-        ('M','Microfluidic'),
-        ('B','Bulk'),
-        ('O','Other'),
     )
 
     # fields
@@ -1009,31 +1008,7 @@ class TenxLibraryConstructionInformation(LibraryConstructionInformation):
         default="VERSION_2"
     )
 
-
-class LibraryQuantificationAndStorage(models.Model, FieldValue):
-
-    """
-    Library quantification and storage base class.
-    """
-
-    class Meta:
-        abstract = True
-
-    # choices
-    qc_check_choices = (
-        ('P','Will sequence'),
-        ('N','Will not sequence'),
-    )
-
-    # fields
-    qc_check = create_chrfield(
-        "QC check",
-        choices=qc_check_choices,
-    )
-    qc_notes = create_textfield("QC notes")
-
-
-class DlpLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
+class DlpLibraryQuantificationAndStorage(models.Model, FieldValue):
 
     """
     DLP library quantification and storage.
@@ -1119,6 +1094,13 @@ class DlpLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
         blank=True,
     )
 
+    # fields
+    qc_check = create_chrfield(
+        "QC check",
+        choices=qc_check_choices,
+    )
+    qc_notes = create_textfield("QC notes")
+
     def library_location(self):
         loc = None
         if self.freezer:
@@ -1131,7 +1113,7 @@ class DlpLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
         return loc
 
 
-class PbalLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
+class PbalLibraryQuantificationAndStorage(models.Model, FieldValue):
 
     """
     PBAL library quantification and storage.
@@ -1152,7 +1134,14 @@ class PbalLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
     )
 
 
-class TenxLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
+    # fields
+    qc_check = create_chrfield(
+        "QC check",
+        choices=qc_check_choices,
+    )
+    qc_notes = create_textfield("QC notes")
+
+class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
 
     """
     10x library quantification and storage.
@@ -1188,42 +1177,48 @@ class TenxLibraryQuantificationAndStorage(LibraryQuantificationAndStorage):
     )
 
 
-#============================
-# Sequencing models
-#----------------------------
-class Sequencing(models.Model, FieldValue):
+    # fields
+    qc_check = create_chrfield(
+        "QC check",
+        choices=qc_check_choices,
+    )
+    qc_notes = create_textfield("QC notes")
+
+class DlpSequencing(models.Model):
+
+    """
+    DLP sequencing information.
+    """
+
+    library_type = 'dlp'
+
+    # track history
+    history = HistoricalRecords(table_name='dlp_history_sequencing')
+
+    # database relationships
+    library = models.ForeignKey(
+        DlpLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+    )
+
+    rev_comp_override = create_chrfield(
+        "Reverse Complement Override",
+        choices=rev_comp_override_choices,
+        default=None,
+        null=True,
+    )
 
     """
     Sequencing information base class.
     """
 
     class Meta:
-        abstract = True
         unique_together = ('library', 'sequencing_center', 'sequencing_instrument')
 
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
-    # choices
-    sequencing_instrument_choices = (
-        ('HX','HiSeqX'),
-        ('H2500','HiSeq2500'),
-        ('N500', 'NextSeq500'),
-        ('N550','NextSeq550'),
-        ('MI','MiSeq'),
-        ('O','other'),
-    )
-
-    sequencing_output_mode_choices = (
-        ('L','Low'),
-        ('M','Medium'),
-        ('H','High'),
-    )
-
-    read_type_choices = (
-        ('P', 'PET'),
-        ('S', 'SET'),
-    )
 
     # fields
     adapter = create_chrfield(
@@ -1283,9 +1278,264 @@ class Sequencing(models.Model, FieldValue):
         blank=True,
     )
 
-    SEQ_CENTER = (
-        ('BCCAGSC', 'BCCAGSC'),
-        ('UBCBRC', 'UBCBRC'),
+    number_of_lanes_requested = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Sequencing Goal"
+    )
+
+    #Set to the last time number_of_lanes_requested was updated
+    lane_requested_date = models.DateField(
+        null=True,
+    )
+
+    gsc_library_id = create_chrfield("GSC library ID")
+    sequencer_id = create_chrfield("Sequencer ID")
+    sequencing_center = create_chrfield(
+        "Sequencing center",
+        choices=SEQ_CENTER,
+        default='BCCAGSC',
+        blank=False
+    )
+    sequencer_notes = create_textfield("Sequencing notes")
+
+    objects = SequencingManager()
+
+    def __init__(self, *args, **kwargs):
+        super(DlpSequencing, self).__init__(*args, **kwargs)
+        self.old_number_of_lanes_requested = self.number_of_lanes_requested
+
+    def __str__(self):
+        return 'SEQ_' + self.library.get_library_id() +"_" + str(self.id)
+
+    def has_sequencing_detail(self):
+        return hasattr(self, self.library_type + 'sequencingdetail')
+
+    def get_absolute_url(self):
+        return reverse(self.library_type + ":sequencing_detail", kwargs={"pk": self.pk})
+
+    def save(self, *args, **kwargs):
+        if self.number_of_lanes_requested != self.old_number_of_lanes_requested:
+            self.old_number_of_lanes_requested = self.number_of_lanes_requested
+            self.lane_requested_date = datetime.date.today()
+        super(DlpSequencing, self).save(*args,**kwargs)
+
+
+
+class PbalSequencing(models.Model):
+
+    """
+    PBAL sequencing information.
+    """
+
+    library_type = 'pbal'
+
+    # track history
+    history = HistoricalRecords(table_name='pbal_history_sequencing')
+
+    # database relationships
+    library = models.ForeignKey(
+        PbalLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+    )
+
+
+    """
+    Sequencing information base class.
+    """
+    class Meta:
+        unique_together = ('library', 'sequencing_center', 'sequencing_instrument')
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
+    # fields
+    adapter = create_chrfield(
+        "Adapter",
+        default="CTGTCTCTTATACACATCT",
+    )
+    format_for_data_submission = create_chrfield(
+        "Format for data dissemination",
+        default="fastq",
+    )
+    index_read_type = create_chrfield(
+        "Index read type",
+        default="Dual Index (i7 and i5)",
+    )
+    index_read1_length = create_intfield(
+        "Index read1 length",
+        default=6,
+    )
+    index_read2_length = create_intfield(
+        "Index read2 length",
+        default=6,
+    )
+    read_type = create_chrfield(
+        "Read type",
+        choices=read_type_choices,
+        default="P",
+    )
+    read1_length = create_intfield(
+        "Read1 length",
+        default=150,
+    )
+    read2_length = create_intfield(
+        "Read2 length",
+        default=150,
+    )
+
+    sequencing_instrument = create_chrfield(
+        "Sequencing instrument",
+        choices=sequencing_instrument_choices,
+        default="HX",
+    )
+    sequencing_output_mode = create_chrfield(
+        "Sequencing output mode",
+        choices=sequencing_output_mode_choices,
+    )
+    short_description_of_submission = create_chrfield(
+        "Short description of submission",
+        max_length=150,
+    )
+    submission_date = models.DateField(
+        "Submission date",
+        default= datetime.date.today
+        )
+    relates_to = models.ManyToManyField(
+        "self",
+        verbose_name="Relates to",
+        blank=True,
+    )
+
+
+    number_of_lanes_requested = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Sequencing Goal"
+    )
+
+    #Set to the last time number_of_lanes_requested was updated
+    lane_requested_date = models.DateField(
+        null=True,
+    )
+
+    gsc_library_id = create_chrfield("GSC library ID")
+    sequencer_id = create_chrfield("Sequencer ID")
+    sequencing_center = create_chrfield(
+        "Sequencing center",
+        choices=SEQ_CENTER,
+        default='BCCAGSC',
+        blank=False
+    )
+    sequencer_notes = create_textfield("Sequencing notes")
+
+    objects = SequencingManager()
+
+    def __init__(self, *args, **kwargs):
+        super(PbalSequencing, self).__init__(*args, **kwargs)
+        self.old_number_of_lanes_requested = self.number_of_lanes_requested
+
+    def __str__(self):
+        return 'SEQ_' + self.library.get_library_id() +"_" + str(self.id)
+
+    def has_sequencing_detail(self):
+        return hasattr(self, self.library_type + 'sequencingdetail')
+
+    def get_absolute_url(self):
+        return reverse(self.library_type + ":sequencing_detail", kwargs={"pk": self.pk})
+
+    def save(self, *args, **kwargs):
+        if self.number_of_lanes_requested != self.old_number_of_lanes_requested:
+            self.old_number_of_lanes_requested = self.number_of_lanes_requested
+            self.lane_requested_date = datetime.date.today()
+        super(PbalSequencing, self).save(*args,**kwargs)
+
+class TenxSequencing(models.Model):
+
+    """
+    10x sequencing information.
+    """
+
+    library_type = 'tenx'
+
+    # track history
+    history = HistoricalRecords(table_name='tenx_history_sequencing')
+
+    # database relationships
+    library = models.ForeignKey(
+        TenxLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+    )
+
+    tenx_pool = models.ForeignKey(TenxPool, null=True, blank=True)
+
+    """
+    Sequencing information base class.
+    """
+
+    class Meta:
+        unique_together = ('library', 'sequencing_center', 'sequencing_instrument')
+
+    fields_to_exclude = ['ID', 'Library']
+    values_to_exclude = ['id', 'library']
+
+
+    # fields
+    adapter = create_chrfield(
+        "Adapter",
+        default="CTGTCTCTTATACACATCT",
+    )
+    format_for_data_submission = create_chrfield(
+        "Format for data dissemination",
+        default="fastq",
+    )
+    index_read_type = create_chrfield(
+        "Index read type",
+        default="Dual Index (i7 and i5)",
+    )
+    index_read1_length = create_intfield(
+        "Index read1 length",
+        default=6,
+    )
+    index_read2_length = create_intfield(
+        "Index read2 length",
+        default=6,
+    )
+    read_type = create_chrfield(
+        "Read type",
+        choices=read_type_choices,
+        default="P",
+    )
+    read1_length = create_intfield(
+        "Read1 length",
+        default=150,
+    )
+    read2_length = create_intfield(
+        "Read2 length",
+        default=150,
+    )
+
+    sequencing_instrument = create_chrfield(
+        "Sequencing instrument",
+        choices=sequencing_instrument_choices,
+        default="HX",
+    )
+    sequencing_output_mode = create_chrfield(
+        "Sequencing output mode",
+        choices=sequencing_output_mode_choices,
+    )
+    short_description_of_submission = create_chrfield(
+        "Short description of submission",
+        max_length=150,
+    )
+    submission_date = models.DateField(
+        "Submission date",
+        default= datetime.date.today
+        )
+    relates_to = models.ManyToManyField(
+        "self",
+        verbose_name="Relates to",
+        blank=True,
     )
 
     number_of_lanes_requested = models.PositiveIntegerField(
@@ -1311,7 +1561,7 @@ class Sequencing(models.Model, FieldValue):
     objects = SequencingManager()
 
     def __init__(self, *args, **kwargs):
-        super(Sequencing, self).__init__(*args, **kwargs)
+        super(TenxSequencing, self).__init__(*args, **kwargs)
         self.old_number_of_lanes_requested = self.number_of_lanes_requested
 
     def __str__(self):
@@ -1327,91 +1577,21 @@ class Sequencing(models.Model, FieldValue):
         if self.number_of_lanes_requested != self.old_number_of_lanes_requested:
             self.old_number_of_lanes_requested = self.number_of_lanes_requested
             self.lane_requested_date = datetime.date.today()
-        super(Sequencing, self).save(*args,**kwargs)
+        super(TenxSequencing, self).save(*args,**kwargs)
 
-
-class DlpSequencing(Sequencing):
+class DlpLane(models.Model, FieldValue):
 
     """
-    DLP sequencing information.
+    Dlp lane information.
     """
-
-    library_type = 'dlp'
-
-    # track history
-    history = HistoricalRecords(table_name='dlp_history_sequencing')
+    history = HistoricalRecords(table_name='dlp_history_lane')
 
     # database relationships
-    library = models.ForeignKey(
-        DlpLibrary,
-        verbose_name="Library",
+    sequencing = models.ForeignKey(
+        DlpSequencing,
+        verbose_name="Sequencing",
         on_delete=models.CASCADE,
     )
-
-    # fields
-    rev_comp_override_choices = (
-        ('i7,i5', 'No Reverse Complement'),
-        ('i7,rev(i5)', 'Reverse Complement i5'),
-        ('rev(i7),i5', 'Reverse Complement i7'),
-        ('rev(i7),rev(i5)', 'Reverse Complement i7 and i5'),
-    )
-
-    rev_comp_override = create_chrfield(
-        "Reverse Complement Override",
-        choices=rev_comp_override_choices,
-        default=None,
-        null=True,
-    )
-
-
-
-class PbalSequencing(Sequencing):
-
-    """
-    PBAL sequencing information.
-    """
-
-    library_type = 'pbal'
-
-    # track history
-    history = HistoricalRecords(table_name='pbal_history_sequencing')
-
-    # database relationships
-    library = models.ForeignKey(
-        PbalLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-    )
-
-class TenxSequencing(Sequencing):
-
-    """
-    10x sequencing information.
-    """
-
-    library_type = 'tenx'
-
-    # track history
-    history = HistoricalRecords(table_name='tenx_history_sequencing')
-
-    # database relationships
-    library = models.ForeignKey(
-        TenxLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-    )
-
-    tenx_pool = models.ForeignKey(TenxPool, null=True, blank=True)
-
-
-class Lane(models.Model, FieldValue):
-
-    """
-    Lane information base class.
-    """
-
-    class Meta:
-        abstract = True
 
     fields_to_exclude = ['ID', 'Lane']
     values_to_exclude = ['id', 'lane']
@@ -1436,23 +1616,7 @@ class Lane(models.Model, FieldValue):
     def __str__(self):
         return self.flow_cell_id
 
-
-class DlpLane(Lane):
-
-    """
-    Dlp lane information.
-    """
-    history = HistoricalRecords(table_name='dlp_history_lane')
-
-    # database relationships
-    sequencing = models.ForeignKey(
-        DlpSequencing,
-        verbose_name="Sequencing",
-        on_delete=models.CASCADE,
-    )
-
-
-class PbalLane(Lane):
+class PbalLane(models.Model, FieldValue):
 
     """
     PBAL lane information.
@@ -1465,8 +1629,30 @@ class PbalLane(Lane):
         on_delete=models.CASCADE,
     )
 
+    fields_to_exclude = ['ID', 'Lane']
+    values_to_exclude = ['id', 'lane']
 
-class TenxLane(Lane):
+    flow_cell_id = create_chrfield(
+        "Flow cell/Lane ID",
+        null=False,
+        blank=False,
+    )
+
+    path_to_archive = create_chrfield(
+        "Path to archive",
+        max_length=150,
+        null=True,
+        blank=True,
+    )
+
+    sequencing_date = models.DateTimeField(
+        null=True
+    )
+
+    def __str__(self):
+        return self.flow_cell_id
+
+class TenxLane(models.Model, FieldValue):
 
     """
     10x lane information.
@@ -1479,6 +1665,28 @@ class TenxLane(Lane):
         on_delete=models.CASCADE,
     )
 
+    fields_to_exclude = ['ID', 'Lane']
+    values_to_exclude = ['id', 'lane']
+
+    flow_cell_id = create_chrfield(
+        "Flow cell/Lane ID",
+        null=False,
+        blank=False,
+    )
+
+    path_to_archive = create_chrfield(
+        "Path to archive",
+        max_length=150,
+        null=True,
+        blank=True,
+    )
+
+    sequencing_date = models.DateTimeField(
+        null=True
+    )
+
+    def __str__(self):
+        return self.flow_cell_id
 
 class Plate(models.Model, FieldValue):
 
@@ -1496,13 +1704,6 @@ class Plate(models.Model, FieldValue):
         PbalLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
-    )
-
-    # choices
-    plate_type_choices = (
-        ('submitted', 'submitted'),
-        ('sequenced', 'sequenced'),
-        ('stored', 'stored'),
     )
 
     # fields
