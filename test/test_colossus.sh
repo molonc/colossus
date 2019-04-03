@@ -9,4 +9,4 @@ pip3 install -r requirements.txt --ignore-installed
 python3 manage.py migrate
 python3 manage.py makemigrations --check
 kill $(ps aux | grep '[r]unserver' | awk '{print $2}')
-/usr/bin/python3 manage.py runserver 0.0.0.0:8000 log.txt 2>&1 &
+/usr/bin/python3 manage.py runserver >> 0.0.0.0:8000 log.txt 2>&1 &
