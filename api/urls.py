@@ -43,6 +43,8 @@ app_name='api'
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^samplesheet/(?P<pk>\d+)$', views.dlp_sequencing_get_samplesheet, name='dlp_sequencing_get_queried_samplesheet'),
+    url(r'^samplesheet_query/(?P<flowcell>.+)$', views.dlp_sequencing_get_queried_samplesheet, name='dlp_sequencing_get_queried_samplesheet'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

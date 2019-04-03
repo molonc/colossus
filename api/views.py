@@ -8,15 +8,19 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 #============================
 # Django & Django rest framework imports
 #----------------------------
+import os
+
 import django_filters
 import rest_framework.exceptions
-from rest_framework import pagination, viewsets
+from django.http import HttpResponse, HttpResponseRedirect
+from rest_framework import pagination, viewsets, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
+from django.core.urlresolvers import reverse
 
 #============================
 # App imports
 #----------------------------
+from core.utils import generate_samplesheet
 from .serializers import (
     SampleSerializer,
     LibrarySerializer,
@@ -394,3 +398,33 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = TenxPoolSerializer
     filter_fields = "__all__"
 
+
+def dlp_sequencing_get_samplesheet(request, pk):
+
+    """
+    Generates downloadable samplesheet.
+    """
+
+    ofilename, ofilepath = generate_samplesheet(pk)
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
+    ofile = open(ofilepath, 'r')
+    response.write(ofile.read())
+    ofile.close()
+    os.remove(ofilepath)
+    return response
+
+def dlp_sequencing_get_queried_samplesheet(request, flowcell):
+
+    """
+    Makes downloading samplesheets from flowcell possible.
+    """
+    try:
+        pk = DlpLane.objects.get(flow_cell_id=flowcell).pk
+        return dlp_sequencing_get_samplesheet(request, pk)
+    except DlpSequencing.DoesNotExist:
+        msg = "Sorry, no sequencing with flowcell {} found.".format(flowcell)
+        return HttpResponse(msg)
+    except DlpSequencing.MultipleObjectsReturned:
+        msg = "Multiple flowcells with ID {} found.".format(flowcell)
+        return HttpResponse(msg)
