@@ -483,7 +483,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     )
 
     def __str__(self):
-        return 'LIB_' + self.get_library_id()
+        return self.name
 
     def get_absolute_url(self):
         return reverse(self.library_type + ":library_detail", kwargs={"pk": self.pk})

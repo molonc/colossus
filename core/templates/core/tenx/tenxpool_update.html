@@ -6,18 +6,119 @@
 
 {% block body %}
 <div class="container graybg">
-    <form action="{% url 'tenx:pool_update' pk=pk %}" method="POST">
+    <form action="{% url 'tenx:pool_create' %}" method="POST">
         {% csrf_token %}
         <table class="table-condensed">
-            {{ form }}
+
+            {{form}}
+
         </table>
 
-        <br>
+        <div class="row" style="padding-left:20px;">
+            <div id="select-form" class="form-group" style="display: inline-block;">
+              <label for="sel1">Select:</label>
+                <input class="form-control" id="select_input" type="text" placeholder="Search.." style="width: 230px;">
+                <select multiple id="library_input" class="form-control" style="width: 230px;">
+                    {% for library in tenxlibraries %}
+                    <option value={{library.pk}}>{{library}}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
+            <div style="display: inline-block; vertical-align:top;">
+            <span id="add-items" class="glyphicon glyphicon-plus" style="padding-top:30px"></span>
+                <br/>
+            <span id="remove-items" class="glyphicon glyphicon-minus"></span>
+            </div>
+
+            <div class="form-group" style="display: inline-block; vertical-align:top;">
+              <label for="sel1">Selected:</label>
+                <input class="form-control" id="selected_input" type="text" placeholder="Search.." style="width: 230px;">
+                <select multiple id="library_output" class="form-control"  style="width: 230px;">
+                </select>
+            </div>
+        </div>
         <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
-        <a class="btn btn-default btn-sm" href="{% url 'tenx:pool_detail' pk=pk %}">Cancel</a>
+        <a class="btn btn-default btn-sm" href="{% url 'tenx:pool_detail' pk %}">Cancel</a>
     </form>
 
     <br>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function(){
+      init_edit()
+      document.getElementById('id_libraries').style.display = 'none';
+      $("#select_input").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#library_input option").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+      $("#selected_input").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#library_output option").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+
+    $('#add-items').on('click', function(e) {
+        var input = document.getElementById("library_input")
+         for (var i=0, len=input.options.length; i<len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#library_output').append(opt)
+            }
+        }
+        update_field()
+    })
+
+    $('#remove-items').on('click', function(e) {
+        var input = document.getElementById("library_output")
+         for (var i=0, len=input.options.length; i<len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#library_input').append(opt)
+            }
+        }
+        update_field()
+    })
+
+    function update_field(){
+        var input = document.getElementById("library_output")
+        var field = document.getElementById("id_libraries")
+        var result = []
+         for (var i=0, len=input.options.length; i<len; i++) {
+            result.push(input.options[i].value)
+         }
+         field.querySelector('div.selector option[value=valueB]')
+         for (var i=0, len=field.options.length; i<len; i++) {
+            opt = field.options[i];
+            opt.selected = false
+            if (result.indexOf(opt.value) > -1) {
+                opt.selected = true
+            }
+        }
+    }
+
+    function init_edit(){
+     var pool = {{pool_library}}
+     var input = document.getElementById("library_input")
+        for (var i=0, len=input.options.length; i<len; i++) {
+            opt = input.options[i];
+            if (pool.indexOf(parseInt(opt.value)) > -1) {
+                $('#library_output').append(opt)
+                i--
+                len--
+            }
+        }
+    }
+</script>
 {% endblock %}

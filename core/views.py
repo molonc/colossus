@@ -1060,12 +1060,15 @@ class TenxPoolCreate(LoginRequiredMixin,TemplateView):
     def get_context_data(self):
         context = {
             'form': TenxPoolForm(),
+            'tenxlibraries' : TenxLibrary.objects.all()
         }
         return context
 
     def post(self, request):
         form = TenxPoolForm(request.POST)
+        print(request.POST)
         if form.is_valid():
+            print(form["libraries"].value())
             instance = form.save()
             msg = "Successfully created the %s pool." % instance.pool_name()
             messages.success(request, msg)
@@ -1080,9 +1083,13 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
     template_name = "core/tenx/tenxpool_update.html"
 
     def get_context_data(self, pk):
+        pool_library = [l.pk for l in get_object_or_404(TenxPool, pk=pk).libraries.all()]
+        print()
         context = {
             'pk': pk,
             'form': TenxPoolForm(instance=get_object_or_404(TenxPool, pk=pk)),
+            'tenxlibraries': TenxLibrary.objects.all(),
+            'pool_library' : pool_library
         }
         return context
 
