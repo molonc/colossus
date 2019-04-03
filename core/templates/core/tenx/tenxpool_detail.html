@@ -2,7 +2,7 @@
 
 {% load staticfiles %}
 
-{% block title %}{{chip.get_id}} Details{% endblock %}
+{% block title %}{{pool.pool_name}} Details{% endblock %}
 
 {% block body %}
 <div class="container detail-container">
@@ -87,9 +87,12 @@
                     {% endfor %}
                 </tbody>
             {% else %}
-                <tr><h5><i class="text-warning">There is no 10x sequencing related to this Pool!</i></h5></tr>
+                <tr>
+                    <h5><i class="text-warning">There is no 10x sequencing related to this Pool!</i></h5>
+                </tr>
             {% endif %}
         </table>
+        <a href="{% url 'tenx:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color:green;"></i> Add Sequencing</a>
     </div>
 </div>
 <div class="container" style="margin-bottom: 5px;">
