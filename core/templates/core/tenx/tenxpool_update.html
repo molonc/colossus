@@ -6,7 +6,7 @@
 
 {% block body %}
 <div class="container graybg">
-    <form action="{% url 'tenx:pool_create' %}" method="POST">
+    <form action="{% url 'tenx:pool_update' %}" method="POST">
         {% csrf_token %}
         <table class="table-condensed">
 
