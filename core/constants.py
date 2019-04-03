@@ -11,6 +11,53 @@ THREE_PRIME = "3'"
 VDJ = "V(D)J"
 CNV = "CNV"
 
+pathology_occurrence_choices = (
+    ('PR', 'Primary'),
+    ('RC', 'Recurrent or Relapse'),
+    ('ME', 'Metastatic'),
+    ('RM', 'Remission'),
+    ('UN', 'Undetermined'),
+    ('US', 'Unspecified'),
+)
+
+sex_choices = (
+    ('M', 'Male'),
+    ('F', 'Female'),
+    ('X', 'Mixed'),
+    ('U', 'Unknown'),
+)
+
+tissue_type_choices = (
+    ('N', 'Normal'),
+    ('B', 'Benign'),
+    ('PM', 'Pre-malignant'),
+    ('M', 'Malignant'),
+    ('NNP', 'Non-neoplastic Disease'),
+    ('U', 'Undetermined'),
+    ('HP', 'Hyperplasia'),
+    ('MP', 'Metaplasia'),
+    ('DP', 'Dysplasia'),
+)
+
+treatment_status_choices = (
+    ('PR', 'Pre-treatment'),
+    ('IN', 'In-treatment'),
+    ('PO', 'Post-treatment'),
+    ('NA', 'N/A'),
+    ('UN', 'Unknown'),
+)
+TISSUE_STATES = (
+    ('NONE', 'None'),
+    ('FROZ', 'Frozen'),
+    ('FRES', 'Fresh'),
+    ('DIG-FRES', 'Digested-Fresh'),
+
+)
+
+CHIP_WELL = (
+    (0, 'NOT SET'), (1, 'WELL_1'), (2, 'WELL_2'), (3, 'WELL_3'), (4, 'WELL_4'),
+    (5, 'WELL_5'), (6, 'WELL_6'), (7, 'WELL_7'), (8, 'WELL_8')
+)
 
 TENX_LIBRARY_TYPE_CHOICES = (
     (FIVE_PRIME, FIVE_PRIME),
@@ -21,6 +68,122 @@ TENX_LIBRARY_TYPE_CHOICES = (
 CHEMISTRY_VERSION_CHOICES = (
     ("VERSION_2", "v2"),
     ("VERSION_3", "v3")
+)
+
+spotting_location_choices = (
+    ('AD', 'Aparicio Lab - Deckard'),
+    ('AR', 'Aparicio Lab - Rachael'),
+    ('H', 'Hansen Lab'),
+    ('G', 'GSC'),
+)
+
+# choices
+cell_state_choices = (
+    ('C', 'Cells'),
+    ('N', 'Nuclei'),
+    ('M', 'Mixed'),
+    ('U', 'Unknown'),
+)
+
+# choices
+chip_format_choices = (
+    ('W', 'Wafergen'),
+    ('M', 'Microfluidic'),
+    ('B', 'Bulk'),
+    ('O', 'Other'),
+)
+
+qc_check_choices = (
+    ('P', 'Will sequence'),
+    ('N', 'Will not sequence'),
+)
+
+# fields
+rev_comp_override_choices = (
+    ('i7,i5', 'No Reverse Complement'),
+    ('i7,rev(i5)', 'Reverse Complement i5'),
+    ('rev(i7),i5', 'Reverse Complement i7'),
+    ('rev(i7),rev(i5)', 'Reverse Complement i7 and i5'),
+)
+
+# choices
+sequencing_instrument_choices = (
+    ('HX', 'HiSeqX'),
+    ('H2500', 'HiSeq2500'),
+    ('N500', 'NextSeq500'),
+    ('N550', 'NextSeq550'),
+    ('MI', 'MiSeq'),
+    ('O', 'other'),
+)
+
+sequencing_output_mode_choices = (
+    ('L', 'Low'),
+    ('M', 'Medium'),
+    ('H', 'High'),
+)
+
+read_type_choices = (
+    ('P', 'PET'),
+    ('S', 'SET'),
+)
+
+SEQ_CENTER = (
+    ('BCCAGSC', 'BCCAGSC'),
+    ('UBCBRC', 'UBCBRC'),
+)
+
+# choices
+plate_type_choices = (
+    ('submitted', 'submitted'),
+    ('sequenced', 'sequenced'),
+    ('stored', 'stored'),
+)
+
+
+##########
+#SISYPHUS#
+##########
+# Choices for the run status
+IDLE = 'idle'
+ERROR = 'error'
+RUNNING = 'running'
+ARCHIVING = 'archiving'
+COMPLETE = 'complete'
+ALIGN_COMPLETE = 'align_complete'
+HMMCOPY_COMPLETE = 'hmmcopy_complete'
+
+RUN_STATUS_CHOICES = (
+    (IDLE, 'Idle'),
+    (ERROR, 'Error'),
+    (RUNNING, 'Running'),
+    (ARCHIVING, 'Archiving'),
+    (COMPLETE, 'Complete'),
+    (ALIGN_COMPLETE, 'Align Complete'),
+    (HMMCOPY_COMPLETE, 'Hmmcopy Complete'),
+)
+
+# Aligner choices
+aligner_choices = (
+    ('A', 'bwa-aln'),
+    ('M', 'bwa-mem'),
+)
+
+# Smoothing choices
+smoothing_choices = (
+    ('M', 'modal'),
+    ('L', 'loess'),
+)
+
+# choices
+priority_level_choices = (
+    ('L', 'Low'),
+    ('M', 'Medium'),
+    ('H', 'High'),
+)
+
+verified_choices = (
+    ('T', 'True'),
+    ('F', 'False'),
 )
 
 # Enumeration for TenxLibraryConstructionInformation library_type

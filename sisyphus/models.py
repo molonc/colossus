@@ -21,18 +21,9 @@ from simple_history.models import HistoricalRecords
 
 from core.models import DlpSequencing,PbalSequencing,TenxSequencing,DlpLibrary,PbalLibrary,TenxLibrary,DlpLane
 from core.helpers import *
+from core.constants import *
 
-
-class AbstractVersion(models.Model):
-    """
-    Keeps track of the available analysis software versions.
-    """
-
-    class Meta:
-        abstract = True
-
-
-class DlpAnalysisVersion(AbstractVersion):
+class DlpAnalysisVersion(models.Model):
     """
     Keeps track of the available analysis software versions.
     """
@@ -47,7 +38,7 @@ class DlpAnalysisVersion(AbstractVersion):
         return self.version
 
 
-class PbalAnalysisVersion(AbstractVersion):
+class PbalAnalysisVersion(models.Model):
     """
     Keeps track of the available analysis software versions.
     """
@@ -62,7 +53,7 @@ class PbalAnalysisVersion(AbstractVersion):
         return self.version
 
 
-class TenxAnalysisVersion(AbstractVersion):
+class TenxAnalysisVersion(models.Model):
     """
     Keeps track of the available analysis software versions.
     """
@@ -93,24 +84,6 @@ class AnalysisRun(models.Model):
     """
     Analysis/workflow details filled in or changed by database admin
     """
-    # Choices for the run status
-    IDLE = 'idle'
-    ERROR = 'error'
-    RUNNING = 'running'
-    ARCHIVING = 'archiving'
-    COMPLETE = 'complete'
-    ALIGN_COMPLETE= 'align_complete'
-    HMMCOPY_COMPLETE = 'hmmcopy_complete'
-    
-    RUN_STATUS_CHOICES = (
-        (IDLE, 'Idle'),
-        (ERROR, 'Error'),
-        (RUNNING, 'Running'),
-        (ARCHIVING, 'Archiving'),
-        (COMPLETE, 'Complete'),
-        (ALIGN_COMPLETE, 'Align Complete'),
-        (HMMCOPY_COMPLETE, 'Hmmcopy Complete'),
-    )
 
     history = HistoricalRecords(table_name='analysis_run_history')
 
@@ -149,41 +122,32 @@ class AnalysisRun(models.Model):
         return reverse("sisyphus:analysisrun_detail")
 
 
-class AbstractAnalysisInformation(models.Model):
-    """
-    Analysis/workflow information, typical user sees this
-    """
+class DlpAnalysisInformation(models.Model):
+    history = HistoricalRecords(table_name='dlp_analysis_info_history')
+
+    library = models.ForeignKey(
+        DlpLibrary,
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+    )
+
+    sequencings = models.ManyToManyField(DlpSequencing)
+
+    version = models.ForeignKey(
+        DlpAnalysisVersion,
+        verbose_name="Analysis Version",
+        on_delete=models.CASCADE,
+    )
+
+    lanes = models.ManyToManyField(DlpLane, blank=True)
     fields_to_exclude = ['ID']
     values_to_exclude = ['id']
-
-    # Aligner choices
-    aligner_choices = (
-        ('A','bwa-aln'),
-        ('M','bwa-mem'),
-    )
-
-    # Smoothing choices
-    smoothing_choices= (
-        ('M','modal'),
-        ('L','loess'),
-    )
 
     analysis_jira_ticket = create_chrfield("Analysis Jira ticket", blank=False)
 
     # database relationships
     analysis_run = models.OneToOneField(AnalysisRun, blank=True, null=True)
 
-    # choices
-    priority_level_choices = (
-        ('L', 'Low'),
-        ('M', 'Medium'),
-        ('H', 'High'),
-    )
-
-    verified_choices = (
-        ('T', 'True'),
-        ('F', 'False'),
-    )
 
     # fields
     priority_level = create_chrfield(
@@ -236,31 +200,9 @@ class AbstractAnalysisInformation(models.Model):
         return "Analysis of {jira}".format(jira=self.analysis_jira_ticket)
 
     class Meta:
-        abstract = True
         ordering = ['pk']
 
-
-class DlpAnalysisInformation(AbstractAnalysisInformation):
-    history = HistoricalRecords(table_name='dlp_analysis_info_history')
-
-    library = models.ForeignKey(
-        DlpLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-    )
-
-    sequencings = models.ManyToManyField(DlpSequencing)
-
-    version = models.ForeignKey(
-        DlpAnalysisVersion,
-        verbose_name="Analysis Version",
-        on_delete=models.CASCADE,
-    )
-
-    lanes = models.ManyToManyField(DlpLane, blank=True)
-
-
-class PbalAnalysisInformation(AbstractAnalysisInformation):
+class PbalAnalysisInformation(models.Model):
     history = HistoricalRecords(table_name='pbal_analysis_info_history')
 
     sequencings = models.ManyToManyField(PbalSequencing)
@@ -270,9 +212,69 @@ class PbalAnalysisInformation(AbstractAnalysisInformation):
         verbose_name="Analysis Version",
         on_delete=models.CASCADE,
     )
+    fields_to_exclude = ['ID']
+    values_to_exclude = ['id']
 
 
-class TenxAnalysisInformation(AbstractAnalysisInformation):
+    analysis_jira_ticket = create_chrfield("Analysis Jira ticket", blank=False)
+
+    # database relationships
+    analysis_run = models.OneToOneField(AnalysisRun, blank=True, null=True)
+
+    # fields
+    priority_level = create_chrfield(
+        "Priority Level",
+        choices=priority_level_choices,
+        default="L",
+        blank=False,
+        null=False,
+    )
+
+    aligner = create_chrfield(
+        "Aligner",
+        choices=aligner_choices,
+        default="A",
+        blank=False,
+        null=False,
+    )
+
+    smoothing = create_chrfield(
+        "Smoothing",
+        choices=smoothing_choices,
+        default="M",
+        blank=False,
+        null=False,
+    )
+
+    # fields
+    analysis_submission_date = models.DateField(
+        "Analysis submission date",
+        null=True,
+        default=datetime.date.today, # this needs to be a date (not datetime)
+    )
+
+    reference_genome = models.ForeignKey(
+        ReferenceGenome,
+        verbose_name="ReferenceGenome",
+        null=True,
+    )
+
+    verified = create_chrfield(
+        "Verified",
+        choices=verified_choices,
+        default="F",
+    )
+
+    def get_absolute_url(self):
+        return reverse("sisyphus:analysisinformation_detail", kwargs={'pk':self.pk})
+
+    def __str__(self):
+        return "Analysis of {jira}".format(jira=self.analysis_jira_ticket)
+
+    class Meta:
+        ordering = ['pk']
+
+class TenxAnalysisInformation(models.Model):
     history = HistoricalRecords(table_name='tenx_analysis_info_history')
 
     sequencings = models.ManyToManyField(TenxSequencing)
@@ -287,3 +289,63 @@ class TenxAnalysisInformation(AbstractAnalysisInformation):
         verbose_name="Analysis Version",
         on_delete=models.CASCADE,
     )
+    fields_to_exclude = ['ID']
+    values_to_exclude = ['id']
+
+    analysis_jira_ticket = create_chrfield("Analysis Jira ticket", blank=False)
+
+    # database relationships
+    analysis_run = models.OneToOneField(AnalysisRun, blank=True, null=True)
+
+    # fields
+    priority_level = create_chrfield(
+        "Priority Level",
+        choices=priority_level_choices,
+        default="L",
+        blank=False,
+        null=False,
+    )
+
+    aligner = create_chrfield(
+        "Aligner",
+        choices=aligner_choices,
+        default="A",
+        blank=False,
+        null=False,
+    )
+
+    smoothing = create_chrfield(
+        "Smoothing",
+        choices=smoothing_choices,
+        default="M",
+        blank=False,
+        null=False,
+    )
+
+    # fields
+    analysis_submission_date = models.DateField(
+        "Analysis submission date",
+        null=True,
+        default=datetime.date.today, # this needs to be a date (not datetime)
+    )
+
+    reference_genome = models.ForeignKey(
+        ReferenceGenome,
+        verbose_name="ReferenceGenome",
+        null=True,
+    )
+
+    verified = create_chrfield(
+        "Verified",
+        choices=verified_choices,
+        default="F",
+    )
+
+    def get_absolute_url(self):
+        return reverse("sisyphus:analysisinformation_detail", kwargs={'pk':self.pk})
+
+    def __str__(self):
+        return "Analysis of {jira}".format(jira=self.analysis_jira_ticket)
+
+    class Meta:
+        ordering = ['pk']
