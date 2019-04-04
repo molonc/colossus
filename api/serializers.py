@@ -33,9 +33,8 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
-    PbalLibrary,
-    PbalSequencing
 )
+from pbal.models import PbalLibrary, PbalSequencing
 
 from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion, PbalAnalysisInformation
 
