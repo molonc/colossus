@@ -19,9 +19,11 @@ from django.contrib.postgres.fields import JSONField
 #----------------------------
 from simple_history.models import HistoricalRecords
 
-from core.models import DlpSequencing,PbalSequencing,TenxSequencing,DlpLibrary,PbalLibrary,TenxLibrary,DlpLane
+from core.models import DlpSequencing,TenxSequencing,DlpLibrary,TenxLibrary,DlpLane
 from core.helpers import *
 from core.constants import *
+from pbal.models import PbalSequencing
+
 
 class DlpAnalysisVersion(models.Model):
     """
