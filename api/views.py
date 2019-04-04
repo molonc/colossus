@@ -57,8 +57,8 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
-    PbalSequencing, PbalLibrary)
-
+    )
+from pbal.models import PbalSequencing, PbalLibrary
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun, PbalAnalysisInformation
 
 
