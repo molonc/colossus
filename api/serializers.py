@@ -33,9 +33,11 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
+    PbalLibrary,
+    PbalSequencing
 )
 
-from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
+from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion, PbalAnalysisInformation
 
 #============================
 # Other imports
@@ -477,3 +479,53 @@ class TenxPoolSerializer(serializers.ModelSerializer):
             'tenxsequencing_set'
         )
 
+class PbalLibrarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PbalLibrary
+        fields = (
+            'id',
+            'pbalsequencing_set',
+            'pballibraryconstructioninformation',
+            'projects',
+            'sample',
+            'relates_to_dlp',
+            'relates_to_tenx',
+            'description',
+            'result',
+            'failed',
+        )
+
+
+class PbalSequencingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PbalSequencing
+        fields = (
+            'id',
+            'library',
+            'format_for_data_submission',
+            'adapter',
+            'read_type',
+            'read1_length',
+            'read2_length',
+            'index_read_type',
+            'index_read1_length',
+            'index_read2_length',
+            'sequencing_instrument',
+            'sequencing_output_mode',
+            'short_description_of_submission',
+            'relates_to',
+            'submission_date',
+            'pballane_set',
+            'gsc_library_id',
+            'sequencer_id',
+            'sequencing_center',
+            'lane_requested_date',
+            'number_of_lanes_requested',
+            'sequencer_notes',
+        )
+
+
+class PbalAnalysisInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PbalAnalysisInformation
+        fields = "__all__"
