@@ -29,18 +29,23 @@ from django.conf import settings
 # App imports
 #----------------------------
 from core.search_util.search_helper import return_text_search
+from pbal.models import (
+    PbalLane,
+    Plate,
+    PbalLibrary
+)
+
 from .models import (
     Sample,
     TenxCondition,
     TenxPool,
     TenxChip,
-    PbalLane,
     TenxLane,
     SublibraryInformation,
     MetadataField,
-    Plate,
     JiraUser,
     Project)
+
 from sisyphus.models import *
 from .forms import (
     SampleForm,

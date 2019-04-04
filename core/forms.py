@@ -32,11 +32,20 @@ from django.forms.extras.widgets import SelectDateWidget
 #===========================
 # App imports
 #---------------------------
+from pbal.models import (
+    PbalLibrary,
+    PbalLibrarySampleDetail,
+    PbalLibraryConstructionInformation,
+    PbalLibraryQuantificationAndStorage,
+    PbalSequencing,
+    PbalLane,
+    Plate,
+)
+
 from .models import (
     Sample,
     AdditionalSampleInformation,
     DlpLibrary,
-    PbalLibrary,
     TenxLibrary,
     TenxCondition,
     TenxChip,
@@ -44,20 +53,14 @@ from .models import (
     DlpLibrarySampleDetail,
     DlpLibraryConstructionInformation,
     DlpLibraryQuantificationAndStorage,
-    PbalLibrarySampleDetail,
-    PbalLibraryConstructionInformation,
-    PbalLibraryQuantificationAndStorage,
     TenxLibrarySampleDetail,
     TenxLibraryConstructionInformation,
     TenxLibraryQuantificationAndStorage,
     DlpSequencing,
-    PbalSequencing,
     TenxSequencing,
     DlpLane,
-    PbalLane,
     TenxLane,
     TenxPool,
-    Plate,
     JiraUser,
     Project)
 from .utils import parse_smartchipapp_results_file
