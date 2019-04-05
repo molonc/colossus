@@ -261,18 +261,7 @@ class DlpLibraryForm(LibraryForm):
                 self.add_error('pool_id', msg)
 
 
-class PbalLibraryForm(LibraryForm):
-    class Meta:
-        model = PbalLibrary
-        exclude = []
-        labels = {
-            'primary sample': ('*Sample'),
-            'jira_ticket': ('*Jira Ticket'),
-        }
-        help_texts = {
-            'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
-            'jira_ticket': ('Jira Ticket.'),
-        }
+
 
 
 class TenxLibraryForm(LibraryForm):
@@ -441,52 +430,6 @@ DlpLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
 )
 
 
-class PbalLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
-
-    """
-    Clean uploaded PBAL-related files.
-    """
-
-    class Meta(LibraryQuantificationAndStorageForm.Meta):
-        model = PbalLibraryQuantificationAndStorage
-
-PbalLibrarySampleDetailInlineFormset = inlineformset_factory(
-    PbalLibrary,
-    PbalLibrarySampleDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'sample_spot_date': SelectDateWidget(
-            years=range(2000,2020),
-            empty_label=('year', 'month', 'day'),
-        )
-    }
-)
-
-PbalLibraryConstructionInfoInlineFormset =  inlineformset_factory(
-    PbalLibrary,
-    PbalLibraryConstructionInformation,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'submission_date': SelectDateWidget(
-            years=range(2000,2020),
-            empty_label=('year', 'month', 'day'),
-        )
-    }
-)
-
-PbalLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
-    PbalLibrary,
-    PbalLibraryQuantificationAndStorage,
-    form = PbalLibraryQuantificationAndStorageForm,
-    can_delete = False,
-    fields = "__all__",
-)
-
-
 class TenxLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
     """
@@ -588,13 +531,6 @@ class DlpSequencingForm(SequencingForm):
         model = DlpSequencing
 
 
-
-class PbalSequencingForm(SequencingForm):
-    class Meta(SequencingForm.Meta):
-        model = PbalSequencing
-
-
-
 class TenxSequencingForm(SequencingForm):
 
     def __init__(self,*args,**kwargs):
@@ -622,24 +558,11 @@ class DlpLaneForm(LaneForm):
     class Meta(LaneForm.Meta):
         model = DlpLane
 
-
-class PbalLaneForm(LaneForm):
-    class Meta(LaneForm.Meta):
-        model = PbalLane
-
-
 class TenxLaneForm(LaneForm):
     class Meta(LaneForm.Meta):
         model = TenxLane
 
 
-#===========================
-# Plate form
-#---------------------------
-class PlateForm(ModelForm):
-    class Meta:
-        model = Plate
-        fields = "__all__"
 
 
 #===========================

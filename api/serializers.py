@@ -34,9 +34,17 @@ from core.models import (
     Project,
     TenxPool,
 )
+
 from pbal.models import PbalLibrary, PbalSequencing
 
-from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion, PbalAnalysisInformation
+from sisyphus.models import (
+    DlpAnalysisInformation,
+    ReferenceGenome,
+    AnalysisRun,
+    DlpAnalysisVersion,
+    PbalAnalysisInformation,
+    PbalAnalysisVersion)
+
 
 #============================
 # Other imports
@@ -525,6 +533,23 @@ class PbalSequencingSerializer(serializers.ModelSerializer):
 
 
 class PbalAnalysisInformationSerializer(serializers.ModelSerializer):
+    version = serializers.CharField(source='version.version')
     class Meta:
         model = PbalAnalysisInformation
         fields = "__all__"
+
+    def create(self, validated_data):
+        version = PbalAnalysisVersion.objects.create(version=validated_data["version"])
+        version.save()
+
+        listofm2m = validated_data["sequencings"]
+        instance = PbalAnalysisInformation.objects.create(
+            analysis_jira_ticket = validated_data["analysis_jira_ticket"],
+            priority_level = validated_data["priority_level"],
+            aligner = validated_data["aligner"],
+            smoothing=validated_data["smoothing"],
+            version=version
+        )
+        instance.sequencings = listofm2m
+
+        return instance
