@@ -59,7 +59,7 @@ class Project(models.Model, FieldValue):
         return reverse("core:project_detail", kwargs={"pk": self.pk})
 
     def get_libraries(self):
-        return list(self.dlplibrary_set.all()) + list(self.pballibrary_set.all()) + list(self.tenxlibrary_set.all())
+        return list(self.dlplibrary_set.all()) + list(self.pballibrary_projects.all()) + list(self.tenxlibrary_set.all())
 
     class Meta:
         ordering = ['name']

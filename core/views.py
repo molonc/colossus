@@ -154,6 +154,7 @@ class SampleDetail(LoginRequiredMixin, TemplateView):
     template_name = "core/sample_detail.html"
 
     def get_context_data(self, pk):
+        print(get_object_or_404(Sample, pk=pk).pballibrary_sample.all())
         context = {
             'sample': get_object_or_404(Sample, pk=pk),
             'library_list': ['dlp', 'pbal', 'tenx'],

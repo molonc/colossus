@@ -65,7 +65,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'dlplibrary_set',
-            'pballibrary_set',
+            'pballibrary_projects',
             'tenxlibrary_set'
         )
 
