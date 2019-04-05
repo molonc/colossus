@@ -35,7 +35,9 @@ from core.models import (
     TenxPool,
 )
 
-from pbal.models import PbalLibrary, PbalSequencing
+from pbal.models import (
+    PbalLibrary,
+    PbalSequencing)
 
 from sisyphus.models import (
     DlpAnalysisInformation,

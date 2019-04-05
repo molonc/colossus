@@ -32,15 +32,6 @@ from django.forms.extras.widgets import SelectDateWidget
 #===========================
 # App imports
 #---------------------------
-from pbal.models import (
-    PbalLibrary,
-    PbalLibrarySampleDetail,
-    PbalLibraryConstructionInformation,
-    PbalLibraryQuantificationAndStorage,
-    PbalSequencing,
-    PbalLane,
-    Plate,
-)
 
 from .models import (
     Sample,
