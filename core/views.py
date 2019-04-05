@@ -29,46 +29,42 @@ from django.conf import settings
 # App imports
 #----------------------------
 from core.search_util.search_helper import return_text_search
+from pbal.models import (
+    PbalLibrary
+)
+
 from .models import (
     Sample,
     TenxCondition,
     TenxPool,
     TenxChip,
-    PbalLane,
     TenxLane,
     SublibraryInformation,
     MetadataField,
-    Plate,
     JiraUser,
     Project)
+
 from sisyphus.models import *
 from .forms import (
     SampleForm,
     AdditionalSampleInfoInlineFormset,
     DlpLibraryForm,
-    PbalLibraryForm,
     TenxLibraryForm,
     DlpLibrarySampleDetailInlineFormset,
     DlpLibraryConstructionInfoInlineFormset,
     DlpLibraryQuantificationAndStorageInlineFormset,
-    PbalLibrarySampleDetailInlineFormset,
-    PbalLibraryConstructionInfoInlineFormset,
-    PbalLibraryQuantificationAndStorageInlineFormset,
     TenxLibrarySampleDetailInlineFormset,
     TenxLibraryConstructionInfoInlineFormset,
     TenxLibraryQuantificationAndStorageInlineFormset,
     SublibraryForm,
     DlpSequencingForm,
-    PbalSequencingForm,
     TenxSequencingForm,
     DlpLaneForm,
-    PbalLaneForm,
     TenxLaneForm,
     GSCFormDeliveryInfo,
     GSCFormSubmitterInfo,
     TenxConditionFormset,
     ProjectForm,
-    PlateForm,
     JiraConfirmationForm,
     AddWatchersForm,
     TenxChipForm,
@@ -304,17 +300,6 @@ class DlpLibraryList(LibraryList):
         return context
 
 
-class PbalLibraryList(LibraryList):
-
-    """
-    List of PBAL libraries.
-    """
-
-    order = 'sample_id'
-    library_class = PbalLibrary
-    library_type = 'pbal'
-
-
 class TenxLibraryList(LibraryList):
 
     """
@@ -398,18 +383,6 @@ class DlpLibraryDetail(LibraryDetail):
         for x in new_library_order:
             sorted_library_dict[x] = library_dict_original[x]
         return sorted_library_dict
-
-
-class PbalLibraryDetail(LibraryDetail):
-
-    """
-    PBAL library detail page.
-    """
-
-    library_class = PbalLibrary
-    library_type = 'pbal'
-    # sisyphus integration not implemented yet for pbal
-    # analyses = AnalysisInformation.objects.filter(sequencings__in=library.pbalsequencing_set.all()).distinct()
 
 
 class TenxLibraryDetail(LibraryDetail):
@@ -499,17 +472,6 @@ class DlpLibraryDelete(LibraryDelete):
 
     library_class = DlpLibrary
     library_type = 'dlp'
-
-
-class PbalLibraryDelete(LibraryDelete):
-
-    """
-    PBAL library delete page.
-    """
-
-    library_class = PbalLibrary
-    library_type = 'pbal'
-
 
 class TenxLibraryDelete(LibraryDelete):
 
@@ -784,20 +746,6 @@ class DlpLibraryCreate(LibraryCreate):
     libqs_formset_class = DlpLibraryQuantificationAndStorageInlineFormset
     library_type = 'dlp'
 
-
-class PbalLibraryCreate(LibraryCreate):
-
-    """
-    PBAL library create page.
-    """
-
-    lib_form_class = PbalLibraryForm
-    libdetail_formset_class = PbalLibrarySampleDetailInlineFormset
-    libcons_formset_class = PbalLibraryConstructionInfoInlineFormset
-    libqs_formset_class = PbalLibraryQuantificationAndStorageInlineFormset
-    library_type = 'pbal'
-
-
 class TenxLibraryCreate(LibraryCreate):
 
     """
@@ -873,20 +821,6 @@ class DlpLibraryUpdate(LibraryUpdate):
     libcons_formset_class = DlpLibraryConstructionInfoInlineFormset
     libqs_formset_class = DlpLibraryQuantificationAndStorageInlineFormset
     library_type = 'dlp'
-
-
-class PbalLibraryUpdate(LibraryUpdate):
-
-    """
-    PBAL library update page.
-    """
-
-    library_class = PbalLibrary
-    lib_form_class = PbalLibraryForm
-    libdetail_formset_class = PbalLibrarySampleDetailInlineFormset
-    libcons_formset_class = PbalLibraryConstructionInfoInlineFormset
-    libqs_formset_class = PbalLibraryQuantificationAndStorageInlineFormset
-    library_type = 'pbal'
 
 
 class TenxLibraryUpdate(LibraryUpdate):
@@ -1146,16 +1080,6 @@ class DlpSequencingList(SequencingList):
     library_type = 'dlp'
 
 
-class PbalSequencingList(SequencingList):
-
-    """
-    List of PBAL sequencings.
-    """
-
-    sequencing_class = PbalSequencing
-    library_type = 'pbal'
-
-
 class TenxSequencingList(SequencingList):
 
     """
@@ -1199,17 +1123,6 @@ class DlpSequencingDetail(SequencingDetail):
 
     sequencing_class = DlpSequencing
     library_type = 'dlp'
-
-
-class PbalSequencingDetail(SequencingDetail):
-
-    """
-    DLP sequencing detail page.
-    """
-
-    sequencing_class = PbalSequencing
-    library_type = 'pbal'
-
 
 class TenxSequencingDetail(SequencingDetail):
 
@@ -1339,18 +1252,6 @@ class DlpSequencingCreate(SequencingCreate):
     library_type = 'dlp'
 
 
-class PbalSequencingCreate(SequencingCreate):
-
-    """
-    PBAL sequencing create page.
-    """
-
-    library_class = PbalLibrary
-    sequencing_class = PbalSequencing
-    form_class = PbalSequencingForm
-    library_type = 'pbal'
-
-
 class TenxSequencingCreate(SequencingCreate):
 
     """
@@ -1432,18 +1333,6 @@ class DlpSequencingUpdate(SequencingUpdate):
     form_class = DlpSequencingForm
     library_type = 'dlp'
 
-
-class PbalSequencingUpdate(SequencingUpdate):
-
-    """
-    PBAL sequencing update page.
-    """
-
-    sequencing_class = PbalSequencing
-    form_class = PbalSequencingForm
-    library_type = 'pbal'
-
-
 class TenxSequencingUpdate(SequencingUpdate):
 
     """
@@ -1489,17 +1378,6 @@ class DlpSequencingDelete(SequencingDelete):
 
     sequencing_class = DlpSequencing
     library_type = 'dlp'
-
-
-class PbalSequencingDelete(SequencingDelete):
-
-    """
-    PBAL sequencing delete page.
-    """
-
-    sequencing_class = PbalSequencing
-    library_type = 'pbal'
-
 
 class TenxSequencingDelete(SequencingDelete):
 
@@ -1562,7 +1440,8 @@ def dlp_sequencing_get_gsc_form(request, pk):
     ofilename, ofilepath = generate_gsc_form(pk, metadata)
     response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
-    ofile = open(ofilepath, 'r')
+    #https://stackoverflow.com/questions/12468179/unicodedecodeerror-utf8-codec-cant-decode-byte-0x9c
+    ofile = open(ofilepath, 'r', encoding="latin-1")
     response.write(ofile.read())
     ofile.close()
     os.remove(ofilepath)
@@ -1621,16 +1500,6 @@ class DlpLaneCreate(LaneCreate):
     form_class = DlpLaneForm
     library_type = 'dlp'
 
-
-class PbalLaneCreate(LaneCreate):
-
-    """
-    PBAL lane create page.
-    """
-
-    sequencing_class = PbalSequencing
-    form_class = PbalLaneForm
-    library_type = 'pbal'
 
 
 class TenxLaneCreate(LaneCreate):
@@ -1694,18 +1563,6 @@ class DlpLaneUpdate(LaneUpdate):
     form_class = DlpLaneForm
     library_type = 'dlp'
 
-
-class PbalLaneUpdate(LaneUpdate):
-
-    """
-    PBAL lane update page.
-    """
-
-    lane_class = PbalLane
-    form_class = PbalLaneForm
-    library_type = 'pbal'
-
-
 class TenxLaneUpdate(LaneUpdate):
 
     """
@@ -1759,17 +1616,6 @@ class DlpLaneDelete(LaneDelete):
 
     lane_class = DlpLane
     library_type = 'dlp'
-
-
-class PbalLaneDelete(LaneDelete):
-
-    """
-    PBAL lane delete page.
-    """
-
-    lane_class = PbalLane
-    library_type = 'pbal'
-
 
 class TenxLaneDelete(LaneDelete):
 
@@ -1876,100 +1722,6 @@ class TenxChipDelete(LoginRequiredMixin, TemplateView):
         msg = "Successfully deleted the Chip."
         messages.success(request, msg)
         return HttpResponseRedirect(reverse('tenx:chip_list'))
-
-
-#============================
-# Plate views
-#----------------------------
-@Render("core/plate_create.html")
-@login_required
-def plate_create(request, from_library=None):
-
-    """
-    Plate create page.
-    """
-
-    if from_library:
-        library = get_object_or_404(PbalLibrary, pk=from_library)
-    else:
-        library = None
-
-    if request.method == 'POST':
-        form = PlateForm(request.POST)
-        if form.is_valid():
-            instance = form.save()
-            msg = "Successfully created the plate."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.library.get_absolute_url())
-        else:
-            msg = "Failed to create the plate. Please fix the errors below."
-            messages.error(request, msg)
-    else:
-        form = PlateForm()
-
-    context = {
-        'form': form,
-        'library': str(library),
-        'library_id': from_library,
-    }
-    return context
-
-
-@Render("core/plate_update.html")
-@login_required
-def plate_update(request, pk):
-
-    """
-    Plate update page.
-    """
-
-    plate = get_object_or_404(Plate, pk=pk)
-
-    if request.method == 'POST':
-        form = PlateForm(request.POST, instance=plate)
-        if form.is_valid():
-            instance = form.save()
-            msg = "Successfully updated the plate."
-            messages.success(request, msg)
-            return HttpResponseRedirect(instance.library.get_absolute_url())
-        else:
-            msg = "Failed to update the plate. Please fix the errors below."
-            messages.error(request, msg)
-    else:
-        form = PlateForm(instance=plate)
-
-    context = {
-        'form': form,
-        'library': plate.library,
-        'library_id': plate.library_id,
-        'pk': pk,
-    }
-    return context
-
-
-@Render("core/plate_delete.html")
-@login_required
-def plate_delete(request, pk):
-
-    """
-    Plate delete page.
-    """
-
-    plate = get_object_or_404(Plate, pk=pk)
-    library = plate.library
-
-    if request.method == 'POST':
-        plate.delete()
-        msg = "Successfully deleted the Plate."
-        messages.success(request, msg)
-        return HttpResponseRedirect(library.get_absolute_url())
-
-    context = {
-        'plate': plate,
-        'pk': pk,
-        'library_id': library.id,
-    }
-    return context
 
 
 #============================

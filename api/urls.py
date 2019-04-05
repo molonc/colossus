@@ -39,6 +39,10 @@ router.register(r'tenxsequencing', views.TenxSequencingViewSet, base_name='tenxs
 router.register(r'tenxcondition', views.TenxConditionViewSet, base_name='tenxcondition')
 router.register(r'tenxlane', views.TenxLaneViewSet, base_name='tenxlane')
 
+router.register(r'pballibrary', views.PbalLibraryViewSet, base_name='pballibrary')
+router.register(r'pbalsequencing', views.PbalSequencingViewSet, base_name='pbalsequencing')
+router.register(r'pbalanalysis', views.PbalAnalysisInformationViewSet, base_name='pbalanalysis')
+
 app_name='api'
 urlpatterns = [
     url(r'^', include(router.urls)),

@@ -68,7 +68,7 @@
                 <tr><h5><i class="text-warning">There is no dlp library information for this sample!</i></h5></tr>
             {% endif %}
 
-            {% if sample.pballibrary_set.all %}
+            {% if sample.pballibrary_sample.all %}
                 <thead>
                     <tr>
                         <th><h4>PBAL Library Information</h4></th>
@@ -82,7 +82,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for library in sample.pballibrary_set.all %}
+                    {% for library in sample.pballibrary_sample.all %}
                         <tr>
                             <td><a href="{{ library.get_absolute_url }}">{{ library.id }}</a></td>
                             <td>{{ library.plate_set.count }}</td>

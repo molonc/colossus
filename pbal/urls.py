@@ -5,7 +5,7 @@ Created Oct 23, 2017
 """
 
 from django.conf.urls import url
-from core import views
+from pbal import views
 
 app_name = 'pbal'
 urlpatterns = [

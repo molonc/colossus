@@ -25,6 +25,7 @@ from core.models import (
     MetadataField,
     ChipRegion,
     DlpLibraryConstructionInformation,
+    DlpLibrarySampleDetail,
     JiraUser,
     TenxLibrary,
     TenxSequencing,
@@ -35,7 +36,18 @@ from core.models import (
     TenxPool,
 )
 
-from sisyphus.models import DlpAnalysisInformation, ReferenceGenome, AnalysisRun, DlpAnalysisVersion
+from pbal.models import (
+    PbalLibrary,
+    PbalSequencing)
+
+from sisyphus.models import (
+    DlpAnalysisInformation,
+    ReferenceGenome,
+    AnalysisRun,
+    DlpAnalysisVersion,
+    PbalAnalysisInformation,
+    PbalAnalysisVersion)
+
 
 #============================
 # Other imports
@@ -56,7 +68,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'dlplibrary_set',
-            'pballibrary_set',
+            'pballibrary_projects',
             'tenxlibrary_set'
         )
 
@@ -125,9 +137,16 @@ class DlpLibraryConstructionInformationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DlpLibrarySampleDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpLibrarySampleDetail
+        fields = '__all__'
+
+
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer()
     dlplibraryconstructioninformation = DlpLibraryConstructionInformationSerializer()
+    dlplibrarysampledetail = DlpLibrarySampleDetailSerializer()
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
     projects = TagSerializerField()
     class Meta:
@@ -148,6 +167,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'failed',
             'projects',
             'dlplibraryconstructioninformation',
+            'dlplibrarysampledetail',
             'exclude_from_analysis',
         )
 
@@ -477,3 +497,70 @@ class TenxPoolSerializer(serializers.ModelSerializer):
             'tenxsequencing_set'
         )
 
+class PbalLibrarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PbalLibrary
+        fields = (
+            'id',
+            'pbalsequencing_set',
+            'pballibraryconstructioninformation',
+            'projects',
+            'sample',
+            'relates_to_dlp',
+            'relates_to_tenx',
+            'description',
+            'result',
+            'failed',
+        )
+
+
+class PbalSequencingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PbalSequencing
+        fields = (
+            'id',
+            'library',
+            'format_for_data_submission',
+            'adapter',
+            'read_type',
+            'read1_length',
+            'read2_length',
+            'index_read_type',
+            'index_read1_length',
+            'index_read2_length',
+            'sequencing_instrument',
+            'sequencing_output_mode',
+            'short_description_of_submission',
+            'relates_to',
+            'submission_date',
+            'pballane_set',
+            'gsc_library_id',
+            'sequencer_id',
+            'sequencing_center',
+            'lane_requested_date',
+            'number_of_lanes_requested',
+            'sequencer_notes',
+        )
+
+
+class PbalAnalysisInformationSerializer(serializers.ModelSerializer):
+    version = serializers.CharField(source='version.version')
+    class Meta:
+        model = PbalAnalysisInformation
+        fields = "__all__"
+
+    def create(self, validated_data):
+        version = PbalAnalysisVersion.objects.create(version=validated_data["version"])
+        version.save()
+
+        listofm2m = validated_data["sequencings"]
+        instance = PbalAnalysisInformation.objects.create(
+            analysis_jira_ticket = validated_data["analysis_jira_ticket"],
+            priority_level = validated_data["priority_level"],
+            aligner = validated_data["aligner"],
+            smoothing=validated_data["smoothing"],
+            version=version
+        )
+        instance.sequencings = listofm2m
+
+        return instance

@@ -40,7 +40,7 @@ from .serializers import (
     TenxChipSerializer,
     ProjectSerializer,
     TenxPoolSerializer,
-)
+    PbalSequencingSerializer, PbalLibrarySerializer, PbalAnalysisInformationSerializer)
 
 from core.models import (
     Sample,
@@ -57,9 +57,9 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
-)
-
-from sisyphus.models import DlpAnalysisInformation, AnalysisRun
+    )
+from pbal.models import PbalSequencing, PbalLibrary
+from sisyphus.models import DlpAnalysisInformation, AnalysisRun, PbalAnalysisInformation
 
 
 #============================
@@ -396,6 +396,24 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = TenxPool.objects.all()
     serializer_class = TenxPoolSerializer
+    filter_fields = "__all__"
+
+class PbalSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = PbalSequencing.objects.all()
+    serializer_class = PbalSequencingSerializer
+    filter_fields = "__all__"
+
+class PbalLibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = PbalLibrary.objects.all()
+    serializer_class = PbalLibrarySerializer
+    filter_fields = "__all__"
+
+class PbalAnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = PbalAnalysisInformation.objects.all()
+    serializer_class = PbalAnalysisInformationSerializer
     filter_fields = "__all__"
 
 
