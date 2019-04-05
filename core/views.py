@@ -1440,7 +1440,8 @@ def dlp_sequencing_get_gsc_form(request, pk):
     ofilename, ofilepath = generate_gsc_form(pk, metadata)
     response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
-    ofile = open(ofilepath, 'r')
+    #https://stackoverflow.com/questions/12468179/unicodedecodeerror-utf8-codec-cant-decode-byte-0x9c
+    ofile = open(ofilepath, 'r', encoding="latin-1")
     response.write(ofile.read())
     ofile.close()
     os.remove(ofilepath)

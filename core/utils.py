@@ -844,7 +844,7 @@ class Submission(object):
         column_count = 0
         header_count = 0
 
-        for k,v in headers.iteritems():
+        for k,v in headers.items():
             # Catch the "Additional Comments" column and make it span 2 rows
             if k == "Additional Comments":
                 input_cell = span.format(column=self.columns[column_count], row=row_num,
@@ -869,7 +869,7 @@ class Submission(object):
 
 
                 subheader_count = column_count
-                for k2,v2 in v.iteritems():
+                for k2,v2 in v.items():
                     input_cell = span.format(column=self.columns[subheader_count], row=row_num+1,
                                              column_end=self.columns[subheader_count], row_end=row_num+1)
                     if header_count %2 == 0:
@@ -931,7 +931,7 @@ class Submission(object):
 
         column_count = 0
         header_count = 0
-        for k,v in headers.iteritems():
+        for k,v in headers.items():
             input_cell = span.format(column=self.columns[column_count], row=row_num,
                                      column_end=self.columns[column_count+len(v) - 1], row_end=row_num)
 
@@ -947,7 +947,7 @@ class Submission(object):
                     self.worksheet.merge_range(input_cell, k, header_format_dark)
 
             subheader_count = column_count
-            for k2,v2 in v.iteritems():
+            for k2,v2 in v.items():
                 input_cell = span.format(column=self.columns[subheader_count], row=row_num+1,
                                          column_end=self.columns[subheader_count], row_end=row_num+1)
 
