@@ -11,7 +11,8 @@ def return_text_search(query):
     context = {
         "core": {
             "Samples": [],
-            "Projects": []
+            "Projects": [],
+            "Analyses": []
         },
         "dlp": {
             "Libraries": [],
@@ -26,7 +27,6 @@ def return_text_search(query):
             "Chip": [],
             "Libraries": [],
             "Sequencings": [],
-            "Analyses": []
         },
         "query" : query,
         "total" : 0
@@ -34,6 +34,7 @@ def return_text_search(query):
 
     context["core"]["Samples"].extend(list(Sample.objects.annotate(search=SearchVector(*SAMPLE)).filter(Q(search=query) | Q(search__icontains=query))))
     context["core"]["Projects"].extend(list(Project.objects.annotate(search=SearchVector(*PROJECT)).filter(Q(search=query) | Q(search__icontains=query))))
+    context["core"]["Analyses"].extend(list(Analysis.objects.annotate(search=SearchVector(*ANALYSIS)).filter(Q(search=query) | Q(search__icontains=query))))
 
     context["dlp"]["Libraries"].extend(list(DlpLibrary.objects.annotate(search=SearchVector(*(CORE_LIBRARY + DLP_LIBRARY))).filter(Q(search=query) | Q(search__icontains=query))))
     context["dlp"]["Sequencings"].extend(list(DlpSequencing.objects.annotate(search=SearchVector(*(CORE_SEQUENCING + DLP_SEQUENCING))).filter(Q(search=query) | Q(search__icontains=query))))
@@ -45,12 +46,13 @@ def return_text_search(query):
     context["tenx"]["Chip"].extend(list(TenxChip.objects.annotate(search=SearchVector(*TENX_CHIP)).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Libraries"].extend(list(TenxLibrary.objects.annotate(search=SearchVector(*(CORE_LIBRARY + TENX_LIBRARY))).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Sequencings"].extend(list(TenxSequencing.objects.annotate(search=SearchVector(*(CORE_SEQUENCING + TENX_SEQUENCING))).filter(Q(search=query) | Q(search__icontains=query))))
-    context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.annotate(search=SearchVector(*(CORE_ANALYSES + TENX_ANALYSES))).filter(Q(search=query) | Q(search__icontains=query))))
 
     dict_sample_type_choices = dict((y, x) for x, y in Sample.sample_type_choices)
+    dict_run_status = dict((y, x) for x, y in RUN_STATUS_CHOICES)
     if partial_key_match(query, dict_sample_type_choices):
         context["core"]["Samples"].extend(list(Sample.objects.filter(sample_type=partial_key_match(query, dict_sample_type_choices))))
-
+    if partial_key_match(query, dict_run_status):
+        context["core"]["Analyses"].extend(list(Analysis.objects.filter(run_status=partial_key_match(query, dict_run_status))))
     dict_pathology_occurrence_choices = dict((y, x) for x, y in pathology_occurrence_choices)
     dict_sex_choices = dict((y, x) for x, y in sex_choices)
     dict_tissue_type_choices = dict((y, x) for x, y in tissue_type_choices)
@@ -130,23 +132,19 @@ def return_text_search(query):
     dict_priority_level_choices = dict((y, x) for x, y in priority_level_choices)
     dict_verified_choices = dict((y, x) for x, y in verified_choices)
     if partial_key_match(query, dict_aligner_choices):
-        context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(aligner=partial_key_match(query, dict_aligner_choices))))
         context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(aligner=partial_key_match(query, dict_aligner_choices))))
     if partial_key_match(query, dict_smoothing_choices):
-        context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(smoothing=partial_key_match(query, dict_smoothing_choices))))
         context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(smoothing=partial_key_match(query, dict_smoothing_choices))))
     if partial_key_match(query, dict_priority_level_choices):
-        context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(priority_level=partial_key_match(query, dict_priority_level_choices))))
         context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(priority_level=partial_key_match(query, dict_priority_level_choices))))
     if partial_key_match(query, dict_verified_choices):
-        context["tenx"]["Analyses"].extend(list(TenxAnalysisInformation.objects.filter(verified=partial_key_match(query, dict_verified_choices))))
         context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(verified=partial_key_match(query, dict_verified_choices))))
 
     context = remove_duplicate(context)
 
     context["total"] = len(context["core"]["Samples"] + context["dlp"]["Libraries"] + context["dlp"]["Sequencings"]+ context["dlp"]["Analyses"] +
                            context["pbal"]["Libraries"] +  context["pbal"]["Sequencings"] +  context["tenx"]["Chip"] + context["core"]["Projects"] +
-                           context["tenx"]["Libraries"] + context["tenx"]["Sequencings"] + context["tenx"]["Analyses"] )
+                           context["tenx"]["Libraries"] + context["tenx"]["Sequencings"] + context["core"]["Analyses"] )
     return context
 
 def partial_key_match(lookup, dict):
@@ -166,5 +164,5 @@ def remove_duplicate(context):
     context["core"]["Projects"] = list(set(context["core"]["Projects"]))
     context["tenx"]["Libraries"] = list(set(context["tenx"]["Libraries"]))
     context["tenx"]["Sequencings"] = list(set(context["tenx"]["Sequencings"]))
-    context["tenx"]["Analyses"] = list(set(context["tenx"]["Analyses"]))
+    context["core"]["Analyses"] = list(set(context["core"]["Analyses"]))
     return context

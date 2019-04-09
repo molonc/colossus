@@ -40,7 +40,7 @@ from .serializers import (
     TenxChipSerializer,
     ProjectSerializer,
     TenxPoolSerializer,
-    PbalSequencingSerializer, PbalLibrarySerializer, PbalAnalysisInformationSerializer)
+    AnalysisSerializer)
 
 from core.models import (
     Sample,
@@ -57,9 +57,9 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
-    )
+    Analysis)
 from pbal.models import PbalSequencing, PbalLibrary
-from sisyphus.models import DlpAnalysisInformation, AnalysisRun, PbalAnalysisInformation
+from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
 
 #============================
@@ -140,6 +140,11 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'sample_id',
     )
 
+class AnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = Analysis.objects.all()
+    serializer_class = AnalysisSerializer
+    filter_fields = "__all__"
 
 class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
@@ -397,25 +402,6 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxPool.objects.all()
     serializer_class = TenxPoolSerializer
     filter_fields = "__all__"
-
-class PbalSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
-    queryset = PbalSequencing.objects.all()
-    serializer_class = PbalSequencingSerializer
-    filter_fields = "__all__"
-
-class PbalLibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
-    queryset = PbalLibrary.objects.all()
-    serializer_class = PbalLibrarySerializer
-    filter_fields = "__all__"
-
-class PbalAnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
-    queryset = PbalAnalysisInformation.objects.all()
-    serializer_class = PbalAnalysisInformationSerializer
-    filter_fields = "__all__"
-
 
 def dlp_sequencing_get_samplesheet(request, pk):
 

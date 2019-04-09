@@ -204,6 +204,46 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         return res
 
 
+class Analysis(models.Model, FieldValue):
+    class Meta:
+        ordering = ['id']
+
+    input_type = create_chrfield("Input Type", choices=INPUT_TYPE, null=False)
+
+    version = create_chrfield("Analysis Version", blank=False)
+
+    jira_ticket =  create_chrfield("Analysis Jira Ticket", blank=False)
+
+    run_status = create_chrfield(
+        "Run Status",
+        blank=False,
+        null=False,
+        default=IDLE,
+        choices=RUN_STATUS_CHOICES
+    )
+
+    last_updated_date = models.DateTimeField("Last Updated Date", auto_now=True)
+
+    submission_date = models.DateField(
+        "Analysis Submission Date",
+        default=datetime.date.today, # this needs to be a date (not datetime)
+    )
+
+    description = create_textfield("Description")
+
+    #Avoid using GenericForeignKey
+    #All are set to None but one
+    dlp_library = models.ForeignKey('core.DlpLibrary', null=True)
+    pbal_library = models.ForeignKey('pbal.PbalLibrary', null=True)
+    tenx_library = models.ForeignKey('core.TenxLibrary', null=True)
+
+    def __str__(self):
+        res = str(self.id).zfill(3) + "_ANALYSIS_" + self.input_type
+        return res
+
+    def get_absolute_url(self):
+        return reverse("core:analysis_detail" , kwargs={"pk": self.pk})
+
 class DlpLibrary(models.Model, FieldValue, LibraryAssistant):
 
     """
@@ -1115,6 +1155,12 @@ class DlpSequencing(models.Model, FieldValue):
 
     objects = SequencingManager()
 
+    analysis = models.ManyToManyField(
+        Analysis,
+        verbose_name="Analysis",
+        blank=True
+    )
+
     def __init__(self, *args, **kwargs):
         super(DlpSequencing, self).__init__(*args, **kwargs)
         self.old_number_of_lanes_requested = self.number_of_lanes_requested
@@ -1245,6 +1291,12 @@ class TenxSequencing(models.Model, FieldValue):
     sequencer_notes = create_textfield("Sequencing notes")
 
     objects = SequencingManager()
+
+    analysis = models.ManyToManyField(
+        Analysis,
+        verbose_name="Analysis",
+        blank=True
+    )
 
     def __init__(self, *args, **kwargs):
         super(TenxSequencing, self).__init__(*args, **kwargs)

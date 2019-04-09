@@ -1,0 +1,72 @@
+{% extends "base_view.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    {{analysis.input_type}} Analysis Information
+{% endblock %}
+
+{% block body %}
+<div class="container detail-container">
+    <table class="table-condensed">
+        <tr>
+        <th> Library</th>
+            <td><a href="{{library.get_absolute_url}}">{{ library }}</a></td>
+        </tr>
+        <tr>
+        <th>Jira Ticket</th>
+            <td><a href="https://www.bcgsc.ca/jira/browse/{{analysis.jira_ticket}}">{{analysis.jira_ticket}}</a></td>
+        </tr>
+        <tr>
+        <th> Version</th>
+            <td>{{analysis.version}}</td>
+        </tr>
+        <tr>
+        <th>Run Status</th>
+            <td>{{analysis.run_status}}</td>
+        </tr>
+        <tr>
+        <th>Submission Date</th>
+            <td>{{analysis.submission_date}}</td>
+        </tr>
+        <tr>
+        <th>Last Updated Date</th>
+            <td>{{analysis.last_updated_date}}</td>
+        </tr>
+        <tr>
+        <th>Description</th>
+            <td>{{analysis.description}}</td>
+        </tr>
+        <tr>
+    </table>
+</div>
+
+ <div class="container detail-bordered-container">
+    <table class="table">
+        {% if sequencings.all %}
+        <thead>
+            <tr>
+            <th><h4>Sequencings</h4></th>
+            </tr>
+            <tr>
+            <th>Sequencing</th>
+            <th>Centre</th>
+            <th>Adapter</th>
+            <th>Submission Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sequencing in sequencings.all %}
+            <tr>
+            <td><a href="{{sequencing.get_absolute_url}}">{{ sequencing }}</a></td>
+            <td>{{ sequencing.sequencing_center }}</td>
+            <td>{{ sequencing.adapter }}</td>
+            <td>{{ sequencing.submission_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        {% else %}
+        <tr><h5><i class="text-warning">There is no sequencings for this analysis</i></h5></tr>
+        {% endif %}
+    </table>
+ </div>
+{% endblock %}

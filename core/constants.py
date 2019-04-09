@@ -139,6 +139,11 @@ plate_type_choices = (
     ('stored', 'stored'),
 )
 
+INPUT_TYPE = (
+    ('DLP', "DLP"),
+    ('PBAL', "PBAL"),
+    ('TENX', "TenX")
+)
 
 ##########
 #SISYPHUS#
