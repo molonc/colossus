@@ -237,6 +237,8 @@ class Analysis(models.Model, FieldValue):
     pbal_library = models.ForeignKey('pbal.PbalLibrary', null=True)
     tenx_library = models.ForeignKey('core.TenxLibrary', null=True)
 
+    tenx_lanes =  models.ManyToManyField('core.TenxLane', blank=True)
+
     def __str__(self):
         res = str(self.id).zfill(3) + "_ANALYSIS_" + self.input_type
         return res
