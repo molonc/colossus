@@ -21,5 +21,8 @@ urlpatterns = [
     url(r'^project/create$', views.ProjectCreate.as_view(), name='project_create'),
     url(r'^project/update/(?P<pk>\d+)$', views.ProjectUpdate.as_view(), name='project_update'),
     url(r'^project/delete/(?P<pk>\d+)$', views.ProjectDelete.as_view(), name='project_delete'),
-    url(r'^project/detail/(?P<pk>\d+)$', views.ProjectDetail.as_view(), name='project_detail')
+    url(r'^project/detail/(?P<pk>\d+)$', views.ProjectDetail.as_view(), name='project_detail'),
+    url(r'^analysis/list$', views.analys_list, name='analysis_list'),
+    url(r'^analysis/detail/(?P<pk>\d+)$', views.analysis_detail, name='analysis_detail'),
+
 ]

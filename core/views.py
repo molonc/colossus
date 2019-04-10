@@ -42,7 +42,9 @@ from .models import (
     SublibraryInformation,
     MetadataField,
     JiraUser,
-    Project)
+    Project,
+    Analysis
+)
 
 from sisyphus.models import *
 from .forms import (
@@ -106,6 +108,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
     def get_context_data(self):
         context = {
             'sample_size': Sample.objects.count(),
+            'project_size' : Project.objects.count(),
+            'analysis_size': Analysis.objects.count(),
             'dlp_library_size': DlpLibrary.objects.count(),
             'dlp_sequencing_size': DlpSequencing.objects.count(),
             'pbal_library_size': PbalLibrary.objects.count(),
@@ -249,6 +253,28 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
         msg = "Successfully deleted the Sample."
         messages.success(request, msg)
         return HttpResponseRedirect(reverse('core:sample_list'))
+
+
+@Render("core/analysis_list.html")
+@login_required
+def analys_list(request):
+    context = {
+        'analyses': Analysis.objects.all().order_by('id'),
+    }
+    return context
+
+@Render("core/analysis_detail.html")
+@login_required
+def analysis_detail(request, pk):
+    analysis = get_object_or_404(Analysis, pk=pk)
+    library = analysis.__getattribute__(analysis.input_type.lower() + "_library")
+    sequencings = analysis.__getattribute__(analysis.input_type.lower() + "sequencing_set")
+    context = {
+        'analysis': analysis,
+        'library': library,
+        'sequencings': sequencings
+    }
+    return context
 
 
 #============================

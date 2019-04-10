@@ -21,12 +21,15 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><a href="{% url 'core:project_list' %}">Projects</a></td>
+                    <td><a href="{% url 'core:project_list' %}">Projects</a><i class="counter">{{ project_size }}</i></td>
                     <td>
                         <p style="float: right;">
                             <a href="{% url 'core:project_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i> Add</a>
                         </p>
                     </td>
+                </tr>
+               <tr>
+                    <td><a href="{% url 'core:analysis_list' %}">Analyses</a> <i class="counter">{{ analysis_size }}</i></td><td></td>
                 </tr>
                 <tr>
                     <td><a href="{% url 'core:inventory' %}">Inventory</a></td><td></td>

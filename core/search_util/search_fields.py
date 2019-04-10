@@ -21,6 +21,8 @@ SAMPLE = ["sample_id", "taxonomy_id", "anonymous_patient_id", "cell_line_id",
                  "additionalsampleinformation__stage", "additionalsampleinformation__tumour_content",
                  "additionalsampleinformation__family_information"]
 
+ANALYSIS = ["input_type", "version", "jira_ticket", "run_status", "description"]
+
 CORE_LIBRARY = ["description", "result"]
 DLP_LIBRARY = ["pool_id", "jira_ticket", "title",
                     "dlplibrarysampledetail__spotting_location",

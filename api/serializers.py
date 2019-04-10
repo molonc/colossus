@@ -9,11 +9,15 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 #============================
 # Django rest framework imports
 #----------------------------
+import re
+
 from rest_framework import serializers
 
 #============================
 # App imports
 #----------------------------
+from rest_framework.exceptions import ValidationError
+
 from core.models import (
     DlpLibrary,
     Sample,
@@ -34,19 +38,19 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
-)
+    Analysis)
 
 from pbal.models import (
     PbalLibrary,
-    PbalSequencing)
+    PbalSequencing
+)
 
 from sisyphus.models import (
     DlpAnalysisInformation,
     ReferenceGenome,
     AnalysisRun,
     DlpAnalysisVersion,
-    PbalAnalysisInformation,
-    PbalAnalysisVersion)
+    )
 
 
 #============================
@@ -89,6 +93,66 @@ class SampleSerializer(serializers.ModelSerializer):
             'additionalsampleinformation',
         )
 
+
+class AnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Analysis
+        fields = (
+            'id',
+            'input_type',
+            'version',
+            'jira_ticket',
+            'run_status',
+            'last_updated_date',
+            'submission_date',
+            'description',
+            'dlp_library',
+            'pbal_library',
+            'tenx_library',
+            'tenxsequencing_set',
+            'dlpsequencing_set',
+            'pbalsequencing_set'
+        )
+
+    def to_representation(self, instance):
+        value = super(AnalysisSerializer, self).to_representation(instance)
+        try:
+            value["library"] =  value[value["input_type"].lower() + "_library"]
+            del value["dlp_library"]
+            del value["pbal_library"]
+            del value["tenx_library"]
+            #for now we only have tenx_sequencing
+            value["sequencings"] = value[value["input_type"].lower() + 'sequencing_set']
+            del value["dlpsequencing_set"]
+            del value["pbalsequencing_set"]
+            del value["tenxsequencing_set"]
+            return value
+        except:
+            return value
+
+    def create(self, validated_data):
+        libraries = [validated_data["dlp_library"], validated_data["pbal_library"], validated_data["tenx_library"]]
+        sequencings = [validated_data["dlpsequencing_set"], validated_data["pbalsequencing_set"], validated_data["tenxsequencing_set"]]
+        if sum(1 for lib in libraries if lib) > 1:
+            raise ValidationError("Only one Library Id must be provided")
+
+        if sum(1 for lib in libraries if lib) == 0:
+            raise ValidationError("Library must be set")
+
+        if sum(1 for seq in sequencings if seq) > 1:
+            raise ValidationError("Only " + validated_data["input_type"] + " Sequencing list must be provided")
+
+        if sum(1 for seq in sequencings if seq) > 0 and not validated_data[validated_data["input_type"].lower() + 'sequencing_set']:
+            raise ValidationError("Only " + validated_data["input_type"] + " Sequencing list must be provided")
+
+        if not validated_data[validated_data["input_type"].lower() + "_library"]:
+            raise ValidationError(
+                "You specified input type to be " + validated_data["input_type"] + ", please provide the corresponding library id")
+
+        if not re.match(r"(v\d+\.\d+\.\d+)", validated_data["version"]):
+            raise ValidationError("Version must be in the format of v\d+\.\d+\.\d+")
+
+        return super(AnalysisSerializer, self).create(validated_data)
 
 class LaneSerializer(serializers.ModelSerializer):
     class Meta:
@@ -497,70 +561,3 @@ class TenxPoolSerializer(serializers.ModelSerializer):
             'tenxsequencing_set'
         )
 
-class PbalLibrarySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PbalLibrary
-        fields = (
-            'id',
-            'pbalsequencing_set',
-            'pballibraryconstructioninformation',
-            'projects',
-            'sample',
-            'relates_to_dlp',
-            'relates_to_tenx',
-            'description',
-            'result',
-            'failed',
-        )
-
-
-class PbalSequencingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PbalSequencing
-        fields = (
-            'id',
-            'library',
-            'format_for_data_submission',
-            'adapter',
-            'read_type',
-            'read1_length',
-            'read2_length',
-            'index_read_type',
-            'index_read1_length',
-            'index_read2_length',
-            'sequencing_instrument',
-            'sequencing_output_mode',
-            'short_description_of_submission',
-            'relates_to',
-            'submission_date',
-            'pballane_set',
-            'gsc_library_id',
-            'sequencer_id',
-            'sequencing_center',
-            'lane_requested_date',
-            'number_of_lanes_requested',
-            'sequencer_notes',
-        )
-
-
-class PbalAnalysisInformationSerializer(serializers.ModelSerializer):
-    version = serializers.CharField(source='version.version')
-    class Meta:
-        model = PbalAnalysisInformation
-        fields = "__all__"
-
-    def create(self, validated_data):
-        version = PbalAnalysisVersion.objects.create(version=validated_data["version"])
-        version.save()
-
-        listofm2m = validated_data["sequencings"]
-        instance = PbalAnalysisInformation.objects.create(
-            analysis_jira_ticket = validated_data["analysis_jira_ticket"],
-            priority_level = validated_data["priority_level"],
-            aligner = validated_data["aligner"],
-            smoothing=validated_data["smoothing"],
-            version=version
-        )
-        instance.sequencings = listofm2m
-
-        return instance

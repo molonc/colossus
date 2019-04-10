@@ -21,9 +21,10 @@ schema_view = get_schema_view(
 )
 
 router = routers.DefaultRouter()
-router.register(r'project', views.ProjectViewSet,base_name='project')
+router.register(r'project', views.ProjectViewSet, base_name='project')
 router.register(r'sample', views.SampleViewSet)
 router.register(r'lane', views.LaneViewSet)
+router.register(r'analysis', views.AnalysisViewSet, base_name='analysis')
 router.register(r'sequencing', views.SequencingViewSet)
 router.register(r'library', views.LibraryViewSet, base_name='library')
 router.register(r'sublibraries', views.SublibraryViewSet, base_name='sublibraries')
@@ -32,6 +33,7 @@ router.register(r'analysis_information', views.AnalysisInformationViewSet, base_
 router.register(r'analysis_run', views.AnalysisRunViewSet, base_name='analysis_run')
 router.register(r'experimental_metadata', views.ExperimentalMetadata, base_name='experimental_metadata')
 router.register(r'jira_users', views.JiraUserViewSet, base_name='jira_user')
+
 router.register(r'tenxpool', views.TenxPoolViewSet, base_name='tenxpool')
 router.register(r'tenxchip', views.TenxChipViewSet, base_name='tenxchip')
 router.register(r'tenxlibrary', views.TenxLibraryViewSet, base_name='tenxlibrary')
@@ -39,9 +41,7 @@ router.register(r'tenxsequencing', views.TenxSequencingViewSet, base_name='tenxs
 router.register(r'tenxcondition', views.TenxConditionViewSet, base_name='tenxcondition')
 router.register(r'tenxlane', views.TenxLaneViewSet, base_name='tenxlane')
 
-router.register(r'pballibrary', views.PbalLibraryViewSet, base_name='pballibrary')
-router.register(r'pbalsequencing', views.PbalSequencingViewSet, base_name='pbalsequencing')
-router.register(r'pbalanalysis', views.PbalAnalysisInformationViewSet, base_name='pbalanalysis')
+
 
 app_name='api'
 urlpatterns = [
