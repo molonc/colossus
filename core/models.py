@@ -479,13 +479,25 @@ class TenxPool(models.Model, FieldValue):
     construction_location = create_chrfield("Construction Location", choices=LOCATION, null=True, blank=True)
     constructed_by = create_chrfield("Constructed By", null=True, blank=True)
     constructed_date =models.DateField("Construction Date", null=True, blank=True)
-    libraries = models.ManyToManyField(TenxLibrary, blank=True)
+    libraries = models.ManyToManyField(TenxLibrary)
 
     def __str__(self):
         return self.pool_name()
 
     def pool_name(self):
         return "TENXPOOL" + str(self.pk).zfill(3)
+
+    def get_library_ids(self):
+        return [l.id for l in self.liraries.all()]
+
+    def jira_tickets(self):
+        jira_tickets =[]
+        sample_ids =[]
+        for l in self.libraries.all():
+            if l.jira_ticket:
+                jira_tickets.append(l.jira_ticket)
+                sample_ids.append(l.sample.sample_id)
+        return jira_tickets, sample_ids
 
     def get_absolute_url(self):
         return reverse("tenx" + ":pool_detail", kwargs={"pk": self.pk})

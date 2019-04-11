@@ -1174,7 +1174,7 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
             form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])
         elif request.session['library_type'] == 'tenx':
             form = AddWatchersForm(initial={'watchers': list(JiraUser.objects.filter(associated_with_tenx=True).values_list('username', flat=True))})
-            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])  
+            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])
         else:
             form = AddWatchersForm()
         context = {
@@ -1187,25 +1187,35 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
     def post(self, request):
         form = AddWatchersForm(request.POST)
         if form.is_valid():
-            if request.session['library_type'] == 'tenx':
-                reference_genome = get_reference_genome_from_sample_id(request.session['sample_id'])
-                updated_description = generate_tenx_jira_description(request.session['sequencing_center'], reference_genome, request.session['pool_id'])
+            if request.session['library_type'] == 'tenx' and request.session["jira_ticket"]:
+                print(len(request.session["jira_ticket"])-1)
+                for i in range(0,len(request.session["jira_ticket"])):
+                    reference_genome = get_reference_genome_from_sample_id(request.session['sample_id'][i])
+                    updated_description = generate_tenx_jira_description(request.session['sequencing_center'], reference_genome, request.session['pool_id'])
+                    try:
+                        update_description(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'][i], updated_description)
+                        self.update_watchers(request.session['jira_user'], request.session['jira_password'],
+                                             request.session['jira_ticket'][i], form.cleaned_data['watchers'],
+                                             form.cleaned_data['comment'])
+                    except JIRAError as e:
+                        msg = e.text
+                        messages.error(request, msg)
+                        return self.get(request)
+            elif request.session['library_type'] == 'dlp':
                 try:
-                    update_description(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], updated_description)
+                    self.update_watchers(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['watchers'], form.cleaned_data['comment'])
                 except JIRAError as e:
                     msg = e.text
                     messages.error(request, msg)
                     return self.get(request)
-            try:
-                add_watchers(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['watchers'])
-                add_jira_comment(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['comment'])
-            except JIRAError as e:
-                msg = e.text
-                messages.error(request, msg)
+            else:
+                messages.error(request, "Failed to create Jira ticket")
                 return self.get(request)
         return HttpResponseRedirect('/{}/sequencing/{}'.format(request.session['library_type'], request.session['sequencing_id']))
 
-
+    def update_watchers(self, user, password, ticket, watchers, comment):
+        add_watchers(user, password, ticket, watchers)
+        add_jira_comment(user, password, ticket, comment)
 
 class SequencingCreate(LoginRequiredMixin, TemplateView):
 
@@ -1251,7 +1261,10 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
                     request.session['jira_ticket'] = library.jira_ticket
                     request.session['sample_id'] = library.sample.sample_id
                 if (self.library_type == 'tenx'):
-                    request.session['pool_id'] = instance.tenx_pool if instance.tenx_pool else "No Pool"
+                    request.session['jira_ticket'] = instance.tenx_pool.jira_tickets()[0] if instance.tenx_pool else []
+                    request.session['sample_id'] = instance.tenx_pool.jira_tickets()[1] if instance.tenx_pool else []
+                    print(request.session['jira_ticket'], request.session['sample_id'])
+                    request.session['pool_id'] = instance.tenx_pool.id if instance.tenx_pool else None
                 request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
                 request.session['sequencing_center'] = instance.sequencing_center
             else:
@@ -1260,9 +1273,8 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
 
             instance.save()
             request.session['sequencing_id'] = instance.id
-            msg = "Successfully created the Sequencing."
-            messages.success(request, msg)
-            return HttpResponseRedirect(reverse('{}:add_watchers'.format(library.library_type)))
+            messages.success(request, "Successfully created the Sequencing.")
+            return HttpResponseRedirect(reverse('{}:add_watchers'.format(self.library_type)))
         else:
             msg = "Failed to create the sequencing. Please fix the errors below."
             messages.error(request, msg)
@@ -1327,12 +1339,26 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
             if(old_count != instance.number_of_lanes_requested):
                 jira_comment = "Sequencing Goal has been updated from {} to {} for this [Sequencing|http://colossus.bcgsc.ca/{}/sequencing/{}]".format(old_count, instance.number_of_lanes_requested, self.library_type, pk)
                 try:
-                    add_jira_comment(
-                        form.cleaned_data['jira_user'],
-                        form.cleaned_data['jira_password'],
-                        instance.library.jira_ticket,
-                        jira_comment
-                    )
+                    if self.library_type == "tenx" and instance.tenx_pool:
+                        jira_tickets, sample_ids = instance.tenx_pool.jira_tickets()
+                        for jira in jira_tickets:
+                            add_jira_comment(
+                                form.cleaned_data['jira_user'],
+                                form.cleaned_data['jira_password'],
+                                jira,
+                                jira_comment
+                            )
+                    elif self.library_type == "dlp":
+                        add_jira_comment (
+                            form.cleaned_data['jira_user'],
+                            form.cleaned_data['jira_password'],
+                            instance.library.jira_ticket,
+                            jira_comment
+                        )
+                    else:
+                        messages.error(request, "Failed to update Jira Ticket")
+                        return self.get_context_and_render(request, sequencing, form)
+
                 except JIRAError as e:
                     msg = "JIRA Error: {}".format(e.response.reason)
                     messages.error(request, msg)
@@ -1341,12 +1367,10 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
             instance.save()
             form.save_m2m()
 
-            msg = "Successfully updated the Sequencing."
-            messages.success(request, msg)
+            messages.success(request, "Successfully updated the Sequencing.")
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            msg = "Failed to update the sequencing. Please fix the errors below."
-            messages.error(request, msg)
+            messages.error(request, "Failed to update the sequencing. Please fix the errors below.")
             return self.get_context_and_render(request, sequencing, form)
 
 

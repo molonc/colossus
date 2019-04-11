@@ -533,6 +533,9 @@ class TenxSequencingForm(SequencingForm):
             
     class Meta(SequencingForm.Meta):
         model = TenxSequencing
+        labels = {
+            'tenx_pool': ('*TENX POOL'),
+        }
 
 #===========================
 # Lane forms
