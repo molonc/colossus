@@ -15,12 +15,17 @@
                 {% for field in form %}
                     <tr>
                         <th>
+
+                            {% if not field.name == "library" %}
                             {{ field.label_tag }}
+                            {% elif  not library_type == "tenx" %}
+                            {{ field.label_tag }}
+                            {% endif %}
                         </th>
                         <td>
                             {{ field.errors }}
 
-                            {% if field.name == "library" and library_id %}
+                            {% if field.name == "library" and library_id%}
                                 <select id="id_library" name="library">
                                     <option value="{{ library_id }}" selected="selected">{{ library }}</option>
                                 </select>
@@ -57,6 +62,9 @@
 {% block scripts %}
 <script>
     $(document).ready(function(){
+     if ('{{library_type}}' == 'tenx'){
+        document.getElementById('id_library').style.display = 'none';
+     }
      var prev = document.referrer
      if (prev.indexOf("pool") > -1 &&
          prev.indexOf("detail") > -1 ){

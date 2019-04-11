@@ -14,8 +14,12 @@
                 <thead>
                 {% for field in form %}
                     <tr>
-                        <th>
+                      <th>
+                            {% if not field.name == "library" %}
                             {{ field.label_tag }}
+                            {% elif  not library_type == "tenx" %}
+                            {{ field.label_tag }}
+                            {% endif %}
                         </th>
                         <td>
                             {{ field.errors }}
@@ -55,4 +59,13 @@
 
     <br>
 </div>
+{% endblock %}
+
+
+{% block datatables_script %}
+<script type="text/javascript">
+   if ('{{library_type}}' == 'tenx'){
+        document.getElementById('id_library').style.display = 'none';
+     }
+</script>
 {% endblock %}

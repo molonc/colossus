@@ -39,6 +39,7 @@
             </tr>
         {% endfor %}
 
+    {% if library_type != 'tenx' %}
         <tr>
             <th id="thid">Relates to:</th>
             <td id="tdid">
@@ -49,6 +50,7 @@
                 {% endfor %}
             </td>
         </tr>
+    {% endif %}
     </table>
 </div>
 <!-- end of Meta Information -->

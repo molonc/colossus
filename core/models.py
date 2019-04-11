@@ -479,13 +479,25 @@ class TenxPool(models.Model, FieldValue):
     construction_location = create_chrfield("Construction Location", choices=LOCATION, null=True, blank=True)
     constructed_by = create_chrfield("Constructed By", null=True, blank=True)
     constructed_date =models.DateField("Construction Date", null=True, blank=True)
-    libraries = models.ManyToManyField(TenxLibrary, blank=True)
+    libraries = models.ManyToManyField(TenxLibrary)
 
     def __str__(self):
         return self.pool_name()
 
     def pool_name(self):
         return "TENXPOOL" + str(self.pk).zfill(3)
+
+    def get_library_ids(self):
+        return [l.id for l in self.liraries.all()]
+
+    def jira_tickets(self):
+        jira_tickets =[]
+        sample_ids =[]
+        for l in self.libraries.all():
+            if l.jira_ticket:
+                jira_tickets.append(l.jira_ticket)
+                sample_ids.append(l.sample.sample_id)
+        return jira_tickets, sample_ids
 
     def get_absolute_url(self):
         return reverse("tenx" + ":pool_detail", kwargs={"pk": self.pk})
@@ -1199,6 +1211,7 @@ class TenxSequencing(models.Model, FieldValue):
         TenxLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
+        null=True, blank=True
     )
 
     tenx_pool = models.ForeignKey(TenxPool, null=True, blank=True)
@@ -1213,76 +1226,17 @@ class TenxSequencing(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
-
-    # fields
-    adapter = create_chrfield(
-        "Adapter",
-        default="CTGTCTCTTATACACATCT",
-    )
-    format_for_data_submission = create_chrfield(
-        "Format for data dissemination",
-        default="fastq",
-    )
-    index_read_type = create_chrfield(
-        "Index read type",
-        default="Dual Index (i7 and i5)",
-    )
-    index_read1_length = create_intfield(
-        "Index read1 length",
-        default=6,
-    )
-    index_read2_length = create_intfield(
-        "Index read2 length",
-        default=6,
-    )
-    read_type = create_chrfield(
-        "Read type",
-        choices=read_type_choices,
-        default="P",
-    )
-    read1_length = create_intfield(
-        "Read1 length",
-        default=150,
-    )
-    read2_length = create_intfield(
-        "Read2 length",
-        default=150,
-    )
-
     sequencing_instrument = create_chrfield(
         "Sequencing instrument",
         choices=sequencing_instrument_choices,
         default="HX",
     )
-    sequencing_output_mode = create_chrfield(
-        "Sequencing output mode",
-        choices=sequencing_output_mode_choices,
-    )
-    short_description_of_submission = create_chrfield(
-        "Short description of submission",
-        max_length=150,
-    )
+
     submission_date = models.DateField(
         "Submission date",
         default= datetime.date.today
         )
-    relates_to = models.ManyToManyField(
-        "self",
-        verbose_name="Relates to",
-        blank=True,
-    )
 
-    number_of_lanes_requested = models.PositiveIntegerField(
-        default=0,
-        verbose_name="Sequencing Goal"
-    )
-
-    #Set to the last time number_of_lanes_requested was updated
-    lane_requested_date = models.DateField(
-        null=True,
-    )
-
-    gsc_library_id = create_chrfield("GSC library ID")
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
         "Sequencing center",
@@ -1292,7 +1246,6 @@ class TenxSequencing(models.Model, FieldValue):
     )
     sequencer_notes = create_textfield("Sequencing notes")
 
-    objects = SequencingManager()
 
     analysis = models.ManyToManyField(
         Analysis,
@@ -1300,12 +1253,18 @@ class TenxSequencing(models.Model, FieldValue):
         blank=True
     )
 
-    def __init__(self, *args, **kwargs):
-        super(TenxSequencing, self).__init__(*args, **kwargs)
-        self.old_number_of_lanes_requested = self.number_of_lanes_requested
+    number_of_lanes_requested = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Sequencing Goal"
+    )
+
+    # Set to the last time number_of_lanes_requested was updated
+    lane_requested_date = models.DateField(
+        null=True,
+    )
 
     def __str__(self):
-        return 'SEQ_' + self.library.get_library_id() +"_" + str(self.id)
+        return 'SEQ_' + str(self.id)
 
     def has_sequencing_detail(self):
         return hasattr(self, self.library_type + 'sequencingdetail')
@@ -1313,11 +1272,16 @@ class TenxSequencing(models.Model, FieldValue):
     def get_absolute_url(self):
         return reverse(self.library_type + ":sequencing_detail", kwargs={"pk": self.pk})
 
+    def __init__(self, *args, **kwargs):
+        super(TenxSequencing, self).__init__(*args, **kwargs)
+        self.old_number_of_lanes_requested = self.number_of_lanes_requested
+
     def save(self, *args, **kwargs):
         if self.number_of_lanes_requested != self.old_number_of_lanes_requested:
             self.old_number_of_lanes_requested = self.number_of_lanes_requested
             self.lane_requested_date = datetime.date.today()
-        super(TenxSequencing, self).save(*args,**kwargs)
+        super(TenxSequencing, self).save(*args, **kwargs)
+
 
 class DlpLane(models.Model, FieldValue):
 

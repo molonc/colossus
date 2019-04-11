@@ -45,7 +45,7 @@ def return_text_search(query):
 
     context["tenx"]["Chip"].extend(list(TenxChip.objects.annotate(search=SearchVector(*TENX_CHIP)).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Libraries"].extend(list(TenxLibrary.objects.annotate(search=SearchVector(*(CORE_LIBRARY + TENX_LIBRARY))).filter(Q(search=query) | Q(search__icontains=query))))
-    context["tenx"]["Sequencings"].extend(list(TenxSequencing.objects.annotate(search=SearchVector(*(CORE_SEQUENCING + TENX_SEQUENCING))).filter(Q(search=query) | Q(search__icontains=query))))
+    context["tenx"]["Sequencings"].extend(list(TenxSequencing.objects.annotate(search=SearchVector(*TENX_SEQUENCING)).filter(Q(search=query) | Q(search__icontains=query))))
 
     dict_sample_type_choices = dict((y, x) for x, y in Sample.sample_type_choices)
     dict_run_status = dict((y, x) for x, y in RUN_STATUS_CHOICES)
@@ -107,20 +107,18 @@ def return_text_search(query):
             list(PbalSequencing.objects.filter(sequencing_instrument=partial_key_match(query, dict_sequencing_instrument_choices))))
         context["tenx"]["Sequencings"].extend(
             list(TenxSequencing.objects.filter(sequencing_instrument=partial_key_match(query, dict_sequencing_instrument_choices))))
+
     if partial_key_match(query, dict_sequencing_output_mode_choices):
         context["dlp"]["Sequencings"].extend(
             list(DlpSequencing.objects.filter(sequencing_output_mode=partial_key_match(query, dict_sequencing_output_mode_choices))))
         context["pbal"]["Sequencings"].extend(
             list(PbalSequencing.objects.filter(sequencing_output_mode=partial_key_match(query, dict_sequencing_output_mode_choices))))
-        context["tenx"]["Sequencings"].extend(
-            list(TenxSequencing.objects.filter(sequencing_output_mode=partial_key_match(query, dict_sequencing_output_mode_choices))))
+
     if partial_key_match(query,dict_read_type_choices):
         context["dlp"]["Sequencings"].extend(
             list(DlpSequencing.objects.filter(read_type=partial_key_match(query,dict_read_type_choices))))
         context["pbal"]["Sequencings"].extend(
             list(PbalSequencing.objects.filter(read_type=partial_key_match(query,dict_read_type_choices))))
-        context["tenx"]["Sequencings"].extend(
-            list(TenxSequencing.objects.filter(read_type=partial_key_match(query,dict_read_type_choices))))
 
     dict_rev_comp_override_choices = dict((y, x) for x, y in rev_comp_override_choices)
     if partial_key_match(query, dict_rev_comp_override_choices):
