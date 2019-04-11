@@ -18,18 +18,20 @@
             <thead>
                 <tr>
                     <th>Sequencing ID</th>
+                    {% if library_type != 'tenx' %}
                     <th>Library Information</th>
-                    <th>Sample ID</th>
                     <th>GSC library ID</th>
-
+                    {% else %}
+                    <th>Pool</th>
+                    {% endif %}
+                    <th>Sample ID</th>
                     {% if library_type == 'dlp' or library_type == 'tenx' %}
                         <th class="jiraticket">Jira Ticket</th>
                     {% endif %}
-
                     <th>Submission Date</th>
-                    <th>Most Recent Lane Received</th>
                     <th>Lane Requested Date</th>
                     {% if library_type == 'dlp' %}
+                        <th>Most Recent Lane Received</th>
                         <th>Imported</th>
                     {% endif %}
                     <th class="no-sort-col"></th>
@@ -37,7 +39,6 @@
             </thead>
             <tbody>
                 <br/>
-
                 {% for sequencing in sequencings %}
                     <tr>
                         <td>
@@ -45,6 +46,7 @@
                                 {{ sequencing.id }}
                             </a>
                         </td>
+                        {% if library_type != 'tenx' %}
                         <td width="300px">
                             <a href="{% url library_type|add:':library_detail' pk=sequencing.library.pk %}">
                                 {% if library_type == 'dlp' %}
@@ -59,18 +61,17 @@
                             {{ sequencing.library.description }}
                         </td>
                         <td>
+                            {{ sequencing.gsc_library_id }}
+                        </td>
+                        {% else %}
+                        <td>
+                            {{ sequencing.tenx_pool }}
+                        </td>
+                        {% endif %}
+                        <td>
                             <a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">
                                 {{ sequencing.library.sample.sample_id }}
                             </a>
-                        </td>
-                        <td>
-                            {% if library_type == 'dlp' %}
-                                {{ sequencing.gsc_library_id }}
-                            {% elif library_type == 'pbal' %}
-                                {{ sequencing.gsc_library_id }}
-                            {% elif library_type == 'tenx' %}
-                                {{ sequencing.gsc_library_id }}
-                            {% endif %}
                         </td>
 
                         {% if library_type == 'dlp' or library_type == 'tenx' %}
@@ -84,11 +85,12 @@
                         <td>{{ sequencing.submission_date }}</td>
                         {% if sequencing.most_recent_lane %}
                             <td>{{sequencing.most_recent_lane}}</td>
+                            <td>{{ sequencing.lane_requested_date }}</td>
                         {% else %}
+                            <td>{{ sequencing.lane_requested_date }}</td>
                             <td></td>
                         {% endif %}
-                        <td>{{ sequencing.lane_requested_date }}</td>
-                        {% if library_type == 'dlp' %}
+                        {% if library_type != 'tenx' %}
                             {% if sequencing.number_of_lanes_requested == sequencing.dlplane_set.all.count %}
                                 <td>&#10004;</td>
                             {% else %}

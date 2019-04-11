@@ -1,0 +1,48 @@
+{% extends "base_view.html" %}
+
+{% load staticfiles %}
+
+{% block title %}List of TenX Sequencings{% endblock %}
+
+{% block body %}
+<div class="container" style="padding: 0; margin-bottom: 5px;">
+    <h4 style="float: left;">Select a sequencing to view its details</h4>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'tenx:sequencing_create' %}">Add TenxPool</a>
+</div>
+<div class="container" style="background-color: #F5F5F5;">
+    <div class="table-responsive">
+        <table id="datatable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Pool</th>
+                    <th>Library</th>
+                    <th>Submission Date</th>
+                    <th>Sequncing Centre</th>
+                    <th class="no-sort-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <br/>
+                {% for sequencing in sequencings %}
+                    <tr>
+                        <td><a href="{% url 'tenx:sequencing_detail' pk=sequencing.pk %}">{{ sequencing.id }}</a></td>
+                        <td>{{ sequencing.pool_name }}</a></td>
+                        <td>{{ sequencing.library }}</td>
+                        <td>{{ sequencing.submission_date }}</td>
+                        <td>{{ sequencing.sequencing_center }}</td>
+                        <td>
+                            <div style="float: right; min-width: 69px">
+                                <a style="margin-right: 2px;" href="{% url 'tenx:sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
+                                <br>
+                                <a href="{% url 'tenx:sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

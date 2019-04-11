@@ -355,9 +355,7 @@ class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     filter_fields = (
         'id',
         'library',
-        'read_type',
-        'gsc_library_id',
-        'number_of_lanes_requested',
+        'tenx_pool',
         'sequencing_center',
     )
 

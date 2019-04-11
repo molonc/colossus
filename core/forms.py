@@ -502,9 +502,7 @@ class SequencingForm(ModelForm):
         labels = {
             'library': ('*Library'),
         }
-        help_texts = {
-            'library': ('Select a library.'),
-        }
+
 
 
 class DlpSequencingForm(SequencingForm):

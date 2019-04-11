@@ -1106,15 +1106,17 @@ class DlpSequencingList(SequencingList):
     library_type = 'dlp'
 
 
-class TenxSequencingList(SequencingList):
+class TenxSequencingList(TemplateView):
 
-    """
-    List of 10x sequencings.
-    """
 
-    sequencing_class = TenxSequencing
-    library_type = 'tenx'
+    login_url = LOGIN_URL
+    template_name = "core/tenx/tenxsequencing_list.html"
 
+    def get_context_data(self):
+        context = {
+            'sequencings': TenxSequencing.objects.all().order_by('id'),
+        }
+        return context
 
 class SequencingDetail(LoginRequiredMixin, TemplateView):
 
@@ -1239,15 +1241,17 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
-            library = instance.library
-            if(validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password'])):
+
+            if(validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password']) ):
                 request.session['jira_user'] = form.cleaned_data['jira_user']
                 request.session['jira_password'] = form.cleaned_data['jira_password']
-                request.session['jira_ticket'] = library.jira_ticket
-                request.session['library_type'] = library.library_type
-                if(library.library_type == 'tenx'):
-                    request.session['pool_id'] = library.tenxlibraryconstructioninformation.pool
-                request.session['sample_id'] = library.sample.sample_id
+                request.session['library_type'] = self.library_type
+                if (self.library_type == 'dlp'):
+                    library = instance.library
+                    request.session['jira_ticket'] = library.jira_ticket
+                    request.session['sample_id'] = library.sample.sample_id
+                if (self.library_type == 'tenx'):
+                    request.session['pool_id'] = instance.tenx_pool if instance.tenx_pool else "No Pool"
                 request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
                 request.session['sequencing_center'] = instance.sequencing_center
             else:
@@ -1256,7 +1260,6 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
 
             instance.save()
             request.session['sequencing_id'] = instance.id
-            #form.save_m2m()
             msg = "Successfully created the Sequencing."
             messages.success(request, msg)
             return HttpResponseRedirect(reverse('{}:add_watchers'.format(library.library_type)))
@@ -1279,11 +1282,6 @@ class DlpSequencingCreate(SequencingCreate):
 
 
 class TenxSequencingCreate(SequencingCreate):
-
-    """
-    10x sequencing create page.
-    """
-
     library_class = TenxLibrary
     sequencing_class = TenxSequencing
     form_class = TenxSequencingForm
@@ -1305,10 +1303,13 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
         context = {
             'pk': sequencing.pk,
             'form': form,
-            'related_seqs': self.sequencing_class.objects.all(),
-            'selected_related_seqs': sequencing.relates_to.only(),
             'library_type': self.library_type,
         }
+
+        if self.library_type != "tenx":
+            context['related_seqs'] =  self.sequencing_class.objects.all(),
+            context['selected_related_seqs'] =  sequencing.relates_to.only(),
+
         return render(request, self.template_name, context)
 
     def get(self, request, pk):
@@ -1360,15 +1361,9 @@ class DlpSequencingUpdate(SequencingUpdate):
     library_type = 'dlp'
 
 class TenxSequencingUpdate(SequencingUpdate):
-
-    """
-    10x sequencing update page.
-    """
-
     sequencing_class = TenxSequencing
     form_class = TenxSequencingForm
     library_type = 'tenx'
-
 
 class SequencingDelete(LoginRequiredMixin, TemplateView):
 
