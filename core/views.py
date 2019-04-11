@@ -1188,7 +1188,6 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
         form = AddWatchersForm(request.POST)
         if form.is_valid():
             if request.session['library_type'] == 'tenx' and request.session["jira_ticket"]:
-                print(len(request.session["jira_ticket"])-1)
                 for i in range(0,len(request.session["jira_ticket"])):
                     reference_genome = get_reference_genome_from_sample_id(request.session['sample_id'][i])
                     updated_description = generate_tenx_jira_description(request.session['sequencing_center'], reference_genome, request.session['pool_id'])
@@ -1263,7 +1262,6 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
                 if (self.library_type == 'tenx'):
                     request.session['jira_ticket'] = instance.tenx_pool.jira_tickets()[0] if instance.tenx_pool else []
                     request.session['sample_id'] = instance.tenx_pool.jira_tickets()[1] if instance.tenx_pool else []
-                    print(request.session['jira_ticket'], request.session['sample_id'])
                     request.session['pool_id'] = instance.tenx_pool.id if instance.tenx_pool else None
                 request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
                 request.session['sequencing_center'] = instance.sequencing_center
