@@ -78,7 +78,7 @@ def update_sample_and_library(apps, schema_editor):
 
     for row in libraries:
         library = Library.objects.filter(name=row["library_id"])[0]
-        message = "\nTANTALUS ID: " + row["id"] + " CLONED FROM: " + row["old_colossus_library_id"]
+        message = "\nGOOGLE SHEET ID: " + row["id"] + " CLONED FROM: " + row["old_colossus_library_id"]
         if row["chip_well"] and row["chip_well"] != library.chip_well:
             message = message + "\n old chip_well :" + str(library.chip_well) + " new chip_well: " + str(row["chip_well"])
             library.chip_well = row["chip_well"]
