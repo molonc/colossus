@@ -51,6 +51,12 @@
 
                 {% if field == "Jira ticket" %}
                     <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{ value }}">{{ value }}</a></td>
+                {% elif field == "Google Sheet Link" %}
+                    {% if value %}
+                    <td id="tdid"><a href="{{value}}">Link</a></td>
+                    {% else %}
+                    <td>None</td>
+                    {% endif %}
                 {% else %}
                     <td id="tdid" class="notes">{{ value }}</td>
                 {% endif %}
