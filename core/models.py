@@ -85,6 +85,7 @@ class Sample(models.Model, FieldValue):
         ('P','Patient'),
         ('C','Cell Line'),
         ('X','Xenograft'),
+        ('Or', 'Organoid'),
         ('O','Other'),
     )
 
@@ -391,6 +392,13 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         blank=True,
     )
 
+    experimental_condition = create_chrfield(
+        "Experimental condition",
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+
     num_sublibraries = create_intfield(
         "Number of sublibraries",
         default=0,
@@ -402,7 +410,6 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         on_delete=models.CASCADE,
         null=True
     )
-
 
     chip_well = models.IntegerField(
         default=0,
@@ -418,6 +425,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         "Google Sheet Link",
         null=True,
         blank=True,
+        max_length=255,
     )
 
     def get_library_id(self):
@@ -454,7 +462,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     )
 
     # fields
-    description = create_textfield("Description")
+    description = create_textfield("Description", max_length=1024)
     result = create_textfield("Result")
 
     failed = models.BooleanField(
