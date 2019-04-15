@@ -399,7 +399,6 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         null=True,
     )
 
-
     num_sublibraries = create_intfield(
         "Number of sublibraries",
         default=0,
