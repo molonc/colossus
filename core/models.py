@@ -462,7 +462,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     )
 
     # fields
-    description = create_textfield("Description",max_length=1024)
+    description = create_textfield("Description", max_length=1024)
     result = create_textfield("Result")
 
     failed = models.BooleanField(
