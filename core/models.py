@@ -411,7 +411,6 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         null=True
     )
 
-
     chip_well = models.IntegerField(
         default=0,
         choices=CHIP_WELL
