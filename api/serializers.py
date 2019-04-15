@@ -38,7 +38,7 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
-    Analysis)
+    Analysis, TenxLibraryConstructionInformation)
 
 from pbal.models import (
     PbalLibrary,
@@ -499,9 +499,16 @@ class TenxConditionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TenxLibraryConstructionInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxLibraryConstructionInformation
+        fields = "__all__"
+
+
 class TenxLibrarySerializer(serializers.ModelSerializer):
     tenxcondition_set = TenxConditionSerializer(many=True, read_only=True)
     tenxsequencing_set = TenxSequencingSerializer(many=True, read_only=True)
+    tenxlibraryconstructioninformation = TenxLibraryConstructionInformationSerializer(read_only=True)
     sample = SampleSerializer()
     projects = TagSerializerField()
     class Meta:
@@ -517,6 +524,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'num_sublibraries',
             'tenxsequencing_set',
             'tenxcondition_set',
+            'tenxlibraryconstructioninformation',
             'projects',
             'sample',
             'relates_to_dlp',
@@ -550,4 +558,3 @@ class TenxPoolSerializer(serializers.ModelSerializer):
             'libraries',
             'tenxsequencing_set'
         )
-
