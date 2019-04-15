@@ -38,11 +38,8 @@ from core.models import (
     TenxChip,
     Project,
     TenxPool,
-    Analysis, TenxLibraryConstructionInformation)
-
-from pbal.models import (
-    PbalLibrary,
-    PbalSequencing
+    Analysis,
+    TenxLibraryConstructionInformation
 )
 
 from sisyphus.models import (
