@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'drf_yasg',
     'crispy_forms',
+    'storages',
     # 'mod_wsgi.server',
 ]
 
@@ -144,20 +145,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.environ.get(
-    'COLOSSUS_STATIC_ROOT',
-    os.path.join(BASE_DIR, 'static/'),)
-
-# Media files
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.environ.get(
-    'COLOSSUS_MEDIA_ROOT',
-    os.path.join(BASE_DIR, 'media/'),)
-
 # Login url
 LOGIN_URL = '/account/login/'
 
@@ -176,3 +163,14 @@ REST_FRAMEWORK = {
 }
 
 JIRA_URL = 'https://www.bcgsc.ca/jira/'
+
+DEFAULT_FILE_STORAGE = 'colossus.custom_azure.AzureMediaStorage'
+STATICFILES_STORAGE = 'colossus.custom_azure.AzureStaticStorage'
+
+STATIC_LOCATION = "colossus-static"
+MEDIA_LOCATION = "colossus-media"
+
+AZURE_ACCOUNT_NAME = "olympusbackups"
+AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+STATIC_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
