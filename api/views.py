@@ -359,6 +359,8 @@ class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'sequencing_center',
     )
 
+
+
 class TenxConditionViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxCondition.objects.all()
     serializer_class = TenxConditionSerializer
@@ -402,8 +404,11 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     filter_fields = (
         'id',
         'libraries',
-        'libraries__name'
+        'libraries__name',
+        'gsc_pool_name',
+        'construction_location'
     )
+
 
 
 def dlp_sequencing_get_samplesheet(request, pk):
