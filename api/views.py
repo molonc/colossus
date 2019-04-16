@@ -399,7 +399,12 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = TenxPool.objects.all()
     serializer_class = TenxPoolSerializer
-    filter_fields = "__all__"
+    filter_fields = (
+        'id',
+        'libraries',
+        'libraries__name'
+    )
+
 
 def dlp_sequencing_get_samplesheet(request, pk):
 
