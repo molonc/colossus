@@ -171,6 +171,8 @@ STATIC_LOCATION = "colossus-static"
 MEDIA_LOCATION = "colossus-media"
 
 AZURE_ACCOUNT_NAME = "olympusbackups"
+AZURE_CONTAINER = "colossus-media"
+AZURE_ACCOUNT_KEY = os.environ.get('STORAGE_SECRET_KEY')
 AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
 STATIC_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
 MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
