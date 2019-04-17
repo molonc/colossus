@@ -12,10 +12,12 @@ from __future__ import unicode_literals
 # Django imports
 #----------------------------
 import datetime
+
+from django.contrib.postgres.fields import ArrayField
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
-
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator, int_list_validator, \
+    validate_comma_separated_integer_list
 
 #============================
 # App imports
@@ -1357,6 +1359,8 @@ class TenxLane(models.Model, FieldValue):
         null=True,
         blank=True,
     )
+
+    tantalus_datasets = ArrayField(models.IntegerField(null=True, blank=True), null=True, blank=True)
 
     sequencing_date = models.DateTimeField(
         null=True
