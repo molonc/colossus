@@ -24,6 +24,7 @@
                                 {% if field.name == "sequencing" and sequencing_id %}
                                     <select id="id_sequencing" name="sequencing">
                                         <option value="{{ sequencing_id }}" selected="selected">{{ sequencing }}</option>
+                                    </select>
                                 {% else %}
                                     {{ field }}
                                 {% endif %}
