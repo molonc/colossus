@@ -403,7 +403,6 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = TenxPoolSerializer
     filter_fields = (
         'id',
-        'libraries',
         'libraries__name',
         'gsc_pool_name',
         'construction_location'
