@@ -475,7 +475,6 @@ class TenxSequencingSerializer(serializers.ModelSerializer):
         model = TenxSequencing
         fields = (
             'id',
-            'library',
             'tenx_pool',
             'sequencing_instrument',
             'submission_date',
@@ -488,6 +487,11 @@ class TenxSequencingSerializer(serializers.ModelSerializer):
             'sequencer_notes',
         )
 
+
+    def to_representation(self, instance):
+        value = super(TenxSequencingSerializer, self).to_representation(instance)
+        value["library"] = [instance.library.id] if instance.library else []
+        return value
 
 
 class TenxConditionSerializer(serializers.ModelSerializer):
