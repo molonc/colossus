@@ -558,6 +558,4 @@ class TenxPoolSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         value = super(TenxPoolSerializer, self).to_representation(instance)
         value["tenxsequencing_set"] = [s.pk for s in  instance.tenxsequencing_set.all()]
-        print(instance)
-        print(value)
         return value
