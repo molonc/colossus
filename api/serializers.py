@@ -33,7 +33,6 @@ from core.models import (
     JiraUser,
     TenxLibrary,
     TenxSequencing,
-    TenxCondition,
     TenxLane,
     TenxChip,
     Project,
@@ -493,13 +492,6 @@ class TenxSequencingSerializer(serializers.ModelSerializer):
         value["library"] = [instance.library.id] if instance.library else []
         return value
 
-
-class TenxConditionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TenxCondition
-        fields = '__all__'
-
-
 class TenxLibraryConstructionInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenxLibraryConstructionInformation
@@ -507,7 +499,6 @@ class TenxLibraryConstructionInformationSerializer(serializers.ModelSerializer):
 
 
 class TenxLibrarySerializer(serializers.ModelSerializer):
-    tenxcondition_set = TenxConditionSerializer(many=True, read_only=True)
     tenxsequencing_set = TenxSequencingSerializer(many=True, read_only=True)
     tenxlibraryconstructioninformation = TenxLibraryConstructionInformationSerializer(read_only=True)
     sample = SampleSerializer()
@@ -524,7 +515,6 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'condition',
             'num_sublibraries',
             'tenxsequencing_set',
-            'tenxcondition_set',
             'tenxlibraryconstructioninformation',
             'projects',
             'sample',

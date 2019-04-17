@@ -35,7 +35,6 @@ from pbal.models import (
 
 from .models import (
     Sample,
-    TenxCondition,
     TenxPool,
     TenxChip,
     TenxLane,
@@ -65,7 +64,6 @@ from .forms import (
     TenxLaneForm,
     GSCFormDeliveryInfo,
     GSCFormSubmitterInfo,
-    TenxConditionFormset,
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
@@ -419,49 +417,20 @@ class TenxLibraryDetail(LibraryDetail):
 
     library_class = TenxLibrary
     library_type = 'tenx'
-    # sisyphus integration not implemented yet for 10x
-    # analyses = AnalysisInformation.objects.filter(sequencings__in=library.tenxsequencing_set.all()).distinct()
 
     def get(self, request, pk):
         library = get_object_or_404(TenxLibrary, pk=pk)
         library_type = 'tenx'
 
-        fields = (
-            'Experimental_condition',
-            'Enzyme',
-            'Digestion_Temperature',
-            'Live/Dead',
-            'Cells_Targeted',
-        )
         metadata_dict = collections.OrderedDict()
-
-        for condition in library.tenxcondition_set.all():
-            condition_fields = condition.get_field_values()
-
-            metadata_dict[condition.condition_id] = (
-                [condition_fields[field] for field in fields])
 
         return self.get_context_and_render(
             request=request,
             library=library,
             library_type=library_type,
             chip_metadata=metadata_dict,
-            metadata_fields=fields,
         )
 
-
-class TenxConditionsDelete(LoginRequiredMixin, View):
-    """Delete 10x library conditions metadata."""
-    login_url = LOGIN_URL
-
-    def post(self, request, pk):
-        """Delete the 10x library's conditions."""
-        library = get_object_or_404(TenxLibrary, pk=pk)
-        library.tenxcondition_set.all().delete()
-
-        msg = "Successfully deleted the the conditions metadata."
-        messages.success(request, msg)
-        return HttpResponseRedirect(reverse('tenx:library_detail', kwargs=dict(pk=pk)))
 
 
 class LibraryDelete(LoginRequiredMixin, TemplateView):
@@ -649,28 +618,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         # Save the library
                         instance.save()
                         request.session['library_id'] = instance.id
-                        # Save 10x conditions
-                        if context['library_type'] == 'tenx':
-                            condition_formset = TenxConditionFormset(request.POST)
-
-                            # Save each condition
-                            idx = 1
-                            for condition_form in condition_formset:
-                                # If a condition_form was left blank,
-                                # skip it
-                                if not condition_form.has_changed():
-                                    continue
-
-                                # Save the condition
-                                condition = condition_form.save(commit=False)
-                                condition.condition_id = idx
-                                condition.library = instance
-                                condition.sample = instance.sample
-                                condition.save()
-
-                                # Increment the index counter
-                                idx += 1
-
                         # save the ManyToMany field.
                         lib_form.save_m2m()
                         # Add information from SmartChipApp files
@@ -688,27 +635,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
                     elif all_valid and not create:
                         instance.save()
-                        if context['library_type'] == 'tenx':
-                            condition_formset = TenxConditionFormset(request.POST)
-
-                            # Save each condition
-                            idx = 1
-                            for condition_form in condition_formset:
-                                # If a condition_form was left blank,
-                                # skip it
-                                if not condition_form.has_changed():
-                                    continue
-
-                                # Save the condition
-                                condition = condition_form.save(commit=False)
-                                condition.condition_id = idx
-                                condition.library = instance
-                                condition.sample = instance.sample
-                                condition.save()
-
-                                # Increment the index counter
-                                idx += 1
-
                         # save the ManyToMany field.
                         lib_form.save_m2m()
                         # Add information from SmartChipApp files
@@ -786,12 +712,7 @@ class TenxLibraryCreate(LibraryCreate):
 
 
     def get_context_data(self, pk=None):
-        """Add in 10x condition forms."""
         context = super(TenxLibraryCreate, self).get_context_data(pk)
-
-        context['tenx_condition_formset'] = TenxConditionFormset(
-            queryset=TenxCondition.objects.none())
-
         return context
 
 
@@ -863,13 +784,7 @@ class TenxLibraryUpdate(LibraryUpdate):
     library_type = 'tenx'
 
     def get_context_data(self, pk=None):
-        """Add in 10x condition forms."""
         context = super(TenxLibraryUpdate, self).get_context_data(pk)
-
-        library = get_object_or_404(self.library_class, pk=pk)
-        context['tenx_condition_formset'] = TenxConditionFormset(
-            queryset=library.tenxcondition_set.all())
-
         return context
 
 

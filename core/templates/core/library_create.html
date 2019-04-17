@@ -87,34 +87,6 @@
             </table>
          </fieldset>
 
-         {% if library_type == 'tenx' %}
-             <fieldset>
-                <legend>Conditions</legend>
-
-                {{ tenx_condition_formset.management_form }}
-
-                <div id="form_set">
-                    {% for condition_form in tenx_condition_formset %}
-                        <table class="table-condensed">
-                            <thead>
-                                {{ condition_form }}
-                            </thead>
-                        </table>
-                    {% endfor %}
-                </div>
-
-                <input type="button" class="btn btn-primary btn-sm" style="margin-top: 1.3em" value="Add condition" id="add_more">
-
-                <div id="empty_form" style="display:none">
-                    <table class='no_error'>
-                        {{ tenx_condition_formset.empty_form.as_table }}
-                    </table>
-                </div>
-             </fieldset>
-
-             <br>
-         {% endif %}
-
          <br>
 
          <fieldset>
