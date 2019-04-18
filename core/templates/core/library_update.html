@@ -19,7 +19,11 @@
                             </th>
                             <td>
                                 {{ field.errors }}
-
+                                {% if library_type == 'tenx' %}
+                                    {% if field.name == "name" %}
+                                        <h4 id="tenx_name"> {{name}} </h4>
+                                    {% endif %}
+                                {% endif %}
                                 {% if field.name == "projects" %}
                                     <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
                                         {% for project in projects %}
@@ -91,41 +95,6 @@
 
          <br>
 
-         {% if library_type == 'tenx' %}
-             <fieldset>
-                <legend>Conditions</legend>
-
-                {{ tenx_condition_formset.management_form }}
-
-                <div id="form_set">
-                    {% for condition_form in tenx_condition_formset %}
-                        {% if forloop.counter != 1 %}
-                            {# Separate conditions with a rule #}
-                            <hr>
-                        {% endif %}
-
-                        <table class="table-condensed">
-                            <thead>
-                                {{ condition_form }}
-                            </thead>
-                        </table>
-                    {% endfor %}
-                </div>
-
-                <input type="button" class="btn btn-primary btn-sm" style="margin-top: 1.3em" value="Add condition" id="add_more">
-
-                <div id="empty_form" style="display:none">
-                    <table class='no_error'>
-                        {{ tenx_condition_formset.empty_form.as_table }}
-                    </table>
-                </div>
-             </fieldset>
-
-             <br>
-         {% endif %}
-
-         <br>
-
          <fieldset>
             <legend>Library Construction Information</legend>
             <table class="table-condensed">
@@ -154,20 +123,6 @@
 
     <br>
 </div>
-{% endblock %}
-
-{% block scripts %}
-    <script>
-        $('#add_more').click(function() {
-            var form_idx = $('#id_form-TOTAL_FORMS').val();
-
-            if (form_idx != 0) {
-                $('#form_set').append('<hr>');
-            }
-
-            $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-            $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-        });
-    </script>
+{% include "core/scripts/library_script_block.html" %}
 {% endblock %}
 

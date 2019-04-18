@@ -785,6 +785,9 @@ class TenxLibraryUpdate(LibraryUpdate):
 
     def get_context_data(self, pk=None):
         context = super(TenxLibraryUpdate, self).get_context_data(pk)
+        library = get_object_or_404(self.library_class, pk=pk)
+        context['name'] = library.name
+
         return context
 
 
