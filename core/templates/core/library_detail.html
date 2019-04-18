@@ -263,7 +263,7 @@
 <!-- end of Library Quantification and Storage -->
 
 <!-- Experimental Condition Metadata -->
-{% if library_type == 'dlp' or library_type == 'tenx' %}
+{% if library_type == 'dlp' %}
     <div class="container detail-bordered-container">
         <h4>Experimental Condition Metadata</h4>
             {% if chip_metadata %}
@@ -310,11 +310,9 @@
                 <h5><i class="text-warning">There is no condition metadata for library!</i></h5>
             {% endif %}
     </div>
-{% endif %}
 <!-- endof Experimental Condition Metadata -->
 
 <!-- Sublibrary Information -->
-{% if library_type == 'dlp' %}
     <div class="container detail-bordered-container">
         <h4>Sublibrary Information</h4>
 

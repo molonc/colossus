@@ -33,7 +33,6 @@ from .serializers import (
     AnalysisRunSerializer,
     ChipRegionSerializer,
     JiraUserSerializer,
-    TenxConditionSerializer,
     TenxLibrarySerializer,
     TenxLaneSerializer,
     TenxSequencingSerializer,
@@ -52,7 +51,6 @@ from core.models import (
     JiraUser,
     TenxLibrary,
     TenxSequencing,
-    TenxCondition,
     TenxLane,
     TenxChip,
     Project,
@@ -357,25 +355,6 @@ class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'library',
         'tenx_pool',
         'sequencing_center',
-    )
-
-
-
-class TenxConditionViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    queryset = TenxCondition.objects.all()
-    serializer_class = TenxConditionSerializer
-    permission_classes = (IsAuthenticated, )
-
-    filter_fields = (
-        'id',
-        'library',
-        'sample',
-        'condition_id',
-        'experimental_condition',
-        'enzyme',
-        'digestion_temperature',
-        'live_dead',
-        'cells_targeted'
     )
 
 class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):

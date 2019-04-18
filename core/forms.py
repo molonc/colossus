@@ -38,7 +38,6 @@ from .models import (
     AdditionalSampleInformation,
     DlpLibrary,
     TenxLibrary,
-    TenxCondition,
     TenxChip,
     SublibraryInformation,
     DlpLibrarySampleDetail,
@@ -465,12 +464,6 @@ TenxLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
     form = TenxLibraryQuantificationAndStorageForm,
     fields = "__all__",
 )
-
-TenxConditionFormset = forms.modelformset_factory(
-    TenxCondition,
-    exclude=('library', 'sample', 'condition_id'),
-    extra=0)
-
 
 #===========================
 # Project forms

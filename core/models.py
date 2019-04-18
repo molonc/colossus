@@ -396,7 +396,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
 
     experimental_condition = create_chrfield(
         "Experimental condition",
-        max_length=255,
+        max_length=1025,
         blank=True,
         null=True,
     )
@@ -511,38 +511,6 @@ class TenxPool(models.Model, FieldValue):
 
     def get_absolute_url(self):
         return reverse("tenx" + ":pool_detail", kwargs={"pk": self.pk})
-
-class TenxCondition(models.Model, FieldValue):
-    """A 10x experimental condition."""
-    fields_to_exclude = ['ID', 'Library', 'Sample']
-    values_to_exclude = ['id', 'library', 'sample']
-
-    library = models.ForeignKey(
-        TenxLibrary,
-        verbose_name="Library",
-        on_delete=models.CASCADE,
-    )
-
-    sample = models.ForeignKey(
-        Sample,
-        verbose_name="Sample",
-        on_delete=models.CASCADE,
-        null=True,
-    )
-
-    history = HistoricalRecords(table_name='tenx_history_condition')
-
-    condition_id = create_intfield("Condition_ID")
-    experimental_condition = create_chrfield("Experimental_condition")
-    enzyme = create_chrfield("Enzyme")
-    digestion_temperature = create_chrfield("Digestion_Temperature")
-    live_dead = create_chrfield("Live/Dead")
-    cells_targeted = create_chrfield("Cells_Targeted")
-
-    class Meta:
-        ordering = ['id']
-
-
 
 class ChipRegion(models.Model, FieldValue):
 

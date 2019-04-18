@@ -11,7 +11,7 @@ from .models import DlpLibrary, SublibraryInformation, DlpLibrarySampleDetail
 from .models import DlpLibraryConstructionInformation
 from .models import DlpLibraryQuantificationAndStorage
 from .models import DlpSequencing
-from .models import TenxLibrary, TenxCondition, TenxLibrarySampleDetail
+from .models import TenxLibrary, TenxLibrarySampleDetail
 from .models import TenxLibraryConstructionInformation
 from .models import TenxLibraryQuantificationAndStorage
 from .models import ChipRegion, ChipRegionMetadata
@@ -81,9 +81,6 @@ class TenxLibraryConstructionInformationInline(admin.StackedInline):
 class TenxLibraryQuantificationAndStorageInline(admin.StackedInline):
     model = TenxLibraryQuantificationAndStorage
 
-class TenxLibraryConditionsInline(admin.StackedInline):
-    model = TenxCondition
-
 class TenxLibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
     fieldsets = [
       (
@@ -101,7 +98,6 @@ class TenxLibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
       TenxLibrarySampleDetailInline,
       TenxLibraryConstructionInformationInline,
       TenxLibraryQuantificationAndStorageInline,
-      TenxLibraryConditionsInline,
       ]
     list_display = ['id', 'sample',  'jira_ticket']
     list_filter = ['jira_ticket']
