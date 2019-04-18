@@ -4,28 +4,6 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
-
-
-def update_experimental_condition(apps, schema_editor):
-    TenxLibrary = apps.get_model('core', 'TenxLibrary')
-
-    for library in TenxLibrary.objects.all():
-        metadata_list = []
-        for condition in library.tenxcondition_set.all():
-            metadata = {
-                "Condition" : condition.experimental_condition,
-                "Enzyme": condition.enzyme,
-                "Digestion_temperature": condition.digestion_temperature,
-                "Live_dead": condition.live_dead,
-                "cells_targeted": condition.cells_targeted,
-            }
-            metadata_list.append(" | ".join([str(key) + ": " + str(value) + "" for key,value in metadata.items()]))
-        if metadata_list:
-            print(library.name)
-            print(str(library.experimental_condition) + "\n".join(metadata_list))
-            library.experimental_condition = str("\n".join(metadata_list))
-            library.save()
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -34,10 +12,6 @@ class Migration(migrations.Migration):
 
 
     operations = [
-        migrations.SeparateDatabaseAndState(
-            database_operations=database_opeations,
-
-        )
         migrations.AlterField(
             model_name='historicaltenxlibrary',
             name='experimental_condition',
@@ -48,5 +22,4 @@ class Migration(migrations.Migration):
             name='experimental_condition',
             field=models.CharField(blank=True, max_length=1025, null=True, verbose_name='Experimental condition'),
         ),
-        migrations.RunPython(update_experimental_condition)
     ]

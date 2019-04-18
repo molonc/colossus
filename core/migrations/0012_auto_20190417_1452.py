@@ -5,6 +5,25 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 
+def update_experimental_condition(apps, schema_editor):
+    TenxLibrary = apps.get_model('core', 'TenxLibrary')
+
+    for library in TenxLibrary.objects.all():
+        metadata_list = []
+        for condition in library.tenxcondition_set.all():
+            metadata = {
+                "Condition" : condition.experimental_condition,
+                "Enzyme": condition.enzyme,
+                "Digestion_temperature": condition.digestion_temperature,
+                "Live_dead": condition.live_dead,
+                "cells_targeted": condition.cells_targeted,
+            }
+            metadata_list.append(" | ".join([str(key) + ": " + str(value) + "" for key,value in metadata.items()]))
+        if metadata_list:
+            library.experimental_condition = str("\n".join(metadata_list))
+            library.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -12,30 +31,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='historicaltenxcondition',
-            name='history_user',
-        ),
-        migrations.RemoveField(
-            model_name='historicaltenxcondition',
-            name='library',
-        ),
-        migrations.RemoveField(
-            model_name='historicaltenxcondition',
-            name='sample',
-        ),
-        migrations.RemoveField(
-            model_name='tenxcondition',
-            name='library',
-        ),
-        migrations.RemoveField(
-            model_name='tenxcondition',
-            name='sample',
-        ),
-        migrations.DeleteModel(
-            name='HistoricalTenxCondition',
-        ),
-        migrations.DeleteModel(
-            name='TenxCondition',
-        ),
+        migrations.RunPython(update_experimental_condition)
     ]
