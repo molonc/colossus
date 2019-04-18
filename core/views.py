@@ -592,6 +592,17 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         create = True
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
+                    instance.save()
+                    # save the ManyToMany field.
+                    lib_form.save_m2m()
+                    # Add information from SmartChipApp files
+                    region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
+                    sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                    if region_metadata is not None and sublib_results is not None:
+                        instance.sublibraryinformation_set.all().delete()
+                        instance.chipregion_set.all().delete()
+                        create_sublibrary_models(instance, sublib_results, region_metadata)
+
                     if all_valid and create:
                         if context['library_type'] != 'pbal':
                             jira_user = lib_form['jira_user'].value()
@@ -616,17 +627,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             messages.error(request, 'Invalid Jira Credentials')
                             return render(request, self.template_name, context)
                         # Save the library
-                        instance.save()
                         request.session['library_id'] = instance.id
-                        # save the ManyToMany field.
-                        lib_form.save_m2m()
-                        # Add information from SmartChipApp files
-                        region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
-                        sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                        if region_metadata is not None and sublib_results is not None:
-                            instance.sublibraryinformation_set.all().delete()
-                            instance.chipregion_set.all().delete()
-                            create_sublibrary_models(instance, sublib_results, region_metadata)
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
                         if context["library_type"] == "pbal":
@@ -634,16 +635,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         else:
                             return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
                     elif all_valid and not create:
-                        instance.save()
-                        # save the ManyToMany field.
-                        lib_form.save_m2m()
-                        # Add information from SmartChipApp files
-                        region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
-                        sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                        if region_metadata is not None and sublib_results is not None:
-                            instance.sublibraryinformation_set.all().delete()
-                            instance.chipregion_set.all().delete()
-                            create_sublibrary_models(instance, sublib_results, region_metadata)
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
                         return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
