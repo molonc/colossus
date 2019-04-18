@@ -4,7 +4,7 @@
         $(document).ready(function() {
             if ("{{ library_type }}" == "tenx")
                 this.getElementById('id_name').style.display = 'none';
-                if ("{{name}}"  !== null){
+                if ("{{name}}".length  > 4 ){
                     tenx_library_naming = "{{name}}".split("_")
                 }
 
