@@ -15,7 +15,7 @@
             <thead>
                 <tr>
                     <th>Pool Name</th>
-                    <th>GSC Pool Name</th>
+                    <th>Construction Location</th>
                     <th>Number of Tenx Libraries</th>
                     <th>Number of Tenx Sequencings</th>
                     <th class="no-sort-col"></th>
@@ -27,6 +27,7 @@
                     <tr>
                         <td><a  href="{% url 'tenx:pool_detail' pool.pk %}">{{ pool.pool_name }}</a></td>
                         <td>{{ pool.gsc_pool_name }}</td>
+                        <td>{{ pool.construction_location }}</td>
                         <td>{{ pool.libraries.count }}</td>
                         <td>{{ pool.tenxsequencing_set.count }}</td>
                         <td>
