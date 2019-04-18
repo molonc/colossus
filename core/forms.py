@@ -181,6 +181,7 @@ class TenxChipForm(ModelForm):
 class TenxPoolForm(ModelForm):
     class Meta:
         model = TenxPool
+        exclude = ['pool_name']
         fields = "__all__"
         widgets = {
             'constructed_date': SelectDateWidget(
@@ -256,7 +257,6 @@ class DlpLibraryForm(LibraryForm):
 
 class TenxLibraryForm(LibraryForm):
     field_order = [
-        'name',
         'chips',
         'sample',
         'description',

@@ -474,7 +474,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     )
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def get_absolute_url(self):
         return reverse(self.library_type + ":library_detail", kwargs={"pk": self.pk})
@@ -485,6 +485,7 @@ class TenxPool(models.Model, FieldValue):
         ('UBCBRC', 'UBC'),
     )
 
+    pool_name = create_chrfield("Pool Name", null=True, blank=True)
     gsc_pool_name = create_chrfield("GSC Pool Name", null=True, blank=True)
     construction_location = create_chrfield("Construction Location", choices=LOCATION, null=True, blank=True)
     constructed_by = create_chrfield("Constructed By", null=True, blank=True)
@@ -492,10 +493,9 @@ class TenxPool(models.Model, FieldValue):
     libraries = models.ManyToManyField(TenxLibrary)
 
     def __str__(self):
-        return self.pool_name()
+        return self.pool_name
 
-    def pool_name(self):
-        return "TENXPOOL" + str(self.pk).zfill(3)
+
 
     def get_library_ids(self):
         return [l.id for l in self.liraries.all()]
