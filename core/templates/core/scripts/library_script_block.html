@@ -1,10 +1,13 @@
 {% block scripts %}
     <script>
-        console.log("PLEASE")
         var tenx_library_naming = ['SCRNA10X', ' ', ' ',  '0000']
         $(document).ready(function() {
             if ("{{ library_type }}" == "tenx")
                 this.getElementById('id_name').style.display = 'none';
+                if ("{{name}}"  !== null){
+                    tenx_library_naming = "{{name}}".split("_")
+                }
+
 
             var prev = document.referrer
                 if (prev.indexOf("chip") > -1 &&
