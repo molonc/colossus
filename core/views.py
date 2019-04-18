@@ -825,6 +825,7 @@ class LibraryUpdate(LibraryCreate):
             'related_tenx_libs': TenxLibrary.objects.all(),
             'selected_related_dlp_libs': selected_related_dlp_libs,
             'selected_related_tenx_libs': selected_related_tenx_libs,
+            'name' : library.name,
             'library_type': self.library_type,
         }
         return context

@@ -19,7 +19,11 @@
                             </th>
                             <td>
                                 {{ field.errors }}
-
+                                {% if library_type == 'tenx' %}
+                                    {% if field.name == "name" %}
+                                        <h4 id="tenx_name"> {{name}} </h4>
+                                    {% endif %}
+                                {% endif %}
                                 {% if field.name == "projects" %}
                                     <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
                                         {% for project in projects %}
@@ -154,20 +158,6 @@
 
     <br>
 </div>
-{% endblock %}
-
-{% block scripts %}
-    <script>
-        $('#add_more').click(function() {
-            var form_idx = $('#id_form-TOTAL_FORMS').val();
-
-            if (form_idx != 0) {
-                $('#form_set').append('<hr>');
-            }
-
-            $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-            $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-        });
-    </script>
+{% include "core/scripts/library_script_block.html" %}
 {% endblock %}
 
