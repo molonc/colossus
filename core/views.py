@@ -939,7 +939,7 @@ class TenxPoolCreate(LoginRequiredMixin,TemplateView):
         if form.is_valid():
             instance = form.save()
             tenxpool_naming_scheme(instance)
-            msg = "Successfully created the %s pool." % instance.pool_name()
+            msg = "Successfully created the %s pool." % instance.pool_name
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
@@ -968,7 +968,7 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
             form.save_m2m()
             instance.save()
             tenxpool_naming_scheme(instance)
-            msg = "Successfully created the %s pool." % instance.pool_name()
+            msg = "Successfully created the %s pool." % instance.pool_name
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
