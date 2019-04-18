@@ -20,5 +20,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_pool_name())
+        migrations.RunPython(update_pool_name)
     ]

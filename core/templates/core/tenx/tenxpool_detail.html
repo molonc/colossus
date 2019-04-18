@@ -8,10 +8,6 @@
 <div class="container detail-container">
     <table class="table-condensed">
             <br>
-            <tr>
-                <th id="thid">Name:</th>
-                <td id="tdid" class="notes">{{pool.pool_name}}</td>
-            </tr>
             {% for field,value in pool.get_field_values.items %}
             <tr>
                 <th id="thid">{{field}}:</th>

@@ -5,5 +5,5 @@ def tenxlibrary_naming_scheme(library):
     library.save()
 
 def tenxpool_naming_scheme(pool):
-    pool.pool_name = "_".join(["TENXPOOL", str(pool.id).zfill(4)])
+    pool.pool_name = "".join(["TENXPOOL", str(pool.id).zfill(4)])
     pool.save()
