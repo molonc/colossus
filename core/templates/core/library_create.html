@@ -145,63 +145,6 @@
 
     <br>
 </div>
-{% endblock %}
-
-{% block scripts %}
-    <script>
-        var tenx_library_naming = ['SCRNA10X', ' ', ' ',  '0000']
-        $(document).ready(function() {
-            if ("{{ library_type }}" == "tenx")
-                this.getElementById('id_name').style.display = 'none';
-
-            var prev = document.referrer
-                if (prev.indexOf("chip") > -1 &&
-                        prev.indexOf("detail") > -1 ){
-                        var field = document.getElementById("id_chips")
-                        var res = prev.split("/");
-                        for (var i=0, len=field.options.length; i<len; i++) {
-                        opt = field.options[i];
-                        if (res[res.length-1] == opt.value) {
-                        opt.selected = true
-                        document.getElementById('id_chips').onchange();
-                        break;
-                    }
-                }
-            }
-        });
-
-
-        $('#add_more').click(function() {
-            var form_idx = $('#id_form-TOTAL_FORMS').val();
-
-            if (form_idx != 0) {
-                $('#form_set').append('<hr>');
-            }
-
-            $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-            $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-        });
-        function name_assignment() {
-            name =  tenx_library_naming.join("_");
-            document.getElementById('id_name').value = name;
-            document.getElementById('tenx_name').innerHTML =  name;
-        }
-
-        document.getElementById('id_chip_well').onchange = function() {
-            var index = this.selectedIndex;
-            var text = this.children[index].innerHTML.trim()
-            var inputText = (text != "NOT SET") ? text.split("_")[1] : '0';
-            tenx_library_naming[3] = "000" + inputText;
-            name_assignment()
-        }
-
-        document.getElementById('id_chips').onchange = function() {
-            var index = this.selectedIndex;
-            var inputText = this.children[index].innerHTML.trim().split("_");
-            tenx_library_naming[2] = inputText[0];
-            tenx_library_naming[1] = inputText[1];
-            name_assignment()
-        }
-    </script>
+{% include "core/scripts/library_script_block.html" %}
 {% endblock %}
 

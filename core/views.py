@@ -867,6 +867,7 @@ class TenxLibraryUpdate(LibraryUpdate):
         context = super(TenxLibraryUpdate, self).get_context_data(pk)
 
         library = get_object_or_404(self.library_class, pk=pk)
+        context['name'] = library.name
         context['tenx_condition_formset'] = TenxConditionFormset(
             queryset=library.tenxcondition_set.all())
 
