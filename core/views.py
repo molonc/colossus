@@ -825,7 +825,6 @@ class LibraryUpdate(LibraryCreate):
             'related_tenx_libs': TenxLibrary.objects.all(),
             'selected_related_dlp_libs': selected_related_dlp_libs,
             'selected_related_tenx_libs': selected_related_tenx_libs,
-            'name' : library.name,
             'library_type': self.library_type,
         }
         return context
@@ -868,6 +867,7 @@ class TenxLibraryUpdate(LibraryUpdate):
         context = super(TenxLibraryUpdate, self).get_context_data(pk)
 
         library = get_object_or_404(self.library_class, pk=pk)
+        context['name'] = library.name
         context['tenx_condition_formset'] = TenxConditionFormset(
             queryset=library.tenxcondition_set.all())
 
