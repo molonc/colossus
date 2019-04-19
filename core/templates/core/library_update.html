@@ -19,11 +19,6 @@
                             </th>
                             <td>
                                 {{ field.errors }}
-                                {% if library_type == 'tenx' %}
-                                    {% if field.name == "name" %}
-                                        <h4 id="tenx_name"> {{name}} </h4>
-                                    {% endif %}
-                                {% endif %}
                                 {% if field.name == "projects" %}
                                     <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
                                         {% for project in projects %}

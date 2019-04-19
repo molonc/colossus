@@ -32,6 +32,7 @@ from core.search_util.search_helper import return_text_search
 from pbal.models import (
     PbalLibrary
 )
+from tenx.utils import tenxlibrary_naming_scheme, tenxpool_naming_scheme
 
 from .models import (
     Sample,
@@ -592,10 +593,10 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         create = True
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
+                    instance.name = tenxlibrary_naming_scheme(instance) if instance.library_type == "tenx" else None
                     instance.save()
-                    # save the ManyToMany field.
                     lib_form.save_m2m()
-                    # Add information from SmartChipApp files
+
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
                     if region_metadata is not None and sublib_results is not None:
@@ -610,7 +611,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             additional_title = lib_form['additional_title'].value()
 
                         #Add these fields into Session so the JiraTicketConfirm View can access them
-                        if(context['library_type'] == 'pbal' or validate_credentials(jira_user, jira_password)):
+                        if validate_credentials(jira_user, jira_password):
                             #For DLP Libaries
                             if(context['library_type'] == 'dlp'):
                                 request.session['pool_id'] = str(instance.pool_id)
@@ -937,7 +938,9 @@ class TenxPoolCreate(LoginRequiredMixin,TemplateView):
         form = TenxPoolForm(request.POST)
         if form.is_valid():
             instance = form.save()
-            msg = "Successfully created the %s pool." % instance.pool_name()
+            instance.pool_name = tenxpool_naming_scheme(instance)
+            instance.save()
+            msg = "Successfully created the %s pool." % instance.pool_name
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
@@ -964,8 +967,10 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
             form.save_m2m()
+            instance.pool_name = tenxpool_naming_scheme(instance)
             instance.save()
-            msg = "Successfully created the %s pool." % instance.pool_name()
+
+            msg = "Successfully created the %s pool." % instance.pool_name
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
