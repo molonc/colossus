@@ -26,7 +26,6 @@
                 {% for pool in pools %}
                     <tr>
                         <td><a  href="{% url 'tenx:pool_detail' pool.pk %}">{{ pool.pool_name }}</a></td>
-                        <td>{{ pool.gsc_pool_name }}</td>
                         <td>{{ pool.construction_location }}</td>
                         <td>{{ pool.libraries.count }}</td>
                         <td>{{ pool.tenxsequencing_set.count }}</td>

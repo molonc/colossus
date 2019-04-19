@@ -593,8 +593,8 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         create = True
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
+                    instance.name = tenxlibrary_naming_scheme(instance) if instance.library_type == "tenx" else None
                     instance.save()
-                    tenxlibrary_naming_scheme(instance) if instance.library_type == "tenx" else None
                     lib_form.save_m2m()
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
@@ -938,7 +938,8 @@ class TenxPoolCreate(LoginRequiredMixin,TemplateView):
         form = TenxPoolForm(request.POST)
         if form.is_valid():
             instance = form.save()
-            tenxpool_naming_scheme(instance)
+            instance.pool_name = tenxpool_naming_scheme(instance)
+            instance.save()
             msg = "Successfully created the %s pool." % instance.pool_name
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
@@ -966,8 +967,9 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
             form.save_m2m()
+            instance.pool_name = tenxpool_naming_scheme(instance)
             instance.save()
-            tenxpool_naming_scheme(instance)
+
             msg = "Successfully created the %s pool." % instance.pool_name
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())

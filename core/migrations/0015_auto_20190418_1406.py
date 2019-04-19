@@ -11,7 +11,8 @@ def update_pool_name(apps, shcema_editor):
     TenxPool = apps.get_model("core", "TenxPool")
 
     for pool in TenxPool.objects.all():
-        tenxpool_naming_scheme(pool)
+        pool.pool_name = tenxpool_naming_scheme(pool)
+        pool.save()
 
 class Migration(migrations.Migration):
 
