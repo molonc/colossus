@@ -9,6 +9,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 #============================
 # Django rest framework imports
 #----------------------------
+import collections
 import re
 
 from rest_framework import serializers
@@ -262,6 +263,22 @@ class LibrarySerializer(serializers.ModelSerializer):
         instance.relates_to_tenx.add(*relates_to_tenx)
 
         return instance
+
+
+    def to_representation(self, instance):
+        value = super(LibrarySerializer, self).to_representation(instance)
+        metadata_set = ChipRegionMetadata.objects.distinct().filter(chip_region__library=instance)
+
+        metadata_dict = {}
+        for metadata in metadata_set.all():
+            if not metadata.chip_region.region_code in metadata_dict:
+                metadata_dict[metadata.chip_region.region_code] = {metadata.metadata_field.field: metadata.metadata_value}
+            else:
+                metadata_dict[metadata.chip_region.region_code].update({metadata.metadata_field.field : metadata.metadata_value})
+
+        value["metadata_set"] =  metadata_dict
+
+        return value
 
 class SublibraryInformationSerializer(serializers.ModelSerializer):
     sample_id = SampleSerializer(read_only=True)
