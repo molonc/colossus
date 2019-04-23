@@ -9,7 +9,6 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 #============================
 # Django rest framework imports
 #----------------------------
-import collections
 import re
 
 from rest_framework import serializers
