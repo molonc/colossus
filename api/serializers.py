@@ -263,22 +263,6 @@ class LibrarySerializer(serializers.ModelSerializer):
 
         return instance
 
-
-    def to_representation(self, instance):
-        value = super(LibrarySerializer, self).to_representation(instance)
-        metadata_set = ChipRegionMetadata.objects.distinct().filter(chip_region__library=instance)
-
-        metadata_dict = {}
-        for metadata in metadata_set.all():
-            if not metadata.chip_region.region_code in metadata_dict:
-                metadata_dict[metadata.chip_region.region_code] = {metadata.metadata_field.field: metadata.metadata_value}
-            else:
-                metadata_dict[metadata.chip_region.region_code].update({metadata.metadata_field.field : metadata.metadata_value})
-
-        value["metadata_set"] =  metadata_dict
-
-        return value
-
 class SublibraryInformationSerializer(serializers.ModelSerializer):
     sample_id = SampleSerializer(read_only=True)
     library = LibrarySerializer(read_only=True)
@@ -299,6 +283,13 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
             'library',
         )
 
+    def to_representation(self, instance):
+        value = super(SublibraryInformationSerializer, self).to_representation(instance)
+        value["metadata"] = {"region_code" : instance.chip_region.region_code}
+        for metadata in instance.chip_region.chipregionmetadata_set.all():
+            value["metadata"].update({metadata.metadata_field.field: metadata.metadata_value})
+
+        return value
 
 class SublibraryInformationSerializerBrief(serializers.ModelSerializer):
     class Meta:
