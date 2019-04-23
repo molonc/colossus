@@ -283,6 +283,14 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
             'library',
         )
 
+    def to_representation(self, instance):
+        value = super(SublibraryInformationSerializer, self).to_representation(instance)
+        if instance.chip_region:
+            value["metadata"] = {"region_code" : instance.chip_region.region_code}
+            for metadata in instance.chip_region.chipregionmetadata_set.all():
+                value["metadata"][metadata.metadata_field.field] = metadata.metadata_value
+
+        return value
 
 class SublibraryInformationSerializerBrief(serializers.ModelSerializer):
     class Meta:
