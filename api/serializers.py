@@ -288,7 +288,7 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
         if instance.chip_region:
             value["metadata"] = {"region_code" : instance.chip_region.region_code}
             for metadata in instance.chip_region.chipregionmetadata_set.all():
-                value["metadata"].update({metadata.metadata_field.field: metadata.metadata_value})
+                value["metadata"][metadata.metadata_field.field] = metadata.metadata_value
 
         return value
 
