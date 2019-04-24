@@ -66,7 +66,6 @@
                     </tr>
                     <tr>
                         <th>ID</th>
-                        <th>GSC ID</th>
                         <th>Sequencing Centre</th>
                         <th>Submission Date</th>
                         <th>Library</th>
@@ -76,8 +75,6 @@
                     {% for sequencing in pool.tenxsequencing_set.all %}
                         <tr>
                             <td><a href="{{ sequencing.get_absolute_url }}">{{ sequencing.id }}</a></td>
-
-                            <td>{{ sequencing.gsc_library_id }}</a></td>
                             <td>{{ sequencing.sequencing_center }}</td>
                             <td>{{ sequencing.submission_date }}</td>
                             <td><a href="{{ sequencing.library.get_absolute_url }}">{{ sequencing.library }}</td>
