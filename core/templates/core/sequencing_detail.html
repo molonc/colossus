@@ -27,15 +27,25 @@
     <!-- end of action list -->
 
     <table class="table-condensed">
+        {% if library_type == 'dlp' %}
         <tr>
             <th id="thid">Library: </th>
             <td id="tdid" class="notes"><a href="{{ sequencing.library.get_absolute_url }}">{{ sequencing.library }}</a></td>
         </tr>
-
+        {% endif %}
         {% for field, value in sequencing.get_field_values.items %}
             <tr>
+                {% if field == "tenx pool" %}
+                <th id="thid">Tenx Pool:</th>
+                    {% if value %}
+                        <td id="tdid" class="notes"><a href="{{ value.get_absolute_url }}">{{ value }}</a></td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
+                {% else %}
                 <th id="thid">{{ field }}:</th>
                 <td id="tdid" class="notes">{{ value }}</td>
+                {% endif %}
             </tr>
         {% endfor %}
 

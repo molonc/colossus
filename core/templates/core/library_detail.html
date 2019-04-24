@@ -44,33 +44,45 @@
                 <th id="thid"> Number of plates:</th>
                 <td id="tdid" class="notes">{{ library.plate_set.count }}</td>
             {% endif %}
+            {% if library_type == 'tenx' %}
+                <th id="thid">Tenx Pool:</th>
+                {% if library.tenxpool_set.all %}
+                <td id="tdid">
+                    {% for pool in  library.tenxpool_set.all %}
+                    <a href="{{ pool.get_absolute_url }}">{{pool}}</a>
+                    {% endfor %}
+                </td>
+                {% else %}
+                <td>None</td>
+                {% endif %}
+            {% endif %}
         </tr>
         {% for field, value in library_dict.items %}
-            <tr>
-                <th id="thid">{{ field }}:</th>
+        <tr>
+            <th id="thid">{{ field }}:</th>
 
-                {% if field == "Jira ticket" %}
-                    {% if value %}
-                    <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{ value }}">{{ value }}</a></td>
-                    {% else %}
-                    <td>None</td>
-                    {% endif %}
-                {% elif field == "Google Sheet Link" %}
-                    {% if value %}
-                    <td id="tdid"><a href="{{value}}">Link</a></td>
-                    {% else %}
-                    <td>None</td>
-                    {% endif %}
-                {% elif field == "Chip" %}
-                    {% if value %}
-                    <td id="tdid"><a href="{{library.chips.get_absolute_url}}">{{library.chips}}</a></td>
-                    {% else %}
-                    <td>None</td>
-                    {% endif %}
+            {% if field == "Jira ticket" %}
+                {% if value %}
+                <td id="tdid"><a href="https://www.bcgsc.ca/jira/browse/{{ value }}">{{ value }}</a></td>
                 {% else %}
-                    <td id="tdid" class="notes">{{ value }}</td>
+                <td>None</td>
                 {% endif %}
-            </tr>
+            {% elif field == "Google Sheet Link" %}
+                {% if value %}
+                <td id="tdid"><a href="{{value}}">Link</a></td>
+                {% else %}
+                <td>None</td>
+                {% endif %}
+            {% elif field == "Chip" %}
+                {% if value %}
+                <td id="tdid"><a href="{{library.chips.get_absolute_url}}">{{library.chips}}</a></td>
+                {% else %}
+                <td>None</td>
+                {% endif %}
+            {% else %}
+                <td id="tdid" class="notes">{{ value }}</td>
+            {% endif %}
+        </tr>
         {% endfor %}
         <tr>
             <th id="thid">Project:</th>

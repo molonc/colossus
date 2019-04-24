@@ -18,22 +18,14 @@
             <thead>
                 <tr>
                     <th>Sequencing ID</th>
-                    {% if library_type != 'tenx' %}
                     <th>Library Information</th>
                     <th>GSC library ID</th>
-                    {% else %}
-                    <th>Pool</th>
-                    {% endif %}
                     <th>Sample ID</th>
-                    {% if library_type == 'dlp' or library_type == 'tenx' %}
-                        <th class="jiraticket">Jira Ticket</th>
-                    {% endif %}
+                    <th class="jiraticket">Jira Ticket</th>
                     <th>Submission Date</th>
                     <th>Lane Requested Date</th>
-                    {% if library_type == 'dlp' %}
-                        <th>Most Recent Lane Received</th>
-                        <th>Imported</th>
-                    {% endif %}
+                    <th>Most Recent Lane Received</th>
+                    <th>Imported</th>
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -46,7 +38,6 @@
                                 {{ sequencing.id }}
                             </a>
                         </td>
-                        {% if library_type != 'tenx' %}
                         <td width="300px">
                             <a href="{% url library_type|add:':library_detail' pk=sequencing.library.pk %}">
                                 {% if library_type == 'dlp' %}
@@ -63,18 +54,13 @@
                         <td>
                             {{ sequencing.gsc_library_id }}
                         </td>
-                        {% else %}
-                        <td>
-                            {{ sequencing.tenx_pool }}
-                        </td>
-                        {% endif %}
                         <td>
                             <a href="{% url 'core:sample_detail' pk=sequencing.library.sample.pk %}">
                                 {{ sequencing.library.sample.sample_id }}
                             </a>
                         </td>
 
-                        {% if library_type == 'dlp' or library_type == 'tenx' %}
+                        {% if library_type == 'dlp' %}
                             <td>
                                 <a href="https://www.bcgsc.ca/jira/browse/{{ sequencing.library.jira_ticket }}">
                                     {{ sequencing.library.jira_ticket }}

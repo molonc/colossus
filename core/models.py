@@ -481,7 +481,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
 
 class TenxPool(models.Model, FieldValue):
     LOCATION = (
-        ('BCCAGSC', 'GSC')
+        ('BCCAGSC', 'GSC'),
         ('UBCBRC', 'UBC'),
     )
 
