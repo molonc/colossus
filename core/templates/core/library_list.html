@@ -85,9 +85,13 @@
                         <td>{{ library.description }}</td>
 
                         {% if library_type == 'dlp' or library_type == 'tenx' %}
+                            {% if library.jira_ticket %}
                             <td>
                                 <a href="https://www.bcgsc.ca/jira/browse/{{ library.jira_ticket }}">{{ library.jira_ticket }}</a>
                             </td>
+                            {% else %}
+                            <td>None</td>
+                            {% endif %}
                         {% endif %}
 
                         <td>

@@ -16,7 +16,6 @@
                 <tr>
                     <th>ID</th>
                     <th>Pool</th>
-                    <th>Library</th>
                     <th>Submission Date</th>
                     <th>Sequncing Centre</th>
                     <th class="no-sort-col"></th>
@@ -27,8 +26,11 @@
                 {% for sequencing in sequencings %}
                     <tr>
                         <td><a href="{% url 'tenx:sequencing_detail' pk=sequencing.pk %}">{{ sequencing.id }}</a></td>
-                        <td>{{ sequencing.pool_name }}</a></td>
-                        <td>{{ sequencing.library }}</td>
+                        {% if sequencing.tenx_pool %}
+                        <td><a href="{% url 'tenx:pool_detail' pk=sequencing.tenx_pool.pk %}">{{ sequencing.tenx_pool }}</a></td>
+                        {% else %}
+                        <td> None </td>
+                        {% endif %}
                         <td>{{ sequencing.submission_date }}</td>
                         <td>{{ sequencing.sequencing_center }}</td>
                         <td>

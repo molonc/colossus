@@ -9,10 +9,12 @@
     <table class="table-condensed">
             <br>
             {% for field,value in pool.get_field_values.items %}
-            <tr>
+             {% if field != "GSC Pool Name" %}
+             <tr>
                 <th id="thid">{{field}}:</th>
                 <td id="tdid" class="notes">{{value}}</td>
-            </tr>
+             </tr>
+             {% endif %}
             {% endfor %}
     </table>
     <br>
@@ -39,7 +41,7 @@
                     {% for library in pool.libraries.all %}
                         <tr>
                             <td><a href="{{ library.get_absolute_url }}">{{ library.id }}</a></td>
-                            <td><a href="{{ library.sample_id.get_absolute_url }}">{{ library.sample.sample_id }}</a></td>
+                            <td><a href="{{ library.sample.get_absolute_url }}">{{ library.sample.sample_id }}</a></td>
                             <td><a href="https://www.bcgsc.ca/jira/browse/{{ library.jira_ticket }}">{{ library.jira_ticket }}</a></td>
                             <td>{{ library.description }}</td>
                         </tr>
@@ -64,7 +66,6 @@
                     </tr>
                     <tr>
                         <th>ID</th>
-                        <th>GSC ID</th>
                         <th>Sequencing Centre</th>
                         <th>Submission Date</th>
                         <th>Library</th>
@@ -74,11 +75,9 @@
                     {% for sequencing in pool.tenxsequencing_set.all %}
                         <tr>
                             <td><a href="{{ sequencing.get_absolute_url }}">{{ sequencing.id }}</a></td>
-
-                            <td>{{ sequencing.gsc_library_id }}</a></td>
                             <td>{{ sequencing.sequencing_center }}</td>
                             <td>{{ sequencing.submission_date }}</td>
-                            <td><a href="{{ sequencing.library.get_absolute_url }}">{{ sequencing.library }}</td>
+                            <td><a href="{{ sequencing.library.get_absolute_url }}">{{ sequencing.library }}</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
