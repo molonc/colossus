@@ -25,7 +25,7 @@ node {
     }
 
     catch (err) {
-        slackSend color: "danger", message: "Error! Build failed :face_with_head_bandage: \n`${env.JOB_NAME}#${env.BUILD_NUMBER}` <${env.BUILD_URL}|Open in Jenkins>"
+        slackSend color: "danger", message: "Error! Build failed :face_with_head_bandage: \n`${env.JOB_NAME}#${env.BUILD_NUMBER}` \n Cause of Failure: ${currentBuild.rawBuild.getLog(4)} \n ${err.getMessage()}"
 
         throw err
     }
