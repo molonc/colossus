@@ -15,8 +15,9 @@ from core.models import (
     Sample,
     SequencingManager,
     DlpLibrary,
-    TenxLibrary,
     Analysis)
+
+from tenx.models import *
 
 #============================
 # etc

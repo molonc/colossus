@@ -49,14 +49,11 @@ from core.models import (
     SublibraryInformation,
     ChipRegion,
     JiraUser,
-    TenxLibrary,
-    TenxSequencing,
-    TenxLane,
-    TenxChip,
     Project,
-    TenxPool,
     Analysis)
-from pbal.models import PbalSequencing, PbalLibrary
+
+from tenx.models import *
+
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
 
