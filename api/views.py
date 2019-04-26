@@ -218,6 +218,8 @@ class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     filter_fields = (
         'id',
         'library__pool_id',
+        'row',
+        'column',
     )
 
 
