@@ -20,14 +20,7 @@
                         </th>
                         <td>
                             {{ field.errors }}
-                            {% if field.name == "projects" %}
-                                <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
-                                    {% for project in projects %}
-                                        <option value={{ project.id }} >{{ project }}</option>
-                                    {% endfor %}
-
-                                </select>
-                            {% elif field.name == "sample" and sample_id %}
+                            {% if field.name == "sample" and sample_id %}
                                 <select id="id_sample" name="sample">
                                     <option value="{{ sample_id }}" selected="selected">{{ sample }}</option>
                                 </select>
