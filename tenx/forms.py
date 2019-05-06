@@ -2,6 +2,7 @@ from django.forms import (
     ModelForm,
     inlineformset_factory,
     forms)
+from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from core.forms import LibraryForm, LibraryQuantificationAndStorageForm, SaveDefault, SequencingForm, LaneForm
 from .models import *

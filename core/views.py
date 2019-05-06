@@ -959,6 +959,7 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
 
     def post(self, request, from_library=None):
         form = self.form_class(request.POST)
+        print(form.errors)
         if form.is_valid():
             instance = form.save(commit=False)
 
