@@ -56,6 +56,12 @@ from core.models import (
     Project,
     TenxPool,
     Analysis)
+
+from api.filters import (
+    AnalysisFilter,
+    AnalysisInformationFilter
+)
+
 from pbal.models import PbalSequencing, PbalLibrary
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
@@ -142,7 +148,8 @@ class AnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = Analysis.objects.all()
     serializer_class = AnalysisSerializer
-    filter_fields = "__all__"
+    filter_class = AnalysisFilter
+
 
 class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
@@ -240,42 +247,6 @@ class SublibraryViewSetBrief(RestrictedQueryMixin, viewsets.ModelViewSet):
         'id',
         'library__pool_id',
     )
-
-
-class AnalysisInformationFilter(django_filters.rest_framework.FilterSet):
-    """"
-    https://django-filter.readthedocs.io/en/latest/guide/usage.html
-    DateFromToRangeFiler() :it uses datetime format values instead of numerical values.
-    It can be used with DateTimeField.
-    """
-    analysis_run__last_updated = django_filters.DateFromToRangeFilter(
-        method='filter_analysis_run__last_updated')
-
-    def filter_analysis_run__last_updated(self, queryset, name, value):
-        if value.start:
-            queryset = queryset.filter(
-                analysis_run__last_updated__gte=value.start)
-
-        if value.stop:
-            queryset = queryset.filter(
-                analysis_run__last_updated__lte=value.stop)
-
-        return queryset
-
-    class Meta:
-        model = DlpAnalysisInformation
-        fields = [
-        'priority_level',
-        'analysis_jira_ticket',
-        'version',
-        'analysis_submission_date',
-        'reference_genome',
-        'analysis_run',
-        'id',
-        'analysis_run__run_status',
-        'analysis_run__last_updated',
-        'library__pool_id'
-        ]
 
 
 class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
