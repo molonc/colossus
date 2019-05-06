@@ -511,8 +511,7 @@ class DlpLibrarySampleDetail(models.Model, FieldValue):
     # fields
     sample_spot_date = models.DateField(
         "Sample spot date",
-        null=True,
-        blank=True,
+        default=datetime.date.today
     )
     spotting_location = create_chrfield(
         "Spotting location",
