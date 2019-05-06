@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('pbal', '0004_remove_pballibrary_relates_to_tenx'),
         ('tenx', '0001_initial'),
-        ('core', '0016_rename_table_tenx'),
+        ('core', '0017_rename_table_tenx'),
     ]
 
     state_operations = [

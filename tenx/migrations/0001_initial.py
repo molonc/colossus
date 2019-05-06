@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('core', '0016_rename_table_tenx'),
+        ('core', '0017_rename_table_tenx'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

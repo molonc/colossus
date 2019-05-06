@@ -2,6 +2,7 @@ from django.contrib.postgres.search import SearchVector
 from django.db.models import Q
 
 from core.models import *
+from tenx.models import *
 from sisyphus.models import *
 from pbal.models import *
 from core.search_util.search_fields import *
