@@ -655,7 +655,7 @@ class LibraryUpdate(LibraryCreate):
 
     def get_context_data(self, pk):
         library = get_object_or_404(self.library_class, pk=pk)
-        selected_projects = [p.name for p in library.projects.all()]
+        selected_projects = library.projects.all()
         selected_related_dlp_libs = library.relates_to_dlp.all()
         selected_related_tenx_libs = library.relates_to_tenx.all()
 

@@ -20,12 +20,12 @@
                             <td>
                                 {{ field.errors }}
                                 {% if field.name == "projects" %}
-                                    <select class="selectpicker" id="projects" name="projects" multiple data-none-selected-text="--------">
+                                    <select class="selectpicker" id="id_projects" data-live-search="True" name="projects" multiple data-none-selected-text="--------">
                                         {% for project in projects %}
                                             {% if project in selected_projects %}
-                                                <option selected="{{ project }}" value={{ project.id }}>{{ project }}</option>
+                                                <option selected="{{ project }}" value={{ project.id }}>{{project}}</option>
                                             {% else %}
-                                                <option value={{ project.id }}>{{ project }}</option>
+                                                <option value={{ project.id }}>{{project}}</option>
                                             {% endif %}
                                         {% endfor %}
 
