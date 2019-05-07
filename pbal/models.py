@@ -15,7 +15,6 @@ from core.models import (
     Sample,
     SequencingManager,
     DlpLibrary,
-    TenxLibrary,
     Analysis)
 
 #============================
@@ -64,12 +63,6 @@ class PbalLibrary(models.Model, FieldValue, LibraryAssistant):
         DlpLibrary,   # DlpLibrary hasn't been seen yet
         related_name="pballibrary_relates_to_dlp",
         verbose_name="Relates to (DLP)",
-        blank=True,
-    )
-    relates_to_tenx = models.ManyToManyField(
-        TenxLibrary,   # TenxLibrary hasn't been seen yet
-        related_name="pballibrary_relates_to_tenx",
-        verbose_name="Relates to (Tenx)",
         blank=True,
     )
 

@@ -37,20 +37,12 @@ from .models import (
     Sample,
     AdditionalSampleInformation,
     DlpLibrary,
-    TenxLibrary,
-    TenxChip,
     SublibraryInformation,
     DlpLibrarySampleDetail,
     DlpLibraryConstructionInformation,
     DlpLibraryQuantificationAndStorage,
-    TenxLibrarySampleDetail,
-    TenxLibraryConstructionInformation,
-    TenxLibraryQuantificationAndStorage,
     DlpSequencing,
-    TenxSequencing,
     DlpLane,
-    TenxLane,
-    TenxPool,
     JiraUser,
     Project)
 from .utils import parse_smartchipapp_results_file
@@ -172,23 +164,6 @@ class JiraConfirmationForm(Form):
     reporter = forms.ChoiceField(choices=get_user_list)
 
 
-class TenxChipForm(ModelForm):
-    class Meta:
-        model = TenxChip
-        fields = "__all__"
-
-
-class TenxPoolForm(ModelForm):
-    class Meta:
-        model = TenxPool
-        exclude = ['pool_name']
-        fields = "__all__"
-        widgets = {
-            'constructed_date': SelectDateWidget(
-                years=range(2000, 2020),
-                empty_label=('year', 'month', 'day'),
-            )
-        }
 
 
 #===========================
@@ -250,45 +225,6 @@ class DlpLibraryForm(LibraryForm):
             if len(DlpLibrary.objects.filter(pool_id=pool_id)):
                 msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
-
-
-
-
-
-class TenxLibraryForm(LibraryForm):
-    field_order = [
-        'chips',
-        'sample',
-        'description',
-        'result',
-        'num_sublibraries',
-        'relates_to_dlp',
-        'relates_to_tenx',
-        'projects',
-        'jira_ticket',
-    ]
-
-    def __init__(self,*args, **kwargs):
-        super(TenxLibraryForm, self).__init__(*args, **kwargs)
-        if not self.instance.pk:
-            # Get Jira info
-            self.fields['additional_title'] = forms.CharField(max_length=100)
-            self.fields['jira_user'] = forms.CharField(max_length=100)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
-
-            # Remove the field which allows explicitly setting the Jira
-            # ticket ID (since it's done automatically)
-            self.fields.pop('jira_ticket')
-
-    class Meta:
-        model = TenxLibrary
-        fields = '__all__'
-        labels = {
-            'primary sample': ('*Sample'),
-        }
-        help_texts = {
-            'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
-        }
 
 
 class SublibraryForm(Form):
@@ -420,51 +356,6 @@ DlpLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
 )
 
 
-class TenxLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
-
-    """
-    Clean uploaded 10x-related files.
-    """
-
-    class Meta(LibraryQuantificationAndStorageForm.Meta):
-        model = TenxLibraryQuantificationAndStorage
-
-TenxLibrarySampleDetailInlineFormset = inlineformset_factory(
-    TenxLibrary,
-    TenxLibrarySampleDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'sample_prep_date': SelectDateWidget(
-            years=range(2000,2020),
-            empty_label=('year', 'month', 'day'),
-        )
-    }
-)
-
-TenxLibraryConstructionInfoInlineFormset =  inlineformset_factory(
-    TenxLibrary,
-    TenxLibraryConstructionInformation,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'submission_date': SelectDateWidget(
-            years=range(2000,2020),
-            empty_label=('year', 'month', 'day'),
-        )
-    }
-)
-
-TenxLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
-    TenxLibrary,
-    TenxLibraryQuantificationAndStorage,
-    can_delete = False,
-    form = TenxLibraryQuantificationAndStorageForm,
-    fields = "__all__",
-)
-
 #===========================
 # Project forms
 #---------------------------
@@ -512,24 +403,6 @@ class DlpSequencingForm(SequencingForm):
     class Meta(SequencingForm.Meta):
         model = DlpSequencing
 
-
-class TenxSequencingForm(SequencingForm):
-
-    def __init__(self,*args,**kwargs):
-        super(TenxSequencingForm,self).__init__(*args,**kwargs)
-        if not self.instance.pk:
-            self.fields['jira_user'] = forms.CharField(max_length=100)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
-        else:
-            self.fields['jira_user'] = forms.CharField(max_length=100, required=False)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, required=False)
-            
-    class Meta(SequencingForm.Meta):
-        model = TenxSequencing
-        labels = {
-            'tenx_pool': ('*TENX POOL'),
-        }
-
 #===========================
 # Lane forms
 #---------------------------
@@ -542,11 +415,6 @@ class LaneForm(ModelForm):
 class DlpLaneForm(LaneForm):
     class Meta(LaneForm.Meta):
         model = DlpLane
-
-class TenxLaneForm(LaneForm):
-    class Meta(LaneForm.Meta):
-        model = TenxLane
-
 
 
 

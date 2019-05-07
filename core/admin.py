@@ -11,9 +11,9 @@ from .models import DlpLibrary, SublibraryInformation, DlpLibrarySampleDetail
 from .models import DlpLibraryConstructionInformation
 from .models import DlpLibraryQuantificationAndStorage
 from .models import DlpSequencing
-from .models import TenxLibrary, TenxLibrarySampleDetail
-from .models import TenxLibraryConstructionInformation
-from .models import TenxLibraryQuantificationAndStorage
+from tenx.models import TenxLibrary, TenxLibrarySampleDetail
+from tenx.models import TenxLibraryConstructionInformation
+from tenx.models import TenxLibraryQuantificationAndStorage
 from .models import ChipRegion, ChipRegionMetadata
 from .models import MetadataField
 from .models import JiraUser

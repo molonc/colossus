@@ -31,15 +31,11 @@ from core.models import (
     DlpLibraryConstructionInformation,
     DlpLibrarySampleDetail,
     JiraUser,
-    TenxLibrary,
-    TenxSequencing,
-    TenxLane,
-    TenxChip,
     Project,
-    TenxPool,
     Analysis,
-    TenxLibraryConstructionInformation
 )
+
+from tenx.models import *
 
 from sisyphus.models import (
     DlpAnalysisInformation,
