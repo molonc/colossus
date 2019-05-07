@@ -3,18 +3,19 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from tenx.utils import tenxlibrary_naming_scheme
 
 def format_tenxlibrary_naming(apps, schema_editor):
-    tenx_library = apps.get_model('core', 'TenxLibrary')
+    tenx_library = apps.get_model('tenx', 'TenxLibrary')
     for library in tenx_library.objects.all():
         if not library.name.startswith('TENX'):
-            library.name = "_".join(["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4), str(library.chip_well).zfill(4)])
+            library.name = tenxlibrary_naming_scheme(library)
         library.save()
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0016_auto_20190506_1207'),
+        ('tenx', '0002_auto_20190506_1410'),
     ]
 
     operations = [
