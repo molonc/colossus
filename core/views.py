@@ -135,16 +135,6 @@ class SampleList(LoginRequiredMixin, TemplateView):
         }
         return context
 
-
-class Inventory(SampleList):
-
-    """
-    Inventory of sequencings associated with samples.
-    """
-
-    template_name = "core/inventory.html"
-
-
 class SampleDetail(LoginRequiredMixin, TemplateView):
     """
     Sample detail page.
