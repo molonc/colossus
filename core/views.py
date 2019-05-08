@@ -269,6 +269,9 @@ def analysis_detail(request, pk):
         'library': library,
         'sequencings': sequencings
     }
+    if analysis.input_type.lower() == 'tenx':
+        tenx_pools = list(map(lambda x: x.tenx_pool, sequencings.all()))
+        context['tenx_pools'] = tenx_pools
     return context
 
 
