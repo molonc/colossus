@@ -13,6 +13,15 @@
             <td><a href="{{library.get_absolute_url}}">{{ library }}</a></td>
         </tr>
         <tr>
+        {% if tenx_pools %}
+        <tr>
+        <th>TenX Pool</th>
+            {% for tenx_pool in tenx_pools %}
+            <td><a href="{{tenx_pool.get_absolute_url}}">{{ tenx_pool }}</a></td>
+            {% endfor %}
+        </tr>
+        {% endif %}
+        <tr>
         <th>Jira Ticket</th>
             <td><a href="https://www.bcgsc.ca/jira/browse/{{analysis.jira_ticket}}">{{analysis.jira_ticket}}</a></td>
         </tr>

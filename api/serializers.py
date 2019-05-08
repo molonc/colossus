@@ -144,6 +144,17 @@ class AnalysisSerializer(serializers.ModelSerializer):
         if not re.match(r"(v\d+\.\d+\.\d+)", validated_data["version"]):
             raise ValidationError("Version must be in the format of v\d+\.\d+\.\d+")
 
+        if validated_data["input_type"].lower() == "tenx":
+            for seq in validated_data["tenxsequencing_set"]:
+                seq_tenx_pool = seq.tenx_pool
+                if not (seq_tenx_pool and validated_data["tenx_library"] in seq_tenx_pool.libraries.all()):
+                    raise ValidationError("Selected sequencings must belong to selected library")
+
+        else:
+            for seq in validated_data[validated_data["input_type"].lower() + 'sequencing_set']:
+                if not seq.library == validated_data[validated_data["input_type"].lower() + "_library"]:
+                    raise ValidationError("Selected sequencings must belong to selected library")
+
         return super(AnalysisSerializer, self).create(validated_data)
 
 class LaneSerializer(serializers.ModelSerializer):
