@@ -132,6 +132,18 @@ class Sample(models.Model, FieldValue):
     def get_absolute_url(self):
         return reverse("core:sample_detail", kwargs={"pk": self.pk})
 
+    def get_dlp_seq_count(self):
+        count = 0
+        for library in self.dlplibrary_set.all():
+            count += library.dlpsequencing_set.count()
+        return count
+
+    def get_tenx_seq_count(self):
+        count = 0
+        for library in self.tenxlibrary_set.all():
+            count += library.tenxsequencing_set.count()
+        return count
+
     def __str__(self):
         return self.sample_id
 
