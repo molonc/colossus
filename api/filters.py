@@ -34,7 +34,7 @@ class AnalysisFilter(filters.FilterSet):
 
 class ListFilter(Filter):
     def filter(self, qs, value):
-        value_list = value.split(u',')
+        value_list = value.replace(" ", "").split(u',')
         return super(ListFilter, self).filter(qs, Lookup(value_list, 'in'))
 
 class AnalysisInformationFilter(filters.FilterSet):
