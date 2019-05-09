@@ -85,6 +85,7 @@ class VariableResultsSetPagination(pagination.PageNumberPagination):
         try: 
             return super().get_paginated_response(data)
         except AttributeError:
+            # Occurs when page_size is set to None. Still want response in same JSON format
             return Response(OrderedDict([
                 ('count', len(data)),
                 ('results', data)
