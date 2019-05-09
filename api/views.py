@@ -77,7 +77,7 @@ class VariableResultsSetPagination(pagination.PageNumberPagination):
     page_size = 10
 
     def paginate_queryset(self, queryset, request, view=None):
-        if request.query_params.get('no_pagination', False):
+        if 'no_pagination' in request.query_params:
             return list(queryset)
         return super().paginate_queryset(queryset, request, view)
 
