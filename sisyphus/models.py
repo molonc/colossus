@@ -19,7 +19,7 @@ from django.contrib.postgres.fields import JSONField
 #----------------------------
 from simple_history.models import HistoricalRecords
 
-from core.models import DlpSequencing,DlpLibrary,DlpLane
+from dlp.models import *
 from tenx.models import *
 from core.helpers import *
 from core.constants import *

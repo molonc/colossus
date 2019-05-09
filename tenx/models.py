@@ -121,7 +121,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
 
     # related libraries
     relates_to_dlp = models.ManyToManyField(
-        'core.DlpLibrary',   # DlpLibrary hasn't been seen yet
+        'dlp.DlpLibrary',   # DlpLibrary hasn't been seen yet
         verbose_name="Relates to (DLP)",
         blank=True,
     )

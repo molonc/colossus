@@ -43,15 +43,17 @@ from .serializers import (
 
 from core.models import (
     Sample,
-    DlpLibrary,
-    DlpSequencing,
-    DlpLane,
     SublibraryInformation,
     ChipRegion,
     JiraUser,
     Project,
     Analysis)
+from dlp.models import (
+    DlpLibrary,
+    DlpSequencing,
+    DlpLane,
 
+)
 
 from tenx.models import *
 from api.filters import (

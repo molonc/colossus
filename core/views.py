@@ -54,13 +54,6 @@ from sisyphus.models import *
 from .forms import (
     SampleForm,
     AdditionalSampleInfoInlineFormset,
-    DlpLibraryForm,
-    DlpLibrarySampleDetailInlineFormset,
-    DlpLibraryConstructionInfoInlineFormset,
-    DlpLibraryQuantificationAndStorageInlineFormset,
-    SublibraryForm,
-    DlpSequencingForm,
-    DlpLaneForm,
     GSCFormDeliveryInfo,
     GSCFormSubmitterInfo,
     ProjectForm,
@@ -286,34 +279,6 @@ class LibraryList(LoginRequiredMixin, TemplateView):
         }
         return context
 
-
-class DlpLibraryList(LibraryList):
-
-    """
-    List of DLP libraries.
-    """
-
-    order = 'pool_id'
-    library_class = DlpLibrary
-    library_type = 'dlp'
-
-    def get_context_data(self):
-        all_libraries = self.library_class.objects.all().order_by(self.order)
-
-        for library in all_libraries:
-            library.num_sequencings = library.dlpsequencing_set.count()
-            library.max_sequencing_analysis = 0
-            for analysis in library.dlpanalysisinformation_set.all():
-                if analysis.sequencings.count() > library.max_sequencing_analysis:
-                    library.max_sequencing_analysis = analysis.sequencings.count()
-
-        context = {
-            'libraries': all_libraries,
-            'library_type': self.library_type,
-        }
-        return context
-
-
 class LibraryDetail(LoginRequiredMixin, TemplateView):
 
     """
@@ -346,48 +311,6 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
     def sort_library_order(self,library):
             return library.get_field_values()
 
-
-class DlpLibraryDetail(LibraryDetail):
-
-    """
-    DLP library detail page.
-    """
-
-    def get(self, request, pk):
-        library = get_object_or_404(DlpLibrary, pk=pk)
-        library_type = 'dlp'
-        analyses = DlpAnalysisInformation.objects.filter(sequencings__in=library.dlpsequencing_set.all()).distinct()
-        sublibinfo = SublibraryInformation()
-        fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
-        metadata_dict = collections.OrderedDict()
-
-        for chip_region in library.chipregion_set.all().order_by('region_code'):
-            metadata_set = chip_region.chipregionmetadata_set.all()
-            d1 = {}
-
-            for metadata in metadata_set:
-                d1[metadata.metadata_field.field] = metadata.metadata_value
-            row = []
-
-            for field in fields:
-                # Check that columns named in "fields" exist, else populate with "" if no entry in row for that particular metadata column
-                # then adding it to a metadata dictionary with other rows
-                if field not in d1.keys():
-                    d1[field] = ""
-                row.append(d1[field])
-            metadata_dict[chip_region.region_code] = row
-
-        return self.get_context_and_render(request, library, library_type, analyses, sublibinfo.get_fields(), metadata_dict, fields)
-
-    def sort_library_order(self, library):
-        new_library_order = ['Description', 'Result', 'Title', 'Jira ticket', 'Quality', 'Chip ID', 'Number of sublibraries']
-        sorted_library_dict = OrderedDict()
-        library_dict_original = dict(library.get_field_values())
-        for x in new_library_order:
-            sorted_library_dict[x] = library_dict_original[x]
-        return sorted_library_dict
-
-
 class LibraryDelete(LoginRequiredMixin, TemplateView):
 
     """
@@ -412,16 +335,6 @@ class LibraryDelete(LoginRequiredMixin, TemplateView):
         msg = "Successfully deleted the Library."
         messages.success(request, msg)
         return HttpResponseRedirect(reverse(self.library_type + ':library_list'))
-
-
-class DlpLibraryDelete(LibraryDelete):
-
-    """
-    DLP library delete page.
-    """
-
-    library_class = DlpLibrary
-    library_type = 'dlp'
 
 class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
 
@@ -621,20 +534,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             formsets[k] = formset
         return all_valid, formsets
 
-
-class DlpLibraryCreate(LibraryCreate):
-
-    """
-    DLP library create page.
-    """
-
-    lib_form_class = DlpLibraryForm
-    libdetail_formset_class = DlpLibrarySampleDetailInlineFormset
-    libcons_formset_class = DlpLibraryConstructionInfoInlineFormset
-    libqs_formset_class = DlpLibraryQuantificationAndStorageInlineFormset
-    library_type = 'dlp'
-
-
 class LibraryUpdate(LibraryCreate):
 
     """
@@ -673,22 +572,6 @@ class LibraryUpdate(LibraryCreate):
         context = self.get_context_data(pk)
         library = get_object_or_404(self.library_class, pk=pk)
         return self._post(request, context, library=library)
-
-
-class DlpLibraryUpdate(LibraryUpdate):
-
-    """
-    DLP library update page.
-    """
-
-    library_class = DlpLibrary
-    lib_form_class = DlpLibraryForm
-    libdetail_formset_class = DlpLibrarySampleDetailInlineFormset
-    libcons_formset_class = DlpLibraryConstructionInfoInlineFormset
-    libqs_formset_class = DlpLibraryQuantificationAndStorageInlineFormset
-    library_type = 'dlp'
-
-
 
 
 #============================
@@ -821,14 +704,6 @@ class SequencingList(LoginRequiredMixin, TemplateView):
         return context
 
 
-class DlpSequencingList(SequencingList):
-
-    """
-    List of DLP sequencings.
-    """
-
-    sequencing_class = DlpSequencing
-    library_type = 'dlp'
 
 
 class SequencingDetail(LoginRequiredMixin, TemplateView):
@@ -854,16 +729,6 @@ class SequencingDetail(LoginRequiredMixin, TemplateView):
             'library_type': self.library_type,
         }
         return render(request, self.template_name, context)
-
-
-class DlpSequencingDetail(SequencingDetail):
-
-    """
-    DLP sequencing detail page.
-    """
-
-    sequencing_class = DlpSequencing
-    library_type = 'dlp'
 
 
 class AddWatchers(LoginRequiredMixin, TemplateView):
@@ -982,19 +847,6 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
             messages.error(request, msg)
             return self.get_context_and_render(request, from_library, form)
 
-
-class DlpSequencingCreate(SequencingCreate):
-
-    """
-    DLP sequencing create page.
-    """
-
-    library_class = DlpLibrary
-    sequencing_class = DlpSequencing
-    form_class = DlpSequencingForm
-    library_type = 'dlp'
-
-
 class SequencingUpdate(LoginRequiredMixin, TemplateView):
 
     """
@@ -1069,16 +921,6 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
             return self.get_context_and_render(request, sequencing, form)
 
 
-class DlpSequencingUpdate(SequencingUpdate):
-
-    """
-    DLP sequencing update page.
-    """
-
-    sequencing_class = DlpSequencing
-    form_class = DlpSequencingForm
-    library_type = 'dlp'
-
 class SequencingDelete(LoginRequiredMixin, TemplateView):
 
     """
@@ -1103,74 +945,6 @@ class SequencingDelete(LoginRequiredMixin, TemplateView):
         msg = "Successfully deleted the Sequencing."
         messages.success(request, msg)
         return HttpResponseRedirect(reverse(self.library_type + ':sequencing_list'))
-
-
-class DlpSequencingDelete(SequencingDelete):
-
-    """
-    DLP sequencing delete page.
-    """
-
-    sequencing_class = DlpSequencing
-    library_type = 'dlp'
-
-class DlpSequencingCreateGSCFormView(LoginRequiredMixin, TemplateView):
-
-    """
-    Sequencing GSC submission form.
-    """
-    login_url = LOGIN_URL
-    template_name = "core/sequencing_create_gsc_form.html"
-
-    def get_context_data(self, pk):
-        context = {
-            'pk': pk,
-            'delivery_info_form': GSCFormDeliveryInfo(),
-            'submitter_info_form': GSCFormSubmitterInfo(),
-            'library_type': 'dlp',
-        }
-        return context
-
-    def get(self, request, pk):
-        context = self.get_context_data(pk)
-        return render(request, self.template_name, context)
-
-    def post(self, request, pk):
-        sequencing = get_object_or_404(DlpSequencing, pk=pk)
-        context = self.get_context_data(pk)
-        delivery_info_form = GSCFormDeliveryInfo(request.POST)
-        submitter_info_form = GSCFormSubmitterInfo(request.POST)
-        if delivery_info_form.is_valid() and submitter_info_form.is_valid():
-            key = "gsc_form_metadata_%s" % pk
-            request.session[key] = request.POST
-            msg = "Successfully started downloading the GSC submission form."
-            messages.success(request, msg)
-            return HttpResponseRedirect(sequencing.get_absolute_url())
-        else:
-            context['delivery_info_form'] = delivery_info_form
-            context['submitter_info_form'] = submitter_info_form
-            msg = "please fix the errors below."
-            messages.error(request, msg)
-        return render(request, self.template_name, context)
-
-
-@login_required
-def dlp_sequencing_get_gsc_form(request, pk):
-
-    """
-    Generates downloadable GSC submission form.
-    """
-    key = "gsc_form_metadata_%s" % pk
-    metadata = request.session.pop(key)
-    ofilename, ofilepath = generate_gsc_form(pk, metadata)
-    response = HttpResponse(content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
-    #https://stackoverflow.com/questions/12468179/unicodedecodeerror-utf8-codec-cant-decode-byte-0x9c
-    ofile = open(ofilepath, 'r', encoding="latin-1")
-    response.write(ofile.read())
-    ofile.close()
-    os.remove(ofilepath)
-    return response
 
 
 #============================
@@ -1215,17 +989,6 @@ class LaneCreate(LoginRequiredMixin, TemplateView):
             return self.get_context_and_render(request, from_sequencing, form)
 
 
-class DlpLaneCreate(LaneCreate):
-
-    """
-    DLP lane create page.
-    """
-
-    sequencing_class = DlpSequencing
-    form_class = DlpLaneForm
-    library_type = 'dlp'
-
-
 
 
 class LaneUpdate(LoginRequiredMixin, TemplateView):
@@ -1267,18 +1030,6 @@ class LaneUpdate(LoginRequiredMixin, TemplateView):
             messages.error(request, msg)
             return self.get_context_and_render(request, lane, form, pk)
 
-
-class DlpLaneUpdate(LaneUpdate):
-
-    """
-    DLP lane update page.
-    """
-
-    lane_class = DlpLane
-    form_class = DlpLaneForm
-    library_type = 'dlp'
-
-
 class LaneDelete(LoginRequiredMixin, TemplateView):
 
     """
@@ -1312,16 +1063,6 @@ class LaneDelete(LoginRequiredMixin, TemplateView):
         messages.success(request, msg)
         return HttpResponseRedirect(sequencing.get_absolute_url())
 
-
-class DlpLaneDelete(LaneDelete):
-
-    """
-    DLP lane delete page.
-    """
-
-    lane_class = DlpLane
-    library_type = 'dlp'
-
 #============================
 # Search view
 #----------------------------
@@ -1340,89 +1081,5 @@ class SearchView(TemplateView):
 
         return return_text_search(query_str)
 
-
-#============================
-# Summary view
-#----------------------------
-@Render("core/summary.html")
-@login_required
-def dlp_summary_view(request):
-
-    library_per_sample_count = {s.sample_id : s.dlplibrary_set.count() for s in Sample.objects.all()}
-
-    sublibrary_per_sample_count = {s.sample_id : s.sublibraryinformation_set.count() for s in Sample.objects.all()}
-
-    context ={
-        'library_per_sample': library_per_sample_count,
-        'sublibrary_per_sample': sublibrary_per_sample_count,
-        'total_sublibs': SublibraryInformation.objects.count(),
-        'total_libs': DlpLibrary.objects.count(),
-        'samples':Sample.objects.all().order_by('sample_id'),
-    }
-    return context
-
-@login_required
-def dlp_get_filtered_sublib_count(sublibs):
-    unfiltered_count = sublibs.count()
-
-    # wells to filter out
-    blankwells_count = sublibs.filter(spot_well='nan').count()
-
-    # final count
-    filtered_count = unfiltered_count - blankwells_count
-    return filtered_count
-
-@login_required
-def dlp_get_cell_graph(request):
-
-    data = []
-    libs = DlpLibrary.objects.filter(dlpsequencing__isnull=False, sublibraryinformation__isnull=False).distinct()
-
-    for lib in libs:
-        lib_info = {}
-        lib_info['jira_ticket'] = lib.jira_ticket
-        lib_info['pool_id'] = lib.pool_id
-        lib_info['count'] = dlp_get_filtered_sublib_count(lib.sublibraryinformation_set)
-        lib_info['id'] = lib.pk
-
-        for sequencing in lib.dlpsequencing_set.all():
-            lib_info['submission_date'] = sequencing.submission_date
-            data.append(lib_info)
-
-    df = pd.DataFrame(data)
-    # TODO: change time to just only include date
-    today = str(timezone.now().strftime('%Y-%m-%d'))
-    ofilename = os.path.join("cell_count-" + today + ".csv")
-    output_csv_path = os.path.join(settings.MEDIA_ROOT, ofilename)
-    df.to_csv(output_csv_path, index=False)
-
-
-    rscript_path = os.path.join(settings.BASE_DIR, "scripts", "every_cell_count_plot.R")
-    cmd = "Rscript {rscript} {input_csv} {media_dir}/output.pdf".format(rscript=rscript_path, input_csv=output_csv_path, media_dir=settings.MEDIA_ROOT)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    r_stdout, r_stderr = p.communicate()
-    if p.returncode != 0:
-        raise Exception('cmd {} failed\nstdout:\n{}\nstderr:\n{}\n'.format(cmd, r_stdout, r_stderr))
-
-    output_plots_path = os.path.join(settings.MEDIA_ROOT, "output.pdf")
-
-    with open(output_plots_path, 'r') as plots_pdf:
-
-        response = HttpResponse(plots_pdf, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename=%s' % ("cell-count_" + today + ".pdf")
-    os.remove(output_csv_path)
-    os.remove(output_plots_path)
-
-    return response
-
-@login_required
-def export_sublibrary_csv(request,pk):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="Sublibrary-info.csv"'
-    dlp = DlpLibrary.objects.get(id=pk)
-    df = pd.DataFrame(list(dlp.sublibraryinformation_set.all().values()))
-    df = df.assign(Sublibrary_information = pd.Series([x.get_sublibrary_id()for x in dlp.sublibraryinformation_set.all()], index=df.index))
-    df.to_csv(response)
-    return response
 
 

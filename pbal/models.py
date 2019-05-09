@@ -14,7 +14,6 @@ from core.models import (
     Project,
     Sample,
     SequencingManager,
-    DlpLibrary,
     Analysis)
 
 #============================
@@ -60,7 +59,7 @@ class PbalLibrary(models.Model, FieldValue, LibraryAssistant):
 
     # related libraries
     relates_to_dlp = models.ManyToManyField(
-        DlpLibrary,   # DlpLibrary hasn't been seen yet
+        'dlp.DlpLibrary',   # DlpLibrary hasn't been seen yet
         related_name="pballibrary_relates_to_dlp",
         verbose_name="Relates to (DLP)",
         blank=True,
