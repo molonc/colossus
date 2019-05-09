@@ -59,6 +59,7 @@ from .forms import (
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
+    SublibraryForm
 )
 from .utils import (
     create_sublibrary_models,
