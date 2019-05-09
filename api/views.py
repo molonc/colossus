@@ -77,7 +77,7 @@ class PaginationToggleResultsSetPagination(pagination.PageNumberPagination):
     page_size = 10
 
     def paginate_queryset(self, queryset, request, view=None):
-        if not request.query_params.get('pagination', True):
+        if request.query_params.get('no_pagination', False):
             return list(queryset)
         return super().paginate_queryset(queryset, request, view)
 
@@ -97,7 +97,7 @@ class RestrictedQueryMixin(object):
     https://stackoverflow.com/questions/27182527/how-can-i-stop-django-rest-framework-to-show-all-records-if-query-parameter-is-w/50957733#50957733
     """
     def get_queryset(self):
-        non_filter_params = set(['limit', 'offset', 'page', 'page_size', 'format', 'no_page'])
+        non_filter_params = set(['limit', 'offset', 'page', 'page_size', 'format', 'no_pagination'])
 
         qs = super(RestrictedQueryMixin, self).get_queryset().order_by('id')
 
