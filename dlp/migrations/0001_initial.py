@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
-    operations = [
+    state_operations = [
         migrations.CreateModel(
             name='DlpLane',
             fields=[
@@ -351,3 +351,5 @@ class Migration(migrations.Migration):
             unique_together=set([('library', 'sequencing_center', 'sequencing_instrument')]),
         ),
     ]
+
+    operations = [migrations.SeparateDatabaseAndState(state_operations=state_operations)]

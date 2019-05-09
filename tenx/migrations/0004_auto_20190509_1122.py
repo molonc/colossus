@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('tenx', '0003_auto_20190507_0944'),
-        ('dlp', '0001_initial'),
+        ('dlp', '0001_initial')
     ]
 
     operations = [

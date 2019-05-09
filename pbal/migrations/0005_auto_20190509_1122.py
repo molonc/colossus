@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('pbal', '0004_remove_pballibrary_relates_to_tenx'),
-        ('dlp', '0001_initial'),
+        ('dlp', '0001_initial')
     ]
 
     operations = [

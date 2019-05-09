@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         ('core', '0019_rename_table_dlp'),
     ]
 
-    operations = [
+    state_operations = [
         migrations.RemoveField(
             model_name='dlplane',
             name='sequencing',
@@ -173,4 +173,10 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name='HistoricalDlpSequencing',
         ),
+    ]
+
+    operations = [
+        migrations.SeparateDatabaseAndState(
+            state_operations=state_operations
+        )
     ]

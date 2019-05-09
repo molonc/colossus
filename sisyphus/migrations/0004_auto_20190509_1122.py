@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('sisyphus', '0003_auto_20190409_1419'),
-        ('dlp', '0001_initial'),
+        ('dlp', '0001_initial')
     ]
 
     operations = [
