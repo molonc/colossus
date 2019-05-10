@@ -135,6 +135,15 @@
             }
             return 0;
         };
+
+        let sample_spot_date_col;
+        if("{{library_type}}" == 'pbal'){
+            sample_spot_date_col = 3;
+        }
+        else {
+            sample_spot_date_col = 2;
+        }
+
         $(document).ready(function() {
             $("#lib_datatable").DataTable({
                 stateSave: true,
@@ -151,7 +160,8 @@
                         "orderable": false,
                         "targets": "no-sort-col",
                     }
-                ]
+                ],
+                "order": [[ sample_spot_date_col, "desc" ]]
             });
         });
     </script>
