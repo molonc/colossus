@@ -19,20 +19,23 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from core.models import (
-    DlpLibrary,
     Sample,
     AdditionalSampleInformation,
     SublibraryInformation,
-    DlpSequencing,
-    DlpLane,
     ChipRegionMetadata,
     MetadataField,
     ChipRegion,
-    DlpLibraryConstructionInformation,
-    DlpLibrarySampleDetail,
     JiraUser,
     Project,
     Analysis,
+)
+
+from dlp.models import (
+    DlpLibraryConstructionInformation,
+    DlpLibrarySampleDetail,
+    DlpSequencing,
+    DlpLane,
+    DlpLibrary,
 )
 
 from tenx.models import *

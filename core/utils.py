@@ -16,7 +16,11 @@ from datetime import date
 #===============
 # Django imports
 #---------------
-from .models import Sample, DlpSequencing, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, DlpLane
+from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField
+from dlp.models import (
+    DlpLane,
+    DlpSequencing
+)
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError

@@ -26,11 +26,9 @@ from django.http import HttpResponseRedirect
 from jira import JIRA, JIRAError
 
 from core.helpers import *
-from core.models import (
-    DlpLibrary,
-    DlpLane)
 from .forms import *
 from .models import *
+from dlp.models import *
 
 from colossus.settings import LOGIN_URL
 
