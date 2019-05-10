@@ -447,6 +447,7 @@
                                 <th>Montage</th>
                                 <th>Pipeline version</th>
                                 <th>Aligner</th>
+                                <th>Lanes</th>
                                 <th>Analysis run status</th>
                                 <th>Submission date</th>
                             </tr>
@@ -459,6 +460,7 @@
                                     <td><a href="https://52.235.35.201/?dashboard={{ analysis.analysis_jira_ticket }}">{{ analysis.analysis_jira_ticket }}</a></td>
                                     <td>{{ analysis.version.version }}</td>
                                     <td>{{ analysis.aligner }}</td>
+                                    <td>{{analysis.lanes.all.count}}</td>
                                     <td>{{ analysis.analysis_run.get_run_status_display }}</td>
                                     <td>{{ analysis.analysis_submission_date }}</td>
                                 </tr>
