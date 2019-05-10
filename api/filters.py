@@ -2,7 +2,8 @@
 
 from django.db import models
 from django_filters import rest_framework as filters
-from django_filters import DateFromToRangeFilter
+from django_filters import Filter, DateFromToRangeFilter
+from django_filters.fields import Lookup
 from core.models import (
     Analysis,
 )
@@ -23,7 +24,7 @@ class AnalysisFilter(filters.FilterSet):
         fields = {
             "input_type": ["exact"],
             "version": ["exact"],
-            "jira_ticket": ["exact"],
+            "jira_ticket": ["in"],
             "run_status": ["exact"],
             "dlp_library__pool_id": ["exact"],
             "tenx_library__name": ["exact"],
@@ -31,6 +32,10 @@ class AnalysisFilter(filters.FilterSet):
 
     # TODO: Create single library filter field that takes in dlp/tenx/pbal
 
+class ListFilter(Filter):
+    def filter(self, qs, value):
+        value_list = value.replace(" ", "").split(u',')
+        return super(ListFilter, self).filter(qs, Lookup(value_list, 'in'))
 
 class AnalysisInformationFilter(filters.FilterSet):
     """"
@@ -52,11 +57,13 @@ class AnalysisInformationFilter(filters.FilterSet):
 
         return queryset
 
+    jira_tickets = ListFilter(name='analysis_jira_ticket')
+
     class Meta:
         model = DlpAnalysisInformation
         fields = [
         'priority_level',
-        'analysis_jira_ticket',
+        'jira_tickets',
         'version',
         'analysis_submission_date',
         'reference_genome',
