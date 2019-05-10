@@ -65,7 +65,7 @@
                             </a>
                         </td>
 
-                        <td>{{ library.sample.sample_id }}</td>
+                        <td><a href="{{ library.sample.get_absolute_url }}">{{ library.sample.sample_id }}</td>
 
                         {% if library_type == 'pbal' %}
                             <td>{{ library.plate_set.count }}</td>
