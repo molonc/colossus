@@ -15,6 +15,7 @@ import rest_framework.exceptions
 from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework import pagination, viewsets, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from django.core.urlresolvers import reverse
 
 #============================
@@ -73,6 +74,24 @@ class SmallResultsSetPagination(pagination.PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
 
+class VariableResultsSetPagination(pagination.PageNumberPagination):
+    page_size_query_param = 'page_size'
+    page_size = 10
+
+    def paginate_queryset(self, queryset, request, view=None):
+        if 'no_pagination' in request.query_params:
+            return list(queryset)
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data):
+        try: 
+            return super().get_paginated_response(data)
+        except AttributeError:
+            # Occurs when page_size is set to None. Still want response in same JSON format
+            return Response(OrderedDict([
+                ('count', len(data)),
+                ('results', data)
+            ]))
 
 class RestrictedQueryMixin(object):
     """Cause view to fail on invalid filter query parameter.
@@ -81,7 +100,7 @@ class RestrictedQueryMixin(object):
     https://stackoverflow.com/questions/27182527/how-can-i-stop-django-rest-framework-to-show-all-records-if-query-parameter-is-w/50957733#50957733
     """
     def get_queryset(self):
-        non_filter_params = set(['limit', 'offset', 'page', 'page_size', 'format'])
+        non_filter_params = set(['limit', 'offset', 'page', 'page_size', 'format', 'no_pagination'])
 
         qs = super(RestrictedQueryMixin, self).get_queryset().order_by('id')
 
@@ -122,6 +141,7 @@ class ProjectViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'name',
@@ -137,6 +157,7 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = Sample.objects.all()
     serializer_class = SampleSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'sample_id',
@@ -146,6 +167,7 @@ class AnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = Analysis.objects.all()
     serializer_class = AnalysisSerializer
+    pagination_class = VariableResultsSetPagination
     filter_class = AnalysisFilter
 
 
@@ -162,6 +184,7 @@ class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = DlpLane.objects.all()
     serializer_class = LaneSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'flow_cell_id',
@@ -183,6 +206,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = DlpSequencing.objects.all()
     serializer_class = SequencingSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'library__pool_id',
@@ -202,6 +226,7 @@ class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'pool_id',
@@ -220,6 +245,7 @@ class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = SublibraryInformation.objects.all()
     serializer_class = SublibraryInformationSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'library__pool_id',
@@ -255,6 +281,7 @@ class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = DlpAnalysisInformation.objects.all()
     permission_classes = (IsAuthenticated, )
     filter_class = AnalysisInformationFilter
+    pagination_class = VariableResultsSetPagination
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -272,6 +299,7 @@ class AnalysisRunViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = AnalysisRun.objects.all()
     serializer_class = AnalysisRunSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'last_updated',
@@ -289,6 +317,7 @@ class ExperimentalMetadata(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = ChipRegion.objects.all()
     serializer_class = ChipRegionSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'library__jira_ticket',
@@ -300,12 +329,14 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = JiraUser.objects.all()
     serializer_class = JiraUserSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
 
 
 class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'name',
@@ -321,6 +352,7 @@ class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxSequencing.objects.all()
     serializer_class = TenxSequencingSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'library',
@@ -332,6 +364,7 @@ class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = TenxLane.objects.all()
     serializer_class = TenxLaneSerializer
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'flow_cell_id',
@@ -342,6 +375,7 @@ class TenxChipViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = TenxChip.objects.all()
     serializer_class = TenxChipSerializer
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         "id",
         "lab_name"
@@ -351,6 +385,7 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = TenxPool.objects.all()
     serializer_class = TenxPoolSerializer
+    pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
         'libraries',
