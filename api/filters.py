@@ -57,13 +57,13 @@ class AnalysisInformationFilter(filters.FilterSet):
 
         return queryset
 
-    jira_tickets = ListFilter(name='analysis_jira_ticket')
+    analysis_jira_ticket = ListFilter(name='analysis_jira_ticket')
 
     class Meta:
         model = DlpAnalysisInformation
         fields = [
         'priority_level',
-        'jira_tickets',
+        'analysis_jira_ticket',
         'version',
         'analysis_submission_date',
         'reference_genome',
