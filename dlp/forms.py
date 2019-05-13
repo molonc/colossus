@@ -72,6 +72,7 @@ class DlpLibraryForm(LibraryForm):
         if create_jira_ticket and not jira_info:
             msg = "Additional title required"
             self.add_error('additional_title', msg)
+        return cleaned_data
 
 class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
