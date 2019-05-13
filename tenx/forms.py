@@ -43,9 +43,10 @@ class TenxLibraryForm(LibraryForm):
         super(TenxLibraryForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             # Get Jira info
-            self.fields['additional_title'] = forms.CharField(max_length=100)
-            self.fields['jira_user'] = forms.CharField(max_length=100)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+            self.fields['create_jira_ticket'] = forms.BooleanField(initial=True, required=False)
+            self.fields['additional_title'] = forms.CharField(max_length=100, required=False)
+            self.fields['jira_user'] = forms.CharField(max_length=100, required=False)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, required=False)
 
             # Remove the field which allows explicitly setting the Jira
             # ticket ID (since it's done automatically)
@@ -60,6 +61,14 @@ class TenxLibraryForm(LibraryForm):
         help_texts = {
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
         }
+
+    def clean(self):
+        cleaned_data = super(TenxLibraryForm, self).clean()
+        create_jira_ticket = cleaned_data.get('create_jira_ticket')
+        jira_info = cleaned_data.get('additional_title')
+        if create_jira_ticket and not jira_info:
+            msg = "Additional title required"
+            self.add_error('additional_title', msg)
 
 class TenxLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
@@ -111,6 +120,7 @@ class TenxSequencingForm(SequencingForm):
 
     def __init__(self, *args, **kwargs):
         super(TenxSequencingForm, self).__init__(*args, **kwargs)
+        self.fields['create_jira_ticket'] = forms.BooleanField(initial=True, required=False)
         if not self.instance.pk:
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
