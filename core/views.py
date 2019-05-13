@@ -374,7 +374,8 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
                 new_issue = create_ticket(username=request.session['jira_user'],
                       password=request.session['jira_password'],
                       project=form['project'].value(),
-                      title=form['title'].value(),
+                      # Remove underscore from title to make searchable
+                      title=form['title'].value().replace("_", " "),
                       description=form['description'].value(),
                       reporter=form['reporter'].value(),
                     )
@@ -385,12 +386,10 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
                 return render(request, self.template_name)
             if(request.session['library_type'] == 'dlp'):
                 library = DlpLibrary.objects.get(id=request.session['library_id'])
-                library.jira_ticket = new_issue
-                library.save()
             elif(request.session['library_type'] == 'tenx'):
                 library = TenxLibrary.objects.get(id=request.session['library_id'])
-                library.jira_ticket = new_issue
-                library.save()
+            library.jira_ticket = new_issue
+            library.save()
             return HttpResponseRedirect('/{}/library/{}'.format(request.session['library_type'], library.id))
 
 
@@ -449,6 +448,8 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                     instance = lib_form.save(commit=False)
                     if instance.pk is None:
                         create = True
+                        create_jira_ticket = False
+
                     all_valid, formsets = self._validate_formsets(request, instance)
                     context.update(formsets)
                     instance.name = tenxlibrary_naming_scheme(instance) if instance.library_type == "tenx" else None
@@ -464,36 +465,22 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     if all_valid and create:
                         if context['library_type'] != 'pbal':
-                            jira_user = lib_form['jira_user'].value()
-                            jira_password = lib_form['jira_password'].value()
-                            additional_title = lib_form['additional_title'].value()
+                            create_jira_ticket = lib_form['create_jira_ticket'].value()
 
                         #Add these fields into Session so the JiraTicketConfirm View can access them
-                        if validate_credentials(jira_user, jira_password):
-                            #For DLP Libaries
-                            if(context['library_type'] == 'dlp'):
-                                request.session['pool_id'] = str(instance.pool_id)
-                                request.session['description'] = instance.description
-                            elif(context['library_type'] == 'tenx'):
-                                request.session['pool'] = request.POST['tenxlibraryconstructioninformation-0-pool']
-                            if context['library_type'] != 'pbal':
-                                request.session['jira_user'] = jira_user
-                                request.session['jira_password'] = jira_password
-                                request.session['additional_title'] = additional_title
-                                request.session['sample_id'] = instance.sample.sample_id
-                                request.session['library_type'] = context['library_type']
-                        else:
-                            messages.error(request, 'Invalid Jira Credentials')
-                            return render(request, self.template_name, context)
+                        if create_jira_ticket:
+                            if not self._build_request_session(request, instance, lib_form):
+                                messages.error(request, 'Invalid Jira Credentials')
+                                return render(request, self.template_name, context)
                         # Save the library
                         request.session['library_id'] = instance.id
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
-                        if context["library_type"] == "pbal":
+                        if not create_jira_ticket:
                             return HttpResponseRedirect(instance.get_absolute_url())
                         else:
                             return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
-                    elif all_valid and not create:
+                    elif all_valid:
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
                         return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
@@ -511,6 +498,9 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
             messages.error(request, error_message)
             return render(request, self.template_name, context)
+
+    def _build_request_session(self, request, instance, lib_form):
+        return True
 
     def _validate_formsets(self, request, instance):
         all_valid = True
@@ -821,27 +811,30 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
 
-            if(validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password']) ):
-                request.session['jira_user'] = form.cleaned_data['jira_user']
-                request.session['jira_password'] = form.cleaned_data['jira_password']
-                request.session['library_type'] = self.library_type
-                if (self.library_type == 'dlp'):
-                    library = instance.library
-                    request.session['jira_ticket'] = library.jira_ticket
-                    request.session['sample_id'] = library.sample.sample_id
-                if (self.library_type == 'tenx'):
-                    request.session['jira_ticket'] = instance.tenx_pool.jira_tickets()[0] if instance.tenx_pool else []
-                    request.session['sample_id'] = instance.tenx_pool.jira_tickets()[1] if instance.tenx_pool else []
-                    request.session['pool_id'] = instance.tenx_pool.id if instance.tenx_pool else None
-                request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
-                request.session['sequencing_center'] = instance.sequencing_center
-            else:
-                messages.error(request, 'Invalid Jira Credentials')
-                return self.get_context_and_render(request, from_library, form)
+            if self.library_type != 'pbal':
+                if validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password']):
+                    request.session['jira_user'] = form.cleaned_data['jira_user']
+                    request.session['jira_password'] = form.cleaned_data['jira_password']
+                    request.session['library_type'] = self.library_type
+                    if self.library_type == 'dlp':
+                        library = instance.library
+                        request.session['jira_ticket'] = library.jira_ticket
+                        request.session['sample_id'] = library.sample.sample_id
+                    if self.library_type == 'tenx':
+                        request.session['jira_ticket'] = instance.tenx_pool.jira_tickets()[0] if instance.tenx_pool else []
+                        request.session['sample_id'] = instance.tenx_pool.jira_tickets()[1] if instance.tenx_pool else []
+                        request.session['pool_id'] = instance.tenx_pool.id if instance.tenx_pool else None
+                    request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
+                    request.session['sequencing_center'] = instance.sequencing_center
+                else:
+                    messages.error(request, 'Invalid Jira Credentials')
+                    return self.get_context_and_render(request, from_library, form)
 
             instance.save()
             request.session['sequencing_id'] = instance.id
             messages.success(request, "Successfully created the Sequencing.")
+            if self.library_type == 'pbal':
+                return HttpResponseRedirect('/{}/sequencing/{}'.format(self.library_type, request.session['sequencing_id']))
             return HttpResponseRedirect(reverse('{}:add_watchers'.format(self.library_type)))
         else:
             msg = "Failed to create the sequencing. Please fix the errors below."
