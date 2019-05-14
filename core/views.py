@@ -467,7 +467,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         if context['library_type'] != 'pbal':
                             create_jira_ticket = lib_form['create_jira_ticket'].value()
 
-                        #Add these fields into Session so the JiraTicketConfirm View can access them
                         if create_jira_ticket and not self._build_request_session(request, instance, lib_form):
                             messages.error(request, 'Invalid Jira Credentials')
                             return render(request, self.template_name, context)
@@ -499,6 +498,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
     def _build_request_session(self, request, instance, lib_form):
+        # Add fields into Session so the JiraTicketConfirm View can access them
         jira_user = lib_form['jira_user'].value()
         jira_password = lib_form['jira_password'].value()
         if validate_credentials(jira_user, jira_password):
@@ -776,7 +776,7 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
                     messages.error(request, msg)
                     return self.get(request)
             else:
-                messages.error(request, "Failed to create Jira ticket")
+                messages.error(request, "Failed to update Jira ticket")
                 return self.get(request)
         return HttpResponseRedirect('/{}/sequencing/{}'.format(request.session['library_type'], request.session['sequencing_id']))
 
