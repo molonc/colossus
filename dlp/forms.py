@@ -61,18 +61,18 @@ class DlpLibraryForm(LibraryForm):
 
     def clean(self):
         # if it's a new instance, the pool_id should not exist.
-        cleaned_data = super(DlpLibraryForm, self).clean()
         if not self.instance.pk:
+            cleaned_data = super(DlpLibraryForm, self).clean()
             pool_id = cleaned_data.get("pool_id")
             if len(DlpLibrary.objects.filter(pool_id=pool_id)):
                 msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
-        create_jira_ticket = cleaned_data.get('create_jira_ticket')
-        jira_info = cleaned_data.get('additional_title')
-        if create_jira_ticket and not jira_info:
-            msg = "Additional title required"
-            self.add_error('additional_title', msg)
-        return cleaned_data
+            create_jira_ticket = cleaned_data.get('create_jira_ticket')
+            jira_info = cleaned_data.get('additional_title')
+            if create_jira_ticket and not jira_info:
+                msg = "Additional title required"
+                self.add_error('additional_title', msg)
+            return cleaned_data
 
 class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
