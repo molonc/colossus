@@ -79,15 +79,12 @@ class AnalysisInformationFilter(filters.FilterSet):
 class CellIdFilter(filters.Filter):
     def filter(self, qs, value):
         if value:
-            cell_id = value.split("_")
-            cell_id[2] =int(re.search(r'\d+', cell_id[2]).group())
-            cell_id[3] = int(re.search(r'\d+', cell_id[3]).group())
-
+            cell_id = value.split("-")
             return qs.filter(
                 Q(library__pool_id__exact=cell_id[1])&
                 Q(sample_id__sample_id__exact=cell_id[0])&
-                Q(row__exact=cell_id[2])&
-                Q(column__exact=cell_id[3])
+                Q(row__exact=int(re.search(r'\d+', cell_id[2]).group()))&
+                Q(column__exact=int(re.search(r'\d+', cell_id[3]).group()))
             ) if len(cell_id) > 3 else []
         else:
             return qs
