@@ -134,6 +134,14 @@ class DlpSequencingCreate(SequencingCreate):
     form_class = DlpSequencingForm
     library_type = 'dlp'
 
+    def _build_request_session(self, request, instance, form):
+        validated = super(DlpSequencingCreate, self)._build_request_session(request, instance, form)
+        if validated:
+            library = instance.library
+            request.session['jira_ticket'] = library.jira_ticket
+            request.session['sample_id'] = library.sample.sample_id
+        return validated
+
 class DlpSequencingUpdate(SequencingUpdate):
     sequencing_class = DlpSequencing
     form_class = DlpSequencingForm

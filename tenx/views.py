@@ -194,6 +194,14 @@ class TenxSequencingCreate(SequencingCreate):
     form_class = TenxSequencingForm
     library_type = 'tenx'
 
+    def _build_request_session(self, request, instance, form):
+        validated = super(TenxSequencingCreate, self)._build_request_session(request, instance, form)
+        if validated:
+            request.session['jira_ticket'] = instance.tenx_pool.jira_tickets()[0] if instance.tenx_pool else []
+            request.session['sample_id'] = instance.tenx_pool.jira_tickets()[1] if instance.tenx_pool else []
+            request.session['pool_id'] = instance.tenx_pool.id if instance.tenx_pool else None
+        return validated
+
 class TenxSequencingDetail(SequencingDetail):
     sequencing_class = TenxSequencing
     library_type = 'tenx'

@@ -121,7 +121,6 @@ class TenxSequencingForm(SequencingForm):
 
     def __init__(self, *args, **kwargs):
         super(TenxSequencingForm, self).__init__(*args, **kwargs)
-        self.fields['create_jira_ticket'] = forms.BooleanField(initial=True, required=False)
         if not self.instance.pk:
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)

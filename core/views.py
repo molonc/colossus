@@ -468,10 +468,9 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             create_jira_ticket = lib_form['create_jira_ticket'].value()
 
                         #Add these fields into Session so the JiraTicketConfirm View can access them
-                        if create_jira_ticket:
-                            if not self._build_request_session(request, instance, lib_form):
-                                messages.error(request, 'Invalid Jira Credentials')
-                                return render(request, self.template_name, context)
+                        if create_jira_ticket and not self._build_request_session(request, instance, lib_form):
+                            messages.error(request, 'Invalid Jira Credentials')
+                            return render(request, self.template_name, context)
                         # Save the library
                         request.session['library_id'] = instance.id
                         # save the formsets.
@@ -509,8 +508,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             request.session['sample_id'] = instance.sample.sample_id
             request.session['library_type'] = self.library_type
             return True
-        else:
-            return False
+        return False
 
     def _validate_formsets(self, request, instance):
         all_valid = True
@@ -821,24 +819,9 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
 
-            if self.library_type != 'pbal':
-                if validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password']):
-                    request.session['jira_user'] = form.cleaned_data['jira_user']
-                    request.session['jira_password'] = form.cleaned_data['jira_password']
-                    request.session['library_type'] = self.library_type
-                    if self.library_type == 'dlp':
-                        library = instance.library
-                        request.session['jira_ticket'] = library.jira_ticket
-                        request.session['sample_id'] = library.sample.sample_id
-                    if self.library_type == 'tenx':
-                        request.session['jira_ticket'] = instance.tenx_pool.jira_tickets()[0] if instance.tenx_pool else []
-                        request.session['sample_id'] = instance.tenx_pool.jira_tickets()[1] if instance.tenx_pool else []
-                        request.session['pool_id'] = instance.tenx_pool.id if instance.tenx_pool else None
-                    request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
-                    request.session['sequencing_center'] = instance.sequencing_center
-                else:
-                    messages.error(request, 'Invalid Jira Credentials')
-                    return self.get_context_and_render(request, from_library, form)
+            if self.library_type != 'pbal' and not self._build_request_session(request, instance, form):
+                messages.error(request, 'Invalid Jira Credentials')
+                return self.get_context_and_render(request, from_library, form)
 
             instance.save()
             request.session['sequencing_id'] = instance.id
@@ -850,6 +833,18 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
             msg = "Failed to create the sequencing. Please fix the errors below."
             messages.error(request, msg)
             return self.get_context_and_render(request, from_library, form)
+
+    def _build_request_session(self, request, instance, form):
+        jira_user = form.cleaned_data['jira_user']
+        jira_password = form.cleaned_data['jira_password']
+        if validate_credentials(jira_user, jira_password):
+            request.session['jira_user'] = jira_user
+            request.session['jira_password'] = jira_password
+            request.session['library_type'] = self.library_type
+            request.session['number_of_lanes_requested'] = instance.number_of_lanes_requested
+            request.session['sequencing_center'] = instance.sequencing_center
+            return True
+        return False
 
 class SequencingUpdate(LoginRequiredMixin, TemplateView):
 
