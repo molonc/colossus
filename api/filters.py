@@ -1,15 +1,17 @@
 """Contains filters for API viewsets."""
 
 from django.db import models
+from django.db.models import Q
 from django_filters import rest_framework as filters
 from django_filters import Filter, DateFromToRangeFilter
 from django_filters.fields import Lookup
 from core.models import (
     Analysis,
+    SublibraryInformation
 )
 
 from sisyphus.models import DlpAnalysisInformation
-
+import re
 
 class AnalysisFilter(filters.FilterSet):
     """Filters for Analysis."""
@@ -73,3 +75,31 @@ class AnalysisInformationFilter(filters.FilterSet):
         'analysis_run__last_updated',
         'library__pool_id'
         ]
+
+class CellIdFilter(filters.Filter):
+    def filter(self, qs, value):
+        if value:
+            cell_id = value.split("_")
+            cell_id[2] =int(re.search(r'\d+', cell_id[2]).group())
+            cell_id[3] = int(re.search(r'\d+', cell_id[3]).group())
+
+            return qs.filter(
+                Q(library__pool_id__exact=cell_id[1])&
+                Q(sample_id__sample_id__exact=cell_id[0])&
+                Q(row__exact=cell_id[2])&
+                Q(column__exact=cell_id[3])
+            ) if len(cell_id) > 3 else []
+        else:
+            return qs
+
+
+class SublibraryInformationFilter(filters.FilterSet):
+    cell_id= CellIdFilter(label="Cell Id", name="cell_id")
+    class Meta:
+        model = SublibraryInformation
+        fields = (
+            'id',
+            'library__pool_id',
+            'row',
+            'column',
+        )
