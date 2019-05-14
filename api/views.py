@@ -59,7 +59,8 @@ from dlp.models import (
 from tenx.models import *
 from api.filters import (
     AnalysisFilter,
-    AnalysisInformationFilter
+    AnalysisInformationFilter,
+    SublibraryInformationFilter
 )
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
@@ -246,12 +247,7 @@ class SublibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = SublibraryInformationSerializer
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
-    filter_fields = (
-        'id',
-        'library__pool_id',
-        'row',
-        'column',
-    )
+    filter_class = SublibraryInformationFilter
 
 
 class LargeResultsSetPagination(pagination.PageNumberPagination):
