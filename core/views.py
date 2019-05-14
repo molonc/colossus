@@ -500,7 +500,17 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
     def _build_request_session(self, request, instance, lib_form):
-        return True
+        jira_user = lib_form['jira_user'].value()
+        jira_password = lib_form['jira_password'].value()
+        if validate_credentials(jira_user, jira_password):
+            request.session['jira_user'] = jira_user
+            request.session['jira_password'] = jira_password
+            request.session['additional_title'] = lib_form['additional_title'].value()
+            request.session['sample_id'] = instance.sample.sample_id
+            request.session['library_type'] = self.library_type
+            return True
+        else:
+            return False
 
     def _validate_formsets(self, request, instance):
         all_valid = True

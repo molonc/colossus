@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from colossus import settings
 from core.forms import GSCFormDeliveryInfo, GSCFormSubmitterInfo
 from core.models import MetadataField, SublibraryInformation
-from core.jira_templates.jira_wrapper import validate_credentials
 from core.utils import generate_gsc_form
 from dlp.models import *
 from dlp.forms import *
@@ -117,19 +116,11 @@ class DlpLibraryCreate(LibraryCreate):
     library_type = 'dlp'
 
     def _build_request_session(self, request, instance, lib_form):
-        jira_user = lib_form['jira_user'].value()
-        jira_password = lib_form['jira_password'].value()
-        if validate_credentials(jira_user, jira_password):
+        validated = super(DlpLibraryCreate, self)._build_request_session(request, instance, lib_form)
+        if validated:
             request.session['pool_id'] = str(instance.pool_id)
             request.session['description'] = instance.description
-            request.session['jira_user'] = jira_user
-            request.session['jira_password'] = jira_password
-            request.session['additional_title'] = lib_form['additional_title'].value()
-            request.session['sample_id'] = instance.sample.sample_id
-            request.session['library_type'] = self.library_type
-            return True
-        else:
-            return False
+        return validated
 
 
 
