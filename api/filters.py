@@ -78,11 +78,8 @@ class AnalysisInformationFilter(filters.FilterSet):
 
 class CellIdFilter(filters.Filter):
     def filter(self, qs, value):
-        cell_id = value.split("_")
-
         if value:
-            if len(cell_id) > 3:
-                print(cell_id[3].isdigit())
+            cell_id = value.split("_")
             return qs.filter(
                 Q(library__pool_id__exact=cell_id[1])&
                 Q(sample_id__sample_id__exact=cell_id[0])&
