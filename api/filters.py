@@ -83,8 +83,8 @@ class CellIdFilter(filters.Filter):
             return qs.filter(
                 Q(library__pool_id__exact=cell_id[1])&
                 Q(sample_id__sample_id__exact=cell_id[0])&
-                Q(row__exact=cell_id[2][1].isdigit())&
-                Q(column__exact=cell_id[3][1].isdigit())
+                Q(row__exact=cell_id[2][2])&
+                Q(column__exact=cell_id[3][2])
             ) if len(cell_id) > 3 else []
         else:
             return qs
