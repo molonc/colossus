@@ -79,7 +79,7 @@ class AnalysisInformationFilter(filters.FilterSet):
 class CellIdFilter(filters.Filter):
     def filter(self, qs, value):
         if value:
-            cell_id = value.split("_")
+            cell_id = value.split("-")
             cell_id[2] =int(re.search(r'\d+', cell_id[2]).group())
             cell_id[3] = int(re.search(r'\d+', cell_id[3]).group())
 

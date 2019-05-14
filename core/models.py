@@ -344,13 +344,13 @@ class SublibraryInformation(models.Model, FieldValue):
     num_drops = create_intfield("Num_Drops")
 
     def get_sublibrary_id(self):
-        # add leading zero to one digit row/col
-        row = str(self.row) if self.row > 9 else '0' + str(self.row)
-        col = str(self.column) if self.column > 9 else '0' + str(self.column)
-        res = '_'.join(
-            [self.sample_id.sample_id, self.library.pool_id, 'R' + row, 'C' + col]
-        )
-        return res
+        return '-'.join([
+            self.sample_id.sample_id,
+            self.library.pool_id,
+            'R' + str(self.row).zfill(2),
+            'C' + str(self.column).zfill(2)
+        ])
+
 
     def __str__(self):
         return self.get_sublibrary_id()
