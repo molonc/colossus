@@ -61,7 +61,6 @@ class DlpLibraryAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
       ),
     ]
     inlines = [
-      SublibraryInformationInline,
       DlpLibrarySampleDetailInline,
       DlpLibraryConstructionInformationInline,
       DlpLibraryQuantificationAndStorageInline
