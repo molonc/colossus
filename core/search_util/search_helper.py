@@ -159,8 +159,8 @@ def partial_key_match(lookup, dict):
     return False
 
 def sublibrary_id_search(query):
-    if re.match(".+_.+_R\d{2}_C\d{2}", query):
-        return query.split('_')
+    if re.match(".+-.+-R\d{2}-C\d{2}", query):
+        return query.split('-')
     return False
 
 def remove_duplicate(context):
