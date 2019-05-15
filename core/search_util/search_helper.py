@@ -1,3 +1,4 @@
+import re
 from django.contrib.postgres.search import SearchVector
 from django.db.models import Q
 
@@ -139,17 +140,27 @@ def return_text_search(query):
     if partial_key_match(query, dict_verified_choices):
         context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.filter(verified=partial_key_match(query, dict_verified_choices))))
 
+    if sublibrary_id_search(query):
+        sublibrary_id_fields = sublibrary_id_search(query)
+        context["dlp"]["Libraries"].extend(list(DlpLibrary.objects.filter(pool_id=sublibrary_id_fields[1], sample__sample_id=sublibrary_id_fields[0])))
+
     context = remove_duplicate(context)
 
     context["total"] = len(context["core"]["Samples"] + context["dlp"]["Libraries"] + context["dlp"]["Sequencings"]+ context["dlp"]["Analyses"] +
                            context["pbal"]["Libraries"] +  context["pbal"]["Sequencings"] +  context["tenx"]["Chip"] + context["core"]["Projects"] +
                            context["tenx"]["Libraries"] + context["tenx"]["Sequencings"] + context["core"]["Analyses"] )
+
     return context
 
 def partial_key_match(lookup, dict):
     for key,value in dict.items():
         if lookup in key:
             return value
+    return False
+
+def sublibrary_id_search(query):
+    if re.match(".+-.+-R\d{2}-C\d{2}", query):
+        return query.split('-')
     return False
 
 def remove_duplicate(context):

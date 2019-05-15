@@ -19,20 +19,23 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from core.models import (
-    DlpLibrary,
     Sample,
     AdditionalSampleInformation,
     SublibraryInformation,
-    DlpSequencing,
-    DlpLane,
     ChipRegionMetadata,
     MetadataField,
     ChipRegion,
-    DlpLibraryConstructionInformation,
-    DlpLibrarySampleDetail,
     JiraUser,
     Project,
     Analysis,
+)
+
+from dlp.models import (
+    DlpLibraryConstructionInformation,
+    DlpLibrarySampleDetail,
+    DlpSequencing,
+    DlpLane,
+    DlpLibrary,
 )
 
 from tenx.models import *
@@ -296,7 +299,7 @@ class SublibraryInformationSerializer(serializers.ModelSerializer):
             value["metadata"] = {"region_code" : instance.chip_region.region_code}
             for metadata in instance.chip_region.chipregionmetadata_set.all():
                 value["metadata"][metadata.metadata_field.field] = metadata.metadata_value
-
+        value["cell_id"] = instance.get_sublibrary_id()
         return value
 
 class SublibraryInformationSerializerBrief(serializers.ModelSerializer):

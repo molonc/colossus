@@ -5,7 +5,11 @@ Created Oct 19, 2017
 """
 
 from django.conf.urls import url
-from core import views
+from dlp import views
+from core.views import (
+    JiraTicketConfirm,
+    AddWatchers
+)
 
 app_name = 'dlp'
 urlpatterns = [
@@ -15,12 +19,12 @@ urlpatterns = [
     url(r'^library/create/(?P<pk>\d+)$', views.DlpLibraryCreate.as_view(), name='library_create_from_sample'),
     url(r'^library/update/(?P<pk>\d+)$', views.DlpLibraryUpdate.as_view(), name='library_update'),
     url(r'^library/delete/(?P<pk>\d+)$', views.DlpLibraryDelete.as_view(), name='library_delete'),
-    url(r'^library/create/confirm$', views.JiraTicketConfirm.as_view(), name='jira_ticket_confirm'),
+    url(r'^library/create/confirm$', JiraTicketConfirm.as_view(), name='jira_ticket_confirm'),
     url(r'^sequencing/(?P<pk>\d+)$', views.DlpSequencingDetail.as_view(), name='sequencing_detail'),
     url(r'^sequencing/list$', views.DlpSequencingList.as_view(), name='sequencing_list'),
     url(r'^sequencing/create/$', views.DlpSequencingCreate.as_view(), name='sequencing_create'),
     url(r'^sequencing/create/(?P<from_library>\d+)$', views.DlpSequencingCreate.as_view(), name='sequencing_create_from_library'),
-    url(r'^sequencing/create/confirm$', views.AddWatchers.as_view(), name='add_watchers'),
+    url(r'^sequencing/create/confirm$', AddWatchers.as_view(), name='add_watchers'),
     url(r'^sequencing/update/(?P<pk>\d+)$', views.DlpSequencingUpdate.as_view(), name='sequencing_update'),
     url(r'^sequencing/delete/(?P<pk>\d+)$', views.DlpSequencingDelete.as_view(), name='sequencing_delete'),
     url(r'^sequencing/gsc_form/create/(?P<pk>\d+)$', views.DlpSequencingCreateGSCFormView.as_view(), name='sequencing_create_gsc_form'),

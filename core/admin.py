@@ -7,16 +7,14 @@ Created on May 16, 2016
 from django.contrib import admin
 
 from .models import Sample, AdditionalSampleInformation
-from .models import DlpLibrary, SublibraryInformation, DlpLibrarySampleDetail
-from .models import DlpLibraryConstructionInformation
-from .models import DlpLibraryQuantificationAndStorage
-from .models import DlpSequencing
+from .models import SublibraryInformation
 from tenx.models import TenxLibrary, TenxLibrarySampleDetail
 from tenx.models import TenxLibraryConstructionInformation
 from tenx.models import TenxLibraryQuantificationAndStorage
 from .models import ChipRegion, ChipRegionMetadata
 from .models import MetadataField
 from .models import JiraUser
+from dlp.models import *
 
 # third-party apps
 from simple_history.admin import SimpleHistoryAdmin

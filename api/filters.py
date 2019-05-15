@@ -1,14 +1,17 @@
 """Contains filters for API viewsets."""
 
 from django.db import models
+from django.db.models import Q
 from django_filters import rest_framework as filters
-from django_filters import DateFromToRangeFilter
+from django_filters import Filter, DateFromToRangeFilter
+from django_filters.fields import Lookup
 from core.models import (
     Analysis,
+    SublibraryInformation
 )
 
 from sisyphus.models import DlpAnalysisInformation
-
+import re
 
 class AnalysisFilter(filters.FilterSet):
     """Filters for Analysis."""
@@ -23,7 +26,7 @@ class AnalysisFilter(filters.FilterSet):
         fields = {
             "input_type": ["exact"],
             "version": ["exact"],
-            "jira_ticket": ["exact"],
+            "jira_ticket": ["in"],
             "run_status": ["exact"],
             "dlp_library__pool_id": ["exact"],
             "tenx_library__name": ["exact"],
@@ -31,6 +34,10 @@ class AnalysisFilter(filters.FilterSet):
 
     # TODO: Create single library filter field that takes in dlp/tenx/pbal
 
+class ListFilter(Filter):
+    def filter(self, qs, value):
+        value_list = value.replace(" ", "").split(u',')
+        return super(ListFilter, self).filter(qs, Lookup(value_list, 'in'))
 
 class AnalysisInformationFilter(filters.FilterSet):
     """"
@@ -52,6 +59,8 @@ class AnalysisInformationFilter(filters.FilterSet):
 
         return queryset
 
+    analysis_jira_ticket = ListFilter(name='analysis_jira_ticket')
+
     class Meta:
         model = DlpAnalysisInformation
         fields = [
@@ -66,3 +75,28 @@ class AnalysisInformationFilter(filters.FilterSet):
         'analysis_run__last_updated',
         'library__pool_id'
         ]
+
+class CellIdFilter(filters.Filter):
+    def filter(self, qs, value):
+        if value:
+            cell_id = value.split("-")
+            return qs.filter(
+                Q(library__pool_id__exact=cell_id[1])&
+                Q(sample_id__sample_id__exact=cell_id[0])&
+                Q(row__exact=int(re.search(r'\d+', cell_id[2]).group()))&
+                Q(column__exact=int(re.search(r'\d+', cell_id[3]).group()))
+            ) if len(cell_id) > 3 else []
+        else:
+            return qs
+
+
+class SublibraryInformationFilter(filters.FilterSet):
+    cell_id= CellIdFilter(label="Cell Id", name="cell_id")
+    class Meta:
+        model = SublibraryInformation
+        fields = (
+            'id',
+            'library__pool_id',
+            'row',
+            'column',
+        )

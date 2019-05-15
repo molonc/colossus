@@ -1,6 +1,6 @@
 def tenxlibrary_naming_scheme(library):
     return "_".join(
-        ["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4), str(library.chip_well).zfill(4)]
+        ["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4), str(library.chip_well).zfill(3)]
     )
 
 
