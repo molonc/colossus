@@ -6,7 +6,7 @@ Created on June 6, 2016
 Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
-import os, sys
+import os, sys, io
 import pandas as pd
 import yaml
 from string import Template
@@ -303,15 +303,14 @@ def generate_gsc_form(pk, metadata):
     header1 = gsc_form.meta_header
     header2 = gsc_form.data_header
     form_name = gsc_form.get_form_name(metadata["sow"])
-    ofilename = os.path.join(settings.MEDIA_ROOT, form_name)
-
-    workbook = Submission(pool_df, sample_df, ofilename)
+    buffer = io.BytesIO()
+    workbook = Submission(pool_df, sample_df, buffer)
     workbook.set_column_width()
     workbook.write_address_box(metadata)
     workbook.write_pool_header(header1)
     workbook.write_sample_header(header2)
     workbook.close()
-    return form_name, os.path.abspath(ofilename)
+    return form_name, buffer
 
 class GSCForm(object):
 
@@ -601,14 +600,8 @@ class Submission(object):
         self.pool_start = 65
         self.sample_start = self.pool_start + len(df_pool) + 9
         self.writer = pd.ExcelWriter(output, engine='xlsxwriter')
-
-
-
         df_pool.to_excel(self.writer, sheet_name='Submission Info', startrow=self.pool_start, startcol=0, header=False, index=False)
         df_samples.to_excel(self.writer, sheet_name='Submission Info', startrow=self.sample_start, startcol=0, header=False, index=False)
-
-
-
         self.workbook = self.writer.book
         self.worksheet = self.writer.sheets['Submission Info']
 
