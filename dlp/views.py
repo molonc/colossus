@@ -1,5 +1,4 @@
-import os
-import subprocess
+import os, subprocess, io
 
 import pandas as pd
 from django.contrib.auth.decorators import login_required
@@ -177,14 +176,10 @@ class DlpSequencingCreateGSCFormView(LoginRequiredMixin, TemplateView):
 def dlp_sequencing_get_gsc_form(request, pk):
     key = "gsc_form_metadata_%s" % pk
     metadata = request.session.pop(key)
-    ofilename, ofilepath = generate_gsc_form(pk, metadata)
-    response = HttpResponse(content_type='text/plain')
+    ofilename, buffer = generate_gsc_form(pk, metadata)
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
-    #https://stackoverflow.com/questions/12468179/unicodedecodeerror-utf8-codec-cant-decode-byte-0x9c
-    ofile = open(ofilepath, 'r', encoding="latin-1")
-    response.write(ofile.read())
-    ofile.close()
-    os.remove(ofilepath)
     return response
 
 class DlpLaneCreate(LaneCreate):
