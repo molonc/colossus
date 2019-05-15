@@ -373,12 +373,18 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
         validated_data['analysis_run'] = AnalysisRun.objects.create()
         # Remove many to many field
         sequencings = validated_data.pop('sequencings')
+        for sequencing in sequencings:
+            if not sequencing.library == validated_data["library"]:
+                raise ValidationError("Selected sequencings must belong to selected library")
+        lanes = validated_data.pop('lanes')
+
         instance = DlpAnalysisInformation.objects.create(**validated_data)
         instance.full_clean()
         instance.save()
 
         # Re-add many to many field
         instance.sequencings = sequencings
+        instance.lanes = lanes
         instance.save()
         return instance
 
@@ -414,11 +420,16 @@ class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
         # Remove many-to-many field and re-add in after we have a pk for
         # our instance (required for many-to-many field)
         sequencings = validated_data.pop('sequencings')
+        for sequencing in sequencings:
+            if not sequencing.library == validated_data["library"]:
+                raise ValidationError("Selected sequencings must belong to selected library")
+        lanes = validated_data.pop('lanes')
 
         instance = DlpAnalysisInformation.objects.create(**validated_data)
 
         # Re-add many-to-many field
         instance.sequencings = sequencings
+        instance.lanes = lanes
         instance.save()
 
         return instance
