@@ -241,32 +241,6 @@ class LibrarySerializer(serializers.ModelSerializer):
             'exclude_from_analysis',
         )
 
-    def validate(self, data):
-        data["sample"] = data["sample"]["sample_id"]
-        data["relates_to_dlp"] = [p.id for p in data["relates_to_dlp"]]
-        data["relates_to_tenx"] = [p.id for p in data["relates_to_tenx"]]
-        data["sample"] = Sample.objects.filter(sample_id=data["sample"])[0]
-        data["projects"] = [p.id for p in Project.objects.filter(name__in=data["projects"])]
-
-        return data
-
-    def create(self, validated_data):
-        construction_info = validated_data.pop("dlplibraryconstructioninformation")
-        relates_to_dlp = validated_data.pop("relates_to_dlp")
-        relates_to_tenx = validated_data.pop("relates_to_tenx")
-        projects = validated_data.pop("projects")
-
-        instance = DlpLibrary.objects.create(**validated_data)
-        instance.save()
-        info = DlpLibraryConstructionInformation.objects.create(**construction_info)
-        info.save()
-        instance.dlplibraryconstructioninformation = info
-        instance.projects.add(*projects)
-        instance.relates_to_dlp.add(*relates_to_dlp)
-        instance.relates_to_tenx.add(*relates_to_tenx)
-
-        return instance
-
 class SublibraryInformationSerializer(serializers.ModelSerializer):
     sample_id = SampleSerializer(read_only=True)
     library = LibrarySerializer(read_only=True)

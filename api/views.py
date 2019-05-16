@@ -210,15 +210,14 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'sequencing_center',
     )
 
+class LibraryModelViewset(RestrictedQueryMixin,
+                         mixins.RetrieveModelMixin,
+                         mixins.UpdateModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated,)
 
-class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    """
-    View for Library that is queryable by pool_id (aka chip ID) and sample it belongs to.
-
-    See documentation here:
-    https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
-    """
-    permission_classes = (IsAuthenticated, )
+class LibraryViewSet(LibraryModelViewset):
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -321,14 +320,7 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
 
-
-class TenxLibraryViewSet(RestrictedQueryMixin,
-                         mixins.RetrieveModelMixin,
-                         mixins.UpdateModelMixin,
-                         mixins.ListModelMixin,
-                         viewsets.GenericViewSet):
-
-    permission_classes = (IsAuthenticated, )
+class TenxLibraryViewSet(LibraryModelViewset):
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -388,8 +380,6 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'gsc_pool_name',
         'construction_location'
     )
-
-
 
 def dlp_sequencing_get_samplesheet(request, pk):
 
