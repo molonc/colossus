@@ -375,7 +375,7 @@ class TenxSequencing(models.Model, FieldValue):
     )
 
     number_of_lanes_requested = models.PositiveIntegerField(
-        default=0,
+        default=1,
         verbose_name="Sequencing Goal"
     )
 
