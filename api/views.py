@@ -13,7 +13,7 @@ import os
 import django_filters
 import rest_framework.exceptions
 from django.http import HttpResponse, HttpResponseRedirect
-from rest_framework import pagination, viewsets, generics
+from rest_framework import pagination, viewsets, generics, mixins
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.core.urlresolvers import reverse
@@ -69,12 +69,6 @@ from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 #============================
 # Other imports
 #----------------------------
-
-
-class SmallResultsSetPagination(pagination.PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-
 class VariableResultsSetPagination(pagination.PageNumberPagination):
     page_size_query_param = 'page_size'
     page_size = 10
@@ -328,7 +322,12 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     pagination_class = VariableResultsSetPagination
 
 
-class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+class TenxLibraryViewSet(RestrictedQueryMixin,
+                         mixins.RetrieveModelMixin,
+                         mixins.UpdateModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
+
     permission_classes = (IsAuthenticated, )
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
