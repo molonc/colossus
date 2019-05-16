@@ -24,7 +24,7 @@ SAMPLE = ["sample_id", "taxonomy_id", "anonymous_patient_id", "cell_line_id",
 ANALYSIS = ["input_type", "version", "jira_ticket", "run_status", "description"]
 
 CORE_LIBRARY = ["description", "result"]
-DLP_LIBRARY = ["pool_id", "jira_ticket", "title",
+DLP_LIBRARY = ["pool_id", "jira_ticket", "title","sample__sample_id",
                     "dlplibrarysampledetail__spotting_location",
                      "dlplibrarysampledetail__cell_state",
                      "dlplibrarysampledetail__label_of_original_sample_vial",
