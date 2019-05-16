@@ -241,38 +241,6 @@ class LibrarySerializer(serializers.ModelSerializer):
             'exclude_from_analysis',
         )
 
-    def validate(self, data):
-        data["sample"] = data["sample"]["sample_id"]
-        data["relates_to_dlp"] = [p.id for p in data["relates_to_dlp"]]
-        data["relates_to_tenx"] = [p.id for p in data["relates_to_tenx"]]
-        data["sample"] = Sample.objects.filter(sample_id=data["sample"])[0]
-        data["projects"] = [p.id for p in Project.objects.filter(name__in=data["projects"])]
-
-        return data
-
-    def create(self, validated_data):
-        construction_info = validated_data["dlplibraryconstructioninformation"]
-        relates_to_dlp = validated_data["relates_to_dlp"]
-        relates_to_tenx = validated_data["relates_to_tenx"]
-        projects = validated_data["projects"]
-
-        del validated_data["dlplibraryconstructioninformation"]
-        del validated_data["relates_to_dlp"]
-        del validated_data["relates_to_tenx"]
-        del validated_data["projects"]
-
-        instance = DlpLibrary.objects.create(**validated_data)
-        instance.save()
-        info = DlpLibraryConstructionInformation.objects.create(**construction_info)
-        info.save()
-        instance.dlplibraryconstructioninformation = info
-
-        instance.projects.add(*projects)
-        instance.relates_to_dlp.add(*relates_to_dlp)
-        instance.relates_to_tenx.add(*relates_to_tenx)
-
-        return instance
-
 class SublibraryInformationSerializer(serializers.ModelSerializer):
     sample_id = SampleSerializer(read_only=True)
     library = LibrarySerializer(read_only=True)
@@ -526,10 +494,28 @@ class TenxLibraryConstructionInformationSerializer(serializers.ModelSerializer):
         model = TenxLibraryConstructionInformation
         fields = "__all__"
 
+class TenxPoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxPool
+        fields = (
+            'id',
+            'pool_name',
+            'gsc_pool_name',
+            'construction_location',
+            'constructed_date',
+            'libraries',
+        )
+
+    def to_representation(self, instance):
+        value = super(TenxPoolSerializer, self).to_representation(instance)
+        value["tenxsequencing_set"] = [s.pk for s in  instance.tenxsequencing_set.all()]
+        return value
+
 
 class TenxLibrarySerializer(serializers.ModelSerializer):
     tenxsequencing_set = TenxSequencingSerializer(many=True, read_only=True)
-    tenxlibraryconstructioninformation = TenxLibraryConstructionInformationSerializer(read_only=True)
+    tenxpool_set = TenxPoolSerializer(many=True)
+    tenxlibraryconstructioninformation = TenxLibraryConstructionInformationSerializer()
     sample = SampleSerializer()
     projects = TagSerializerField()
     class Meta:
@@ -538,6 +524,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'tenxpool_set',
             'jira_ticket',
             'chips',
             'chip_well',
@@ -566,19 +553,3 @@ class TenxChipSerializer(serializers.ModelSerializer):
             'tenxlibrary_set',
         )
 
-class TenxPoolSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TenxPool
-        fields = (
-            'id',
-            'pool_name',
-            'gsc_pool_name',
-            'construction_location',
-            'constructed_date',
-            'libraries',
-        )
-
-    def to_representation(self, instance):
-        value = super(TenxPoolSerializer, self).to_representation(instance)
-        value["tenxsequencing_set"] = [s.pk for s in  instance.tenxsequencing_set.all()]
-        return value

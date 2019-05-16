@@ -13,7 +13,7 @@ import os
 import django_filters
 import rest_framework.exceptions
 from django.http import HttpResponse, HttpResponseRedirect
-from rest_framework import pagination, viewsets, generics
+from rest_framework import pagination, viewsets, generics, mixins
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.core.urlresolvers import reverse
@@ -69,12 +69,6 @@ from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 #============================
 # Other imports
 #----------------------------
-
-
-class SmallResultsSetPagination(pagination.PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-
 class VariableResultsSetPagination(pagination.PageNumberPagination):
     page_size_query_param = 'page_size'
     page_size = 10
@@ -216,15 +210,8 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'sequencing_center',
     )
 
-
-class LibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    """
-    View for Library that is queryable by pool_id (aka chip ID) and sample it belongs to.
-
-    See documentation here:
-    https://www.bcgsc.ca/wiki/display/MO/Colossus+Documentation#ColossusDocumentation-ColossusRESTAPI
-    """
-    permission_classes = (IsAuthenticated, )
+class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -327,9 +314,8 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
 
-
 class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -389,8 +375,6 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'gsc_pool_name',
         'construction_location'
     )
-
-
 
 def dlp_sequencing_get_samplesheet(request, pk):
 
