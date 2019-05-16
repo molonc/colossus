@@ -210,7 +210,8 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'sequencing_center',
     )
 
-class LibraryViewSet(viewsets.ReadOnlyModelViewSet):
+class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -313,7 +314,8 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
 
-class TenxLibraryViewSet(viewsets.ReadOnlyModelViewSet):
+class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
     pagination_class = VariableResultsSetPagination
