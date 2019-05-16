@@ -492,14 +492,7 @@ class TenxSequencingSerializer(serializers.ModelSerializer):
 class TenxLibraryConstructionInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenxLibraryConstructionInformation
-        fields = (
-            "id",
-            "library_construction_method",
-            "submission_date",
-            "library_prep_location",
-            "concentration",
-            "chemistry_version",
-        )
+        fields = "__all__"
 
 class TenxPoolSerializer(serializers.ModelSerializer):
     class Meta:
@@ -520,8 +513,10 @@ class TenxPoolSerializer(serializers.ModelSerializer):
 
 
 class TenxLibrarySerializer(serializers.ModelSerializer):
+    tenxsequencing_set = TenxSequencingSerializer(many=True, read_only=True)
     tenxpool_set = TenxPoolSerializer(many=True)
     tenxlibraryconstructioninformation = TenxLibraryConstructionInformationSerializer()
+    sample = SampleSerializer()
     projects = TagSerializerField()
     class Meta:
         editable = False,
@@ -535,6 +530,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'chip_well',
             'condition',
             'num_sublibraries',
+            'tenxsequencing_set',
             'tenxlibraryconstructioninformation',
             'projects',
             'sample',

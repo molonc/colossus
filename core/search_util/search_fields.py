@@ -81,7 +81,7 @@ CORE_SEQUENCING = ["adapter", "format_for_data_submission", "index_read_type", "
                    "sequencing_output_mode", "short_description_of_submission", "gsc_library_id",
                    "sequencer_id", "sequencing_center", "sequencer_notes"]
 
-DLP_SEQUENCING = ["rev_comp_override", "dlplane__flow_cell_id", "dlplane__path_to_archive"]
+DLP_SEQUENCING = ["rev_comp_override", "dlplane__flow_cell_id", "dlplane__path_to_archive", "library__pool_id", "library__sample__sample_id"]
 PBAL_SEQUENCING = ["pballane__flow_cell_id", "pballane__path_to_archive"]
 TENX_SEQUENCING = ["sequencing_instrument", "sequencer_id", "sequencing_center", "sequencer_notes"]
 
