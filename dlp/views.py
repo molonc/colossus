@@ -13,7 +13,7 @@ from sisyphus.models import *
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.views.generic import TemplateView
 from colossus.settings import LOGIN_URL
 from core.views import (
@@ -115,7 +115,6 @@ class DlpLibraryCreate(LibraryCreate):
     library_type = 'dlp'
 
 
-
 class DlpSequencingList(SequencingList):
     sequencing_class = DlpSequencing
     library_type = 'dlp'
@@ -181,6 +180,12 @@ def dlp_sequencing_get_gsc_form(request, pk):
     response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
     return response
+
+
+@login_required
+def library_id_to_pk_redirect(request, pool_id):
+    pk = get_object_or_404(DlpLibrary, pool_id=pool_id).pk
+    return redirect("/dlp/library/{}".format(pk))
 
 class DlpLaneCreate(LaneCreate):
     sequencing_class = DlpSequencing

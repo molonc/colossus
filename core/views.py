@@ -18,9 +18,10 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required #, permission_required
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, render
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
+from django.shortcuts import redirect
 
 import pandas as pd
 from django.conf import settings
@@ -126,21 +127,6 @@ class SampleList(LoginRequiredMixin, TemplateView):
     def get_context_data(self):
         context = {
             'samples': Sample.objects.all().order_by('sample_id'),
-        }
-        return context
-
-class SampleDetail(LoginRequiredMixin, TemplateView):
-    """
-    Sample detail page.
-    """
-    login_url = LOGIN_URL
-    template_name = "core/sample_detail.html"
-
-    def get_context_data(self, pk):
-        context = {
-            'sample': get_object_or_404(Sample, pk=pk),
-            'library_list': ['dlp', 'pbal', 'tenx'],
-            'pk': pk,
         }
         return context
 
@@ -257,6 +243,21 @@ def analysis_detail(request, pk):
         tenx_pools = list(map(lambda x: x.tenx_pool, sequencings.all()))
         context['tenx_pools'] = tenx_pools
     return context
+
+@Render("core/sample_detail.html")
+@login_required
+def sample_name_to_id_redirect(request, pk=None, sample_id=None):
+    if pk is not None:
+        context = dict(            
+            library_list=['dlp', 'pbal', 'tenx'],
+            sample=get_object_or_404(Sample, pk=pk),
+            pk=pk
+        )
+        return context
+
+    elif sample_id is not None:
+        pk = get_object_or_404(Sample, sample_id=sample_id).pk
+        return redirect('/core/sample/{}'.format(pk))
 
 
 #============================
