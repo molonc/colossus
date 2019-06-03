@@ -256,9 +256,9 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
         return context
 
     elif sample_id is not None:
-        return HttpResponseRedirect(
-            get_object_or_404(Sample, sample_id=sample_id).get_absolute_url()
-        ) 
+        pk = get_object_or_404(Sample, sample_id=sample_id).pk
+        return redirect('/core/sample/{}'.format(pk))
+
 
 #============================
 # Library views
