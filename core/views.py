@@ -470,13 +470,10 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             jira_password = lib_form['jira_password'].value()
                             additional_title = lib_form['additional_title'].value()
 
-                            jira_users = JiraUser.objects.all()
-
-                            if not jira_users.filter(username=jira_user).exists():
-                                JiraUser.objects.create(
-                                    username=jira_user,
-                                    name=jira_user
-                                )
+                            jira_user_object = JiraUser.objects.get_or_create(
+                                username=jira_user,
+                                name=jira_user
+                            )
 
                         #Add these fields into Session so the JiraTicketConfirm View can access them
                         if validate_credentials(jira_user, jira_password):
