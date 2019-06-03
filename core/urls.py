@@ -11,11 +11,12 @@ from . import views
 
 app_name = 'core'
 urlpatterns = [
-    url(r'^sample/(?P<pk>\d+)$', views.SampleDetail.as_view(), name='sample_detail'),
     url(r'^sample/list$', views.SampleList.as_view(), name='sample_list'),
     url(r'^sample/create/$', views.SampleCreate.as_view(), name='sample_create'),
     url(r'^sample/update/(?P<pk>\d+)$', views.SampleUpdate.as_view(), name='sample_update'),
     url(r'^sample/delete/(?P<pk>\d+)$', views.SampleDelete.as_view(), name='sample_delete'),
+    url(r'^sample/(?P<pk>\d+)$', views.sample_name_to_id_redirect, name='sample_detail'),
+    url(r'^sample/(?P<sample_id>([A-Z]+)\w+)$', views.sample_name_to_id_redirect),
     url(r'^project/list$', views.ProjectList.as_view(), name='project_list'),
     url(r'^project/create$', views.ProjectCreate.as_view(), name='project_create'),
     url(r'^project/update/(?P<pk>\d+)$', views.ProjectUpdate.as_view(), name='project_update'),

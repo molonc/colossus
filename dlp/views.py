@@ -182,6 +182,13 @@ def dlp_sequencing_get_gsc_form(request, pk):
     response['Content-Disposition'] = 'attachment; filename=%s' % ofilename
     return response
 
+
+@login_required
+def library_id_to_pk_redirect(request, pool_id):
+    return HttpResponseRedirect(
+        get_object_or_404(DlpLibrary, pool_id=pool_id).get_absolute_url()
+    )
+
 class DlpLaneCreate(LaneCreate):
     sequencing_class = DlpSequencing
     form_class = DlpLaneForm
