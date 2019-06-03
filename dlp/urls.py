@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'^library/update/(?P<pk>\d+)$', views.DlpLibraryUpdate.as_view(), name='library_update'),
     url(r'^library/delete/(?P<pk>\d+)$', views.DlpLibraryDelete.as_view(), name='library_delete'),
     url(r'^library/create/confirm$', JiraTicketConfirm.as_view(), name='jira_ticket_confirm'),
-    url(r'^library/(?P<pool_id>[ABMD]\w+)$', views.library_id_to_pk_redirect),
+    url(r'^library/(?P<pool_id>[A-Z]\w+)$', views.library_id_to_pk_redirect),
     url(r'^sequencing/(?P<pk>\d+)$', views.DlpSequencingDetail.as_view(), name='sequencing_detail'),
     url(r'^sequencing/list$', views.DlpSequencingList.as_view(), name='sequencing_list'),
     url(r'^sequencing/create/$', views.DlpSequencingCreate.as_view(), name='sequencing_create'),

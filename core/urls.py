@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^sample/update/(?P<pk>\d+)$', views.SampleUpdate.as_view(), name='sample_update'),
     url(r'^sample/delete/(?P<pk>\d+)$', views.SampleDelete.as_view(), name='sample_delete'),
     url(r'^sample/(?P<pk>\d+)$', views.sample_name_to_id_redirect, name='sample_detail'),
-    url(r'^sample/(?P<sample_id>([S][A]|[D][H]|[D][A][H])\w+)$', views.sample_name_to_id_redirect),
+    url(r'^sample/(?P<sample_id>([A-Z]+)\w+)$', views.sample_name_to_id_redirect),
     url(r'^project/list$', views.ProjectList.as_view(), name='project_list'),
     url(r'^project/create$', views.ProjectCreate.as_view(), name='project_create'),
     url(r'^project/update/(?P<pk>\d+)$', views.ProjectUpdate.as_view(), name='project_update'),
