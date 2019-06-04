@@ -526,6 +526,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'name',
             'tenxpool_set',
             'jira_ticket',
+            'analysis_set',
             'chips',
             'chip_well',
             'condition',
