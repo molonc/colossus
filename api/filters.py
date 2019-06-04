@@ -24,9 +24,10 @@ class AnalysisFilter(filters.FilterSet):
     class Meta():
         model = Analysis
         fields = {
+            "id": ["exact"],
             "input_type": ["exact"],
             "version": ["exact"],
-            "jira_ticket": ["in"],
+            "jira_ticket": ["exact"],
             "run_status": ["exact"],
             "dlp_library__pool_id": ["exact"],
             "tenx_library__name": ["exact"],
