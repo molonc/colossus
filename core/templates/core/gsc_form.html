@@ -28,51 +28,61 @@
 
   <body>
     {% load staticfiles %}
-
-    <div class="container">
-        <img src="../static/core/andrew_arms_crossed.jpg" style="width:100%;">
-        <div class="centered">GSC Submission Form</div>
     <div>
-       <div >
       <b-container id="gsc-form">
-        <b-collapse id="collapse1" v-model="showCollapse"> 
-          <b-card
-            id="gsc-card"
-            overlay
-            img-src="../static/core/andrew_arms_crossed.jpg"
-            img-alt="Andrew Image"
-            text-variant="white"
-            title="GSC Submission Form"
-            >
-            <b-card-text>
-                Please Select the Libraries to create a list
-            </b-card-text>
-            <b-container id=bottom-selector" style="padding-top: 80px">
-                <b-row >
-                    <b-col>
-                        <i class="fa fa-child"></i> Libraries:
-                        <b-form-input v-model="options_key"></b-form-input>
-                        <b-form-select v-model="selected_ids" :options="optionsDisplay" multiple :select-size="4"></b-form-select>
-                    </b-col>
-                    <b-col>
-                        <i class="fa fa-edit"></i> Selected:
-                        <b-form-input v-model="selected_key"></b-form-input>
-                        <b-form-select v-model="options_ids" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
-                    </b-col>
-                </b-row>
-                <b-button id="submit-button" v-b-toggle="'collapse2'" v-on:click="updateOptions" variant="primary" >Surprise me</b-button>
-            </b-container>
-            </b-card>
-        </b-collapse>
-        <b-collapse id="collapse2">
-          <b-container id="result-list">
-            <b-card id="result-card">
-              <b-table responsive hover small :items="results"></b-table>
-            </b-card>
+        <b-card
+        id="gsc-card"
+        overlay
+        img-src="../static/core/mainheaderimage.jpg"
+        img-alt="Andrew Image"
+        text-variant="white"
+        title="GSC Submission Helper"
+        sub-title="Cool Subtitle"
+        >
+          <b-card-text>
+              Please Select the Libraries to create a list
+          </b-card-text> 
+        </b-card>      
+        <b-card>
+
+          <b-collapse v-model="showCollapse" id="collapse-1">
+          <b-container id="bottom-selector">
+              <b-row >
+                  <b-col>
+                      <i class="fa fa-child"></i> Libraries:
+                      <b-form-input v-model="options_key"></b-form-input>
+                      <b-form-select v-model="selected_ids" :options="optionsDisplay" multiple :select-size="4"></b-form-select>
+                  </b-col>
+                  <b-col>
+                      <i class="fa fa-edit"></i> Selected:
+                      <b-form-input v-model="selected_key"></b-form-input>
+                      <b-form-select v-model="options_ids" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                  </b-col>
+              </b-row>
+              <b-button id="submit-button"  v-on:click="updateOptions" variant="primary">MOve</b-button>
+          </b-container>  
+          </b-collapse>
+
+          <b-collapse id="collapse-2">  
+          <b-container id="bottom-result">
+            <b-table responsive hover small :items="results"></b-table>
+          </b-container>        
+          </b-collapse>
+
+        </b-card>
+        <b-card
+          overlay
+          img-src="../static/core/mainfooterimage.jpg"
+          img-alt="Andrew Image"
+          text-variant="white"
+        >
+          <b-container>
+            <b-button id="show-button" v-b-toggle.collapse-2 v-on:click="updateCollapse"> Show List </b-button>
           </b-container>
-        </b-collapse>
+        </b-card>
       </b-container>
     </div>
+
     <script>
       window.app = new Vue({
         el: '#gsc-form',
@@ -86,8 +96,10 @@
           results: [],
         },
         methods: {
-          updateOptions: function() {
+          updateCollapse: function () {
             this.showCollapse = !this.showCollapse
+          },
+          updateOptions: function() {
             for(var i = 0; i < this.libraries.length; i++){
               if (this.selected_ids.includes(this.libraries[i].value)){
                 this.libraries[i].userselect = true
@@ -148,49 +160,37 @@
     </script>
 
     <style>
+    
     #gsc-form {
         padding-top: 4%;
-        
         width: 800px;
-    }
-    .container {
-      position: relative;
-      width: 800px;      
-      margin: 0 auto;
-    }
-    .img {
-      position: absolute;
-      left: 0;
-      top: 0;      
-    }
-    .centered {
-      z-index: 100;
-      position: absolute;
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      left: 150px;
-      top: 350px;   
-    }
-    img {
-      max-width: 100%;
-      max-height: 100%;
     }
     
     #gsc-card {
       width: 100%;
       margin: 0 auto;
+      border-radius: 100px;
     }
 
-    #result-list {
-      width: 100%;
-      margin: 0 auto;
+    #show-button {
+      float: right;
+      margin-bottom: 10px;
+      border: none;
+      background: none;
     }
-    
-    #result-card {
+
+    #bottom-selector {
+      height:220px;
+      align-content: center;
+      padding: 10px;
+
+    }
+    #bottom-result {
+      padding: 10px;
+      max-height:500px;
       overflow-y: scroll;
-      max-height: 500px;
     }
+
     #submit-button {
         float: right;
         margin-top: 0.3em
