@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^library/update/(?P<pk>\d+)$', views.TenxLibraryUpdate.as_view(), name='library_update'),
     url(r'^library/delete/(?P<pk>\d+)$', views.TenxLibraryDelete.as_view(), name='library_delete'),
     url(r'^library/create/confirm$', JiraTicketConfirm.as_view(), name='jira_ticket_confirm'),
+    url(r'^library/(?P<pool_id>[A-Z]\w+)$', views.library_id_to_pk_redirect),
 
     url(r'^sequencing/(?P<pk>\d+)$', views.TenxSequencingDetail.as_view(), name='sequencing_detail'),
     url(r'^sequencing/list$', views.TenxSequencingList.as_view(), name='sequencing_list'),

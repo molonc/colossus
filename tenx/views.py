@@ -1,10 +1,12 @@
+from django.contrib.auth.decorators import login_required
+
 from tenx.models import *
 from tenx.forms import *
 from tenx.utils import tenxpool_naming_scheme
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.views.generic import TemplateView
 
 from colossus.settings import LOGIN_URL
@@ -29,6 +31,12 @@ class TenxLibraryList(LibraryList):
     order = 'sample_id'
     library_class = TenxLibrary
     library_type = 'tenx'
+
+@login_required
+def library_id_to_pk_redirect(request, pool_id):
+    pk = get_object_or_404(TenxLibrary, name=pool_id).pk
+    return redirect("/tenx/library/{}".format(pk))
+
 
 class TenxLibraryDetail(LibraryDetail):
     library_class = TenxLibrary
