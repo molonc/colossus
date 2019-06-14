@@ -28,18 +28,16 @@
 
   <body>
     {% load staticfiles %}
-    <div>
-      <b-container id="gsc-form">
+      <b-container fluid id="gsc-form">
         <b-card
         id="gsc-card"
         overlay
-        img-src="../static/core/mainheaderimage.jpg"
-        img-alt="Andrew Image"
+        img-src="../static/core/teal_header.png"
+        img-alt="Teal wall header"
         text-variant="white"
-        title="GSC Submission Helper"
-        sub-title="Cool Subtitle"
         >
-          <b-card-text>
+          <b-card-text class="show-hide">
+              <h3> GSC Submission Helper</h3>
               Please Select the Libraries to create a list
           </b-card-text> 
         </b-card>      
@@ -50,21 +48,28 @@
               <b-row >
                   <b-col>
                       <i class="fa fa-child"></i> Libraries:
-                      <b-form-input v-model="options_key"></b-form-input>
-                      <b-form-select v-model="selected_ids" :options="optionsDisplay" multiple :select-size="4"></b-form-select>
+                      <b-form-input v-model="search_library_key"></b-form-input>
+                      <b-form-select v-model="selected_lib_in_libs" :options="libraryDisplay" multiple :select-size="4"></b-form-select>
+                      <b-button class="my-button"  v-on:click="addSelectedLib" variant="primary">Add</b-button>
                   </b-col>
                   <b-col>
                       <i class="fa fa-edit"></i> Selected:
-                      <b-form-input v-model="selected_key"></b-form-input>
-                      <b-form-select v-model="options_ids" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                      <b-form-input v-model="search_selected_key"></b-form-input>
+                      <b-form-select v-model="selected_libs_in_selected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                      <b-button class="my-button" v-show="!selected_empty" v-on:click="removeAllLibs" variant="primary">Remove All</b-button>
+                      <b-button class="my-button  remove-button" v-show="!selected_empty" v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
                   </b-col>
               </b-row>
-              <b-button id="submit-button"  v-on:click="updateOptions" variant="primary">MOve</b-button>
           </b-container>  
           </b-collapse>
 
           <b-collapse id="collapse-2">  
-          <b-container id="bottom-result">
+          <b-container fluid class="inner-container" id="bottom-result">
+            <!-- <template v-model="libraries_selected"> -->
+              <b-card-text  v-if="libraries_selected.length == 0"> 
+                <h3>{{error_msg}} </h3>
+              </b-card-text>
+            <!-- </template> -->
             <b-table responsive hover small :items="results"></b-table>
           </b-container>        
           </b-collapse>
@@ -72,12 +77,13 @@
         </b-card>
         <b-card
           overlay
-          img-src="../static/core/mainfooterimage.jpg"
-          img-alt="Andrew Image"
+          img-src="../static/core/teal_footer.png"
+          img-alt="Teal wall footer"
           text-variant="white"
         >
           <b-container>
-            <b-button id="show-button" v-b-toggle.collapse-2 v-on:click="updateCollapse"> Show List </b-button>
+            <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
+            <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
           </b-container>
         </b-card>
       </b-container>
@@ -88,36 +94,74 @@
         el: '#gsc-form',
         data: {
           showCollapse: true,
-          options_key: "",
-          selected_key: "",
-          selected_ids: [],
-          options_ids: [],
-          libraries: [],
+          search_library_key: "",
+          search_selected_key: "",
+          selected_lib_in_libs: [],
+          selected_libs_in_selected: [],
+          all_libraries: [],
           results: [],
+          selected_empty: true,
+          libraries_selected: [],
+          error_msg: "Sorry, no libraries were selected."
         },
         methods: {
-          updateCollapse: function () {
-            this.showCollapse = !this.showCollapse
-          },
-          updateOptions: function() {
-            for(var i = 0; i < this.libraries.length; i++){
-              if (this.selected_ids.includes(this.libraries[i].value)){
-                this.libraries[i].userselect = true
+
+          addSelectedLib: function() {
+            for (var i=0; i < this.all_libraries.length; i++){
+              if (this.selected_lib_in_libs.includes(this.all_libraries[i].value)){
+                this.all_libraries[i].userselect = true
+                this.libraries_selected.push(this.all_libraries[i])
               }
-              else if (this.options_ids.includes(this.libraries[i].value)){
-                this.libraries[i].userselect = false
+            } 
+            this.showRemoveButton()
+          },
+          removeSelectedLib: function() {
+            for (var i=0; i < this.all_libraries.length; i++){
+              if (this.selected_libs_in_selected.includes(this.all_libraries[i].value)){
+                console.log(`removing ${this.all_libraries[i].text}`)
+                this.all_libraries[i].userselect = false
+                this.libraries_selected.pop(this.all_libraries[i])
               }
             }
-            this.postSelected()
+            this.showRemoveButton()
           },
-          postSelected: function() {
-            var selectedlist = []
-            this.libraries.forEach( function (library) {
-              if (library.userselect) {
-                selectedlist.push(library.value)
+
+          removeAllLibs: function() {
+              for (var i=0; i < this.all_libraries.length; i++){
+                if (this.all_libraries[i].userselect) {
+                  console.log(`removing ${this.all_libraries[i].text}`)
+                  this.all_libraries[i].userselect = false
+                }
+
+                this.libraries_selected = []
               }
-            })
-            console.log(selectedlist)
+          },
+
+          showRemoveButton: function() {
+            this.selected_empty = (this.libraries_selected.length == 0 ? true: false)
+          },
+
+          updateCollapse: function() {
+            this.showCollapse = !this.showCollapse
+          },
+
+          showSelectedData: function() {
+            this.updateCollapse()
+            var selectedlist = []
+
+            for (var i=0; i < this.libraries_selected.length; i++){
+              selectedlist.push(this.libraries_selected[i].value)
+              console.log(this.libraries_selected[i].value)
+            }
+
+            if (selectedlist.length == 0){
+              console.log("No libraries selected")
+            }
+
+            else {
+              console.log(`${this.libraries_selected.length} selected`)
+            }
+
             axios(
               {
                 method: 'post',
@@ -138,29 +182,33 @@
           }
         },
         computed: {
-          optionsDisplay() {
-            var filter = this.options_key
-            return this.libraries.filter(function (library) {
-              return !library.userselect && library.text.includes(filter)
+          libraryDisplay() {
+            var filter = this.search_library_key
+
+            search_results = this.all_libraries.filter(function (library) {
+              return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
+
+            return search_results
           },
+
           selectedDisplay() {
-            var filter = this.selected_key
-            return this.libraries.filter(function (library) {
-              // console.log(library)
-              return library.userselect && library.text.includes(filter)
+            var filter = this.search_selected_key
+            search_results = this.all_libraries.filter(function (library) {
+              return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
+
+            return search_results
           }
         },
         created: function() {
-          this.libraries = JSON.parse(unescape("{{libraries| safe | escapejs}}")) 
-          // console.log(this.libraries)
+          this.all_libraries = JSON.parse(unescape("{{libraries| safe | escapejs}}"))
         },
       })
     </script>
 
     <style>
-    
+
     #gsc-form {
         padding-top: 4%;
         width: 800px;
@@ -172,11 +220,12 @@
       border-radius: 100px;
     }
 
-    #show-button {
+    .show-button {
+      background-color: #a3a3a3;
+      border-color: #a3a3a3;
       float: right;
-      margin-bottom: 10px;
-      border: none;
-      background: none;
+      vertical-align: middle;
+      width: 7em;
     }
 
     #bottom-selector {
@@ -191,10 +240,53 @@
       overflow-y: scroll;
     }
 
-    #submit-button {
+    .show-hide { 
+      display: none; 
+    }
+
+    /* Hide/Show elements when window is resized*/
+    @media screen and (min-width: 768px) {
+      .show-hide  { display: block; }
+      #leftside > button { display: none; }
+    }
+
+    .my-button {
+      background-color: #76ccc7;
+      border-color: #76ccc7;
+      float: right;
+      margin-top: 0.3em
+    }
+
+    .my-button:hover {
+      background-color: #5faaa5;
+      border-color: #5faaa5;
+    }
+
+    .submit-button {
         float: right;
         margin-top: 0.3em
     }
+
+    .remove-button {
+        margin: 5px;
+    }
+
+    .back-button {
+      background-color: #a3a3a3;
+      border-color: #a3a3a3;
+      float: right;
+      vertical-align: middle;
+      width: 7em;
+    }
+
+    .container-fluid {
+        width: 75% !important;
+    }
+
+    .inner-container {
+      width: 100% !important;
+    }
+
     </style>
   </body>
 </html>
