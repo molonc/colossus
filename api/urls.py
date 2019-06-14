@@ -40,6 +40,9 @@ router.register(r'tenxlibrary', views.TenxLibraryViewSet, base_name='tenxlibrary
 router.register(r'tenxsequencing', views.TenxSequencingViewSet, base_name='tenxsequencing')
 router.register(r'tenxlane', views.TenxLaneViewSet, base_name='tenxlane')
 
+router.register(r'kududlplibrary_list', views.KuduDLPLibraryList, base_name='kudu_dlp_library_list')
+router.register(r'kudutenxlibrary_list', views.KuduTenxLibraryList, base_name='kudu_tenx_library_list')
+
 
 
 app_name='api'

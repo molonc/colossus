@@ -40,7 +40,7 @@ from .serializers import (
     TenxChipSerializer,
     ProjectSerializer,
     TenxPoolSerializer,
-    AnalysisSerializer)
+    AnalysisSerializer, KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer)
 
 from core.models import (
     Sample,
@@ -404,3 +404,32 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
     except DlpSequencing.MultipleObjectsReturned:
         msg = "Multiple flowcells with ID {} found.".format(flowcell)
         return HttpResponse(msg)
+
+
+#============================
+# KUDU API
+#----------------------------
+class KuduTenxLibraryList(RestrictedQueryMixin, viewsets.ModelViewSet):
+    """
+    View for ChipRegion Objects
+    ChipRegion Objects are queryable by Jira ticket or library pool id
+    """
+    queryset = TenxLibrary.objects.all()
+    serializer_class = KuduTenxLibraryListSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = None
+
+#============================
+# KUDU API
+#----------------------------
+class KuduDLPLibraryList(RestrictedQueryMixin, viewsets.ModelViewSet):
+    """
+    View for ChipRegion Objects
+    ChipRegion Objects are queryable by Jira ticket or library pool id
+    """
+    queryset = DlpLibrary.objects.all()
+    serializer_class = KuduDLPLibraryListSerializer
+    permission_classes = (AllowAny,)
+    pagination_class = None
+
+

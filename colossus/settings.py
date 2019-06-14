@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'crispy_forms',
     'storages',
+    'corsheaders',
     # 'mod_wsgi.server',
 ]
 
@@ -74,6 +75,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'colossus.urls'
@@ -95,6 +97,7 @@ TEMPLATES = [
     },
 ]
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases

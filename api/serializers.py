@@ -17,6 +17,7 @@ from rest_framework import serializers
 # App imports
 #----------------------------
 from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
 from core.models import (
     Sample,
@@ -554,3 +555,53 @@ class TenxChipSerializer(serializers.ModelSerializer):
             'tenxlibrary_set',
         )
 
+
+
+#============================
+# KUDU API
+#----------------------------
+
+class KuduProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = (
+            'name',
+        )
+
+
+class KuduTenxLibraryListSerializer(serializers.ModelSerializer):
+    projects = KuduProjectSerializer(many=True, read_only=True)
+    class Meta:
+        model = TenxLibrary
+        fields = (
+            'id',
+            'name',
+            'sample_id',
+            'num_sublibraries',
+            'projects',
+        )
+    def to_representation(self, instance):
+        value = super(KuduTenxLibraryListSerializer, self).to_representation(instance)
+        value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
+        value['projects'] = ", ".join([i["name"] for i in value['projects']])
+        return value
+
+
+class KuduDLPLibraryListSerializer(serializers.ModelSerializer):
+    projects = KuduProjectSerializer(many=True, read_only=True)
+    class Meta:
+        model = DlpLibrary
+        fields = (
+            'id',
+            'pool_id',
+            'sample_id',
+            'jira_ticket',
+            'num_sublibraries',
+            'projects',
+        )
+
+    def to_representation(self, instance):
+        value = super(KuduDLPLibraryListSerializer, self).to_representation(instance)
+        value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
+        value['projects'] = ", ".join([i["name"] for i in value['projects']])
+        return value
