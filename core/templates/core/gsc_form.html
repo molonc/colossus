@@ -28,6 +28,7 @@
 
   <body>
     {% load staticfiles %}
+
       <b-container fluid id="gsc-form">
         <b-card
         id="gsc-card"
@@ -65,14 +66,14 @@
 
           <b-collapse id="collapse-2">  
           <b-container fluid class="inner-container" id="bottom-result">
-            <!-- <template v-model="libraries_selected"> -->
-              <b-card-text  v-if="libraries_selected.length == 0"> 
-                <h3>{{error_msg}} </h3>
+              <b-card-text class="text-center" v-if="noLibrariesSelected"> 
+                Sorry, no libraries were selected.
               </b-card-text>
-            <!-- </template> -->
             <b-table responsive hover small :items="results"></b-table>
           </b-container>        
           </b-collapse>
+
+
 
         </b-card>
         <b-card
@@ -82,6 +83,8 @@
           text-variant="white"
         >
           <b-container>
+            <b-button class="download-button show-hide" v-show="showCollapse"> Download CSV
+            </b-button>
             <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
             <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
           </b-container>
@@ -102,7 +105,7 @@
           results: [],
           selected_empty: true,
           libraries_selected: [],
-          error_msg: "Sorry, no libraries were selected."
+          error_msg: "Sorry, no libraries were selected.",
         },
         methods: {
 
@@ -135,6 +138,7 @@
 
                 this.libraries_selected = []
               }
+              this.showRemoveButton()
           },
 
           showRemoveButton: function() {
@@ -199,6 +203,14 @@
             })
 
             return search_results
+          },
+
+          noLibrariesSelected() {
+            return this.libraries_selected.length === 0
+          },
+
+          get_error_message() {
+            return this.error_msg
           }
         },
         created: function() {
@@ -277,6 +289,14 @@
       float: right;
       vertical-align: middle;
       width: 7em;
+    }
+
+    .download-button {
+      background-color: #a3a3a3;
+      border-color: #a3a3a3;
+      float: left;
+      vertical-align: middle;
+      width: 9em;
     }
 
     .container-fluid {
