@@ -189,7 +189,7 @@
             search_results = this.all_libraries.filter(function (library) {
               return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
-
+            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
             return search_results
           },
 
@@ -199,6 +199,8 @@
               return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
 
+            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+            
             return search_results
           },
 
