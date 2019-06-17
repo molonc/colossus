@@ -23,7 +23,6 @@ from django.shortcuts import get_object_or_404, render_to_response, render
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
 from django.shortcuts import redirect
-from django.core.serializers.json import DjangoJSONEncoder
 import pandas as pd
 from django.conf import settings
 
@@ -285,9 +284,9 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
         return context
 
     elif sample_id is not None:
-        return HttpResponseRedirect(
-            get_object_or_404(Sample, sample_id=sample_id).get_absolute_url()
-        ) 
+        pk = get_object_or_404(Sample, sample_id=sample_id).pk
+        return redirect('/core/sample/{}'.format(pk))
+      
 
 #============================
 # Library views
@@ -374,14 +373,15 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
     template_name = 'core/jira_ticket_confirm.html'
 
     def get(self, request):
-        projects = get_projects(request.session['jira_user'], request.session['jira_password'])
+        jira_user = request.session['jira_user']
+        projects = get_projects(jira_user, request.session['jira_password'])
         form = JiraConfirmationForm()
         #Set default values for DLP and TenX Library Ticket Creation
         #If default value can't be found, no error will be thrown, and the field will just be empty by default
         if(request.session['library_type'] == 'dlp'):
             form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
             form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
-            form.fields['reporter'].initial = 'elaks'                                                                                    
+            form.fields['reporter'].initial = jira_user                                                                                 
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
             form.fields['description'].initial = 'Awaiting first sequencing...'
@@ -498,6 +498,11 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             jira_password = lib_form['jira_password'].value()
                             additional_title = lib_form['additional_title'].value()
 
+                            jira_user_object = JiraUser.objects.get_or_create(
+                                username=jira_user,
+                                name=jira_user
+                            )
+
                         #Add these fields into Session so the JiraTicketConfirm View can access them
                         if validate_credentials(jira_user, jira_password):
                             #For DLP Libaries
@@ -571,7 +576,7 @@ class LibraryUpdate(LibraryCreate):
     Library update base class.
     """
 
-    class Meta:
+    class Meta: 
         abstract = True
 
     template_name = "core/library_update.html"

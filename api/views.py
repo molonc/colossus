@@ -59,9 +59,8 @@ from dlp.models import (
 from tenx.models import *
 from api.filters import (
     AnalysisFilter,
-    AnalysisInformationFilter,
-    SublibraryInformationFilter
-)
+    SublibraryInformationFilter,
+    AnalysisInformationFilter)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
@@ -263,8 +262,8 @@ class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = DlpAnalysisInformation.objects.all()
     permission_classes = (IsAuthenticated, )
-    filter_class = AnalysisInformationFilter
     pagination_class = VariableResultsSetPagination
+    filter_class=AnalysisInformationFilter
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
