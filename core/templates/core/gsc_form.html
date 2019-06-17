@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>GSC Form Submission</title>
+
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  </head>
+
+  <body>
+    {% load staticfiles %}
+
+      <b-container fluid id="gsc-form">
+        <b-card
+        id="gsc-card"
+        overlay
+        img-src="../static/core/teal_header.png"
+        img-alt="Teal wall header"
+        text-variant="white"
+        >
+          <b-card-text class="show-hide">
+              <h3> GSC Submission Helper</h3>
+          </b-card-text> 
+        </b-card>      
+        <b-card>
+
+          <b-collapse v-model="showCollapse" id="collapse-1">
+          <b-container id="bottom-selector">
+              <b-row >
+                  <b-col>
+                      <i class="fa fa-child"></i> Libraries:
+                      <b-form-input v-model="search_library_key"></b-form-input>
+                      <b-form-select v-model="selected_lib_in_libs" :options="libraryDisplay" multiple :select-size="4"></b-form-select>
+                      <b-button class="my-button"  v-on:click="addSelectedLib" variant="primary">Add</b-button>
+                  </b-col>
+                  <b-col>
+                      <i class="fa fa-edit"></i> Selected:
+                      <b-form-input v-model="search_selected_key"></b-form-input>
+                      <b-form-select v-model="selected_libs_in_selected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                      <b-button class="my-button" v-show="!selected_empty" v-on:click="removeAllLibs" variant="primary">Remove All</b-button>
+                      <b-button class="my-button  remove-button" v-show="!selected_empty" v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
+                  </b-col>
+              </b-row>
+          </b-container>  
+          </b-collapse>
+
+          <b-collapse id="collapse-2">  
+          <b-container fluid class="inner-container" id="bottom-result">
+              <b-card-text class="text-center" v-if="noLibrariesSelected"> 
+                No libraries were selected.
+              </b-card-text>
+            <b-table responsive hover small :items="results"></b-table>
+          </b-container>        
+          </b-collapse>
+
+
+
+        </b-card>
+        <b-card
+          overlay
+          img-src="../static/core/teal_footer.png"
+          img-alt="Teal wall footer"
+          text-variant="white"
+        >
+          <b-container>
+            <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
+            <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
+          </b-container>
+        </b-card>
+      </b-container>
+    </div>
+
+    <script>
+      window.app = new Vue({
+        el: '#gsc-form',
+        data: {
+          showCollapse: true,
+          search_library_key: "",
+          search_selected_key: "",
+          selected_lib_in_libs: [],
+          selected_libs_in_selected: [],
+          all_libraries: [],
+          results: [],
+          selected_empty: true,
+          libraries_selected: [],
+          error_msg: "No libraries were selected.",
+        },
+        methods: {
+
+          addSelectedLib: function() {
+            for (var i=0; i < this.all_libraries.length; i++){
+              if (this.selected_lib_in_libs.includes(this.all_libraries[i].value)){
+                this.all_libraries[i].userselect = true
+                this.libraries_selected.push(this.all_libraries[i])
+              }
+            } 
+            this.showRemoveButton()
+          },
+          removeSelectedLib: function() {
+            for (var i=0; i < this.all_libraries.length; i++){
+              if (this.selected_libs_in_selected.includes(this.all_libraries[i].value)){
+                console.log(`removing ${this.all_libraries[i].text}`)
+                this.all_libraries[i].userselect = false
+                this.libraries_selected.pop(this.all_libraries[i])
+              }
+            }
+            this.showRemoveButton()
+          },
+
+          removeAllLibs: function() {
+              for (var i=0; i < this.all_libraries.length; i++){
+                if (this.all_libraries[i].userselect) {
+                  console.log(`removing ${this.all_libraries[i].text}`)
+                  this.all_libraries[i].userselect = false
+                }
+
+                this.libraries_selected = []
+              }
+              this.showRemoveButton()
+          },
+
+          showRemoveButton: function() {
+            this.selected_empty = (this.libraries_selected.length == 0 ? true: false)
+          },
+
+          updateCollapse: function() {
+            this.showCollapse = !this.showCollapse
+          },
+
+          showSelectedData: function() {
+            this.updateCollapse()
+            var selectedlist = []
+
+            for (var i=0; i < this.libraries_selected.length; i++){
+              selectedlist.push(this.libraries_selected[i].value)
+              console.log(this.libraries_selected[i].value)
+            }
+
+            if (selectedlist.length == 0){
+              console.log("No libraries selected")
+            }
+
+            else {
+              console.log(`${this.libraries_selected.length} selected`)
+            }
+
+            axios(
+              {
+                method: 'post',
+                url: "http://127.0.0.1:8000/core/gsc_data",
+                dataType: "json",
+                data: {
+                  "selected" : selectedlist
+                  },
+                headers: {
+                  "X-CSRFToken": Cookies.get('csrftoken'), 
+                  "content-type": "application/json" 
+                }
+              }
+            ).then( (response) => {
+              this.results = response.data
+              }
+            )
+          }
+        },
+        computed: {
+          libraryDisplay() {
+            var filter = this.search_library_key
+
+            search_results = this.all_libraries.filter(function (library) {
+              return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
+            })
+
+            return search_results
+          },
+
+          selectedDisplay() {
+            var filter = this.search_selected_key
+            search_results = this.all_libraries.filter(function (library) {
+              return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
+            })
+
+            return search_results
+          },
+
+          noLibrariesSelected() {
+            return this.libraries_selected.length === 0
+          },
+
+          get_error_message() {
+            return this.error_msg
+          }
+        },
+        created: function() {
+          this.all_libraries = JSON.parse(unescape("{{libraries| safe | escapejs}}"))
+        },
+      })
+    </script>
+
+    <style>
+
+    #gsc-form {
+        padding-top: 4%;
+        width: 800px;
+    }
+    
+    #gsc-card {
+      width: 100%;
+      margin: 0 auto;
+      border-radius: 100px;
+    }
+
+    .show-button {
+      background-color: #a3a3a3;
+      border-color: #a3a3a3;
+      float: right;
+      vertical-align: middle;
+      width: 7em;
+    }
+
+    #bottom-selector {
+      height:220px;
+      align-content: center;
+      padding: 10px;
+
+    }
+    #bottom-result {
+      padding: 10px;
+      max-height:500px;
+      overflow-y: scroll;
+    }
+
+    .show-hide { 
+      display: none; 
+    }
+
+    /* Hide/Show elements when window is resized*/
+    @media screen and (min-width: 768px) {
+      .show-hide  { display: block; }
+      #leftside > button { display: none; }
+    }
+
+    .my-button {
+      background-color: #76ccc7;
+      border-color: #76ccc7;
+      float: right;
+      margin-top: 0.3em
+    }
+
+    .my-button:hover {
+      background-color: #5faaa5;
+      border-color: #5faaa5;
+    }
+
+    .submit-button {
+        float: right;
+        margin-top: 0.3em
+    }
+
+    .remove-button {
+        margin: 5px;
+    }
+
+    .back-button {
+      background-color: #a3a3a3;
+      border-color: #a3a3a3;
+      float: right;
+      vertical-align: middle;
+      width: 7em;
+    }
+
+    .download-button {
+      background-color: #a3a3a3;
+      border-color: #a3a3a3;
+      float: left;
+      vertical-align: middle;
+      width: 9em;
+    }
+
+    .container-fluid {
+        width: 75% !important;
+    }
+
+    .inner-container {
+      width: 100% !important;
+    }
+
+    </style>
+  </body>
+</html>
