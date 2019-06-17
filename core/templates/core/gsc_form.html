@@ -82,6 +82,7 @@
           class="mb-2 rounded-0"
           text-variant="white"
         >
+          <b-container>
             <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
             <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
           </b-container>
@@ -166,7 +167,8 @@
             axios(
               {
                 method: 'post',
-                url: "https://colossus.canadacentral.cloudapp.azure.com/core/gsc_data",
+                url: "http://127.0.0.1:8000/core/gsc_data",
+                // url: "https://colossus.canadacentral.cloudapp.azure.com/core/gsc_data",
                 dataType: "json",
                 data: {
                   "selected" : selectedlist
@@ -189,7 +191,7 @@
             search_results = this.all_libraries.filter(function (library) {
               return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
-
+            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
             return search_results
           },
 
@@ -199,6 +201,8 @@
               return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
 
+            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+            
             return search_results
           },
 
@@ -221,6 +225,7 @@
     #gsc-form {
         padding-top: 4%;
         width: 800px;
+
     }
     
     #gsc-card {

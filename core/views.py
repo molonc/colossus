@@ -130,10 +130,12 @@ def gsc_info_post(request):
     returnJson = [{
         "Pool ID" : library.pool_id,
         "Sample ID" : library.sample.sample_id,
+        "Sample Type": library.sample.sample_type,
+        "Number of Sublibraries": library.num_sublibraries,
         "Anonymous Patient ID" : library.sample.anonymous_patient_id,
         "Sex" : library.sample.additionalsampleinformation.sex,
         "Anatomic Site" : library.sample.additionalsampleinformation.anatomic_site,
-        "Tissue Disease State" : library.sample.additionalsampleinformation.disease_condition_health_status,
+        "Pathology Disease Name" : library.sample.additionalsampleinformation.pathology_disease_name,
         "Construction Method" : "NanoWellSingleCellGenome",
         "Size Range" : library.dlplibraryquantificationandstorage.size_range,
         "Average Size" : library.dlplibraryquantificationandstorage.average_size,
