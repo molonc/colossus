@@ -133,7 +133,7 @@ def gsc_info_post(request):
         "Anonymous Patient ID" : library.sample.anonymous_patient_id,
         "Sex" : library.sample.additionalsampleinformation.sex,
         "Anatomic Site" : library.sample.additionalsampleinformation.anatomic_site,
-        "Tissue Disease State" : "",
+        "Tissue Disease State" : library.sample.additionalsampleinformation.disease_condition_health_status,
         "Construction Method" : "NanoWellSingleCellGenome",
         "Size Range" : library.dlplibraryquantificationandstorage.size_range,
         "Average Size" : library.dlplibraryquantificationandstorage.average_size,
