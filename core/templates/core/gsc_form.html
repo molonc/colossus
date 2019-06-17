@@ -33,8 +33,8 @@
         <b-card
         id="gsc-card"
         overlay
-        img-src="../static/core/teal_header.png"
-        img-alt="Teal wall header"
+        style="background-color: #72ccc0; border-style: none; height: 100px"
+        class="mb-2 rounded-0"
         text-variant="white"
         >
           <b-card-text class="show-hide">
@@ -76,12 +76,12 @@
 
         </b-card>
         <b-card
+          id="gsc-card"
           overlay
-          img-src="../static/core/teal_footer.png"
-          img-alt="Teal wall footer"
+          style="background-color: #72ccc0; border-style: none; height: 100px"
+          class="mb-2 rounded-0"
           text-variant="white"
         >
-          <b-container>
             <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
             <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
           </b-container>
@@ -166,7 +166,7 @@
             axios(
               {
                 method: 'post',
-                url: "http://127.0.0.1:8000/core/gsc_data",
+                url: "https://colossus.canadacentral.cloudapp.azure.com/core/gsc_data",
                 dataType: "json",
                 data: {
                   "selected" : selectedlist
