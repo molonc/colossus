@@ -9,6 +9,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import os
 import collections
 import subprocess
+import json
 from jira import JIRAError
 
 #============================
@@ -22,7 +23,7 @@ from django.shortcuts import get_object_or_404, render_to_response, render
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
 from django.shortcuts import redirect
-
+from django.core.serializers.json import DjangoJSONEncoder
 import pandas as pd
 from django.conf import settings
 
@@ -113,6 +114,35 @@ class IndexView(LoginRequiredMixin, TemplateView):
         }
         return context
 
+@login_required
+def gsc_submission_form(request):
+  return render(
+      request, 
+      "core/gsc_form.html", 
+      {"libraries" : 
+          json.dumps(
+              [{"value" : library.pk, "text" : "{}_{}".format(library.pool_id,library.sample.sample_id),"userselect" : False} for library in DlpLibrary.objects.all()],
+              cls=DjangoJSONEncoder)}
+    )
+
+def gsc_info_post(request):
+    selected = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
+    returnJson = [{
+        "Pool ID" : library.pool_id,
+        "Sample ID" : library.sample.sample_id,
+        "Anonymous Patient ID" : library.sample.anonymous_patient_id,
+        "Sex" : library.sample.additionalsampleinformation.sex,
+        "Anatomic Site" : library.sample.additionalsampleinformation.anatomic_site,
+        "Tissue Disease State" : library.sample.additionalsampleinformation.disease_condition_health_status,
+        "Construction Method" : "NanoWellSingleCellGenome",
+        "Size Range" : library.dlplibraryquantificationandstorage.size_range,
+        "Average Size" : library.dlplibraryquantificationandstorage.average_size,
+        "Xenograph" : "Yes",
+        "Concentration(nM)" : library.dlplibraryquantificationandstorage.dna_concentration_nm,
+        "Volume" : library.dlplibraryquantificationandstorage.dna_volume,
+        "Quantification Method" : library.dlplibraryquantificationandstorage.quantification_method,
+    } for library in selected]
+    return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
 
 #============================
 # Sample views
@@ -219,7 +249,6 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
         messages.success(request, msg)
         return HttpResponseRedirect(reverse('core:sample_list'))
 
-
 @Render("core/analysis_list.html")
 @login_required
 def analys_list(request):
@@ -258,7 +287,6 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
     elif sample_id is not None:
         pk = get_object_or_404(Sample, sample_id=sample_id).pk
         return redirect('/core/sample/{}'.format(pk))
-
 
 #============================
 # Library views
@@ -345,15 +373,14 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
     template_name = 'core/jira_ticket_confirm.html'
 
     def get(self, request):
-        jira_user = request.session['jira_user']
-        projects = get_projects(jira_user, request.session['jira_password'])
+        projects = get_projects(request.session['jira_user'], request.session['jira_password'])
         form = JiraConfirmationForm()
         #Set default values for DLP and TenX Library Ticket Creation
         #If default value can't be found, no error will be thrown, and the field will just be empty by default
         if(request.session['library_type'] == 'dlp'):
             form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
             form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
-            form.fields['reporter'].initial = jira_user                                                                                 
+            form.fields['reporter'].initial = 'elaks'                                                                                    
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
             form.fields['description'].initial = 'Awaiting first sequencing...'
@@ -470,11 +497,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             jira_password = lib_form['jira_password'].value()
                             additional_title = lib_form['additional_title'].value()
 
-                            jira_user_object = JiraUser.objects.get_or_create(
-                                username=jira_user,
-                                name=jira_user
-                            )
-
                         #Add these fields into Session so the JiraTicketConfirm View can access them
                         if validate_credentials(jira_user, jira_password):
                             #For DLP Libaries
@@ -548,7 +570,7 @@ class LibraryUpdate(LibraryCreate):
     Library update base class.
     """
 
-    class Meta: 
+    class Meta:
         abstract = True
 
     template_name = "core/library_update.html"
