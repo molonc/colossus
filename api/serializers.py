@@ -556,18 +556,82 @@ class TenxChipSerializer(serializers.ModelSerializer):
         )
 
 
-
+#----------------------------
 #============================
 # KUDU API
 #----------------------------
+#----------------------------
+
+
+#============================
+# CORE
+#----------------------------
+class KuduSampleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sample
+        fields = (
+            'id',
+            'sample_id',
+            'sample_type',
+            'cell_line_id',
+            'xenograft_id',
+            'anonymous_patient_id',
+        )
+
+class KuduAnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Analysis
+        fields = (
+            'id',
+            'input_type',
+            'jira_ticket',
+            'version',
+            'run_status'
+        )
 
 class KuduProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = (
+            'id',
             'name',
         )
 
+
+#============================
+# DLP
+#----------------------------
+class KuduDLPLibraryListSerializer(serializers.ModelSerializer):
+    projects = KuduProjectSerializer(many=True, read_only=True)
+    class Meta:
+        model = DlpLibrary
+        fields = (
+            'id',
+            'pool_id',
+            'sample_id',
+            'jira_ticket',
+            'num_sublibraries',
+            'projects',
+        )
+
+    def to_representation(self, instance):
+        value = super(KuduDLPLibraryListSerializer, self).to_representation(instance)
+        value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
+        value['projects'] = ", ".join([i["name"] for i in value['projects']])
+        return value
+
+class KuduDLPSequencingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpSequencing
+        fields = (
+            'id',
+
+        )
+
+
+#============================
+# TENX
+#----------------------------
 
 class KuduTenxLibraryListSerializer(serializers.ModelSerializer):
     projects = KuduProjectSerializer(many=True, read_only=True)
@@ -587,21 +651,3 @@ class KuduTenxLibraryListSerializer(serializers.ModelSerializer):
         return value
 
 
-class KuduDLPLibraryListSerializer(serializers.ModelSerializer):
-    projects = KuduProjectSerializer(many=True, read_only=True)
-    class Meta:
-        model = DlpLibrary
-        fields = (
-            'id',
-            'pool_id',
-            'sample_id',
-            'jira_ticket',
-            'num_sublibraries',
-            'projects',
-        )
-
-    def to_representation(self, instance):
-        value = super(KuduDLPLibraryListSerializer, self).to_representation(instance)
-        value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
-        value['projects'] = ", ".join([i["name"] for i in value['projects']])
-        return value

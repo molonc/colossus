@@ -40,7 +40,8 @@ from .serializers import (
     TenxChipSerializer,
     ProjectSerializer,
     TenxPoolSerializer,
-    AnalysisSerializer, KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer)
+    AnalysisSerializer, KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
+    KuduSampleSerializer, KuduAnalysisSerializer)
 
 from core.models import (
     Sample,
@@ -210,7 +211,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -314,7 +315,7 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     pagination_class = VariableResultsSetPagination
 
 class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -409,15 +410,30 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
 #============================
 # KUDU API
 #----------------------------
-class KuduTenxLibraryList(RestrictedQueryMixin, viewsets.ModelViewSet):
+class KuduList(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (AllowAny, )
+    pagination_class = None
+
+class KuduProjectList(KuduList):
+    queryset = Project.objects.all()
+    serializer_class = KuduProjectSerializer
+
+class KuduSampleList(KuduList):
+    queryset = Sample.objects.all()
+    serializer_class = KuduSampleSerializer
+
+class KuduAnalysisList(KuduList):
+    queryset = Analysis.objects.all()
+    serializer_class = KuduAnalysisSerializer
+
+
+class KuduTenxLibraryList(KuduList):
     """
     View for ChipRegion Objects
     ChipRegion Objects are queryable by Jira ticket or library pool id
     """
     queryset = TenxLibrary.objects.all()
     serializer_class = KuduTenxLibraryListSerializer
-    permission_classes = (IsAuthenticated, )
-    pagination_class = None
 
 #============================
 # KUDU API
