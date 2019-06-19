@@ -28,6 +28,9 @@
 
   <body>
     {% load staticfiles %}
+      <b-container>
+        <b-button href="http://127.0.0.1:8000/">Colossus</b-button>
+      </b-container>
 
       <b-container fluid id="gsc-form">
         <b-card
@@ -83,6 +86,7 @@
           text-variant="white"
         >
           <b-container>
+            <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo"> Download CSV </b-button>
             <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
             <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
           </b-container>
@@ -167,7 +171,7 @@
             axios(
               {
                 method: 'post',
-                url: "https://colossus.canadacentral.cloudapp.azure.com/core/gsc_data",
+                url: "http://127.0.0.1:8000/core/gsc_data",
                 dataType: "json",
                 data: {
                   "selected" : selectedlist
@@ -181,7 +185,33 @@
               this.results = response.data
               }
             )
-          }
+          },
+          downloadSelectedSublibraryInfo: function() {
+            var selectedlist = []
+
+            for (var i=0; i < this.libraries_selected.length; i++){
+              selectedlist.push(this.libraries_selected[i].value)
+              console.log(this.libraries_selected[i].value)
+            }
+
+            axios(
+              {
+                method: 'post',
+                url: "http://127.0.0.1:8000/core/download_sublibrary",
+                dataType: "json",
+                data: {
+                  "selected" : selectedlist
+                  },
+                headers: {
+                  "X-CSRFToken": Cookies.get('csrftoken'), 
+                  "content-type": "application/json" 
+                }
+              }
+            ).then( (response) => {
+              this.results = response.data
+              }
+            )
+          },
         },
         computed: {
           libraryDisplay() {

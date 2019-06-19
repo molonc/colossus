@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^analysis/detail/(?P<pk>\d+)$', views.analysis_detail, name='analysis_detail'),
     url(r'^gsc$', views.gsc_submission_form, name='gsc_submission_form'),
     url(r'^gsc_data$', views.gsc_info_post, name='gsc_retreive_data'),
+    url(r'^download_sublibrary$', views.download_sublibrary_info, name='download_sublibrary_info'),
 
 ]

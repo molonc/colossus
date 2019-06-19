@@ -7,6 +7,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 import os
+import csv
 import collections
 import subprocess
 import json
@@ -31,6 +32,9 @@ from django.conf import settings
 # App imports
 #----------------------------
 from core.search_util.search_helper import return_text_search
+from dlp.models import (
+    DlpLibrary
+)
 from pbal.models import (
     PbalLibrary
 )
@@ -145,6 +149,44 @@ def gsc_info_post(request):
         "Quantification Method" : library.dlplibraryquantificationandstorage.quantification_method,
     } for library in selected]
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+def download_sublibrary_info(request):
+    selected_libraries = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
+
+    for library in selected_libraries:
+        filename = "{}.csv".format(library.pool_id)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+
+        # sublibraries = SublibraryInformation.objects.filter(library__pool_id=)
+        sublibraries = library.sublibraryinformation_set.all()
+        print(type(sublibraries.all()))
+
+        if not sublibraries:
+            continue
+
+        else:
+            fieldnames = ["Sub-Library ID", "Index Read Type", "Index Sequence"]
+            with open(filename, 'w', newline='') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for sublib in sublibraries:
+                    writer.writerow(
+                        {
+                            'Sub-Library ID': sublib.get_sublibrary_id(), 
+                            'Index Read Type': '"Dual Index (i7 and i5)"', 
+                            'Index Sequence': "{}-{}".format(sublib.primer_i7, sublib.primer_i5)
+                        }
+                    )
+
+        with open(filename, newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in spamreader:
+                print(', '.join(row))
+
+            return response
+        
 
 #============================
 # Sample views
