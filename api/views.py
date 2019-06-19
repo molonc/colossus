@@ -41,7 +41,8 @@ from .serializers import (
     ProjectSerializer,
     TenxPoolSerializer,
     AnalysisSerializer, KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
-    KuduSampleSerializer, KuduAnalysisSerializer)
+    KuduSampleSerializer, KuduAnalysisSerializer, KuduDLPAnalysisSerializer, KuduDLPSequencingSerializer,
+    KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer)
 
 from core.models import (
     Sample,
@@ -414,6 +415,7 @@ class KuduList(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (AllowAny, )
     pagination_class = None
 
+#CORE
 class KuduProjectList(KuduList):
     queryset = Project.objects.all()
     serializer_class = KuduProjectSerializer
@@ -426,26 +428,38 @@ class KuduAnalysisList(KuduList):
     queryset = Analysis.objects.all()
     serializer_class = KuduAnalysisSerializer
 
+#DLP
+class KuduDLPLibraryList(KuduList):
+    queryset = DlpLibrary.objects.all()
+    serializer_class = KuduDLPLibraryListSerializer
 
+class KuduDLPSequencingList(KuduList):
+    queryset = DlpSequencing.objects.all()
+    serializer_class = KuduDLPSequencingSerializer
+
+class KuduDLPAnalysisList(KuduList):
+    queryset = DlpAnalysisInformation.objects.all()
+    serializer_class = KuduDLPAnalysisSerializer
+
+#TenX
 class KuduTenxLibraryList(KuduList):
-    """
-    View for ChipRegion Objects
-    ChipRegion Objects are queryable by Jira ticket or library pool id
-    """
     queryset = TenxLibrary.objects.all()
     serializer_class = KuduTenxLibraryListSerializer
+
+class KuduTenxChipList(KuduList):
+    queryset = TenxChip.objects.all()
+    serializer_class = KuduTenxChipSerializer
+
+class KuduTenxPoolList(KuduList):
+    queryset = TenxPool.objects.all()
+    serializer_class = KuduTenxPoolSerializer
+
+class KuduTenxSequencingList(KuduList):
+    queryset = TenxSequencing.objects.all()
+    serializer_class = KuduTenxSequencingSerializer
+
 
 #============================
 # KUDU API
 #----------------------------
-class KuduDLPLibraryList(RestrictedQueryMixin, viewsets.ModelViewSet):
-    """
-    View for ChipRegion Objects
-    ChipRegion Objects are queryable by Jira ticket or library pool id
-    """
-    queryset = DlpLibrary.objects.all()
-    serializer_class = KuduDLPLibraryListSerializer
-    permission_classes = (AllowAny,)
-    pagination_class = None
-
 

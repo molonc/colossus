@@ -47,15 +47,15 @@ router.register(r'kuduanalysis_list', views.KuduAnalysisList, base_name="kudu_an
 
 #Kudu dlp
 router.register(r'kududlplibrary_list', views.KuduDLPLibraryList, base_name='kudu_dlp_library_list')
-router.register(r'kududlpsequencing_list', views.KuduDLPLibraryList, base_name='kudu_dlp_sequencing_list')
-router.register(r'kududlpanalysis_list', views.KuduDLPLibraryList, base_name='kudu_dlp_analysis_list')
+router.register(r'kududlpsequencing_list', views.KuduDLPSequencingList, base_name='kudu_dlp_sequencing_list')
+router.register(r'kududlpanalysis_list', views.KuduDLPAnalysisList, base_name='kudu_dlp_analysis_list')
 
 
 #Kudu tenx
 router.register(r'kudutenxlibrary_list', views.KuduTenxLibraryList, base_name='kudu_tenx_library_list')
-router.register(r'kudutenxchip_list', views.KuduTenxLibraryList, base_name='kudu_tenx_chip_list')
-router.register(r'kudutenxpool_list', views.KuduTenxLibraryList, base_name='kudu_tenx_pool_list')
-router.register(r'kudutenxsequencing_list', views.KuduTenxLibraryList, base_name='kudu_tenx_sequencing_list')
+router.register(r'kudutenxchip_list', views.KuduTenxChipList, base_name='kudu_tenx_chip_list')
+router.register(r'kudutenxpool_list', views.KuduTenxPoolList, base_name='kudu_tenx_pool_list')
+router.register(r'kudutenxsequencing_list', views.KuduTenxSequencingList, base_name='kudu_tenx_sequencing_list')
 
 app_name='api'
 urlpatterns = [

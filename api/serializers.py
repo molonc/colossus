@@ -625,9 +625,34 @@ class KuduDLPSequencingSerializer(serializers.ModelSerializer):
         model = DlpSequencing
         fields = (
             'id',
-
+            'library',
+            'gsc_library_id',
+            'submission_date'
         )
 
+    def to_representation(self, instance):
+        value = super(KuduDLPSequencingSerializer, self).to_representation(instance)
+        temp_lib = get_object_or_404(DlpLibrary,id=value['library'])
+        value['jira_ticket'] = temp_lib.jira_ticket
+        value['sample_id'] = get_object_or_404(Sample,id=temp_lib.sample_id).sample_id
+        value['library'] = temp_lib.pool_id
+        return value
+
+class KuduDLPAnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpAnalysisInformation
+        fields = (
+            'id',
+            'analysis_run',
+            'analysis_jira_ticket',
+            'priority_level',
+        )
+    def to_representation(self, instance):
+        value = super(KuduDLPAnalysisSerializer, self).to_representation(instance)
+        temp_analysis = get_object_or_404(AnalysisRun,id=value['analysis_run'])
+        value['last_updated'] = temp_analysis.last_updated
+        value['run_status'] = temp_analysis.run_status
+        return value
 
 #============================
 # TENX
@@ -650,4 +675,39 @@ class KuduTenxLibraryListSerializer(serializers.ModelSerializer):
         value['projects'] = ", ".join([i["name"] for i in value['projects']])
         return value
 
+
+class KuduTenxPoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxPool
+        fields = (
+            'id',
+            'pool_name',
+            'gsc_pool_name',
+            'construction_location',
+            'constructed_date'
+        )
+
+
+class KuduTenxChipSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="get_id")
+    class Meta:
+        model = TenxChip
+        fields = (
+            'id',
+            'lab_name',
+            'name'
+        )
+
+class KuduTenxSequencingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxSequencing
+        fields = (
+            'id',
+            'tenx_pool',
+            'sequencing_instrument',
+            'submission_date',
+            'sequencing_center',
+            'number_of_lanes_requested',
+            'lane_requested_date',
+        )
 
