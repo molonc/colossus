@@ -124,8 +124,11 @@ def gsc_submission_form(request):
       request, 
       "core/gsc_form.html", 
       {"libraries" : 
-          json.dumps(
-              [{"value" : library.pk, "text" : "{}_{}".format(library.pool_id,library.sample.sample_id),"userselect" : False} for library in DlpLibrary.objects.all()],
+          json.dumps([{
+                "value" : library.pk, 
+                "text" : "{}_{}".format(library.pool_id,library.sample.sample_id),
+                "userselect" : False,
+            } for library in DlpLibrary.objects.all()],
               cls=DjangoJSONEncoder)}
     )
 
@@ -152,16 +155,17 @@ def gsc_info_post(request):
 
 
 def download_sublibrary_info(request):
-    libraries = DlpLibrary.objects.filter(pk=json.loads(request.body.decode('utf-8'))["library_pk"])
-    # testing
-    library = libraries[0]
+    library = get_object_or_404(DlpLibrary, pk=json.loads(request.body.decode('utf-8'))["libraryPk"])
 
     sublibraries = library.sublibraryinformation_set.all()
 
-    csvString = "Library\n{}\n\n".format(library.pool_id)
-    csvString += "Sub-Library ID, Index Read Type, Index Sequence\n"
+    if not sublibraries:
+        print("No sublibraries")
+        return HttpResponse("")
+
+    csvString = "Sub-Library ID,Index Sequence\n"
     for sublib in sublibraries:
-        csvString += "{}, Dual Index (i7 and i5), {}-{}\n".format(
+        csvString += "{},{}-{}\n".format(
             sublib.get_sublibrary_id(),
             sublib.primer_i7, 
             sublib.primer_i5
