@@ -152,40 +152,24 @@ def gsc_info_post(request):
 
 
 def download_sublibrary_info(request):
-    selected_libraries = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
+    libraries = DlpLibrary.objects.filter(pk=json.loads(request.body.decode('utf-8'))["library_pk"])
+    # testing
+    library = libraries[0]
 
-    for library in selected_libraries:
-        filename = "{}.csv".format(library.pool_id)
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+    sublibraries = library.sublibraryinformation_set.all()
 
-        # sublibraries = SublibraryInformation.objects.filter(library__pool_id=)
-        sublibraries = library.sublibraryinformation_set.all()
-        print(type(sublibraries.all()))
+    csvString = "Library\n{}\n\n".format(library.pool_id)
+    csvString += "Sub-Library ID, Index Read Type, Index Sequence\n"
+    for sublib in sublibraries:
+        csvString += "{}, Dual Index (i7 and i5), {}-{}\n".format(
+            sublib.get_sublibrary_id(),
+            sublib.primer_i7, 
+            sublib.primer_i5
+        )
 
-        if not sublibraries:
-            continue
+    print(csvString)
+    return HttpResponse(csvString)
 
-        else:
-            fieldnames = ["Sub-Library ID", "Index Read Type", "Index Sequence"]
-            with open(filename, 'w', newline='') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                writer.writeheader()
-                for sublib in sublibraries:
-                    writer.writerow(
-                        {
-                            'Sub-Library ID': sublib.get_sublibrary_id(), 
-                            'Index Read Type': '"Dual Index (i7 and i5)"', 
-                            'Index Sequence': "{}-{}".format(sublib.primer_i7, sublib.primer_i5)
-                        }
-                    )
-
-        with open(filename, newline='') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-            for row in spamreader:
-                print(', '.join(row))
-
-            return response
         
 
 #============================

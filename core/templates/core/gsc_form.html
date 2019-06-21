@@ -19,20 +19,21 @@
       href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
     />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <!-- <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script> -->
+    <script src="../../static/core/bootstrap-vue.js "></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </head>
 
   <body>
     {% load staticfiles %}
-      <b-container>
-        <b-button href="http://127.0.0.1:8000/">Colossus</b-button>
-      </b-container>
-
       <b-container fluid id="gsc-form">
+        <b-button @click="goHome" >Back to Colossus</b-button>
         <b-card
         id="gsc-card"
         overlay
@@ -105,11 +106,15 @@
           selected_libs_in_selected: [],
           all_libraries: [],
           results: [],
+          csvString: "",
           selected_empty: true,
           libraries_selected: [],
           error_msg: "No libraries were selected.",
         },
         methods: {
+          goHome: function() {
+            window.location = window.origin 
+          },
 
           addSelectedLib: function() {
             for (var i=0; i < this.all_libraries.length; i++){
@@ -171,7 +176,7 @@
             axios(
               {
                 method: 'post',
-                url: "http://127.0.0.1:8000/core/gsc_data",
+                url: window.origin + "/core/gsc_data",
                 dataType: "json",
                 data: {
                   "selected" : selectedlist
@@ -186,31 +191,58 @@
               }
             )
           },
-          downloadSelectedSublibraryInfo: function() {
-            var selectedlist = []
 
+          createCSV: function(response) {
+              this.csvString = response.data
+              console.log("CSVSTRING 2:", this.csvString)
+              console.log("CONFIG DATA", response.config.data)
+              // create hyperlink element
+              var element = document.createElement('a');
+              // add attributes
+              element.setAttribute(
+                  'href',
+                  // specify data's media type, and replace URL reserved characters with their UTF-8 encoding
+                  'data:text/plain;charset=utf-8,' + encodeURIComponent(this.csvString)
+              );
+              // when this link is clicked, download it with this name
+              var filename = `${response.config.data.library_name}_sublibrary_info.csv`
+              console.log(filename)
+              element.setAttribute('download', filename);
+              // once this element is appended in the DOM, don't display this element
+              element.style.display = 'none';
+              // append in DOM, then clean up
+              document.body.appendChild(element);
+              element.click();
+              document.body.removeChild(element);
+          },
+
+          downloadSelectedSublibraryInfo: function() {
             for (var i=0; i < this.libraries_selected.length; i++){
-              selectedlist.push(this.libraries_selected[i].value)
-              console.log(this.libraries_selected[i].value)
+              console.log("Inside download function", this.libraries_selected[i].value)
+
+              axios(
+                {
+                  method: 'post',
+                  url: window.origin + "/core/download_sublibrary",
+                  dataType: "json",
+                  data: {
+                    "library_pk" : this.libraries_selected[i].value,
+                    "library_name" : this.libraries_selected[i].text
+                  },
+                  headers: {
+                    "X-CSRFToken": Cookies.get('csrftoken'), 
+                    "content-type": "application/json" 
+                  }
+                }
+              ).then( (response) => {
+                  // this.csvString = response.data
+                  console.log('response: ', JSON.stringify(response, null, 4))
+                  console.log("RESPONSE DATA", response.data)
+                  this.createCSV(response)
+                }
+              )
             }
 
-            axios(
-              {
-                method: 'post',
-                url: "http://127.0.0.1:8000/core/download_sublibrary",
-                dataType: "json",
-                data: {
-                  "selected" : selectedlist
-                  },
-                headers: {
-                  "X-CSRFToken": Cookies.get('csrftoken'), 
-                  "content-type": "application/json" 
-                }
-              }
-            ).then( (response) => {
-              this.results = response.data
-              }
-            )
           },
         },
         computed: {
