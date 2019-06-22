@@ -33,8 +33,6 @@
   <body>
     {% load staticfiles %}
       <b-container fluid id="gsc-form">
-
-        <!-- <b-button v-b-modal.modal-1>Launch demo modal</b-button> -->
         <b-button @click="goHome" > Back to Colossus</b-button>
         <b-card
         id="gsc-card"
@@ -72,7 +70,7 @@
           <b-collapse id="collapse-2">  
           <b-container fluid class="inner-container" id="bottom-result">
               <b-card-text class="text-center" v-if="noLibrariesSelected"> 
-                No libraries were selected.
+                {% verbatim %} {{errorMsg}} {% endverbatim %}
               </b-card-text>
             <b-table responsive hover small :items="results"></b-table>
           </b-container>        
@@ -94,7 +92,7 @@
             <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
 
             <b-modal title="Warning" ref="no-sublib">
-              <p class="my-4">{{currentLibrary}} has no sublibraries. Download anyway?</p>
+              <p class="my-4">{% verbatim %} {{currentLibrary}} has no sublibraries. Download anyway? {% endverbatim %}</p>
               <div slot="modal-footer" class="w-100">
                 <b-button
                   variant="primary"
@@ -286,7 +284,6 @@
               .then(response => {
                   console.log('response: ', JSON.stringify(response, null, 4))
                   this.currentLibraryResponse = response
-                  console.log('*******: ', JSON.stringify(this.currentLibraryResponse, null, 4))
                   this.checkSublibraries()
 
               })
@@ -314,7 +311,7 @@
             }
           },
 
-          checkSublibraries(response){
+          checkSublibraries(){
             // try {
             //   var responseData = this.currentLibraryResponse.data
             // }
@@ -374,9 +371,6 @@
             return this.librariesSelected.length === 0
           },
 
-          get_error_message() {
-            return this.errorMsg
-          },
         },
         created: function() {
           this.allLibraries = JSON.parse(unescape("{{libraries| safe | escapejs}}"))
