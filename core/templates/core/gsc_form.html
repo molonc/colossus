@@ -268,6 +268,8 @@
             })
             search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
 
+            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+            
             return search_results
           },
           noLibrariesSelected() {
