@@ -18,12 +18,17 @@
       rel="stylesheet"
       href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
     />
+    <link
+      rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+      integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+      crossorigin="anonymous"
+    >
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
-    <!-- <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script> -->
-    <script src="../../static/core/bootstrap-vue.js "></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <!-- <script src="../../static/core/bootstrap-vue.js "></script> -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -33,7 +38,7 @@
   <body>
     {% load staticfiles %}
       <b-container fluid id="gsc-form">
-        <b-button @click="goHome" > Back to Colossus</b-button>
+        <b-button @click="goHome" > <i class="fas fa-home"></i> Colossus</b-button>
         <b-card
         id="gsc-card"
         overlay
@@ -43,37 +48,37 @@
         >
           <b-card-text class="show-hide">
               <h3> GSC Submission Helper</h3>
-          </b-card-text> 
-        </b-card>      
-        <b-card>
+          </b-card-text>
+        </b-card>
 
+        <b-card>
           <b-collapse v-model="showCollapse" id="collapse-1">
           <b-container id="bottom-selector">
               <b-row >
                   <b-col>
-                      <i class="fa fa-child"></i> Libraries:
+                      <i class="fa fa-child" ></i></i> Libraries:
                       <b-form-input v-model="searchLibraryKey"></b-form-input>
-                      <b-form-select v-model="selectedLibInLibs" :options="libraryDisplay" multiple :select-size="4"></b-form-select>
-                      <b-button class="teal-button"  v-on:click="addSelectedLib" variant="primary">Add</b-button>
+                      <b-form-select v-model="selectedInLibs" :options="libraryDisplay" multiple :select-size="4"></b-form-select>
+                      <b-button class="my-button"  v-on:click="addSelectedLib" variant="primary">Add</b-button>
                   </b-col>
                   <b-col>
                       <i class="fa fa-edit"></i> Selected:
                       <b-form-input v-model="searchSelectedKey"></b-form-input>
-                      <b-form-select v-model="selectedLibInSelected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
-                      <b-button class="teal-button" v-show="!selected_empty" v-on:click="removeAllLibs" variant="primary">Remove All</b-button>
-                      <b-button class="teal-button  remove-button" v-show="!selected_empty" v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
+                      <b-form-select v-model="selectedInSelected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                      <b-button class="my-button" v-show="!selectedEmpty" v-on:click="removeAllLibs" variant="primary">Remove All</b-button>
+                      <b-button class="my-button  remove-button" v-show="!selectedEmpty" v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
                   </b-col>
               </b-row>
-          </b-container>  
+          </b-container>
           </b-collapse>
 
-          <b-collapse id="collapse-2">  
+          <b-collapse id="collapse-2">
           <b-container fluid class="inner-container" id="bottom-result">
-              <b-card-text class="text-center" v-if="noLibrariesSelected"> 
-                {% verbatim %} {{errorMsg}} {% endverbatim %}
+              <b-card-text class="text-center" v-if="noLibrariesSelected">
+                {% verbatim %} {{errorMsg}}{% endverbatim %}
               </b-card-text>
             <b-table responsive hover small :items="results"></b-table>
-          </b-container>        
+          </b-container>
           </b-collapse>
 
 
@@ -87,74 +92,58 @@
           text-variant="white"
         >
           <b-container>
-            <b-button class="download-button show-hide" v-show="showCollapse" v-b-modal.no-sublib @click="downloadSelectedSublibraryInfo"> Download CSV </b-button>
+            <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo"> Download CSV </b-button>
             <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
             <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
-
-            <b-modal title="Warning" ref="no-sublib">
-              <p class="my-4">{% verbatim %} {{currentLibrary}} has no sublibraries. Download anyway? {% endverbatim %}</p>
-              <div slot="modal-footer" class="w-100">
-                <b-button
-                  variant="primary"
-                  class="teal-button"
-                  @click="downloadAnyway"
-                >
-                  Ok
-                </b-button>
-                  <b-button
-                  variant="primary"
-                  class="grey-button"
-                  @click="skipDownload"
-                >
-                  Skip
-                </b-button>
-              </div>
-            </b-modal>
-
           </b-container>
+        </b-card>
+
+        <b-card v-for="(item) in log" v-model="log" v-bind:key="item.status">
+          {% verbatim %} {{item.status}} {% endverbatim %}
+          <div v-if="!downloaded" class="spinner-border spinner-border-sm float-right" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <div v-else style="float: right;"><i class="fas fa-check"></i></div>
         </b-card>
       </b-container>
     </div>
 
     <script>
-
       window.app = new Vue({
         el: '#gsc-form',
         data: {
           showCollapse: true,
           searchLibraryKey: "",
           searchSelectedKey: "",
-          selectedLibInLibs: [],
-          selectedLibInSelected: [],
+          selectedInLibs: [],
+          selectedInSelected: [],
           allLibraries: [],
           results: [],
           csvString: "",
-          selected_empty: true,
-          librariesSelected: [],
-          noSublibraries: false,
-          configData: {},
-          libraryName: "",
-          currentLibrary: "",
+          log: [],
+          selectedEmpty: true,
+          downloaded: false,
           currentLibraryResponse: {},
+          configData: {},
+          librariesSelected: [],
           errorMsg: "No libraries were selected.",
         },
         methods: {
           goHome: function() {
-            window.location = window.origin 
+            window.location = window.origin
           },
-
           addSelectedLib: function() {
             for (var i=0; i < this.allLibraries.length; i++){
-              if (this.selectedLibInLibs.includes(this.allLibraries[i].value)){
+              if (this.selectedInLibs.includes(this.allLibraries[i].value)){
                 this.allLibraries[i].userselect = true
                 this.librariesSelected.push(this.allLibraries[i])
               }
-            } 
+            }
             this.showRemoveButton()
           },
           removeSelectedLib: function() {
-            for (var i=0; i < this.allLibraries.length; i++){_
-              if (this.selectedLibInSelected.includes(this.allLibraries[i].value)){
+            for (var i=0; i < this.allLibraries.length; i++){
+              if (this.selectedInSelected.includes(this.allLibraries[i].value)){
                 console.log(`removing ${this.allLibraries[i].text}`)
                 this.allLibraries[i].userselect = false
                 this.librariesSelected.pop(this.allLibraries[i])
@@ -162,44 +151,35 @@
             }
             this.showRemoveButton()
           },
-
           removeAllLibs: function() {
               for (var i=0; i < this.allLibraries.length; i++){
                 if (this.allLibraries[i].userselect) {
                   console.log(`removing ${this.allLibraries[i].text}`)
                   this.allLibraries[i].userselect = false
                 }
-
                 this.librariesSelected = []
               }
               this.showRemoveButton()
           },
-
           showRemoveButton: function() {
-            this.selected_empty = (this.librariesSelected.length == 0 ? true: false)
+            this.selectedEmpty = (this.librariesSelected.length == 0 ? true: false)
           },
-
           updateCollapse: function() {
             this.showCollapse = !this.showCollapse
           },
-
           showSelectedData: function() {
             this.updateCollapse()
             var selectedlist = []
-
             for (var i=0; i < this.librariesSelected.length; i++){
               selectedlist.push(this.librariesSelected[i].value)
               console.log(this.librariesSelected[i].value)
             }
-
             if (selectedlist.length == 0){
               console.log("No libraries selected")
             }
-
             else {
               console.log(`${this.librariesSelected.length} selected`)
             }
-
             axios(
               {
                 method: 'post',
@@ -209,8 +189,8 @@
                   "selected" : selectedlist
                   },
                 headers: {
-                  "X-CSRFToken": Cookies.get('csrftoken'), 
-                  "content-type": "application/json" 
+                  "X-CSRFToken": Cookies.get('csrftoken'),
+                  "content-type": "application/json"
                 }
               }
             ).then( (response) => {
@@ -218,11 +198,8 @@
               }
             )
           },
-
-          createCSV: function(response) {
-              this.csvString = response.data
-              this.configData = JSON.parse(response.config.data)
-              this.libraryName = this.configData.libraryName
+          createCSV: function() {
+              this.csvString = this.currentLibraryResponse.data
 
               // create hyperlink element
               var element = document.createElement('a');
@@ -233,144 +210,72 @@
                   'data:text/plain;charset=utf-8,' + encodeURIComponent(this.csvString)
               );
               // when this link is clicked, download it with this name
-              var filename = `${this.libraryName}_sublibrary_info.csv`
-              console.log(filename)
-              element.setAttribute('download', filename);
+              element.setAttribute('download', this.filename);
               // once this element is appended in the DOM, don't display this element
               element.style.display = 'none';
               // append in DOM, then clean up
               document.body.appendChild(element);
               element.click();
               document.body.removeChild(element);
+              this.downloaded = true
+              this.log.pop()
+              status = `Downloaded ${this.filename}`
+              this.log.push({status: status})
           },
-
           downloadSelectedSublibraryInfo: function() {
+            this.log = []
+            this.downloaded = false
             for (var i=0; i < this.librariesSelected.length; i++){
-              this.currentLibrary = this.librariesSelected[i].text
-              this.noSublibraries = false
-              console.log("Inside download function", this.librariesSelected[i].value)
-
-              async function getData(value, text) {
-                  try {
-                    let response = await axios(
-                        {
-                          method: 'post',
-                          url: window.origin + "/core/download_sublibrary",
-                          dataType: "json",
-                          data: {
-                            "libraryPk" : value,
-                            "libraryName" : text,
-                          },
-                          headers: {
-                            "X-CSRFToken": Cookies.get('csrftoken'), 
-                            "content-type": "application/json" 
-                          }
-                        }
-                      )
-
-                    if(response.status == 200){
-                        // test for status you want, etc
-                        console.log(response.status)
-                    }    
-                    // Don't forget to return something   
-                    return response
+              axios(
+                {
+                  method: 'post',
+                  url: window.origin + "/core/download_sublibrary",
+                  dataType: "json",
+                  data: {
+                    "libraryPk" : this.librariesSelected[i].value,
+                    "libraryName" : this.librariesSelected[i].text
+                  },
+                  headers: {
+                    "X-CSRFToken": Cookies.get('csrftoken'),
+                    "content-type": "application/json"
                   }
-
-                  catch (err) {
-                      console.error("ERROR:", err);
-                  }
-              }
-              getData(this.librariesSelected[i].value, this.librariesSelected[i].text)
-              .then(response => {
-                  console.log('response: ', JSON.stringify(response, null, 4))
+                }
+              ).then( (response) => {
                   this.currentLibraryResponse = response
-                  this.checkSublibraries()
-
-              })
-
-              // axios(
-              //   {
-              //     method: 'post',
-              //     url: window.origin + "/core/download_sublibrary",
-              //     dataType: "json",
-              //     data: {
-              //       "libraryPk" : this.librariesSelected[i].value,
-              //       "libraryName" : this.librariesSelected[i].text,
-              //     },
-              //     headers: {
-              //       "X-CSRFToken": Cookies.get('csrftoken'), 
-              //       "content-type": "application/json" 
-              //     }
-              //   }
-              // ).then( (response) => {
-              //     console.log('response: ', JSON.stringify(response, null, 4))
-              //     this.currentLibraryResponse = response
-              //     this.checkSublibraries(response)
-              //   }
-              // )
+                  this.configData = JSON.parse(this.currentLibraryResponse.config.data)
+                  this.filename = `${this.configData.libraryName}_sublibrary_info.csv`
+                  var status = `Downloading ${this.filename}  \n`
+                  this.log.push({status: status})
+                  this.createCSV()
+                }
+              )
             }
-          },
-
-          checkSublibraries(){
-            // try {
-            //   var responseData = this.currentLibraryResponse.data
-            // }
-
-            // catch (err) {
-            //   console.log("DATA IS EMPTY")
-            //   return false
-            // }
-
-            console.log("RESPONSE DATA ", this.currentLibraryResponse.data)
-            if (this.currentLibraryResponse.data === "") {
-              console.log("MODAL SHOULD APPEAR")
-              this.noSublibraries = true
-              this.$refs['no-sublib'].show()
-            }
-
-            else {
-              console.log("LIBRARY HAS SUBLIBRARIES. DOWNLOADING...")
-              this.createCSV(this.currentLibraryResponse)
-            }
-          },
-
-          downloadAnyway() {
-            console.log("DOWNLOADING CSV ANYWAYS")
-            this.createCSV(this.currentLibraryResponse)
-            this.$refs['no-sublib'].hide()
-          },
-
-          skipDownload() {
-            console.log("SKIPPING DOWNLOAD")
-            this.$refs['no-sublib'].hide()
           },
         },
         computed: {
           libraryDisplay() {
             var filter = this.searchLibraryKey
-
             search_results = this.allLibraries.filter(function (library) {
               return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
             search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
             return search_results
           },
-
           selectedDisplay() {
             var filter = this.searchSelectedKey
             search_results = this.allLibraries.filter(function (library) {
               return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
             })
-
             search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
-            
+
             return search_results
           },
-
           noLibrariesSelected() {
             return this.librariesSelected.length === 0
           },
-
+          get_error_message() {
+            return this.errorMsg
+          },
         },
         created: function() {
           this.allLibraries = JSON.parse(unescape("{{libraries| safe | escapejs}}"))
@@ -379,18 +284,17 @@
     </script>
 
     <style>
-
     #gsc-form {
         padding-top: 4%;
         width: 800px;
     }
-    
+
     #gsc-card {
       width: 100%;
       margin: 0 auto;
       border-radius: 100px;
+      padding: 10px;
     }
-
     .show-button {
       background-color: #a3a3a3;
       border-color: #a3a3a3;
@@ -398,64 +302,41 @@
       vertical-align: middle;
       width: 7em;
     }
-
     #bottom-selector {
       height:220px;
       align-content: center;
       padding: 10px;
-
     }
     #bottom-result {
       padding: 10px;
       max-height:500px;
       overflow-y: scroll;
     }
-
-    .show-hide { 
-      display: none; 
+    .show-hide {
+      display: none;
     }
-
     /* Hide/Show elements when window is resized*/
     @media screen and (min-width: 768px) {
       .show-hide  { display: block; }
       #leftside > button { display: none; }
     }
-
-    .teal-button {
+    .my-button {
       background-color: #76ccc7;
       border-color: #76ccc7;
       float: right;
-      margin: 0.3em
-
+      margin-top: 0.3em
     }
-
-    .teal-button:hover {
+    .my-button:hover {
       background-color: #5faaa5;
       border-color: #5faaa5;
     }
-
-    .grey-button {
-      background-color: #a3a3a3;
-      border-color: #a3a3a3;
-      float: right;
-      margin: 0.3em
-
-    }
-
-    .grey-button:hover {
-      background-color: #5a6268;
-      border-color: #5a6268;
-    }
-
     .submit-button {
         float: right;
         margin-top: 0.3em
     }
-
     .remove-button {
         margin: 5px;
     }
-
     .back-button {
       background-color: #a3a3a3;
       border-color: #a3a3a3;
@@ -463,7 +344,6 @@
       vertical-align: middle;
       width: 7em;
     }
-
     .download-button {
       background-color: #a3a3a3;
       border-color: #a3a3a3;
@@ -471,15 +351,12 @@
       vertical-align: middle;
       width: 9em;
     }
-
     .container-fluid {
         width: 75% !important;
     }
-
     .inner-container {
       width: 100% !important;
     }
-
     </style>
   </body>
 </html>

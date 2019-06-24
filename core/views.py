@@ -121,11 +121,11 @@ class IndexView(LoginRequiredMixin, TemplateView):
 @login_required
 def gsc_submission_form(request):
   return render(
-      request, 
-      "core/gsc_form.html", 
-      {"libraries" : 
+      request,
+      "core/gsc_form.html",
+      {"libraries" :
           json.dumps([{
-                "value" : library.pk, 
+                "value" : library.pk,
                 "text" : "{}_{}".format(library.pool_id,library.sample.sample_id),
                 "userselect" : False,
             } for library in DlpLibrary.objects.all()],
@@ -156,25 +156,19 @@ def gsc_info_post(request):
 
 def download_sublibrary_info(request):
     library = get_object_or_404(DlpLibrary, pk=json.loads(request.body.decode('utf-8'))["libraryPk"])
-
     sublibraries = library.sublibraryinformation_set.all()
-
-    if not sublibraries:
-        print("No sublibraries")
-        return HttpResponse("")
 
     csvString = "Sub-Library ID,Index Sequence\n"
     for sublib in sublibraries:
         csvString += "{},{}-{}\n".format(
             sublib.get_sublibrary_id(),
-            sublib.primer_i7, 
+            sublib.primer_i7,
             sublib.primer_i5
         )
 
-    print(csvString)
     return HttpResponse(csvString)
 
-        
+
 
 #============================
 # Sample views
@@ -309,7 +303,7 @@ def analysis_detail(request, pk):
 @login_required
 def sample_name_to_id_redirect(request, pk=None, sample_id=None):
     if pk is not None:
-        context = dict(            
+        context = dict(
             library_list=['dlp', 'pbal', 'tenx'],
             sample=get_object_or_404(Sample, pk=pk),
             pk=pk
@@ -412,7 +406,7 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
         if(request.session['library_type'] == 'dlp'):
             form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
             form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
-            form.fields['reporter'].initial = 'elaks'                                                                                    
+            form.fields['reporter'].initial = 'elaks'
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
             form.fields['description'].initial = 'Awaiting first sequencing...'
@@ -762,7 +756,7 @@ class SequencingList(LoginRequiredMixin, TemplateView):
             'sequencings': sequencing_list,
             'library_type': self.library_type,
         }
-        
+
         return context
 
 
@@ -1142,6 +1136,3 @@ class SearchView(TemplateView):
             return {"total" : 0}
 
         return return_text_search(query_str)
-
-
-
