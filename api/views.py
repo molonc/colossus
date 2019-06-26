@@ -136,7 +136,7 @@ class ProjectViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',

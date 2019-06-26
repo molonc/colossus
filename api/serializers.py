@@ -37,7 +37,7 @@ from dlp.models import (
     DlpSequencing,
     DlpLane,
     DlpLibrary,
-)
+    DlpLibraryQuantificationAndStorage)
 
 from tenx.models import *
 
@@ -179,20 +179,7 @@ class SequencingSerializer(serializers.ModelSerializer):
     dlplane_set = LaneSerializer(many=True, read_only=True)
     class Meta:
         model = DlpSequencing
-        fields = (
-            'id',
-            'library',
-            'adapter',
-            'read_type',
-            'index_read_type',
-            'sequencing_instrument',
-            'submission_date',
-            'dlplane_set',
-            'gsc_library_id',
-            'sequencing_center',
-            'rev_comp_override',
-            'number_of_lanes_requested',
-        )
+        fields = "__all__"
 
 
 class TagSerializerField(serializers.ListField):
@@ -213,11 +200,16 @@ class DlpLibrarySampleDetailSerializer(serializers.ModelSerializer):
         model = DlpLibrarySampleDetail
         fields = '__all__'
 
+class DlpLibraryQuantificationAndStorageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpLibraryQuantificationAndStorage
+        fields = '__all__'
 
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer()
     dlplibraryconstructioninformation = DlpLibraryConstructionInformationSerializer()
     dlplibrarysampledetail = DlpLibrarySampleDetailSerializer()
+    dlplibraryquantificationandstorage = DlpLibraryQuantificationAndStorageSerializer()
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
     projects = TagSerializerField()
     class Meta:
@@ -239,6 +231,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'projects',
             'dlplibraryconstructioninformation',
             'dlplibrarysampledetail',
+            'dlplibraryquantificationandstorage',
             'exclude_from_analysis',
         )
 
