@@ -8,6 +8,7 @@ from django.conf.urls import url, include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions, routers
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from . import views
 
 schema_view = get_schema_view(
@@ -65,4 +66,6 @@ urlpatterns = [
     url(r'^samplesheet_query/(?P<flowcell>.+)$', views.dlp_sequencing_get_queried_samplesheet, name='dlp_sequencing_get_queried_samplesheet'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    url(r'^auth/$', obtain_jwt_token),
+    url(r'^auth/refresh/$', refresh_jwt_token)
 ]

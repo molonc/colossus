@@ -412,7 +412,7 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
 # KUDU API
 #----------------------------
 class KuduList(RestrictedQueryMixin, viewsets.ModelViewSet):
-    permission_classes = (AllowAny, )
+    permission_classes = (IsAuthenticated, )
     pagination_class = None
 
 #CORE
