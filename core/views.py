@@ -65,7 +65,8 @@ from .forms import (
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
-    SublibraryForm
+    SublibraryForm,
+    DoubletInfoForm
 )
 from .utils import (
     create_sublibrary_models,
@@ -346,7 +347,7 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
 
     template_name = "core/library_detail.html"
 
-    def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None):
+    def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None, doubletinfo_fields=None):
         library_dict = self.sort_library_order(library)
         context = {
             'library': library,
@@ -356,6 +357,7 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
             'chip_metadata': chip_metadata,
             'metadata_fields': metadata_fields,
             'library_dict':library_dict,
+            'doubletinfo_fields':doubletinfo_fields,
         }
         return render(request, self.template_name, context)
 
@@ -470,6 +472,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
+            'doublet_form': DoubletInfoForm(),
             'libdetail_formset': self.libdetail_formset_class(),
             'libcons_formset': self.libcons_formset_class(),
             'libqs_formset': self.libqs_formset_class(),

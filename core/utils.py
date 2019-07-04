@@ -40,6 +40,19 @@ def read_excel_sheets(filename, sheetnames):
             raise ValueError('unable to read sheet(s)', sheetname)
         yield data[sheetname]
 
+
+def generate_doublet_info(filename):
+    """ Read SmartChipApp results and record doublet info
+    """
+    results = read_excel_sheets(filename, ['Summary'])
+
+    # Filter out rows with no conditions
+    results = results[results["Condition"] != "~"]
+
+    print(results.columns)
+
+
+
 def parse_smartchipapp_results_file(filename):
     """ Parse the result file of SmartChipApp.
     """

@@ -202,6 +202,25 @@ class LibraryQuantificationAndStorageForm(ModelForm):
         get validated and saved."""
         return True
 
+
+class DoubletInfoForm(Form):
+    # SmartChipApp results file
+    smartchipapp_results_file = FileField(
+        label="SmartChipApp results:",
+        required=False,
+    )
+
+    def clean_smartchipapp_results_file(self):
+        filename = self.cleaned_data['smartchipapp_results_file']
+        if filename:
+            try:
+                results = parse_smartchipapp_results_file(filename)
+                self.cleaned_data['smartchipapp_results'] = results
+            except ValueError as e:
+                self.add_error('smartchipapp_results_file', ' '.join(e.args))
+            except Exception as e:
+                self.add_error('smartchipapp_results_file', 'failed to parse the file.')
+
 #===========================
 # Project forms
 #---------------------------
