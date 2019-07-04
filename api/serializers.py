@@ -80,12 +80,15 @@ class SampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = (
+            'id',
             'anonymous_patient_id',
             'cell_line_id',
             'sample_id',
             'sample_type',
             'taxonomy_id',
             'xenograft_id',
+            'dlplibrary_set',
+            'tenxlibrary_set',
             'additionalsampleinformation',
         )
 
@@ -182,11 +185,18 @@ class SequencingSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TagSerializerField(serializers.ListField):
-    child = serializers.CharField()
+class TagSerializerField(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = (
+            'id',
+            'name'
+        )
 
-    def to_representation(self, data):
-        return data.values_list('name', flat=True)
+
+    # def to_representation(self, data):
+    #     print(type(data.values_list('name', flat=True)))
+    #     return data.values_list('id', flat=True)
 
 
 class DlpLibraryConstructionInformationSerializer(serializers.ModelSerializer):
@@ -211,7 +221,7 @@ class LibrarySerializer(serializers.ModelSerializer):
     dlplibrarysampledetail = DlpLibrarySampleDetailSerializer()
     dlplibraryquantificationandstorage = DlpLibraryQuantificationAndStorageSerializer()
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
-    projects = TagSerializerField()
+    projects = TagSerializerField(read_only=True, many=True)
     class Meta:
         model = DlpLibrary
         fields = (
