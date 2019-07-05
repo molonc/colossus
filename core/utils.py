@@ -8,6 +8,7 @@ Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 
 import os, sys, io
 import pandas as pd
+import numpy as np
 import yaml
 from string import Template
 from collections import OrderedDict
@@ -48,8 +49,32 @@ def generate_doublet_info(filename):
 
     # Filter out rows with no conditions
     results = results[results["Condition"] != "~"]
+    data = {"Live": [0, 0 ,0], "Dead": [0, 0, 0], "Other": [0, 0, 0]}
+    row_names = ["1 cell", "2 cell", "More than 2 cells"]
 
-    print(results.columns)
+    doublet_table = pd.DataFrame(data, index = row_names)
+
+    single_matrix = np.identity(3)
+    doublet_matrix = np.identity(3)*2
+
+    live_single = [1, 0, 0]
+    dead_single = [0, 1, 0]
+    other_single = [0, 0, 1]
+    live_doublet = [2, 0, 0]
+    dead_doublet = [0, 2, 0]
+    other_doublet = [0, 0, 2]
+    # live_gte_doublet = [1, 1, 0]
+    # dead_gte_doublet = [1, 0, 0]
+    # other_gte_doublet = [1, 0, 0]
+    for index, row in results.iterrows():
+        override_row = [row["Rev_Live"], row["Rev_Dead"], row["Rev_Other"]]
+        if np.array_equal(override_row, [-1, -1, -1]):
+
+            continue
+        else:
+            continue
+
+    # print(results.columns)
 
 
 

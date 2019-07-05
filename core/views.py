@@ -347,7 +347,17 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
 
     template_name = "core/library_detail.html"
 
-    def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None, doubletinfo_fields=None):
+    def get_context_and_render(
+        self,
+        request,
+        library,
+        library_type,
+        analyses=None,
+        sublibinfo_fields=None,
+        chip_metadata=None,
+        metadata_fields=None,
+        doubletinfo_fields=None
+    ):
         library_dict = self.sort_library_order(library)
         context = {
             'library': library,
@@ -497,8 +507,10 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
         lib_form = self.lib_form_class(request.POST, instance=library)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
+        doublet_form = DoubletInfoForm(request.POST, request.FILES or None)
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
+        context['doublet_form'] = doublet_form
 
         error_message = ''
         try:
@@ -515,6 +527,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                    doublet_results = doublet_form.cleaned_data.get('smartchipapp_results')
                     if region_metadata is not None and sublib_results is not None:
                         instance.sublibraryinformation_set.all().delete()
                         instance.chipregion_set.all().delete()

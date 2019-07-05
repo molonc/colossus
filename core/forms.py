@@ -38,7 +38,7 @@ from .models import (
     AdditionalSampleInformation,
     JiraUser,
     Project)
-from .utils import parse_smartchipapp_results_file
+from .utils import parse_smartchipapp_results_file, generate_doublet_info
 from .jira_templates.jira_wrapper import *
 from jira import JIRA, JIRAError
 from colossus.settings import JIRA_URL
@@ -186,6 +186,25 @@ class SublibraryForm(Form):
                 self.add_error('smartchipapp_results_file', 'failed to parse the file.')
 
 
+class DoubletInfoForm(Form):
+    # SmartChipApp results file
+    smartchipapp_results_file = FileField(
+        label="SmartChipApp results:",
+        required=False,
+    )
+
+    def clean_smartchipapp_results_file(self):
+        filename = self.cleaned_data['smartchipapp_results_file']
+        if filename:
+            try:
+                results = generate_doublet_info(filename)
+                self.cleaned_data['smartchipapp_results'] = results
+            except ValueError as e:
+                self.add_error('smartchipapp_results_file', ' '.join(e.args))
+            except Exception as e:
+                self.add_error('smartchipapp_results_file', 'failed to parse the file.')
+
+
 class LibraryQuantificationAndStorageForm(ModelForm):
 
     """
@@ -202,24 +221,6 @@ class LibraryQuantificationAndStorageForm(ModelForm):
         get validated and saved."""
         return True
 
-
-class DoubletInfoForm(Form):
-    # SmartChipApp results file
-    smartchipapp_results_file = FileField(
-        label="SmartChipApp results:",
-        required=False,
-    )
-
-    def clean_smartchipapp_results_file(self):
-        filename = self.cleaned_data['smartchipapp_results_file']
-        if filename:
-            try:
-                results = parse_smartchipapp_results_file(filename)
-                self.cleaned_data['smartchipapp_results'] = results
-            except ValueError as e:
-                self.add_error('smartchipapp_results_file', ' '.join(e.args))
-            except Exception as e:
-                self.add_error('smartchipapp_results_file', 'failed to parse the file.')
 
 #===========================
 # Project forms
@@ -408,4 +409,3 @@ class GSCFormSubmitterInfo(Form):
         choices=at_completion_choices,
         initial='R',
     )
-
