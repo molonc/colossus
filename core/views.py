@@ -132,6 +132,14 @@ def gsc_submission_form(request):
               cls=DjangoJSONEncoder)}
     )
 
+@login_required
+def pipeline_status_page(request):
+  return render(
+      request,
+      "core/vue/status-page.html",
+      {}
+    )
+
 def gsc_info_post(request):
     selected = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
     returnJson = [{
