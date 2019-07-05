@@ -5,15 +5,7 @@
 
 <div id="app">
     <div>
-      <md-table v-model="information" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
-        <md-table-toolbar>
-        <h1 class="md-title">Status Page</h1>
-        </md-table-toolbar>
-
-        <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="ID" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
-        </md-table-row>
-      </md-table>
+      HELLO WORLD
     </div>
 </div>
 <script>
@@ -21,6 +13,27 @@
     el: '#app',
     data: {
       information: [{id: 3}]
+    },
+    methods: {
+      axiosGetSamples () {
+        let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOCwidXNlcm5hbWUiOiJzc29uZyIsImV4cCI6MTU2Mjk3NTIyOCwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2MjM3MDQyOH0.OGyLNiP476J31Bs2zYuvRJVQO7vL4A3FIZARV_J-Cpo"
+        let url = "http://127.0.0.1:8001/api/analysis/"
+        axios
+        .get(url,{
+          headers : {
+            Authorization : 'JWT ' + token
+          }
+        })
+        .then(r => {
+          resolve("success")
+        })
+        .catch(e => {
+        })
+      }
+    },
+    created () {
+      console.log("CREATED")
+      this.axiosGetSamples()
     },
   })
 </script>
