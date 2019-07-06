@@ -515,7 +515,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         error_message = ''
         try:
             with transaction.atomic():
-                if lib_form.is_valid() and sublib_form.is_valid():
+                if lib_form.is_valid() and sublib_form.is_valid() and doublet_form.is_valid():
                     instance = lib_form.save(commit=False)
                     if instance.pk is None:
                         create = True

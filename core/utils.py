@@ -49,32 +49,55 @@ def generate_doublet_info(filename):
 
     # Filter out rows with no conditions
     results = results[results["Condition"] != "~"]
-    data = {"Live": [0, 0 ,0], "Dead": [0, 0, 0], "Other": [0, 0, 0]}
-    row_names = ["1 cell", "2 cell", "More than 2 cells"]
 
-    doublet_table = pd.DataFrame(data, index = row_names)
+    col_names = ["Live", "Dead", "Other"]
+    row_names = ["1 cell", "2 cell", "More than 2 cells"]
+    # data = {"Live": [0, 0, 0], "Dead": [0, 0, 0], "Other": [0, 0, 0]}
+    data = np.zeros((3,3))
+
+    doublet_table = pd.DataFrame(data, columns=col_names, index=row_names)
 
     single_matrix = np.identity(3)
     doublet_matrix = np.identity(3)*2
 
-    live_single = [1, 0, 0]
-    dead_single = [0, 1, 0]
-    other_single = [0, 0, 1]
-    live_doublet = [2, 0, 0]
-    dead_doublet = [0, 2, 0]
-    other_doublet = [0, 0, 2]
-    # live_gte_doublet = [1, 1, 0]
-    # dead_gte_doublet = [1, 0, 0]
-    # other_gte_doublet = [1, 0, 0]
+    # single = [0, 0, 0]
+    # doublet = [0, 0, 0]
+    # gte_doublet = [0, 0, 0]
     for index, row in results.iterrows():
+        smartchip_row = [row["Num_Live"], row["Num_Dead"], row["Num_Other"]]
         override_row = [row["Rev_Live"], row["Rev_Dead"], row["Rev_Other"]]
         if np.array_equal(override_row, [-1, -1, -1]):
+            print("row {} is not overridden".format(index))
 
-            continue
+            # TODO: create seperate function
+            if smartchip_row in single_matrix:
+                # cell = single_matrix.index(smartchip_row)
+                for row in len(smartchip_row):
+                    if smartchip_row == single_matrix[row]:
+                        single_matrix[0][row] += 1
+
+            elif smartchip_row in doublet_matrix:
+                for row in len(smartchip_row):
+                    if smartchip_row == doublet_matrix[row]:
+                        doublet_table[1][row] += 1
+            else:
+                # Figure out way to caculate gte doublets
+                continue
+
         else:
-            continue
+            print("row {} is overridden".format(index))
+            if smartchip_row in single_matrix:
+                # cell = single_matrix.index(smartchip_row)
+                for row in len(smartchip_row):
+                    if smartchip_row == single_matrix[row]:
+                        single_matrix[0][row] += 1
 
-    # print(results.columns)
+            elif smartchip_row in doublet_matrix:
+                for row in len(smartchip_row):
+                    if smartchip_row == doublet_matrix[row]:
+                        doublet_table[1][row] += 1
+            else:
+                continue
 
 
 
