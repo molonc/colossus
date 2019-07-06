@@ -3,16 +3,26 @@
 
 {% block body %}
 
-<div id="app">
-    <div>
-      HELLO WORLD
-    </div>
+<div id="app" class="centre-focus">
+    <div >
+        <div class="centre-focus">
+          <div>
+            <md-content class="sidemenu">
+            </md-content>
+          </div>
+          <div >
+            <md-content class="topmenu">
+            </md-content>     
+            <md-content class="maincontent">
+            </md-content>
+          </div>
+        </div>
+      </div>
 </div>
 <script>
   new Vue({
     el: '#app',
     data: {
-      information: [{id: 3}]
     },
     methods: {
       axiosGetSamples () {
@@ -37,5 +47,48 @@
     },
   })
 </script>
+
+<style>
+.topmenu {
+  height: 50px;
+  width:800px;  
+  max-width: calc(100vw - 125px);
+  display: flex;
+  align-items: center;
+}
+
+.sidemenu {
+  width: 260px;
+  height: 68vh;
+  max-width: calc(100vw - 100px);
+  overflow-y : scroll;
+}
+
+.maincontent {
+  height: calc(80vh - 49px);
+  width:800px;  
+  max-width: calc(100vw - 125px);
+}
+
+.centre-focus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 100vh;
+  background-color: beige;
+}
+
+.md-content {
+  
+  z-index: 1;
+  padding: 15px;
+  margin: 0.2vh;
+  position: relative;
+}
+
+
+</style>
+
 {% endblock %}
 
