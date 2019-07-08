@@ -481,6 +481,7 @@ class TenxSequencingSerializer(serializers.ModelSerializer):
             'number_of_lanes_requested',
             'lane_requested_date',
             'sequencer_notes',
+            'gsc_library_id',
         )
 
 

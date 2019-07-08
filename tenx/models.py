@@ -374,6 +374,12 @@ class TenxSequencing(models.Model, FieldValue):
         blank=True
     )
 
+    gsc_library_id = create_chrfield(
+        "GSC Library ID",
+        blank=True,
+        null=True,
+    )
+
     number_of_lanes_requested = models.PositiveIntegerField(
         default=1,
         verbose_name="Sequencing Goal"
