@@ -134,16 +134,30 @@ def gsc_submission_form(request):
 
 @login_required
 def pipeline_status_page(request):
-  samples = Sample.objects.filter(pk__in=[123, 124, 7, 13, 12, 269])
-  print(samples)
+  samples = Sample.objects.filter(pk__in=[72, 123, 124, 7, 13, 12, 269])
+  sample_list = []
+  for s in samples:
+      dlplibraries = []
+      for d in s.dlplibrary_set.all():
+          print(d.pool_id)
+          library = {}
+          library["library"] = d.pool_id
+          if d.dlpanalysisinformation_set.all():
+              library["analyses"] = []
+              for a in d.dlpanalysisinformation_set.all():
+                  library["analyses"].append({"jira" : a.analysis_jira_ticket, "date" : a.analysis_submission_date, "lanes" : a.lanes.count()})
+          dlplibraries.append(library)
+      sample_list.append({
+          "id": s.pk,
+          "name": s.sample_id,
+          "dlplibraries" : dlplibraries,
+          "show" : False
+      })
+ 
   return render(
       request,
       "core/vue/status-page.html",
-      { "samples" : json.dumps([{
-                "id" : s.pk,
-                "name" : s.sample_id,
-            } for s in samples],
-              cls=DjangoJSONEncoder)} 
+      { "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder)}
     )
 
 def gsc_info_post(request):

@@ -35,12 +35,40 @@ var Row =  {
       @click="sample.show = !sample.show">ID {% verbatim %}{{sample.id}}{% endverbatim %}</md-button>
       <md-button disabled style="color: black;" >DEscription</md-button>
       <md-button disabled style="color: black;">{% verbatim %}{{sample.name}}{% endverbatim %}</md-button>
-      <md-button disabled>DLP+</md-button>
-      <md-button disabled>Align</md-button>
-      <md-button disabled>hmmcopy</md-button>
-      <md-button class="md-primary">pseudobulk</md-button>
-      <b-collapse :id="sample.name" v-model="sample.show" class="mt-2">
-        <b-card>I should start open!</b-card>
+
+      <b-collapse v-if="sample.show" :id="sample.name" v-model="sample.show" class="mt-2">
+        <div v-if="sample.dlplibraries.length">
+          <div v-for="library in sample.dlplibraries">
+
+            <div v-if="library.analyses">
+                <md-table md-card>
+                    <md-table-toolbar>
+                      <md-button disabled class="btn-small">Library</md-button>
+                      <md-button class="btn-small">{% verbatim %}{{library.library}}{% endverbatim %}</md-button>
+                    </md-table-toolbar>
+
+                    <md-table-row>
+                      <md-table-head>JIRA</md-table-head>
+                      <md-table-head>Submission</md-table-head>
+                      <md-table-head>Lanes</md-table-head>
+                      <md-table-head>DLP+</md-table-head>
+                      <md-table-head>Align</md-table-head>
+                      <md-table-head>hmmcopy</md-table-head>
+                      <md-table-head>pseudobulk</md-table-head>
+                    </md-table-row>
+                    
+                    <div v-for="analysis in library.analyses">
+                    </div>
+                </md-table>
+            </div>
+            <div v-else>
+              <md-button disabled class="btn-lrg">Np DLP Analysis on Library {% verbatim %}{{library.library}}{% endverbatim %}</md-button>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <md-button disabled class="btn-lrg">Np DLP Library</md-button>
+        </div>
       </b-collapse>
     </div>
   `
@@ -94,8 +122,17 @@ span {
   width: 100px;
 }  
 
+.btn-small {
+    width: 100px;
+}
+
+
+.btn-lrg {
+    width: 300px;
+}
+
 .status-row {
-  padding-left: 8px;
+  padding: 8px;
 }
 
 .topmenu {
