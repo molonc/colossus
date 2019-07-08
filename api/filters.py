@@ -61,6 +61,7 @@ class AnalysisInformationFilter(filters.FilterSet):
 
         return queryset
 
+    jira_tickets = ListFilter(name='analysis_jira_ticket')
 
     class Meta:
         model = DlpAnalysisInformation
