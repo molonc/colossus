@@ -12,24 +12,45 @@
           </div>
           <div >
             <md-content class="topmenu">
-              <md-menu>
-              <md-menu-content>
-                <md-menu-item>My Item 1</md-menu-item>
-                <md-menu-item>My Item 2</md-menu-item>
-                <md-menu-item>My Item 3</md-menu-item>
-              </md-menu-content>
-            </md-menu>
+                {% include "core/vue/status-header.html" %}
             </md-content>     
             <md-content class="maincontent">
+              <Row v-for="sample in samples" :sample="sample"/>
             </md-content>
           </div>
         </div>
       </div>
 </div>
 <script>
+
+
+var Row =  {
+  props: ['sample'],
+  template: `
+    <div class="status-row">
+      <md-button
+      :class="sample.show ? 'collapsed' : null"
+      :aria-expanded="sample.show ? 'true' : 'false'"
+      :aria-controls="sample.name"
+      @click="sample.show = !sample.show">ID {% verbatim %}{{sample.id}}{% endverbatim %}</md-button>
+      <md-button disabled style="color: black;" >DEscription</md-button>
+      <md-button disabled style="color: black;">{% verbatim %}{{sample.name}}{% endverbatim %}</md-button>
+      <md-button disabled>DLP+</md-button>
+      <md-button disabled>Align</md-button>
+      <md-button disabled>hmmcopy</md-button>
+      <md-button class="md-primary">pseudobulk</md-button>
+      <b-collapse :id="sample.name" v-model="sample.show" class="mt-2">
+        <b-card>I should start open!</b-card>
+      </b-collapse>
+    </div>
+  `
+  }
+          
+
   new Vue({
     el: '#app',
     data: {
+      samples: []
     },
     methods: {
       axiosGetSamples () {
@@ -48,17 +69,38 @@
         })
       }
     },
+    components:{
+      Row
+    },
     created () {
       console.log("CREATED")
       this.axiosGetSamples()
+      
+      this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      console.log(this.samples)
     },
   })
 </script>
 
 <style>
+
+span { 
+    display:block;
+    width:150px;
+    word-wrap:break-word;
+}
+
+.md-button {
+  width: 100px;
+}  
+
+.status-row {
+  padding-left: 8px;
+}
+
 .topmenu {
   height: 50px;
-  width:800px;  
+  width:830px;  
   max-width: calc(100vw - 125px);
   display: flex;
   align-items: center;
@@ -73,8 +115,9 @@
 
 .maincontent {
   height: calc(80vh - 49px);
-  width:800px;  
+  width:830px; 
   max-width: calc(100vw - 125px);
+  overflow: scroll;
 }
 
 .centre-focus {

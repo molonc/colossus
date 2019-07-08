@@ -134,10 +134,16 @@ def gsc_submission_form(request):
 
 @login_required
 def pipeline_status_page(request):
+  samples = Sample.objects.filter(pk__in=[123, 124, 7, 13, 12, 269])
+  print(samples)
   return render(
       request,
       "core/vue/status-page.html",
-      {}
+      { "samples" : json.dumps([{
+                "id" : s.pk,
+                "name" : s.sample_id,
+            } for s in samples],
+              cls=DjangoJSONEncoder)} 
     )
 
 def gsc_info_post(request):
