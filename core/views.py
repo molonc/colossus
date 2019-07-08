@@ -507,7 +507,9 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
         lib_form = self.lib_form_class(request.POST, instance=library)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
+        print("SUBLIB FORM : {}".format(sublib_form.errors))
         doublet_form = DoubletInfoForm(request.POST, request.FILES or None)
+        print("DOUBLET FORM : {}".format(doublet_form.errors))
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
         context['doublet_form'] = doublet_form
@@ -516,6 +518,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         try:
             with transaction.atomic():
                 if lib_form.is_valid() and sublib_form.is_valid() and doublet_form.is_valid():
+                    print("FORMS ARE VALIDATED")
                     instance = lib_form.save(commit=False)
                     if instance.pk is None:
                         create = True
@@ -527,7 +530,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                    doublet_results = doublet_form.cleaned_data.get('smartchipapp_results')
+                    doublet_results = doublet_form.cleaned_data.get('smartchipapp_summary')
                     if region_metadata is not None and sublib_results is not None:
                         instance.sublibraryinformation_set.all().delete()
                         instance.chipregion_set.all().delete()
@@ -569,6 +572,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         [formset.save() for formset in formsets.values()]
                         return HttpResponseRedirect('/{}/library/{}'.format(context['library_type'], instance.id))
                 else:
+                    print("FORMS ARE NOT VALIDATED ANGRY FACE!!!")
                     messages.info(request, lib_form.errors)
                     return HttpResponseRedirect(request.get_full_path())
 

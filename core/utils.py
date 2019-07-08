@@ -33,7 +33,7 @@ def read_excel_sheets(filename, sheetnames):
     """ Read the excel sheet.
     """
     try:
-        data = pd.read_excel(filename, sheetname=None)
+        data = pd.read_excel(filename, sheet_name=None)
     except IOError:
         raise ValueError('unable to find file', filename)
     for sheetname in sheetnames:
@@ -49,6 +49,7 @@ def generate_doublet_info(filename):
 
     # Filter out rows with no conditions
     results = results[results["Condition"] != "~"]
+    print(results.columns)
 
     col_names = ["Live", "Dead", "Other"]
     row_names = ["1 cell", "2 cell", "More than 2 cells"]
@@ -67,6 +68,7 @@ def generate_doublet_info(filename):
         smartchip_row = [row["Num_Live"], row["Num_Dead"], row["Num_Other"]]
         override_row = [row["Rev_Live"], row["Rev_Dead"], row["Rev_Other"]]
         if np.array_equal(override_row, [-1, -1, -1]):
+            row_sum = sum(smartchip_row)
             print("row {} is not overridden".format(index))
 
             # TODO: create seperate function
@@ -80,26 +82,44 @@ def generate_doublet_info(filename):
                 for row in len(smartchip_row):
                     if smartchip_row == doublet_matrix[row]:
                         doublet_table[1][row] += 1
+
+            elif row_sum == 2 and smartchip_row not in doublet_matrix:
+                doublet_table[1][2] += 1
+
+            # Greater than doublet row and row is multiple of unit vector
+            elif row_sum > 2 and row_sum in smartchip_row:
+                index = np.where(smartchip_row != 0)
+                doublet_table[2][index[0]] += 1
+
             else:
-                # Figure out way to caculate gte doublets
-                continue
+                doublet_table[2][2] += 1
 
         else:
             print("row {} is overridden".format(index))
-            if smartchip_row in single_matrix:
+            row_sum = sum(override_row)
+            if override_row in single_matrix:
                 # cell = single_matrix.index(smartchip_row)
-                for row in len(smartchip_row):
-                    if smartchip_row == single_matrix[row]:
+                for row in len(override_row):
+                    if override_row == single_matrix[row]:
                         single_matrix[0][row] += 1
 
-            elif smartchip_row in doublet_matrix:
-                for row in len(smartchip_row):
-                    if smartchip_row == doublet_matrix[row]:
+            elif override_row in doublet_matrix:
+                for row in len(override_row):
+                    if override_row == doublet_matrix[row]:
                         doublet_table[1][row] += 1
+
+            elif row_sum == 2 and override_row not in doublet_matrix:
+                doublet_table[1][2] += 1
+
+            # Greater than doublet row and row is multiple of unit vector
+            elif row_sum > 2 and row_sum in override_row:
+                index = np.where(override_row != 0)
+                doublet_table[2][index[0]] += 1
+
             else:
-                continue
+                doublet_table[2][2] += 1
 
-
+    return results
 
 def parse_smartchipapp_results_file(filename):
     """ Parse the result file of SmartChipApp.
