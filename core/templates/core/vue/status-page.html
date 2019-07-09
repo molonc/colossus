@@ -3,23 +3,12 @@
 
 {% block body %}
 
-<div id="app" class="centre-focus">
-    <div >
-        <div class="centre-focus">
-          <div>
-            <md-content class="sidemenu">
-            </md-content>
-          </div>
-          <div >
-            <md-content class="topmenu">
-                {% include "core/vue/status-header.html" %}
-            </md-content>     
-            <md-content class="maincontent">
-              <Row v-for="sample in samples" :sample="sample"/>
-            </md-content>
-          </div>
-        </div>
-      </div>
+<div id="app" >
+    <b-container class="main-container">
+      <b-card class="main-card">
+      <Row v-for="sample in samples" :sample="sample"/>\
+      </b-card> 
+    </b-container>
 </div>
 <script>
 
@@ -111,69 +100,22 @@ var Row =  {
 </script>
 
 <style>
+.main-card {
+  margin-top: 100px;
+  width: 1200px;
+  height: 600px;
+    
 
-span { 
-    display:block;
-    width:150px;
-    word-wrap:break-word;
 }
 
-.md-button {
-  width: 100px;
-}  
-
-.btn-small {
-    width: 100px;
-}
-
-
-.btn-lrg {
-    width: 300px;
-}
-
-.status-row {
-  padding: 8px;
-}
-
-.topmenu {
-  height: 50px;
-  width:830px;  
-  max-width: calc(100vw - 125px);
-  display: flex;
-  align-items: center;
-}
-
-.sidemenu {
-  width: 260px;
-  height: 68vh;
-  max-width: calc(100vw - 100px);
-  overflow-y : scroll;
-}
-
-.maincontent {
-  height: calc(80vh - 49px);
-  width:830px; 
-  max-width: calc(100vw - 125px);
-  overflow: scroll;
-}
-
-.centre-focus {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+#app {
+  background-color: beige;
   height: 100vh;
+}
+
+body {
   background-color: beige;
 }
-
-.md-content {
-  z-index: 1;
-  padding: 15px;
-  margin: 0.2vh;
-  position: relative;
-}
-
-
 </style>
 
 {% endblock %}
