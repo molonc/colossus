@@ -482,7 +482,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
-            'doublet_form': DoubletInfoForm(),
+            # 'doublet_form': DoubletInfoForm(),
             'libdetail_formset': self.libdetail_formset_class(),
             'libcons_formset': self.libcons_formset_class(),
             'libqs_formset': self.libqs_formset_class(),
@@ -508,16 +508,22 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         lib_form = self.lib_form_class(request.POST, instance=library)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
         print("SUBLIB FORM : {}".format(sublib_form.errors))
-        doublet_form = DoubletInfoForm(request.POST, request.FILES or None)
-        print("DOUBLET FORM : {}".format(doublet_form.errors))
+        # doublet_form = DoubletInfoForm(request.POST, request.FILES or None)
+        # print("DOUBLET FORM : {}".format(doublet_form.errors))
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
-        context['doublet_form'] = doublet_form
+        # context['doublet_form'] = doublet_form
 
         error_message = ''
         try:
             with transaction.atomic():
-                if lib_form.is_valid() and sublib_form.is_valid() and doublet_form.is_valid():
+                # if lib_form.is_valid() and sublib_form.is_valid() and doublet_form.is_valid():
+                if lib_form.is_valid() and sublib_form.is_valid():
+                    # print(doublet_form)
+                    print(sublib_form)
+                    # print(doublet_form.files)
+                    # print(doublet_form.fields)
+                    # print(doublet_form.data)
                     print("FORMS ARE VALIDATED")
                     instance = lib_form.save(commit=False)
                     if instance.pk is None:
@@ -530,7 +536,9 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                    doublet_results = doublet_form.cleaned_data.get('smartchipapp_summary')
+                    doublet_results = sublib_form.cleaned_data.get('smartchipapp_doublet_info')
+                    # print(doublet_results)
+                    # print(sublib_results)
                     if region_metadata is not None and sublib_results is not None:
                         instance.sublibraryinformation_set.all().delete()
                         instance.chipregion_set.all().delete()

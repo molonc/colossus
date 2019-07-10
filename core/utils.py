@@ -42,88 +42,158 @@ def read_excel_sheets(filename, sheetnames):
         yield data[sheetname]
 
 
-def generate_doublet_info(filename):
-    """ Read SmartChipApp results and record doublet info
-    """
-    results = read_excel_sheets(filename, ['Summary'])
-
-    # Filter out rows with no conditions
-    results = results[results["Condition"] != "~"]
-    print(results.columns)
-
-    col_names = ["Live", "Dead", "Other"]
-    row_names = ["1 cell", "2 cell", "More than 2 cells"]
-    # data = {"Live": [0, 0, 0], "Dead": [0, 0, 0], "Other": [0, 0, 0]}
-    data = np.zeros((3,3))
-
-    doublet_table = pd.DataFrame(data, columns=col_names, index=row_names)
+def check_smartchip_row(index, smartchip_row):
+    row_sum = sum(smartchip_row)
 
     single_matrix = np.identity(3)
     doublet_matrix = np.identity(3)*2
 
-    # single = [0, 0, 0]
-    # doublet = [0, 0, 0]
-    # gte_doublet = [0, 0, 0]
+    if smartchip_row == [0,0,0]:
+        print("skipping row {} since no cells preset".format(index))
+        cell = None
+
+    # elif smartchip_row in single_matrix: #Faulty; will always return true
+    elif row_sum == 1:
+        print("row {} is a singlet".format(index))
+        for row in range(len(smartchip_row)):
+            if np.array_equal(smartchip_row, single_matrix[row]):
+                cell = [0,row]
+                # doublet_table[col_names[row]][row_names[0]] += 1
+
+    elif smartchip_row in doublet_matrix:
+        print("row {} is a doublet".format(index))
+        for row in range(len(smartchip_row)):
+            if np.array_equal(smartchip_row, doublet_matrix[row]):
+                cell = [1,row]
+                # doublet_table[col_names[row]][row_names[1]] += 1
+
+    elif row_sum == 2 and smartchip_row not in doublet_matrix:
+        print("row {} is a mixed doublet".format(index))
+        cell = [1,row]
+        # doublet_table[col_names[2]][row_names[1]] += 1
+
+    # Greater than doublet row and row is multiple of unit vector
+    elif row_sum > 2 and row_sum in smartchip_row:
+        print("row {} is a single/dead more than doublet".format(index))
+        index = np.where(smartchip_row != 0)
+        cell = [index[0],2]
+        # doublet_table[col_names[index[0]]][row_names[2]] += 1
+
+    else:
+        print("row {} is a mixed more than doublet".format(index))
+        # doublet_table[col_names[2]][row_names[2]] += 1
+        cell = [2,2]
+
+    return cell
+
+
+def generate_doublet_info(filename):
+    """ Read SmartChipApp results and record doublet info
+    """
+    print("******* in generate doublet info *******")
+
+    col_names = ["Live", "Dead", "Other"]
+    row_names = ["1 cell", "2 cells", "More than 2 cells"]
+    # data = {"Live": [0, 0, 0], "Dead": [0, 0, 0], "Other": [0, 0, 0]}
+    data = np.zeros((3,3))
+
+    doublet_table = pd.DataFrame(data, columns=col_names, index=row_names, dtype=int)
+
+    # single_matrix = np.identity(3)
+    # doublet_matrix = np.identity(3)*2
+
+    results = pd.read_excel(filename, sheet_name="Summary")
+    print("RESULTS IN GENERATE DOUBLET {}".format(results))
+    results = results[results["Condition"] != "~"]
+
     for index, row in results.iterrows():
         smartchip_row = [row["Num_Live"], row["Num_Dead"], row["Num_Other"]]
         override_row = [row["Rev_Live"], row["Rev_Dead"], row["Rev_Other"]]
+        print("smartchip row: {}".format(smartchip_row))
+        print("override row: {}".format(override_row))
         if np.array_equal(override_row, [-1, -1, -1]):
-            row_sum = sum(smartchip_row)
-            print("row {} is not overridden".format(index))
-
-            # TODO: create seperate function
-            if smartchip_row in single_matrix:
-                # cell = single_matrix.index(smartchip_row)
-                for row in len(smartchip_row):
-                    if smartchip_row == single_matrix[row]:
-                        single_matrix[0][row] += 1
-
-            elif smartchip_row in doublet_matrix:
-                for row in len(smartchip_row):
-                    if smartchip_row == doublet_matrix[row]:
-                        doublet_table[1][row] += 1
-
-            elif row_sum == 2 and smartchip_row not in doublet_matrix:
-                doublet_table[1][2] += 1
-
-            # Greater than doublet row and row is multiple of unit vector
-            elif row_sum > 2 and row_sum in smartchip_row:
-                index = np.where(smartchip_row != 0)
-                doublet_table[2][index[0]] += 1
-
-            else:
-                doublet_table[2][2] += 1
+            cell = check_smartchip_row(index, smartchip_row)
 
         else:
-            print("row {} is overridden".format(index))
-            row_sum = sum(override_row)
-            if override_row in single_matrix:
-                # cell = single_matrix.index(smartchip_row)
-                for row in len(override_row):
-                    if override_row == single_matrix[row]:
-                        single_matrix[0][row] += 1
+            cell = check_smartchip_row(index, override_row)
 
-            elif override_row in doublet_matrix:
-                for row in len(override_row):
-                    if override_row == doublet_matrix[row]:
-                        doublet_table[1][row] += 1
+        if cell is not None:
+            print(cell)
+            doublet_table[col_names[cell[0]]][row_names[cell[1]]] += 1
 
-            elif row_sum == 2 and override_row not in doublet_matrix:
-                doublet_table[1][2] += 1
+        # if np.array_equal(override_row, [-1, -1, -1]):
+        #     row_sum = sum(smartchip_row)
+        #     print("row {} is not overridden".format(index))
 
-            # Greater than doublet row and row is multiple of unit vector
-            elif row_sum > 2 and row_sum in override_row:
-                index = np.where(override_row != 0)
-                doublet_table[2][index[0]] += 1
+        #     # TODO: create seperate function
+        #     if smartchip_row == [0,0,0]:
+        #         print("skipping row {} since no cells preset".format(index))
+        #         continue
 
-            else:
-                doublet_table[2][2] += 1
+        #     elif smartchip_row in single_matrix:
+        #         print("row {} is a singlet".format(index))
+        #         for row in range(len(smartchip_row)):
+        #             if np.array_equal(smartchip_row, single_matrix[row]):
+        #                 doublet_table[col_names[row]][row_names[0]] += 1
 
-    return results
+        #     elif smartchip_row in doublet_matrix:
+        #         print("row {} is a doublet".format(index))
+        #         for row in range(len(smartchip_row)):
+        #             if np.array_equal(smartchip_row, doublet_matrix[row]):
+        #                 doublet_table[col_names[row]][row_names[1]] += 1
+
+        #     elif row_sum == 2 and smartchip_row not in doublet_matrix:
+        #         print("row {} is a mixed doublet".format(index))
+        #         doublet_table[col_names[2]][row_names[1]] += 1
+
+        #     # Greater than doublet row and row is multiple of unit vector
+        #     elif row_sum > 2 and row_sum in smartchip_row:
+        #         print("row {} is a single/dead more than doublet".format(index))
+        #         index = np.where(smartchip_row != 0)
+        #         doublet_table[col_names[index[0]]][row_names[2]] += 1
+
+        #     else:
+        #         print("row {} is a mixed more than doublet".format(index))
+        #         doublet_table[col_names[2]][row_names[2]] += 1
+
+        # else:
+        #     print("row {} is overridden".format(index))
+        #     row_sum = sum(override_row)
+        #     # TODO: create seperate function
+        #     if override_row in single_matrix:
+        #         print("row {} is a singlet".format(index))
+        #         # cell = single_matrix.index(smartchip_row)
+        #         for row in range(len(override_row)):
+        #             if np.array_equal(override_row, single_matrix[row]):
+        #                 doublet_table[col_names[row]][row_names[0]] += 1
+
+        #     elif override_row in doublet_matrix:
+        #         print("row {} is a doublet".format(index))
+        #         for row in range(len(override_row)):
+        #             if np.array_equal(override_row, doublet_matrix[row]):
+        #                 doublet_table[col_names[row]][row_names[1]] += 1
+
+        #     elif row_sum == 2 and override_row not in doublet_matrix:
+        #         print("row {} is a mixed doublet".format(index))
+        #         doublet_table[col_names[2]][row_names[1]] += 1
+
+        #     # Greater than doublet row and row is multiple of unit vector
+        #     elif row_sum > 2 and row_sum in override_row:
+        #         print("row {} is a single/dead more than doublet".format(index))
+        #         index = np.where(override_row != 0)
+        #         doublet_table[col_names[index[0]]][row_names[2]] += 1
+
+        #     else:
+        #         print("row {} is a mixed more than doublet".format(index))
+        #         doublet_table[col_names[2]][row_names[2]] += 1
+
+    print(doublet_table)
+    return doublet_table
 
 def parse_smartchipapp_results_file(filename):
     """ Parse the result file of SmartChipApp.
     """
+    print("******* in parse smartchip app *******")
     results, region_metadata = read_excel_sheets(filename, ['Summary', 'Region_Meta_Data'])
 
     # filter out the cells whose Spot_Well value is not NaN

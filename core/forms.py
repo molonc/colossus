@@ -38,7 +38,8 @@ from .models import (
     AdditionalSampleInformation,
     JiraUser,
     Project)
-from .utils import parse_smartchipapp_results_file, generate_doublet_info
+from .utils import parse_smartchipapp_results_file
+from .utils import generate_doublet_info
 from .jira_templates.jira_wrapper import *
 from jira import JIRA, JIRAError
 from colossus.settings import JIRA_URL
@@ -178,8 +179,10 @@ class SublibraryForm(Form):
         if filename:
             try:
                 results, region_metadata = parse_smartchipapp_results_file(filename)
+                doublet_info = generate_doublet_info(filename)
                 self.cleaned_data['smartchipapp_results'] = results
                 self.cleaned_data['smartchipapp_region_metadata'] = region_metadata
+                self.cleaned_data['smartchipapp_doublet_info'] = doublet_info
             except ValueError as e:
                 self.add_error('smartchipapp_results_file', ' '.join(e.args))
             except Exception as e:
