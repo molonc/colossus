@@ -335,7 +335,7 @@ class TenxSequencing(models.Model, FieldValue):
         null=True, blank=True
     )
 
-    tenx_pool = models.ForeignKey(TenxPool, null=True, blank=True)
+    tenx_pool = models.ForeignKey(TenxPool, on_delete=models.SET_NULL ,null=True, blank=True)
 
     """
     Sequencing information base class.
