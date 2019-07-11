@@ -66,10 +66,10 @@ from .forms import (
     JiraConfirmationForm,
     AddWatchersForm,
     SublibraryForm,
-    DoubletInfoForm
 )
 from .utils import (
     create_sublibrary_models,
+    create_doublet_info,
     generate_samplesheet,
     generate_gsc_form,
 )
@@ -367,7 +367,7 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
             'chip_metadata': chip_metadata,
             'metadata_fields': metadata_fields,
             'library_dict':library_dict,
-            'doubletinfo_fields':doubletinfo_fields,
+            'doubletinfo_fields': doubletinfo_fields,
         }
         return render(request, self.template_name, context)
 
@@ -482,7 +482,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
-            # 'doublet_form': DoubletInfoForm(),
             'libdetail_formset': self.libdetail_formset_class(),
             'libcons_formset': self.libcons_formset_class(),
             'libqs_formset': self.libqs_formset_class(),
@@ -492,6 +491,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             'related_dlp_libs': DlpLibrary.objects.all(),
             'related_tenx_libs': TenxLibrary.objects.all(),
             'library_type': self.library_type,
+            # 'doublet_info': self.doublet_info,
         }
         return context
 
@@ -508,22 +508,14 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         lib_form = self.lib_form_class(request.POST, instance=library)
         sublib_form = SublibraryForm(request.POST, request.FILES or None)
         print("SUBLIB FORM : {}".format(sublib_form.errors))
-        # doublet_form = DoubletInfoForm(request.POST, request.FILES or None)
-        # print("DOUBLET FORM : {}".format(doublet_form.errors))
         context['lib_form'] = lib_form
         context['sublib_form'] = sublib_form
-        # context['doublet_form'] = doublet_form
 
         error_message = ''
         try:
             with transaction.atomic():
-                # if lib_form.is_valid() and sublib_form.is_valid() and doublet_form.is_valid():
                 if lib_form.is_valid() and sublib_form.is_valid():
-                    # print(doublet_form)
                     print(sublib_form)
-                    # print(doublet_form.files)
-                    # print(doublet_form.fields)
-                    # print(doublet_form.data)
                     print("FORMS ARE VALIDATED")
                     instance = lib_form.save(commit=False)
                     if instance.pk is None:
@@ -536,13 +528,14 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
-                    doublet_results = sublib_form.cleaned_data.get('smartchipapp_doublet_info')
-                    # print(doublet_results)
-                    # print(sublib_results)
+                    doublet_info = sublib_form.cleaned_data.get('smartchipapp_doublet_info')
+                    print("IN VIEW: {}\n".format(doublet_info))
+                    context['doublet_info'] = doublet_info.to_dict()
                     if region_metadata is not None and sublib_results is not None:
                         instance.sublibraryinformation_set.all().delete()
                         instance.chipregion_set.all().delete()
                         create_sublibrary_models(instance, sublib_results, region_metadata)
+                        # create_doublet_info(doublet_info)
 
                     if all_valid and create:
                         if context['library_type'] != 'pbal':

@@ -48,40 +48,39 @@ def check_smartchip_row(index, smartchip_row):
     single_matrix = np.identity(3)
     doublet_matrix = np.identity(3)*2
 
+    # Row does not have cells
     if smartchip_row == [0,0,0]:
         print("skipping row {} since no cells preset".format(index))
         cell = None
 
-    # elif smartchip_row in single_matrix: #Faulty; will always return true
+    # TODO: Clean up code; use identity matrices
+    # Row is singlet
     elif row_sum == 1:
         print("row {} is a singlet".format(index))
         for row in range(len(smartchip_row)):
             if np.array_equal(smartchip_row, single_matrix[row]):
-                cell = [0,row]
-                # doublet_table[col_names[row]][row_names[0]] += 1
+                cell = [row,0]
 
-    elif smartchip_row in doublet_matrix:
+    # Row is doublet and is strictly live/dead/other
+    elif row_sum == 2 and len(np.where(np.array(smartchip_row) == 0)[0]) == 2:
         print("row {} is a doublet".format(index))
         for row in range(len(smartchip_row)):
             if np.array_equal(smartchip_row, doublet_matrix[row]):
-                cell = [1,row]
-                # doublet_table[col_names[row]][row_names[1]] += 1
+                cell = [row,1]
 
-    elif row_sum == 2 and smartchip_row not in doublet_matrix:
+    # Row is doublet but mixed
+    elif row_sum == 2 and len(np.where(np.array(smartchip_row) == 0)[0]) != 2:
         print("row {} is a mixed doublet".format(index))
-        cell = [1,row]
-        # doublet_table[col_names[2]][row_names[1]] += 1
+        cell = [2,1]
 
     # Greater than doublet row and row is multiple of unit vector
     elif row_sum > 2 and row_sum in smartchip_row:
         print("row {} is a single/dead more than doublet".format(index))
         index = np.where(smartchip_row != 0)
         cell = [index[0],2]
-        # doublet_table[col_names[index[0]]][row_names[2]] += 1
 
     else:
         print("row {} is a mixed more than doublet".format(index))
-        # doublet_table[col_names[2]][row_names[2]] += 1
         cell = [2,2]
 
     return cell
@@ -94,13 +93,9 @@ def generate_doublet_info(filename):
 
     col_names = ["Live", "Dead", "Other"]
     row_names = ["1 cell", "2 cells", "More than 2 cells"]
-    # data = {"Live": [0, 0, 0], "Dead": [0, 0, 0], "Other": [0, 0, 0]}
+
     data = np.zeros((3,3))
-
     doublet_table = pd.DataFrame(data, columns=col_names, index=row_names, dtype=int)
-
-    # single_matrix = np.identity(3)
-    # doublet_matrix = np.identity(3)*2
 
     results = pd.read_excel(filename, sheet_name="Summary")
     print("RESULTS IN GENERATE DOUBLET {}".format(results))
@@ -119,6 +114,9 @@ def generate_doublet_info(filename):
 
         if cell is not None:
             print(cell)
+            print("incrementing cell {}, {}".format(
+                col_names[cell[0]], row_names[cell[1]])
+            )
             doublet_table[col_names[cell[0]]][row_names[cell[1]]] += 1
 
         # if np.array_equal(override_row, [-1, -1, -1]):
@@ -260,6 +258,10 @@ def create_sublibrary_models(library, sublib_results, region_metadata):
             raise ValueError('Undefined condition in metadata at row, column: {}, {}'.format(row['row'], row['column']))
     library.num_sublibraries = len(sublib_results.index)
     library.save()
+
+def create_doublet_info(doublet_info):
+
+    pass
 
 #=================
 # History manager

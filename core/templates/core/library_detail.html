@@ -369,8 +369,11 @@
         <h4>Doublet Information</h4>
         {% if library.sublibraryinformation_set.all %}
             <h5>Add doublet information here </h5>
+            {% for field in  doubletinfo_fields %}
+                <th>{{ field }}</th>
+            {% endfor %}
         {% else %}
-            <h5><i class="text-warning">There is no sublibrary information for this library!</i></h5>
+            <h5><i class="text-warning">There is no doublet information for this library!</i></h5>
         {% endif %}
     </div>
 

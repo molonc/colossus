@@ -356,6 +356,66 @@ class SublibraryInformation(models.Model, FieldValue):
         return self.get_sublibrary_id()
 
 
+class DoubletInformation(models.Model):
+
+    history = HistoricalRecords(table_name='doublet_information_history')
+
+    library = models.OneToOneField(
+        'dlp.DlpLibrary',
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+    )
+
+    live_single_cell = create_intfield(
+        "Number of live single cells",
+        default=0,
+    )
+
+    dead_single_cell = create_intfield(
+        "Number of dead single cells",
+        default=0,
+    )
+
+    other_single_cell = create_intfield(
+        "Number of other single cells",
+        default=0,
+    )
+
+    live_doublet_cell = create_intfield(
+        "Number of live doublet cells",
+        default=0,
+    )
+
+    dead_doublet_cell = create_intfield(
+        "Number of dead doublet cells",
+        default=0,
+    )
+    
+    other_doublet_cell = create_intfield(
+        "Number of mixed doublet cells",
+        default=0,
+    )
+
+    live_gt_doublet_cell = create_intfield(
+        "More than two live cells",
+        default=0,
+    )
+
+    dead_gt_doublet_cell = create_intfield(
+        "More than two dead cells",
+        default=0,
+    )
+    
+    other_gt_doublet_cell = create_intfield(
+        "More than two other cells",
+        default=0,
+    )
+
+    def __str__(self):
+        return self.library
+
+
+
 class MetadataField(models.Model):
 
     """

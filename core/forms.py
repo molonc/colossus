@@ -189,25 +189,6 @@ class SublibraryForm(Form):
                 self.add_error('smartchipapp_results_file', 'failed to parse the file.')
 
 
-class DoubletInfoForm(Form):
-    # SmartChipApp results file
-    smartchipapp_summary_file = FileField(
-        label="SmartChipApp summary:",
-        required=False,
-    )
-
-    def clean_smartchipapp_summary_file(self):
-        filename = self.cleaned_data['smartchipapp_summary_file']
-        if filename:
-            try:
-                results = generate_doublet_info(filename)
-                self.cleaned_data['smartchipapp_summary'] = results
-            except ValueError as e:
-                self.add_error('smartchipapp_summary_file', ' '.join(e.args))
-            except Exception as e:
-                self.add_error('smartchipapp_summary_file', 'failed to parse the file.')
-
-
 class LibraryQuantificationAndStorageForm(ModelForm):
 
     """
