@@ -16,6 +16,7 @@ from jira import JIRAError
 #============================
 # Django imports
 #----------------------------
+from django.db.models import F
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required #, permission_required
@@ -53,8 +54,8 @@ from .models import (
     MetadataField,
     JiraUser,
     Project,
-    Analysis
-)
+    Analysis,
+    PipelineTag)
 
 from sisyphus.models import *
 from .forms import (
@@ -132,33 +133,81 @@ def gsc_submission_form(request):
               cls=DjangoJSONEncoder)}
     )
 
-@login_required
-def pipeline_status_page(request):
-  samples = Sample.objects.filter(pk__in=[72, 123, 124, 7, 13, 12, 269])
-  sample_list = []
-  for s in samples:
-      dlplibraries = []
-      for d in s.dlplibrary_set.all():
-          print(d.pool_id)
-          library = {}
-          library["library"] = d.pool_id
-          if d.dlpanalysisinformation_set.all():
-              library["analyses"] = []
-              for a in d.dlpanalysisinformation_set.all():
-                  library["analyses"].append({"jira" : a.analysis_jira_ticket, "date" : a.analysis_submission_date, "lanes" : a.lanes.count()})
-          dlplibraries.append(library)
-      sample_list.append({
-          "id": s.pk,
-          "name": s.sample_id,
-          "dlplibraries" : dlplibraries,
-          "show" : False
-      })
- 
-  return render(
-      request,
-      "core/vue/status-page.html",
-      { "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder)}
-    )
+
+#============================
+# Pipeline Status
+#----------------------------
+def get_sample_info(id):
+    sample_list = []
+    samples = PipelineTag.objects.get(id=id).sample_set.iterator()
+    print("SAMPLE STATUS")
+    print(samples)
+    for s in samples:
+        sample_dict = {"id": s.pk, "name": s.sample_id, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"} }
+        sample_imported = True
+        libraries = s.dlplibrary_set.all()
+        if libraries:
+            for d in libraries:
+                analysis_set = d.dlpanalysisinformation_set.all()
+                if analysis_set:
+                    for analysis in analysis_set:
+                        sample_list.append({**sample_dict, **{
+                            "library" : d.pool_id,
+                            "jira" : analysis.analysis_jira_ticket,
+                            "date" : analysis.analysis_submission_date,
+                            "lanes" : analysis.lanes.count(),
+                            "run_status" : analysis.analysis_run.run_status}
+                        })
+                else: sample_list.append({**sample_dict, **{"library" : d.pool_id}})
+                # sequencing_set = d.dlpsequencing_set.all()
+                # if sequencing_set:
+                #     count = 0
+                #     for sequencing in sequencing_set:
+                #         if sequencing.number_of_lanes_requested > sequencing.dlplane_set.count():
+                #             count += 1
+                #     library["sequencing"] = { "total" : sequencing_set.count(), "imported" : count}
+                #     if count < sequencing_set.count():
+                #         library["imported"] = False
+                #         sample_imported = False
+        else: sample_list.append(sample_dict)
+        print(sample_list)
+    return sample_list
+
+class PipeLineStatus(LoginRequiredMixin, TemplateView):
+    """
+    List of samples.
+    """
+    login_url = LOGIN_URL
+    template_name = "core/vue/status-selection.html"
+
+    def get_context_data(self):
+        samples = list(Sample.objects.annotate(text=F('sample_id'), value=F('pk')).values("text", "value"))
+        return { "samples" :  json.dumps(list(samples),cls=DjangoJSONEncoder) }
+
+    def post(self, request):
+        pipelinetag = PipelineTag.objects.create(title = request.POST.get('title'))
+        pipelinetag.save()
+        pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=request.POST.getlist('samples'))))
+        #
+        return HttpResponseRedirect("")
+
+    def handle_request(request):
+        data = json.loads(request.body.decode('utf-8'))
+        returnJson = {}
+        if data["type"] == "fetchSample":
+            returnJson["samples"] = get_sample_info(data["id"])
+            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        return None
+
+    def pipeline_status_page(request):
+      pipelinetags = list(PipelineTag.objects.values("id", "title"))
+      sample_list = []
+      return render( request, "core/vue/status-page.html",
+                     { "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) }
+                     )
+#============================
+# End of Pipeline Status
+#----------------------------
 
 def gsc_info_post(request):
     selected = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
@@ -180,7 +229,6 @@ def gsc_info_post(request):
         "Quantification Method" : library.dlplibraryquantificationandstorage.quantification_method,
     } for library in selected]
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
-
 
 def download_sublibrary_info(request):
     library = get_object_or_404(DlpLibrary, pk=json.loads(request.body.decode('utf-8'))["libraryPk"])
@@ -301,7 +349,7 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
         get_object_or_404(Sample, pk=pk).delete()
         msg = "Successfully deleted the Sample."
         messages.success(request, msg)
-        return HttpResponseRedirect(reverse('core:sample_list'))
+        return HttpResponseRedirect(reverse('core:pipeline_status'))
 
 @Render("core/analysis_list.html")
 @login_required

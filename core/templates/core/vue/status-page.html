@@ -2,97 +2,137 @@
 {% load staticfiles %}
 
 {% block body %}
-
-<div id="app" >
-    <b-container class="main-container">
-      <b-card class="main-card">
-      <Row v-for="sample in samples" :sample="sample"/>\
-      </b-card> 
-    </b-container>
+<div id="app">
+    {% verbatim %}{{samples}}{% endverbatim %}
+  <b-button @click="axiosVeifyTantalus">fefe</b-button>
+  <b-container id="main-container">
+    <b-row class="text-center custom-row">
+      <b-col class="main-menu">
+        <md-card class="pipeline-tag">
+          <md-card-content>
+          <md-field>
+            <label>Search by Title</label>
+            <md-input v-model="search"></md-input>
+          </md-field>
+          </md-card-content>
+          <md-divider></md-divider>
+          <md-card-content class="tag-list">
+            <button v-for="tag in tags" @click="fetchSamples(tag.id)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+          </md-card-content>
+          <md-card-actions >
+                <md-button>Edit</md-button>
+                <md-button>Add</md-button>
+          </md-card-actions>
+        </md-card>
+      </b-col>
+      <b-col class=" main-content" cols="9"> 
+        <md-card style="margin-left: 5px;">
+        <div class="main-table">
+          <div class="content-table">         
+            <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
+          </div>
+        </div>
+      </md-card>
+      </b-col>
+    </b-row>
+  </b-container>
 </div>
 <script>
 
-
 var Row =  {
   props: ['sample'],
+  methods: {
+    setShow() {this.sample.show = !this.sample.show},
+  },
   template: `
-    <div class="status-row">
-      <md-button
-      :class="sample.show ? 'collapsed' : null"
-      :aria-expanded="sample.show ? 'true' : 'false'"
-      :aria-controls="sample.name"
-      @click="sample.show = !sample.show">ID {% verbatim %}{{sample.id}}{% endverbatim %}</md-button>
-      <md-button disabled style="color: black;" >DEscription</md-button>
-      <md-button disabled style="color: black;">{% verbatim %}{{sample.name}}{% endverbatim %}</md-button>
-
-      <b-collapse v-if="sample.show" :id="sample.name" v-model="sample.show" class="mt-2">
-        <div v-if="sample.dlplibraries.length">
-          <div v-for="library in sample.dlplibraries">
-
-            <div v-if="library.analyses">
-                <md-table md-card>
-                    <md-table-toolbar>
-                      <md-button disabled class="btn-small">Library</md-button>
-                      <md-button class="btn-small">{% verbatim %}{{library.library}}{% endverbatim %}</md-button>
-                    </md-table-toolbar>
-
-                    <md-table-row>
-                      <md-table-head>JIRA</md-table-head>
-                      <md-table-head>Submission</md-table-head>
-                      <md-table-head>Lanes</md-table-head>
-                      <md-table-head>DLP+</md-table-head>
-                      <md-table-head>Align</md-table-head>
-                      <md-table-head>hmmcopy</md-table-head>
-                      <md-table-head>pseudobulk</md-table-head>
-                    </md-table-row>
-                    
-                    <div v-for="analysis in library.analyses">
-                    </div>
-                </md-table>
-            </div>
-            <div v-else>
-              <md-button disabled class="btn-lrg">Np DLP Analysis on Library {% verbatim %}{{library.library}}{% endverbatim %}</md-button>
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <md-button disabled class="btn-lrg">Np DLP Library</md-button>
-        </div>
-      </b-collapse>
-    </div>
+  <b-button-group @click="setShow" style="margin-top : 1px;">
+    <b-button squared class="row-button sample-name" style="width:140px;">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    
+    <b-button v-if="sample.library" class="row-button" style="width:100px;">
+        {% verbatim %}{{sample.library}}{% endverbatim %}
+    </b-button>
+    <b-button class="row-button" v-else style="width:100px;" >
+    <b-badge variant="warning">No DLP</b-badge> 
+    </b-button>
+    <b-button v-if="sample.jira" class="row-button" style="width:100px;" >
+     {% verbatim %}{{sample.jira}}{% endverbatim %}
+    </b-button>
+    <b-button v-else class="row-button" style="width:100px;" >
+    <b-badge variant="warning">No Analysis</b-badge> 
+    </b-button>
+    <b-button squared class="row-button">
+      <b-badge :variant="sample.pipeline.qc">QC</b-badge>
+      <b-badge :variant="sample.pipeline.align">align</b-badge>
+      <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
+      <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
+    </b-button>
+  </b-button-group>   
   `
   }
           
 
-  new Vue({
+  var vm = new Vue({
     el: '#app',
     data: {
-      samples: []
+      samples: [],
+      tags: [],
+      search: "",
     },
-    methods: {
-      axiosGetSamples () {
-        let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOCwidXNlcm5hbWUiOiJzc29uZyIsImV4cCI6MTU2Mjk3NTIyOCwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2MjM3MDQyOH0.OGyLNiP476J31Bs2zYuvRJVQO7vL4A3FIZARV_J-Cpo"
-        let url = "http://127.0.0.1:8001/api/analysis/"
+    methods: {  
+      setPipeline(i) {
+        console.log("HELLO")
+        this.samples[i].pipeline["qc"] = "primary"
+      },    
+      fetchSamples (id) {
+        axios({
+                method: 'post',
+                url: "{% url 'core:pipeline_status_request_handler' %}",
+                dataType: "json",
+                data: {"type" : "fetchSample", "id" : id},
+                headers: {
+                  "X-CSRFToken": Cookies.get('csrftoken'),
+                  "content-type": "application/json"
+                }}
+            ).then( (response) => {
+              this.samples = response.data.samples  
+              this.samples.forEach( sample => {
+                sample.pipeline = {qc:"secondary", align: "secondary", hmmcopy: "secondary", pseudo: "secondary"}
+                if(sample.jira) this.axiosVeifyTantalus(sample)
+              })
+              }
+              )
+      },
+      axiosVeifyTantalus (sample) {
+        jira = sample.jira
+        library = sample.library
+        let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOCwidXNlcm5hbWUiOiJzc29uZyIsImV4cCI6MTU2MzQwMTg5NSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2Mjc5NzA5NX0.hP70bhBNncnE4uLdb5hJUoHQga3Ocv63sB2wz0ujn5c"
+        const url = "http://127.0.0.1:8001/api/analysis/"
+        // Qc, hmmcopy and align 
         axios
-        .get(url,{
-          headers : {
-            Authorization : 'JWT ' + token
-          }
-        })
+        .get(url,{ headers : { Authorization : token},
+        params : {jira_ticket : jira}})
         .then(r => {
-          resolve("success")
-        })
-        .catch(e => {
-        })
+          r.data.results.forEach(a => {
+            atype = a.analysis_type
+            if (atype in sample.pipeline) sample["pipeline"][atype]= "primary"})
+            if (sample.pipeline["align"] && sample.pipeline["hmmcopy"]) sample["pipeline"]["qc"]= "primary"})
+        .catch(e => {console.log(e.response)})
+
+        // Pseudobulk
+        axios
+        .get(url,{ headers : { Authorization : token},
+        params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
+        .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= "primary"})
+        .catch(e => {console.log(e.response)})
+
+        
       }
     },
     components:{
       Row
     },
     created () {
-      console.log("CREATED")
-      this.axiosGetSamples()
-      
+      this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
       console.log(this.samples)
     },
@@ -100,22 +140,88 @@ var Row =  {
 </script>
 
 <style>
-.main-card {
+#main-container {
+  padding-top: 4%;
+}
+
+.wrap-button {
+  height: 45px;
+}
+
+.sample-name {
+  font-size: 10px;
+}
+
+.row-button {
+  background-color:whitesmoke;
+  color: black;
+}
+
+.row-description {
+  background-color:whitesmoke;
+  border: 0.5px solid grey;
+  
+}
+
+.main-menu {
+  max-width: 200px;
+}
+
+.tag-list {
+  height: 430px;
+}
+
+.main-content {
+  width: 100%;
+}
+
+.project-button {
+  border: none;
+  background-color: #a9a9b0;
+  width: 160px;
+  height: 33px;
+  margin: 1px;
+}
+
+.pipeline-tag {
+  width: 200px;
+  height: 600px;
+}
+
+.content-table {
+  overflow: scroll;
+  max-height: 600px;
+}
+
+.main-table {
+  
+  border-radius: 5px;
+  width: 100%;
+}
+
+.menu-table {
+  
+}
+.content-table {
+  
+}
+
+
+.custom-row {
+  
+}
+
+.column { 
+  border: 1px solid black;
+}
+/* .main-card {
   margin-top: 100px;
   width: 1200px;
   height: 600px;
     
 
-}
+} */
 
-#app {
-  background-color: beige;
-  height: 100vh;
-}
-
-body {
-  background-color: beige;
-}
 </style>
 
 {% endblock %}

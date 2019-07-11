@@ -1,0 +1,83 @@
+{% extends "../vue/header.html" %}
+{% load staticfiles %}
+
+{% block body %}
+
+<div id="app">
+  <div class="centered-container">
+    <form action="{% url 'core:pipeline_status_create' %}" method="POST" class="md-layout">
+        {% csrf_token %}
+        <md-card class="md-layout-item">
+            <md-card-header>
+              <div class="md-title">Choose Samples</div>
+            </md-card-header>
+            <md-card-content>
+              <div class="md-layout md-gutter">
+                  <div class="md-layout-item">
+                    <md-field >
+                    <label for="title">Title</label>
+                    <md-input name="title" id="first-name" autocomplete="given-name"  />
+                    </md-field>
+                  </div>
+              </div>
+              <div class="md-layout md-gutter">
+                  
+                <div class="md-layout-item">
+                    <md-field v-b-tooltip.hover title="Hold down control to select multiple.">
+                      <b-form-select name="samples" v-model="selectedSamples" :options="samples" multiple :select-size="4"></b-form-select>
+                    </md-field>
+                </div>
+              </div>
+              <div>
+                  <strong>Selected samples:</strong>
+                  <span>{% verbatim %}{{ selectedSamples }}{% endverbatim %}</span>
+              </div>
+
+              <div class="actions md-layout md-alignment-center-space-between">
+                <a href="">I already have my project</a>
+                <md-button class="md-raised md-primary" type="submit" name="create" value="Ok">Create</md-button>
+              </div>
+
+            </md-card-content>
+        </md-card>
+    </form>
+    </div>
+</div>
+<script>
+  new Vue({
+    el: '#app',
+    data: () => ({
+      selectedSamples: [],
+      samples: []
+    }),
+    computed: {
+      count () {
+        return this.selectedSamples.map(s => s.text)
+      }
+    },
+    created () {
+      
+      this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      console.log(this.samples)
+    },
+  })
+</script>
+
+<style>
+
+.centered-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 100vh;
+  }
+span {
+  display:block;
+  width:300px;
+  word-wrap:break-word;
+}
+</style>
+
+{% endblock %}
+
