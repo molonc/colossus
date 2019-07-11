@@ -156,6 +156,7 @@ def get_sample_info(id):
                             "jira" : analysis.analysis_jira_ticket,
                             "date" : analysis.analysis_submission_date,
                             "lanes" : analysis.lanes.count(),
+                            "version" : analysis.version.version,
                             "run_status" : analysis.analysis_run.run_status}
                         })
                 else: sample_list.append({**sample_dict, **{"library" : d.pool_id}})

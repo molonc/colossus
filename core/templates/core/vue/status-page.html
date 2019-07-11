@@ -3,11 +3,9 @@
 
 {% block body %}
 <div id="app">
-    {% verbatim %}{{samples}}{% endverbatim %}
-  <b-button @click="axiosVeifyTantalus">fefe</b-button>
   <b-container id="main-container">
     <b-row class="text-center custom-row">
-      <b-col class="main-menu">
+      <b-col class="main-menu" style="margin-right: 4px">
         <md-card class="pipeline-tag">
           <md-card-content>
           <md-field>
@@ -25,14 +23,25 @@
           </md-card-actions>
         </md-card>
       </b-col>
-      <b-col class=" main-content" cols="9"> 
-        <md-card style="margin-left: 5px;">
-        <div class="main-table">
-          <div class="content-table">         
-            <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
+      <b-col cols="9"> 
+        <md-card class="main-content"  >
+          <br />
+          <div class="main-table">
+            <b-button-group style="margin-top : 1px; height: 40px;">
+                <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>                
+                <b-button class="menu-button" style="width:100px;">library ID</b-button>
+                <b-button class="menu-button" style="width:100px;">Analysis</b-button>
+                <b-button class="menu-button" style="width:100px;">Version</b-button>
+                <b-button class="menu-button" style="width:100px;">Montage</b-button>
+                <b-button squared class="menu-button" style="width:169px;">Pipeline  </b-button>
+                <b-button squared class="menu-button" style="width:110px;">Pseudobulk  </b-button>
+            </b-button-group>
+            <div class="content-table">         
+              <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
+            </div>
           </div>
-        </div>
-      </md-card>
+          <br />
+        </md-card >
       </b-col>
     </b-row>
   </b-container>
@@ -43,27 +52,37 @@ var Row =  {
   props: ['sample'],
   methods: {
     setShow() {this.sample.show = !this.sample.show},
+    returnURL(type,pk) { return window.origin + type + "/" + pk},
+    returnJiraURL(jira) {return "www.bcgsc.ca/jira/browse/" + jira }
   },
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
-    <b-button squared class="row-button sample-name" style="width:140px;">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
-    
-    <b-button v-if="sample.library" class="row-button" style="width:100px;">
+    <b-button squared class="row-button sample-name" style="width:140px;" :href="returnURL('core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    <b-button v-if="sample.library" class="row-button" style="width:100px;" :href="returnURL('dlp/library',sample.library)">
         {% verbatim %}{{sample.library}}{% endverbatim %}
     </b-button>
     <b-button class="row-button" v-else style="width:100px;" >
     <b-badge variant="warning">No DLP</b-badge> 
     </b-button>
-    <b-button v-if="sample.jira" class="row-button" style="width:100px;" >
+    <b-button v-if="sample.jira" class="row-button" style="width:100px;" :href="returnJiraURL(sample.jira)">
      {% verbatim %}{{sample.jira}}{% endverbatim %}
     </b-button>
     <b-button v-else class="row-button" style="width:100px;" >
     <b-badge variant="warning">No Analysis</b-badge> 
     </b-button>
+    <b-button v-if="sample.version" class="row-button" style="width:100px;">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.version}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
+    <b-button class="menu-button" style="width:100px;">N/A</b-button>
     <b-button squared class="row-button">
-      <b-badge :variant="sample.pipeline.qc">QC</b-badge>
       <b-badge :variant="sample.pipeline.align">align</b-badge>
       <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
+      <b-badge :variant="sample.pipeline.qc">QC</b-badge>
+    </b-button>
+    <b-button squared class="row-button" style="width:110px;">
       <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
     </b-button>
   </b-button-group>   
@@ -83,6 +102,13 @@ var Row =  {
         console.log("HELLO")
         this.samples[i].pipeline["qc"] = "primary"
       },    
+      setRunStatus(status) {
+        run_status = { secondary: ['idle'],
+        info: ['running','archiving'],
+        danger: ['error'],
+        success:['complete', 'align_complete', 'hmmcopy_complete']}
+
+      },
       fetchSamples (id) {
         axios({
                 method: 'post',
@@ -107,6 +133,7 @@ var Row =  {
         library = sample.library
         let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOCwidXNlcm5hbWUiOiJzc29uZyIsImV4cCI6MTU2MzQwMTg5NSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2Mjc5NzA5NX0.hP70bhBNncnE4uLdb5hJUoHQga3Ocv63sB2wz0ujn5c"
         const url = "http://127.0.0.1:8001/api/analysis/"
+        
         // Qc, hmmcopy and align 
         axios
         .get(url,{ headers : { Authorization : token},
@@ -123,9 +150,7 @@ var Row =  {
         .get(url,{ headers : { Authorization : token},
         params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
         .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= "primary"})
-        .catch(e => {console.log(e.response)})
-
-        
+        .catch(e => {console.log(e.response)})        
       }
     },
     components:{
@@ -144,17 +169,36 @@ var Row =  {
   padding-top: 4%;
 }
 
+a { text-decoration : none; color : #000; }
+
 .wrap-button {
   height: 45px;
 }
 
 .sample-name {
   font-size: 10px;
+  text-align: left;
+  font-weight: 800;
 }
 
 .row-button {
   background-color:whitesmoke;
   color: black;
+}
+
+
+.tag-list {
+            max-height:500px;
+      overflow-y: scroll;
+    }
+
+.menu-button {
+  background-color:rgb(190, 182, 182);
+  color: black;
+}
+
+a {
+  color: hotpink;
 }
 
 .row-description {
@@ -172,7 +216,7 @@ var Row =  {
 }
 
 .main-content {
-  width: 100%;
+  width: 1000px;
 }
 
 .project-button {
