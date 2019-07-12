@@ -27,7 +27,6 @@ from core.models import (
     ChipRegion,
     JiraUser,
     Project,
-    Analysis,
 )
 
 from dlp.models import (
@@ -89,76 +88,20 @@ class SampleSerializer(serializers.ModelSerializer):
         )
 
 
-class AnalysisSerializer(serializers.ModelSerializer):
+class TenxAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Analysis
+        model = TenxAnalysis
         fields = (
             'id',
-            'input_type',
             'version',
             'jira_ticket',
             'run_status',
             'last_updated_date',
             'submission_date',
             'description',
-            'dlp_library',
-            'pbal_library',
             'tenx_library',
             'tenxsequencing_set',
-            'dlpsequencing_set',
-            'pbalsequencing_set'
         )
-
-    def to_representation(self, instance):
-        value = super(AnalysisSerializer, self).to_representation(instance)
-        try:
-            value["library"] =  value[value["input_type"].lower() + "_library"]
-            del value["dlp_library"]
-            del value["pbal_library"]
-            del value["tenx_library"]
-            #for now we only have tenx_sequencing
-            value["sequencings"] = value[value["input_type"].lower() + 'sequencing_set']
-            del value["dlpsequencing_set"]
-            del value["pbalsequencing_set"]
-            del value["tenxsequencing_set"]
-            return value
-        except:
-            return value
-
-    def create(self, validated_data):
-        libraries = [validated_data["dlp_library"], validated_data["pbal_library"], validated_data["tenx_library"]]
-        sequencings = [validated_data["dlpsequencing_set"], validated_data["pbalsequencing_set"], validated_data["tenxsequencing_set"]]
-        if sum(1 for lib in libraries if lib) > 1:
-            raise ValidationError("Only one Library Id must be provided")
-
-        if sum(1 for lib in libraries if lib) == 0:
-            raise ValidationError("Library must be set")
-
-        if sum(1 for seq in sequencings if seq) > 1:
-            raise ValidationError("Only " + validated_data["input_type"] + " Sequencing list must be provided")
-
-        if sum(1 for seq in sequencings if seq) > 0 and not validated_data[validated_data["input_type"].lower() + 'sequencing_set']:
-            raise ValidationError("Only " + validated_data["input_type"] + " Sequencing list must be provided")
-
-        if not validated_data[validated_data["input_type"].lower() + "_library"]:
-            raise ValidationError(
-                "You specified input type to be " + validated_data["input_type"] + ", please provide the corresponding library id")
-
-        if not re.match(r"(v\d+\.\d+\.\d+)", validated_data["version"]):
-            raise ValidationError("Version must be in the format of v\d+\.\d+\.\d+")
-
-        if validated_data["input_type"].lower() == "tenx":
-            for seq in validated_data["tenxsequencing_set"]:
-                seq_tenx_pool = seq.tenx_pool
-                if not (seq_tenx_pool and validated_data["tenx_library"] in seq_tenx_pool.libraries.all()):
-                    raise ValidationError("Selected sequencings must belong to selected library")
-
-        else:
-            for seq in validated_data[validated_data["input_type"].lower() + 'sequencing_set']:
-                if not seq.library == validated_data[validated_data["input_type"].lower() + "_library"]:
-                    raise ValidationError("Selected sequencings must belong to selected library")
-
-        return super(AnalysisSerializer, self).create(validated_data)
 
 class LaneSerializer(serializers.ModelSerializer):
     class Meta:

@@ -13,8 +13,7 @@ from core.helpers import *
 from core.models import (
     Project,
     Sample,
-    SequencingManager,
-    Analysis)
+    SequencingManager)
 
 #============================
 # etc
@@ -313,12 +312,6 @@ class PbalSequencing(models.Model, FieldValue):
     sequencer_notes = create_textfield("Sequencing notes")
 
     objects = SequencingManager()
-
-    analysis = models.ManyToManyField(
-        Analysis,
-        verbose_name="Analysis",
-        blank=True
-    )
 
     def __init__(self, *args, **kwargs):
         super(PbalSequencing, self).__init__(*args, **kwargs)

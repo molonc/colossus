@@ -32,6 +32,28 @@ class TenxLibraryList(LibraryList):
     library_class = TenxLibrary
     library_type = 'tenx'
 
+@Render("core/tenxanalysis_list.html")
+@login_required
+def analys_list(request):
+    context = {
+        'analyses': TenxAnalysis.objects.all().order_by('id'),
+    }
+    return context
+
+@Render("core/tenxanalysis_detail.html")
+@login_required
+def analysis_detail(request, pk):
+    analysis = get_object_or_404(TenxAnalysis, pk=pk)
+    context = {
+        'analysis': analysis,
+        'library': analysis.tenx_library,
+        'sequencings': analysis.tenxsequencing_set
+    }
+
+    tenx_pools = list(map(lambda x: x.tenx_pool, analysis.tenxsequencing_set.all()))
+    context['tenx_pools'] = tenx_pools
+    return context
+
 @login_required
 def library_id_to_pk_redirect(request, pool_id):
     pk = get_object_or_404(TenxLibrary, name=pool_id).pk

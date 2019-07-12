@@ -7,7 +7,7 @@ from django.db import models
 
 from core.helpers import *
 from core.constants import *
-from core.models import Sample, Project, Analysis
+from core.models import Sample, Project
 
 
 class TenxChip(models.Model, FieldValue):
@@ -181,6 +181,37 @@ class TenxPool(models.Model, FieldValue):
         return reverse("tenx" + ":pool_detail", kwargs={"pk": self.pk})
 
 
+class TenxAnalysis(models.Model, FieldValue):
+    class Meta:
+        ordering = ['id']
+
+    input_type = create_chrfield("Input Type", choices=INPUT_TYPE, null=False)
+    version = create_chrfield("Analysis Version", blank=False)
+    jira_ticket =  create_chrfield("Analysis Jira Ticket", blank=False)
+    run_status = create_chrfield(
+        "Run Status",
+        blank=False,
+        null=False,
+        default=IDLE,
+        choices=RUN_STATUS_CHOICES
+    )
+
+    last_updated_date = models.DateTimeField("Last Updated Date", auto_now=True)
+    submission_date = models.DateField(
+        "Analysis Submission Date",
+        default=datetime.date.today, # this needs to be a date (not datetime)
+    )
+
+    description = create_textfield("Description")
+    tenx_library = models.ForeignKey('tenx.TenxLibrary', null=True)
+    tenx_lanes = models.ManyToManyField('tenx.TenxLane', blank=True)
+
+    def __str__(self):
+        res = str(self.id).zfill(3) + "_ANALYSIS"
+        return res
+
+    def get_absolute_url(self):
+        return reverse("tenx:tenxanalysis_detail" , kwargs={"pk": self.pk})
 
 class TenxLibrarySampleDetail(models.Model, FieldValue):
 
@@ -367,10 +398,9 @@ class TenxSequencing(models.Model, FieldValue):
     )
     sequencer_notes = create_textfield("Sequencing notes")
 
-
-    analysis = models.ManyToManyField(
-        Analysis,
-        verbose_name="Analysis",
+    tenx_analysis = models.ManyToManyField(
+        TenxAnalysis,
+        verbose_name="Tenx Analysis",
         blank=True
     )
 
