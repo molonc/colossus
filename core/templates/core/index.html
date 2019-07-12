@@ -16,7 +16,7 @@
                     <td><a href="{% url 'core:sample_list' %}">Samples</a> <i class="counter">{{ sample_size }}</i></td>
                     <td>
                         <p style="float: right;">
-                            <a href="{% url 'core:sample_create' %}"><i class="fa fa-home" aria-hidden="true" style="color: green;"></i> Add</a>
+                            <a href="{% url 'core:sample_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i> Add</a>
                         </p>
                     </td>
                 </tr>
@@ -28,14 +28,9 @@
                         </p>
                     </td>
                 </tr>
-               <tr>
-                    <td><a href="{% url 'core:analysis_list' %}">Analyses</a> <i class="counter">{{ analysis_size }}</i></td><td></td>
-                </tr>
-            <tr>
-                <td></td>
-                <td ><a href="{% url 'core:gsc_submission_form' %}" style="float: right;"><i class="fa fa-download" ></i> GSC Form</a></td>
-            </tr>
+
             </tbody>
+             <a href="{% url 'core:gsc_submission_form' %}" style="float: right;"><i class="fa fa-cut" ></i> GSC Form</a>
         </table>
     </div>
 </div>
@@ -146,6 +141,9 @@
                             <a href="{% url 'tenx:sequencing_create' %}"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i> Add</a>
                         </p>
                     </td>
+                </tr>
+                <tr>
+                    <td><a href="{% url 'tenx:tenxanalysis_list' %}">Analyses</a> <i class="counter">{{ tenxanalysis_size }}</i></td><td></td>
                 </tr>
             </tbody>
         </table>
