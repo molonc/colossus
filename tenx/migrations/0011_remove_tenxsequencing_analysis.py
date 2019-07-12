@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tenx', '0011_auto_20190711_1454'),
+        ('tenx', '0010_auto_20190711_1453'),
     ]
 
     operations = [
