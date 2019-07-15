@@ -145,10 +145,10 @@ def get_sample_info(id):
     for s in samples:
         sample_dict = {"id": s.pk, "name": s.sample_id, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"} }
         sample_imported = True
-        libraries = s.dlplibrary_set.all()
+        libraries = s.dlplibrary_set.iterator()
         if libraries:
             for d in libraries:
-                analysis_set = d.dlpanalysisinformation_set.all()
+                analysis_set = d.dlpanalysisinformation_set.iterator()
                 if analysis_set:
                     for analysis in analysis_set:
                         sample_list.append({**sample_dict, **{
@@ -157,7 +157,11 @@ def get_sample_info(id):
                             "date" : analysis.analysis_submission_date,
                             "lanes" : analysis.lanes.count(),
                             "version" : analysis.version.version,
-                            "run_status" : analysis.analysis_run.run_status}
+                            "run_status" : analysis.analysis_run.run_status,
+                            "aligner" : analysis.aligner,
+                            "submission" :analysis.analysis_submission_date,
+                            "last_updated" : analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None,
+                        }
                         })
                 else: sample_list.append({**sample_dict, **{"library" : d.pool_id}})
                 # sequencing_set = d.dlpsequencing_set.all()
@@ -181,16 +185,21 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
     login_url = LOGIN_URL
     template_name = "core/vue/status-selection.html"
 
-    def get_context_data(self):
+    def get_context_and_render(self, request, error=None):
         samples = list(Sample.objects.annotate(text=F('sample_id'), value=F('pk')).values("text", "value"))
-        return { "samples" :  json.dumps(list(samples),cls=DjangoJSONEncoder) }
+        context =  {"error" : error, "samples": json.dumps(list(samples), cls=DjangoJSONEncoder)}
+        return render(request, self.template_name, context)
+
+    def get(self, request):
+        return self.get_context_and_render(request)
 
     def post(self, request):
+        if PipelineTag.objects.filter(title = request.POST.get('title')).exists():
+            return self.get_context_and_render(request, error="Title Name Already Exist")
         pipelinetag = PipelineTag.objects.create(title = request.POST.get('title'))
         pipelinetag.save()
         pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=request.POST.getlist('samples'))))
-        #
-        return HttpResponseRedirect("")
+        return HttpResponseRedirect(reverse('core:pipeline_status'))
 
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
@@ -204,8 +213,7 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
       pipelinetags = list(PipelineTag.objects.values("id", "title"))
       sample_list = []
       return render( request, "core/vue/status-page.html",
-                     { "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) }
-                     )
+                     { "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
 #============================
 # End of Pipeline Status
 #----------------------------

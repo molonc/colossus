@@ -3,7 +3,7 @@
 
 {% block body %}
 <div id="app">
-  <b-container id="main-container">
+  <b-container fluid id="main-container">
     <b-row class="text-center custom-row">
       <b-col class="main-menu" style="margin-right: 4px">
         <md-card class="pipeline-tag">
@@ -23,18 +23,27 @@
           </md-card-actions>
         </md-card>
       </b-col>
-      <b-col cols="9"> 
-        <md-card class="main-content"  >
+      <b-col class="main-table"> 
+        <md-card class="main-content">
           <br />
-          <div class="main-table">
+          <div style="float: right;">
+              <b-badge pill variant="primary">Primary</b-badge>
+              <b-badge pill variant="secondary">Secondary</b-badge>
+              <b-badge pill variant="success">Success</b-badge>
+          </div>
+          <div class="sample-table">
             <b-button-group style="margin-top : 1px; height: 40px;">
                 <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>                
                 <b-button class="menu-button" style="width:100px;">library ID</b-button>
                 <b-button class="menu-button" style="width:100px;">Analysis</b-button>
                 <b-button class="menu-button" style="width:100px;">Version</b-button>
+                <b-button class="menu-button" style="width:100px;">Aligner</b-button>
+                <b-button class="menu-button" style="width:100px;">Lanes</b-button>
                 <b-button class="menu-button" style="width:100px;">Montage</b-button>
-                <b-button squared class="menu-button" style="width:169px;">Pipeline  </b-button>
-                <b-button squared class="menu-button" style="width:110px;">Pseudobulk  </b-button>
+                <b-button class="menu-button" style="width:169px;">Pipeline</b-button>
+                <b-button class="menu-button" style="width:110px;">Pseudobulk</b-button>
+                <b-button class="menu-button" style="width:110px;">Submitted</b-button>
+                <b-button squared class="menu-button" style="width:130px;">Last Updated</b-button>
             </b-button-group>
             <div class="content-table">         
               <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
@@ -52,13 +61,18 @@ var Row =  {
   props: ['sample'],
   methods: {
     setShow() {this.sample.show = !this.sample.show},
-    returnURL(type,pk) { return window.origin + type + "/" + pk},
-    returnJiraURL(jira) {return "www.bcgsc.ca/jira/browse/" + jira }
+    returnURL(type,pk) { 
+      console.log(type,pk)
+      return window.origin + type + "/" + pk
+      },
+    returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
   },
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
-    <b-button squared class="row-button sample-name" style="width:140px;" :href="returnURL('core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
-    <b-button v-if="sample.library" class="row-button" style="width:100px;" :href="returnURL('dlp/library',sample.library)">
+
+  
+    <b-button squared class="row-button sample-name" style="width:140px;" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    <b-button v-if="sample.library" class="row-button" style="width:100px;" :href="returnURL('/dlp/library',sample.library)">
         {% verbatim %}{{sample.library}}{% endverbatim %}
     </b-button>
     <b-button class="row-button" v-else style="width:100px;" >
@@ -76,16 +90,41 @@ var Row =  {
       </b-badge>
     </b-button>
     <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
-    <b-button class="menu-button" style="width:100px;">N/A</b-button>
-    <b-button squared class="row-button">
+    <b-button v-if="sample.lanes" class="row-button" style="width:100px;">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.lanes}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
+    <b-button v-if="sample.aligner" class="row-button" style="width:100px;">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.aligner}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
+    <b-button class="row-button" style="width:100px;" :href="returnJiraURL(sample.jira)">Link</b-button>
+    <b-button class="row-button">
       <b-badge :variant="sample.pipeline.align">align</b-badge>
       <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
       <b-badge :variant="sample.pipeline.qc">QC</b-badge>
     </b-button>
-    <b-button squared class="row-button" style="width:110px;">
+    <b-button  class="row-button" style="width:110px;">
       <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
     </b-button>
+    <b-button v-if="sample.submission" class="row-button" style="width:110px;">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.submission}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button" style="width:110px;">N/A</b-button>
+    <b-button squared v-if="sample.last_updated" class="row-button" style="width:130px;">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.last_updated}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button squared v-else class="row-button" style="width:130px;">N/A</b-button>
   </b-button-group>   
+  
   `
   }
           
@@ -103,11 +142,23 @@ var Row =  {
         this.samples[i].pipeline["qc"] = "primary"
       },    
       setRunStatus(status) {
-        run_status = { secondary: ['idle'],
-        info: ['running','archiving'],
-        danger: ['error'],
-        success:['complete', 'align_complete', 'hmmcopy_complete']}
-
+        let variant = "secondary"
+        console.log("THIS IS STATUS")
+        console.log(status)
+        let run_status = { 
+          dark: 'idle',
+          info: 'running',
+          primary: 'archiving',
+          danger: 'error',
+          success:'complete'}
+        Object.entries(run_status).forEach(([key, val]) => {
+          if(status.includes(val)) {
+            variant = key
+            console.log("TRUE")
+          }
+          console.log(variant)
+        });
+        return variant
       },
       fetchSamples (id) {
         axios({
@@ -141,15 +192,20 @@ var Row =  {
         .then(r => {
           r.data.results.forEach(a => {
             atype = a.analysis_type
-            if (atype in sample.pipeline) sample["pipeline"][atype]= "primary"})
-            if (sample.pipeline["align"] && sample.pipeline["hmmcopy"]) sample["pipeline"]["qc"]= "primary"})
+            status = a.status
+            if (atype in sample.pipeline) {
+              sample["pipeline"][atype]= this.setRunStatus(status)
+              }
+            })
+            if ((sample.pipeline["align"] === "success") && (sample.pipeline["hmmcopy"] === "success")) sample["pipeline"]["qc"]= "success"
+            })
         .catch(e => {console.log(e.response)})
 
         // Pseudobulk
         axios
         .get(url,{ headers : { Authorization : token},
         params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
-        .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= "primary"})
+        .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= this.setRunStatus(status)})
         .catch(e => {console.log(e.response)})        
       }
     },
@@ -169,54 +225,41 @@ var Row =  {
   padding-top: 4%;
 }
 
-a { text-decoration : none; color : #000; }
-
-.wrap-button {
-  height: 45px;
-}
-
-.sample-name {
-  font-size: 10px;
-  text-align: left;
-  font-weight: 800;
-}
-
-.row-button {
-  background-color:whitesmoke;
-  color: black;
-}
-
-
 .tag-list {
-            max-height:500px;
-      overflow-y: scroll;
-    }
-
-.menu-button {
-  background-color:rgb(190, 182, 182);
-  color: black;
-}
-
-a {
-  color: hotpink;
-}
-
-.row-description {
-  background-color:whitesmoke;
-  border: 0.5px solid grey;
-  
+  max-height:500px;
+  height: 430px;
+  overflow-y: scroll;
 }
 
 .main-menu {
   max-width: 200px;
 }
 
-.tag-list {
-  height: 430px;
+.pipeline-tag {
+  width: 200px;
+  height: 600px;
 }
 
+
 .main-content {
-  width: 1000px;
+  overflow: auto;
+  width: 100%;
+  
+}
+
+.main-table {
+  width: 200px;
+}
+
+.sample-table {
+  border-radius: 5px;
+  padding: 2px;
+  min-width: 1260px;
+}
+
+.menu-button {
+  background-color:rgb(190, 182, 182);
+  color: black;
 }
 
 .project-button {
@@ -227,44 +270,20 @@ a {
   margin: 1px;
 }
 
-.pipeline-tag {
-  width: 200px;
-  height: 600px;
+.row-description {
+  background-color:whitesmoke;
+  border: 0.5px solid grey;
+}
+.sample-name {
+  font-size: 10px;
+  text-align: left;
+  font-weight: 800;
 }
 
-.content-table {
-  overflow: scroll;
-  max-height: 600px;
+.row-button {
+  background-color:whitesmoke;
+  color: black;
 }
-
-.main-table {
-  
-  border-radius: 5px;
-  width: 100%;
-}
-
-.menu-table {
-  
-}
-.content-table {
-  
-}
-
-
-.custom-row {
-  
-}
-
-.column { 
-  border: 1px solid black;
-}
-/* .main-card {
-  margin-top: 100px;
-  width: 1200px;
-  height: 600px;
-    
-
-} */
 
 </style>
 

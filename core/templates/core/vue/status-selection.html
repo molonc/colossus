@@ -5,6 +5,8 @@
 
 <div id="app">
   <div class="centered-container">
+      {{error}}
+    <b-modal id="my-modal" ok-only>{{error}}</b-modal>
     <form action="{% url 'core:pipeline_status_create' %}" method="POST" class="md-layout">
         {% csrf_token %}
         <md-card class="md-layout-item">
@@ -34,7 +36,7 @@
               </div>
 
               <div class="actions md-layout md-alignment-center-space-between">
-                <a href="">I already have my project</a>
+                <a href="{% url 'core:pipeline_status' %}">I already have my project</a>
                 <md-button class="md-raised md-primary" type="submit" name="create" value="Ok">Create</md-button>
               </div>
 
@@ -55,8 +57,14 @@
         return this.selectedSamples.map(s => s.text)
       }
     },
+    mounted() {
+      if (true) this.$bvModal.show('my-modal')
+    },
     created () {
+      this.error = "{{error}}";
       
+
+      console.log(this.error)
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
       console.log(this.samples)
     },
