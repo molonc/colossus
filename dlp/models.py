@@ -422,12 +422,6 @@ class DlpSequencing(models.Model, FieldValue):
 
     objects = SequencingManager()
 
-    analysis = models.ManyToManyField(
-        'core.Analysis',
-        verbose_name="Analysis",
-        blank=True
-    )
-
     def __init__(self, *args, **kwargs):
         super(DlpSequencing, self).__init__(*args, **kwargs)
         self.old_number_of_lanes_requested = self.number_of_lanes_requested
