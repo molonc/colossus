@@ -21,7 +21,7 @@ from django.core.urlresolvers import reverse
 #============================
 # App imports
 #----------------------------
-from core.utils import generate_samplesheet
+from core.utils import generate_samplesheet, generate_tenx_pool_sample_csv
 from .serializers import (
     SampleSerializer,
     LibrarySerializer,
@@ -405,3 +405,6 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
     except DlpSequencing.MultipleObjectsReturned:
         msg = "Multiple flowcells with ID {} found.".format(flowcell)
         return HttpResponse(msg)
+
+def tenx_pool_sample_sheet(request, pk):
+    return generate_tenx_pool_sample_csv(pk)

@@ -5,7 +5,7 @@ Created on June 6, 2016
 
 Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
-
+import csv
 import os, sys, io
 import pandas as pd
 import yaml
@@ -16,6 +16,9 @@ from datetime import date
 #===============
 # Django imports
 #---------------
+from django.http import HttpResponse
+
+from tenx.models import TenxPool
 from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField
 from dlp.models import (
     DlpLane,
@@ -138,6 +141,28 @@ class HistoryManager(object):
                 str(h.history_user),
                 ]))
             print( '-' * 100)
+
+
+def generate_tenx_pool_sample_csv(id):
+    buffer = io.StringIO()
+    pool = TenxPool.objects.get(id=id)
+    list_of_dict = []
+    for library in pool.libraries.all():
+        index = library.tenxlibraryconstructioninformation.index_used
+        list_of_dict.append({
+            "lane" : "*" ,
+            "sample" : library.name,
+            "index" : index.split(",")[0] if index else "None"})
+
+    wr = csv.DictWriter(buffer, fieldnames=["lane","sample","index"])
+    wr.writeheader()
+    wr.writerows(list_of_dict)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={}_tenxpool_sample.csv'.format(pool.id)
+    return response
+
 
 #======================
 # Generate sample sheet
