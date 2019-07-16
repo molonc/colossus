@@ -15,6 +15,7 @@
           </md-card-content>
           <md-divider></md-divider>
           <md-card-content class="tag-list">
+            <button class="project-button"  @click="fetchWetlab()" squared><span>Wetlab</span></button>
             <button v-for="tag in tags" @click="fetchSamples(tag.id)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
           </md-card-content>
           <md-card-actions >
@@ -26,21 +27,16 @@
       <b-col class="main-table"> 
         <md-card class="main-content">
           <br />
-          <div style="float: right;">
-              <b-badge pill variant="primary">Primary</b-badge>
-              <b-badge pill variant="secondary">Secondary</b-badge>
-              <b-badge pill variant="success">Success</b-badge>
-          </div>
           <div class="sample-table">
             <b-button-group style="margin-top : 1px; height: 40px;">
                 <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>                
-                <b-button class="menu-button" style="width:100px;">library ID</b-button>
+                <b-button class="menu-button" style="width:110px;">library ID</b-button>
                 <b-button class="menu-button" style="width:100px;">Analysis</b-button>
                 <b-button class="menu-button" style="width:100px;">Version</b-button>
                 <b-button class="menu-button" style="width:100px;">Aligner</b-button>
                 <b-button class="menu-button" style="width:100px;">Lanes</b-button>
                 <b-button class="menu-button" style="width:100px;">Montage</b-button>
-                <b-button class="menu-button" style="width:169px;">Pipeline</b-button>
+                <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
                 <b-button class="menu-button" style="width:110px;">Pseudobulk</b-button>
                 <b-button class="menu-button" style="width:110px;">Submitted</b-button>
                 <b-button squared class="menu-button" style="width:130px;">Last Updated</b-button>
@@ -62,20 +58,17 @@ var Row =  {
   methods: {
     setShow() {this.sample.show = !this.sample.show},
     returnURL(type,pk) { 
-      console.log(type,pk)
       return window.origin + type + "/" + pk
       },
     returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
   },
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
-
-  
     <b-button squared class="row-button sample-name" style="width:140px;" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
-    <b-button v-if="sample.library" class="row-button" style="width:100px;" :href="returnURL('/dlp/library',sample.library)">
+    <b-button v-if="sample.library" class="row-button" style="width:110px;" :href="returnURL('/dlp/library',sample.library)">
         {% verbatim %}{{sample.library}}{% endverbatim %}
     </b-button>
-    <b-button class="row-button" v-else style="width:100px;" >
+    <b-button class="row-button" v-else style="width:110px;" >
     <b-badge variant="warning">No DLP</b-badge> 
     </b-button>
     <b-button v-if="sample.jira" class="row-button" style="width:100px;" :href="returnJiraURL(sample.jira)">
@@ -90,15 +83,15 @@ var Row =  {
       </b-badge>
     </b-button>
     <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
-    <b-button v-if="sample.lanes" class="row-button" style="width:100px;">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.lanes}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
     <b-button v-if="sample.aligner" class="row-button" style="width:100px;">
       <b-badge variant="primary">
       {% verbatim %}{{sample.aligner}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
+    <b-button v-if="sample.lanes" class="row-button" style="width:100px;">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.lanes}}{% endverbatim %}
       </b-badge>
     </b-button>
     <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
@@ -138,13 +131,11 @@ var Row =  {
     },
     methods: {  
       setPipeline(i) {
-        console.log("HELLO")
         this.samples[i].pipeline["qc"] = "primary"
       },    
       setRunStatus(status) {
+        console.log("setRunStatus")
         let variant = "secondary"
-        console.log("THIS IS STATUS")
-        console.log(status)
         let run_status = { 
           dark: 'idle',
           info: 'running',
@@ -154,13 +145,31 @@ var Row =  {
         Object.entries(run_status).forEach(([key, val]) => {
           if(status.includes(val)) {
             variant = key
-            console.log("TRUE")
           }
-          console.log(variant)
         });
         return variant
       },
+      fetchWetlab() {
+        console.log("fetchWetlab")
+        axios({
+                method: 'post',
+                url: "{% url 'core:pipeline_status_request_handler' %}",
+                dataType: "json",
+                data: {"type" : "fetchWetlab"},
+                headers: {
+                  "X-CSRFToken": Cookies.get('csrftoken'),
+                  "content-type": "application/json"
+                }}
+            ).then( (response) => {
+              this.samples = response.data.samples  
+              this.samples.forEach( sample => {
+                if(sample.jira) this.axiosVeifyTantalus(sample)
+              })
+              }
+              )    
+      },
       fetchSamples (id) {
+        console.log("fetchSamples")
         axios({
                 method: 'post',
                 url: "{% url 'core:pipeline_status_request_handler' %}",
@@ -173,13 +182,13 @@ var Row =  {
             ).then( (response) => {
               this.samples = response.data.samples  
               this.samples.forEach( sample => {
-                sample.pipeline = {qc:"secondary", align: "secondary", hmmcopy: "secondary", pseudo: "secondary"}
                 if(sample.jira) this.axiosVeifyTantalus(sample)
               })
               }
               )
       },
       axiosVeifyTantalus (sample) {
+        console.log("axiosVeifyTantalus")
         jira = sample.jira
         library = sample.library
         let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOCwidXNlcm5hbWUiOiJzc29uZyIsImV4cCI6MTU2MzQwMTg5NSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2Mjc5NzA5NX0.hP70bhBNncnE4uLdb5hJUoHQga3Ocv63sB2wz0ujn5c"
@@ -213,9 +222,9 @@ var Row =  {
       Row
     },
     created () {
+      console.log("created")
       this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
-      console.log(this.samples)
     },
   })
 </script>
@@ -242,19 +251,23 @@ var Row =  {
 
 
 .main-content {
-  overflow: auto;
-  width: 100%;
-  
+  overflow-x: auto;
+  width: 95%;
 }
 
 .main-table {
   width: 200px;
 }
 
+.content-table {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
 .sample-table {
   border-radius: 5px;
   padding: 2px;
-  min-width: 1260px;
+  min-width: 1280px;
 }
 
 .menu-button {

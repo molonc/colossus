@@ -11,12 +11,14 @@ import csv
 import collections
 import subprocess
 import json
+from datetime import timedelta
+
 from jira import JIRAError
 
 #============================
 # Django imports
 #----------------------------
-from django.db.models import F
+from django.db.models import F, Count, Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required #, permission_required
@@ -137,6 +139,36 @@ def gsc_submission_form(request):
 #============================
 # Pipeline Status
 #----------------------------
+def analysis_info_dict(analysis):
+    return { "jira": analysis.analysis_jira_ticket,
+             "date": analysis.analysis_submission_date,
+            "lanes": analysis.lanes.count(),
+            "version": analysis.version.version,
+            "run_status": analysis.analysis_run.run_status,
+            "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
+            "submission": analysis.analysis_submission_date,
+            "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
+
+def get_wetlab_analyses():
+    sample_list = []
+    time_threshold = datetime.datetime.now() - timedelta(days=14)
+    analyses = DlpAnalysisInformation.objects.filter(analysis_run__last_updated__gte=time_threshold)
+    sequencings = DlpSequencing.objects.annotate(lane_count=Count('dlplane')).filter(Q(lane_count__lte=0)|Q(lane_count__lt=F('number_of_lanes_requested')))
+    for s in sequencings.all():
+        for analysis in s.library.dlpanalysisinformation_set.iterator():
+
+            sample_list.append({**analysis_info_dict(analysis),
+                **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"},
+                 "library": s.library.pool_id}})
+
+    for a in analyses.all():
+        sample_list.append({**analysis_info_dict(a),
+                            **{"id": a.library.sample.pk, "name": a.library.sample.sample_id,
+                               "pipeline": {"qc": "secondary", "align": "secondary", "hmmcopy": "secondary",
+                                            "pseudo": "secondary"},
+                               "library": a.library.pool_id}})
+    return sample_list
+
 def get_sample_info(id):
     sample_list = []
     samples = PipelineTag.objects.get(id=id).sample_set.iterator()
@@ -151,29 +183,8 @@ def get_sample_info(id):
                 analysis_set = d.dlpanalysisinformation_set.iterator()
                 if analysis_set:
                     for analysis in analysis_set:
-                        sample_list.append({**sample_dict, **{
-                            "library" : d.pool_id,
-                            "jira" : analysis.analysis_jira_ticket,
-                            "date" : analysis.analysis_submission_date,
-                            "lanes" : analysis.lanes.count(),
-                            "version" : analysis.version.version,
-                            "run_status" : analysis.analysis_run.run_status,
-                            "aligner" : analysis.aligner,
-                            "submission" :analysis.analysis_submission_date,
-                            "last_updated" : analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None,
-                        }
-                        })
+                        sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
                 else: sample_list.append({**sample_dict, **{"library" : d.pool_id}})
-                # sequencing_set = d.dlpsequencing_set.all()
-                # if sequencing_set:
-                #     count = 0
-                #     for sequencing in sequencing_set:
-                #         if sequencing.number_of_lanes_requested > sequencing.dlplane_set.count():
-                #             count += 1
-                #     library["sequencing"] = { "total" : sequencing_set.count(), "imported" : count}
-                #     if count < sequencing_set.count():
-                #         library["imported"] = False
-                #         sample_imported = False
         else: sample_list.append(sample_dict)
         print(sample_list)
     return sample_list
@@ -206,6 +217,9 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         returnJson = {}
         if data["type"] == "fetchSample":
             returnJson["samples"] = get_sample_info(data["id"])
+            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "fetchWetlab":
+            returnJson["samples"] = get_wetlab_analyses()
             return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
         return None
 
