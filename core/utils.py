@@ -8,6 +8,7 @@ Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 
 import os, sys, io
 import pandas as pd
+import numpy as np
 import yaml
 from string import Template
 from collections import OrderedDict
@@ -16,7 +17,7 @@ from datetime import date
 #===============
 # Django imports
 #---------------
-from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField
+from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, DoubletInformation
 from dlp.models import (
     DlpLane,
     DlpSequencing
@@ -32,13 +33,79 @@ def read_excel_sheets(filename, sheetnames):
     """ Read the excel sheet.
     """
     try:
-        data = pd.read_excel(filename, sheetname=None)
+        data = pd.read_excel(filename, sheet_name=None)
     except IOError:
         raise ValueError('unable to find file', filename)
     for sheetname in sheetnames:
         if sheetname not in data:
             raise ValueError('unable to read sheet(s)', sheetname)
         yield data[sheetname]
+
+
+def check_smartchip_row(index, smartchip_row):
+    row_sum = sum(smartchip_row)
+
+    single_matrix = np.identity(3)
+    doublet_matrix = np.identity(3)*2
+
+    # Row does not have cells
+    if smartchip_row == [0,0,0]:
+        cell = None
+
+    # TODO: Clean up code; use identity matrices
+    # Row is singlet
+    elif row_sum == 1:
+        for row in range(len(smartchip_row)):
+            if np.array_equal(smartchip_row, single_matrix[row]):
+                cell = [row,0]
+
+    # Row is doublet and is strictly live/dead/other
+    elif row_sum == 2 and len(np.where(np.array(smartchip_row) == 0)[0]) == 2:
+        for row in range(len(smartchip_row)):
+            if np.array_equal(smartchip_row, doublet_matrix[row]):
+                cell = [row,1]
+
+    # Row is doublet but mixed
+    elif row_sum == 2 and len(np.where(np.array(smartchip_row) == 0)[0]) != 2:
+        cell = [2,1]
+
+    # Greater than doublet row and row is multiple of unit vector
+    elif row_sum > 2 and row_sum in smartchip_row:
+        non_zero_index = np.where(smartchip_row != 0)
+        cell = [non_zero_index[0][0],2]
+
+    else:
+        cell = [2,2]
+
+    return cell
+
+
+def generate_doublet_info(filename):
+    """ Read SmartChipApp results and record doublet info
+    """
+
+    col_names = ["live", "dead", "other"]
+    row_names = ["single", "doublet", "more_than_doublet"]
+
+    data = np.zeros((3,3))
+    doublet_table = pd.DataFrame(data, columns=col_names, index=row_names, dtype=int)
+
+    results = pd.read_excel(filename, sheet_name="Summary")
+    results = results[results["Condition"] != "~"]
+
+    for index, row in results.iterrows():
+        smartchip_row = [row["Num_Live"], row["Num_Dead"], row["Num_Other"]]
+        override_row = [row["Rev_Live"], row["Rev_Dead"], row["Rev_Other"]]
+        if np.array_equal(override_row, [-1, -1, -1]):
+            cell = check_smartchip_row(index, smartchip_row)
+
+        else:
+            cell = check_smartchip_row(index, override_row)
+
+        if cell is not None:
+            doublet_table[col_names[cell[0]]][row_names[cell[1]]] += 1
+
+    return doublet_table
 
 def parse_smartchipapp_results_file(filename):
     """ Parse the result file of SmartChipApp.
@@ -109,6 +176,24 @@ def create_sublibrary_models(library, sublib_results, region_metadata):
             raise ValueError('Undefined condition in metadata at row, column: {}, {}'.format(row['row'], row['column']))
     library.num_sublibraries = len(sublib_results.index)
     library.save()
+
+
+def create_doublet_info_model(library, doublet_info):
+
+    doublet_info = DoubletInformation(
+        live_single=doublet_info["live"]["single"],
+        dead_single=doublet_info["dead"]["single"],
+        other_single=doublet_info["other"]["single"],
+        live_doublet=doublet_info["live"]["doublet"],
+        dead_doublet=doublet_info["dead"]["doublet"],
+        other_doublet=doublet_info["other"]["doublet"],
+        live_gt_doublet=doublet_info["live"]["more_than_doublet"],
+        dead_gt_doublet=doublet_info["dead"]["more_than_doublet"],
+        other_gt_doublet=doublet_info["other"]["more_than_doublet"],
+    )
+    doublet_info.library_id = library.pk
+    doublet_info.save()
+
 
 #=================
 # History manager

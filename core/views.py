@@ -64,10 +64,11 @@ from .forms import (
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
-    SublibraryForm
+    SublibraryForm,
 )
 from .utils import (
     create_sublibrary_models,
+    create_doublet_info_model,
     generate_samplesheet,
     generate_gsc_form,
 )
@@ -321,7 +322,17 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
 
     template_name = "core/library_detail.html"
 
-    def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None):
+    def get_context_and_render(
+        self,
+        request,
+        library,
+        library_type,
+        analyses=None,
+        sublibinfo_fields=None,
+        chip_metadata=None,
+        metadata_fields=None,
+        doubletinfo_fields=None
+    ):
         library_dict = self.sort_library_order(library)
         context = {
             'library': library,
@@ -487,10 +498,13 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                    doublet_info = sublib_form.cleaned_data.get('smartchipapp_doublet_info')
                     if region_metadata is not None and sublib_results is not None:
                         instance.sublibraryinformation_set.all().delete()
                         instance.chipregion_set.all().delete()
+                        context['doublet_info'] = doublet_info.to_dict()
                         create_sublibrary_models(instance, sublib_results, region_metadata)
+                        create_doublet_info_model(instance, doublet_info)
 
                     if all_valid and create:
                         if context['library_type'] != 'pbal':
