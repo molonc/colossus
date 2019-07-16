@@ -96,14 +96,6 @@ class DlpLibrary(models.Model, FieldValue, LibraryAssistant):
         blank=False
     )
 
-    doublet_info = models.ForeignKey(
-        'core.DoubletInformation',
-        verbose_name="Doublet information",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-    )
-
     def __str__(self):
         return 'LIB_' + self.get_library_id()
 

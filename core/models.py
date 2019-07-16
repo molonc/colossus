@@ -317,53 +317,56 @@ class DoubletInformation(models.Model):
 
     history = HistoricalRecords(table_name='doublet_information_history')
 
+    fields_to_exclude = ['Library']
+    values_to_exclude = ['library']
+
     library = models.OneToOneField(
         'dlp.DlpLibrary',
         verbose_name="Library",
         on_delete=models.CASCADE,
     )
 
-    live_single_cell = create_intfield(
+    live_single = create_intfield(
         "Number of live single cells",
         default=0,
     )
 
-    dead_single_cell = create_intfield(
+    dead_single = create_intfield(
         "Number of dead single cells",
         default=0,
     )
 
-    other_single_cell = create_intfield(
+    other_single = create_intfield(
         "Number of other single cells",
         default=0,
     )
 
-    live_doublet_cell = create_intfield(
+    live_doublet = create_intfield(
         "Number of live doublet cells",
         default=0,
     )
 
-    dead_doublet_cell = create_intfield(
+    dead_doublet = create_intfield(
         "Number of dead doublet cells",
         default=0,
     )
     
-    other_doublet_cell = create_intfield(
+    other_doublet = create_intfield(
         "Number of mixed doublet cells",
         default=0,
     )
 
-    live_gt_doublet_cell = create_intfield(
+    live_gt_doublet = create_intfield(
         "More than two live cells",
         default=0,
     )
 
-    dead_gt_doublet_cell = create_intfield(
+    dead_gt_doublet = create_intfield(
         "More than two dead cells",
         default=0,
     )
     
-    other_gt_doublet_cell = create_intfield(
+    other_gt_doublet = create_intfield(
         "More than two other cells",
         default=0,
     )
