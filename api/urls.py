@@ -24,7 +24,7 @@ router = routers.DefaultRouter()
 router.register(r'project', views.ProjectViewSet, base_name='project')
 router.register(r'sample', views.SampleViewSet)
 router.register(r'lane', views.LaneViewSet)
-router.register(r'analysis', views.AnalysisViewSet, base_name='analysis')
+
 router.register(r'sequencing', views.SequencingViewSet)
 router.register(r'library', views.LibraryViewSet, base_name='library')
 router.register(r'sublibraries', views.SublibraryViewSet, base_name='sublibraries')
@@ -39,6 +39,7 @@ router.register(r'tenxchip', views.TenxChipViewSet, base_name='tenxchip')
 router.register(r'tenxlibrary', views.TenxLibraryViewSet, base_name='tenxlibrary')
 router.register(r'tenxsequencing', views.TenxSequencingViewSet, base_name='tenxsequencing')
 router.register(r'tenxlane', views.TenxLaneViewSet, base_name='tenxlane')
+router.register(r'tenxanalysis', views.TenxAnalysisViewSet, base_name='tenxanalysis')
 
 
 

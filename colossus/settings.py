@@ -167,17 +167,14 @@ JIRA_URL = 'https://www.bcgsc.ca/jira/'
 DEFAULT_FILE_STORAGE = 'colossus.custom_azure.AzureMediaStorage'
 STATICFILES_STORAGE = 'colossus.custom_azure.AzureStaticStorage'
 
-STATIC_LOCATION = "colossus-static"
-MEDIA_LOCATION = "colossus-media"
 
 
 AZURE_ACCOUNT_NAME = "olympusbackups"
-AZURE_CONTAINER = "colossus-media"
 AZURE_ACCOUNT_KEY = os.environ.get('STORAGE_SECRET_KEY')
-AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
-STATIC_URL = '/static/'
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.environ.get(
-    'COLOSSUS_MEDIA_ROOT',
-    os.path.join(BASE_DIR, 'media/'),)
 
+STATIC_URL = f'https://olympusbackups.blob.core.windows.net/colossus-static/'
+MEDIA_URL = f'https://olympusbackups.blob.core.windows.net/colossus-media/'
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

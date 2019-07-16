@@ -7,30 +7,30 @@ from django_filters import FilterSet
 from django_filters import Filter, DateFromToRangeFilter
 from django_filters.fields import Lookup
 from core.models import (
-    Analysis,
     SublibraryInformation
 )
 
 from sisyphus.models import DlpAnalysisInformation
 import re
 
-class AnalysisFilter(filters.FilterSet):
+from tenx.models import TenxAnalysis
+
+
+class TenxAnalysisFilter(filters.FilterSet):
     """Filters for Analysis."""
 
     def __init__(self, *args, **kwargs):
-        super(AnalysisFilter, self).__init__(*args, **kwargs)
-        self.filters["dlp_library__pool_id"].label = "DLP Library Chip ID"
+        super(TenxAnalysisFilter, self).__init__(*args, **kwargs)
         self.filters["tenx_library__name"].label = "TenX Library Chip ID"
 
     class Meta():
-        model = Analysis
+        model = TenxAnalysis
         fields = {
             "id": ["exact"],
             "input_type": ["exact"],
             "version": ["exact"],
             "jira_ticket": ["exact"],
             "run_status": ["exact"],
-            "dlp_library__pool_id": ["exact"],
             "tenx_library__name": ["exact"],
         }
 

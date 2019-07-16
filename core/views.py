@@ -56,8 +56,8 @@ from .models import (
     MetadataField,
     JiraUser,
     Project,
-    Analysis,
-    PipelineTag)
+    PipelineTag
+)
 
 from sisyphus.models import *
 from .forms import (
@@ -68,10 +68,11 @@ from .forms import (
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
-    SublibraryForm
+    SublibraryForm,
 )
 from .utils import (
     create_sublibrary_models,
+    create_doublet_info_model,
     generate_samplesheet,
     generate_gsc_form,
 )
@@ -107,7 +108,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         context = {
             'sample_size': Sample.objects.count(),
             'project_size' : Project.objects.count(),
-            'analysis_size': Analysis.objects.count(),
+            'tenxanalysis_size': TenxAnalysis.objects.count(),
             'dlp_library_size': DlpLibrary.objects.count(),
             'dlp_sequencing_size': DlpSequencing.objects.count(),
             'pbal_library_size': PbalLibrary.objects.count(),
@@ -149,6 +150,12 @@ def analysis_info_dict(analysis):
             "submission": analysis.analysis_submission_date,
             "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
 
+def validate_imported(jira):
+    analysis = DlpAnalysisInformation.objects.get(analysis_jira_ticket=jira)
+    val = all([ a.imported() for a in analysis.library.dlpsequencing_set.all()])
+    print(val)
+    return val
+
 def get_wetlab_analyses():
     sample_list = []
     time_threshold = datetime.datetime.now() - timedelta(days=14)
@@ -171,20 +178,28 @@ def get_wetlab_analyses():
 
 def get_sample_info(id):
     sample_list = []
-    samples = PipelineTag.objects.get(id=id).sample_set.iterator()
+    samples = PipelineTag.objects.get(id=id).sample_set.all()
     print("SAMPLE STATUS")
     print(samples)
     for s in samples:
+        print(s.id)
         sample_dict = {"id": s.pk, "name": s.sample_id, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"} }
         sample_imported = True
-        libraries = s.dlplibrary_set.iterator()
+        libraries = s.dlplibrary_set.all()
         if libraries:
             for d in libraries:
-                analysis_set = d.dlpanalysisinformation_set.iterator()
+                print(d.pool_id)
+                analysis_set = d.dlpanalysisinformation_set.all()
+                print(d.dlpanalysisinformation_set.all())
                 if analysis_set:
+                    print("ANALYSIS EXIST")
                     for analysis in analysis_set:
+                        print(analysis.id)
                         sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
-                else: sample_list.append({**sample_dict, **{"library" : d.pool_id}})
+                else:
+                    print("NOT EXIST")
+                    sample_list.append({**sample_dict, **{"library" : d.pool_id}})
+                    print(sample_list)
         else: sample_list.append(sample_dict)
         print(sample_list)
     return sample_list
@@ -221,6 +236,9 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         elif data["type"] == "fetchWetlab":
             returnJson["samples"] = get_wetlab_analyses()
             return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "validateColossus":
+            return HttpResponse(json.dumps(validate_imported(data["id"])))
+
         return None
 
     def pipeline_status_page(request):
@@ -374,30 +392,6 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
         messages.success(request, msg)
         return HttpResponseRedirect(reverse('core:pipeline_status'))
 
-@Render("core/analysis_list.html")
-@login_required
-def analys_list(request):
-    context = {
-        'analyses': Analysis.objects.all().order_by('id'),
-    }
-    return context
-
-@Render("core/analysis_detail.html")
-@login_required
-def analysis_detail(request, pk):
-    analysis = get_object_or_404(Analysis, pk=pk)
-    library = analysis.__getattribute__(analysis.input_type.lower() + "_library")
-    sequencings = analysis.__getattribute__(analysis.input_type.lower() + "sequencing_set")
-    context = {
-        'analysis': analysis,
-        'library': library,
-        'sequencings': sequencings
-    }
-    if analysis.input_type.lower() == 'tenx':
-        tenx_pools = list(map(lambda x: x.tenx_pool, sequencings.all()))
-        context['tenx_pools'] = tenx_pools
-    return context
-
 @Render("core/sample_detail.html")
 @login_required
 def sample_name_to_id_redirect(request, pk=None, sample_id=None):
@@ -445,7 +439,17 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
 
     template_name = "core/library_detail.html"
 
-    def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None):
+    def get_context_and_render(
+        self,
+        request,
+        library,
+        library_type,
+        analyses=None,
+        sublibinfo_fields=None,
+        chip_metadata=None,
+        metadata_fields=None,
+        doubletinfo_fields=None
+    ):
         library_dict = self.sort_library_order(library)
         context = {
             'library': library,
@@ -611,10 +615,13 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                    doublet_info = sublib_form.cleaned_data.get('smartchipapp_doublet_info')
                     if region_metadata is not None and sublib_results is not None:
                         instance.sublibraryinformation_set.all().delete()
                         instance.chipregion_set.all().delete()
+                        context['doublet_info'] = doublet_info.to_dict()
                         create_sublibrary_models(instance, sublib_results, region_metadata)
+                        create_doublet_info_model(instance, doublet_info)
 
                     if all_valid and create:
                         if context['library_type'] != 'pbal':

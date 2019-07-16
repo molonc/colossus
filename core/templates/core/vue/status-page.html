@@ -164,6 +164,7 @@ var Row =  {
               this.samples = response.data.samples  
               this.samples.forEach( sample => {
                 if(sample.jira) this.axiosVeifyTantalus(sample)
+                if(sample.jira) this.axiosVerifyColossus(sample.jira)
               })
               }
               )    
@@ -183,8 +184,25 @@ var Row =  {
               this.samples = response.data.samples  
               this.samples.forEach( sample => {
                 if(sample.jira) this.axiosVeifyTantalus(sample)
+                if(sample.jira) this.axiosVerifyColossus(sample.jira)
               })
               }
+              )
+      },
+      axiosVerifyColossus(jira){
+        console.log("HELLO?")
+
+        axios({
+                method: 'post',
+                url: "{% url 'core:pipeline_status_request_handler' %}",
+                dataType: "json",
+                data:{"type" : "validateColossus", "id" : jira}, 
+                headers: {
+                  "X-CSRFToken": Cookies.get('csrftoken'),
+                  "content-type": "application/json"
+                }}
+            ).then( (response) => {
+              console.log(response.data)}
               )
       },
       axiosVeifyTantalus (sample) {
