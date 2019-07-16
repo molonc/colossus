@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^samplesheet/(?P<pk>\d+)$', views.dlp_sequencing_get_samplesheet, name='dlp_sequencing_get_queried_samplesheet'),
     url(r'^samplesheet_query/(?P<flowcell>.+)$', views.dlp_sequencing_get_queried_samplesheet, name='dlp_sequencing_get_queried_samplesheet'),
     url(r'^tenxpool_sheet/(?P<pk>\d+)$', views.tenx_pool_sample_sheet, name='tenx_pool_sample_sheet'),
+    url(r'^tenxpool_sheet/(?P<pool_name>(TENXPOOL\d{4}))$', views.pool_name_to_id_redirect),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

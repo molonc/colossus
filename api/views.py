@@ -17,6 +17,7 @@ from rest_framework import pagination, viewsets, generics, mixins
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404, redirect
 
 #============================
 # App imports
@@ -408,3 +409,9 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
 
 def tenx_pool_sample_sheet(request, pk):
     return generate_tenx_pool_sample_csv(pk)
+
+def pool_name_to_id_redirect(request, pool_name):
+    pk = get_object_or_404(TenxPool, pool_name=pool_name).pk
+    return redirect('api:tenx_pool_sample_sheet', pk=pk)
+
+
