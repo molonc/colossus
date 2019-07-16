@@ -324,6 +324,44 @@
     </div>
 <!-- endof Experimental Condition Metadata -->
 
+<!-- Doublet Information -->
+    <div class="container detail-bordered-container">
+        <h4>Doublet Information</h4>
+        {% if library.doubletinformation %}
+            <div class="table-responsive">
+                <table id="doublet-datatable" class="table-striped table-bordered" style="text-align: center; width: 100%">
+                  <tr>
+                    <td></td>
+                    <th scope="col" style="text-align: center; width:30%">Live</th>
+                    <th scope="col" style="text-align: center; width:30%">Dead</th>
+                    <th scope="col" style="text-align: center; width:30%">Other</th>
+                  </tr>
+                  <tr>
+                    <th scope="row">1 cell</th>
+                    <td>{{library.doubletinformation.live_single}}</td>
+                    <td>{{library.doubletinformation.dead_single}}</td>
+                    <td>{{library.doubletinformation.other_single}}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2 cells</th>
+                    <td>{{library.doubletinformation.live_doublet}}</td>
+                    <td>{{library.doubletinformation.dead_doublet}}</td>
+                    <td>{{library.doubletinformation.other_doublet}}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">>2 cells</th>
+                    <td>{{library.doubletinformation.live_gt_doublet}}</td>
+                    <td>{{library.doubletinformation.dead_gt_doublet}}</td>
+                    <td>{{library.doubletinformation.other_gt_doublet}}</td>
+                  </tr>
+                </table>
+            </div>
+        {% else %}
+            <h5><i class="text-warning">There is no doublet information for this library!</i></h5>
+        {% endif %}
+    </div>
+<!-- End of Doublet Information -->
+
 <!-- Sublibrary Information -->
     <div class="container detail-bordered-container">
         <h4>Sublibrary Information</h4>
@@ -366,6 +404,9 @@
         {% endif %}
     </div>
 {% endif %}
+
+<!-- ADD DOUBLET INFORMATION HERE -->
+
 <!-- end of Sublibrary Information -->
 {% if library_type == 'dlp' or library_type == 'pbal' %}
 <!-- Sequencing Information -->
@@ -500,6 +541,14 @@
                 ]
             });
             $("#sublibrary-datatable").DataTable({
+                "columnDefs": [
+                    {
+                        "orderable": false,
+                        "targets": "no-sort-col",
+                    }
+                ]
+            });
+            $("#doublet-datatable").DataTable({
                 "columnDefs": [
                     {
                         "orderable": false,
