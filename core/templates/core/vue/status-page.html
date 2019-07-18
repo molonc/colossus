@@ -3,7 +3,6 @@
 
 {% block body %}
 <div id="app">
-  {% verbatim %}{{montage_ready}}{% endverbatim %}
   <b-modal id="my-modal" ok-only>Are you sure you want to delete Tag: {% verbatim %}{{selected_tag.title}}{% endverbatim %}</b-modal>
   <b-container fluid id="main-container">
     <b-row class="text-center custom-row">
@@ -69,58 +68,58 @@ var Row =  {
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
     <b-button squared class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
-    <b-button v-if="sample.library" class="row-button library-id" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
+    <b-button v-if="sample.library" class="row-button ln110" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
         {% verbatim %}{{sample.library}}{% endverbatim %}
     </b-button>
-    <b-button v-else class="row-button library-id" :style="sample.imported" >
+    <b-button v-else class="row-button ln110" :style="sample.imported" >
     <b-badge variant="warning">No DLP</b-badge>
     </b-button>
-    <b-button v-if="sample.jira" class="row-button jira-ticket" :style="sample.imported" :href="returnJiraURL(sample.jira)">
+    <b-button v-if="sample.jira" class="row-button ln100" :style="sample.imported" :href="returnJiraURL(sample.jira)">
      {% verbatim %}{{sample.jira}}{% endverbatim %}
     </b-button>
-    <b-button v-else class="row-button jira-ticket" :style="sample.imported" >
+    <b-button v-else class="row-button ln100" :style="sample.imported" >
     <b-badge variant="warning">No Analysis</b-badge>
     </b-button>
-    <b-button v-if="sample.version" class="row-button version" :style="sample.imported">
+    <b-button v-if="sample.version" class="row-button ln100" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.version}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button v-else class="row-button version" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.aligner" class="row-button aligner" :style="sample.imported">
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.aligner" class="row-button ln100" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.aligner}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button v-else class="row-button aligner" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.lanes" class="row-button lanes" :style="sample.imported">
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.lanes" class="row-button ln100" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.lanes}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button v-else class="row-button lanes" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.montage" class="row-button jira-ticket" :style="sample.imported" :href="returnMontageURL(sample.jira)">Link</b-button>
-    <b-button v-else class="row-button jira-ticket" :style="sample.imported">N/A</b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.montage" class="row-button ln100" :style="sample.imported" :href="returnMontageURL(sample.jira)">Link</b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
     <b-button class="row-button" :style="sample.imported">
       <b-badge :variant="sample.pipeline.align">align</b-badge>
       <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
       <b-badge :variant="sample.pipeline.qc">QC</b-badge>
     </b-button>
-    <b-button  class="row-button pseudobulk" :style="sample.imported">
+    <b-button  class="row-button ln110" :style="sample.imported">
       <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
     </b-button>
-    <b-button v-if="sample.submission" class="row-button submission" :style="sample.imported">
+    <b-button v-if="sample.submission" class="row-button ln110" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.submission}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button v-else class="row-button" style="width:110px;">N/A</b-button>
-    <b-button squared v-if="sample.last_updated" class="row-button last-updated" :style="sample.imported">
+    <b-button v-else class="row-button ln110">N/A</b-button>
+    <b-button squared v-if="sample.last_updated" class="row-button ln130" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.last_updated}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button squared v-else class="row-button last-updated" :style="sample.imported">N/A</b-button>
+    <b-button squared v-else class="row-button ln130" :style="sample.imported">N/A</b-button>
   </b-button-group>
 
   `
@@ -311,35 +310,15 @@ var Row =  {
   width:140px;
 }
 
-.library-id {
+.ln110 {
   width: 110px;
 }
 
-.jira-ticket {
+.ln100 {
   width: 100px;
 }
 
-.version {
-  width: 100px;
-}
-
-.aligner {
-  width: 100px;
-}
-
-.lanes {
-  width: 100px;
-}
-
-.pseudobulk {
-  width: 110px;
-}
-
-.submission {
-  width: 110px;
-}
-
-.last-updated {
+.ln130 {
   width: 130px;
 }
 
@@ -347,7 +326,6 @@ var Row =  {
   background-color:whitesmoke;
   color: black;
 }
-
 
 .row-imported {
   background-color: #c8e6c5;

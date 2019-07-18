@@ -224,6 +224,9 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=request.POST.getlist('samples'))))
         return HttpResponseRedirect(reverse('core:pipeline_status'))
 
+    # def delete(request):
+    #     PipelineTag.objects.get(id=request.POST.get('id')
+
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
         returnJson = {}
