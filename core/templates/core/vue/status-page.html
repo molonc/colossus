@@ -16,7 +16,9 @@
           <md-divider></md-divider>
           <md-card-content class="tag-list">
             <button class="project-button"  @click="fetchWetlab()" squared><span>Wetlab</span></button>
-            <button v-for="tag in tags" @click="fetchSamples(tag.id)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+<!--             <button v-for="tag in tags" @click="fetchSamples(tag.id)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button> -->
+            <button v-if="!search" v-for="tag in tags" @click="fetchSamples(tag.id)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+            <button v-else v-for="tag in searchedTagResults" @click="fetchSamples(tag.id)" :model="searchTags" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
           </md-card-content>
           <md-card-actions >
                 <md-button>Edit</md-button>
@@ -64,7 +66,7 @@ var Row =  {
   },
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
-    <b-button squared class="row-button sample-name" style="width:140px;" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    <b-button squared class="row-button sample-name" style=width:140px;" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{{sample.imported}}{% endverbatim %}</b-button>
     <b-button v-if="sample.library" class="row-button" style="width:110px;" :href="returnURL('/dlp/library',sample.library)">
         {% verbatim %}{{sample.library}}{% endverbatim %}
     </b-button>
@@ -128,13 +130,15 @@ var Row =  {
       samples: [],
       tags: [],
       search: "",
+      searching: "",
+      searchedTagResults: [],
     },
     methods: {  
       setPipeline(i) {
         this.samples[i].pipeline["qc"] = "primary"
       },    
       setRunStatus(status) {
-        console.log("setRunStatus")
+        // console.log("setRunStatus")
         let variant = "secondary"
         let run_status = { 
           dark: 'idle',
@@ -163,8 +167,9 @@ var Row =  {
             ).then( (response) => {
               this.samples = response.data.samples  
               this.samples.forEach( sample => {
-                if(sample.jira) this.axiosVeifyTantalus(sample)
-                if(sample.jira) this.axiosVerifyColossus(sample.jira)
+                if(sample.jira) this.axiosVerifyTantalus(sample)
+                if(sample.jira) this.axiosVerifyColossus(sample)
+                // console.log(`imported is ${sample.imported}`)
               })
               }
               )    
@@ -183,14 +188,14 @@ var Row =  {
             ).then( (response) => {
               this.samples = response.data.samples  
               this.samples.forEach( sample => {
-                if(sample.jira) this.axiosVeifyTantalus(sample)
-                if(sample.jira) this.axiosVerifyColossus(sample.jira)
+                if(sample.jira) this.axiosVerifyTantalus(sample)
+                if(sample.jira) this.axiosVerifyColossus(sample)
               })
               }
               )
       },
-      axiosVerifyColossus(jira){
-        console.log("HELLO?")
+      axiosVerifyColossus(sample){
+        console.log("axiosVerifyColossus")
 
         axios({
                 method: 'post',
@@ -202,15 +207,19 @@ var Row =  {
                   "content-type": "application/json"
                 }}
             ).then( (response) => {
-              console.log(response.data)}
-              )
+              console.log(`response is ${response.data}`)
+
+                sample.imported = response.data ? "#c8e6c5" : "grey";
+                console.log(sample.imported)
+            }
+            )
       },
-      axiosVeifyTantalus (sample) {
-        console.log("axiosVeifyTantalus")
+      axiosVerifyTantalus (sample) {
+        console.log("axiosVerifyTantalus")
         jira = sample.jira
         library = sample.library
-        let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOCwidXNlcm5hbWUiOiJzc29uZyIsImV4cCI6MTU2MzQwMTg5NSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2Mjc5NzA5NX0.hP70bhBNncnE4uLdb5hJUoHQga3Ocv63sB2wz0ujn5c"
-        const url = "http://127.0.0.1:8001/api/analysis/"
+        let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNiwidXNlcm5hbWUiOiJqcGhhbSIsImV4cCI6MTU2NDAwMTEzMSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2MzM5NjMzMX0.DpU0SFgS390B1KCMKI3bUMVUwFocw3X-Qodlz8K848A"
+        const url = "https://tantalus.canadacentral.cloudapp.azure.com/api/analysis/"
         
         // Qc, hmmcopy and align 
         axios
@@ -234,6 +243,22 @@ var Row =  {
         params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
         .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= this.setRunStatus(status)})
         .catch(e => {console.log(e.response)})        
+      },
+
+      searchTags() {
+
+        for (var i; i < this.tags.length; i++){
+          if this.tags[i].title.includes(this.search) {
+            searchTags.push(this.tags[i].title)
+            console.log(`adding ${this.tags[i].title} to searchTags`)
+          }
+        }
+      //     console.log("hello")
+          // tags.forEach(function(tag) {
+          //   if tag.includes(this.search) {
+          //     searchTags.push(tag)
+          //   }
+          // })
       }
     },
     components:{
@@ -314,6 +339,10 @@ var Row =  {
 .row-button {
   background-color:whitesmoke;
   color: black;
+}
+
+.row-imported {
+  background-color: #c8e6c5;
 }
 
 </style>
