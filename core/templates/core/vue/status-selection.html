@@ -24,14 +24,27 @@
               <div class="md-layout md-gutter">
                   
                 <div class="md-layout-item">
-                    <md-field v-b-tooltip.hover title="Hold down control to select multiple.">
-                      <b-form-select name="samples" v-model="selectedSamples" :options="samples" multiple :select-size="4"></b-form-select>
-                    </md-field>
+                    <b-row >
+                        <b-col>
+                            <i class="fa fa-child" ></i></i> Samples:
+                            <b-form-input v-model="searchKey"></b-form-input>
+                            <b-form-select v-model="preSelected" :options="preSamples" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button"  v-on:click="addSelected" variant="primary">Add</b-button>
+                        </b-col>
+                        <b-col>
+                            <i class="fa fa-edit"></i> Selected:
+                            <b-form-input v-model="searchKey"></b-form-input>
+                            <b-form-select v-model="postSelected" :options="postSamples" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button" v-show="!selectedEmpty" v-on:click="addSelected" variant="primary">Remove All</b-button>
+                            <b-button class="my-button  remove-button" v-show="!selectedEmpty" v-on:click="removeSelected" variant="primary">Remove</b-button>
+                        </b-col>
+                    </b-row>
+
                 </div>
               </div>
               <div>
                   <strong>Selected samples:</strong>
-                  <span>{% verbatim %}{{ selectedSamples }}{% endverbatim %}</span>
+                  <span>{% verbatim %}{{ postSamples }}{% endverbatim %}</span>
               </div>
 
               <div class="actions md-layout md-alignment-center-space-between">
@@ -48,9 +61,18 @@
   new Vue({
     el: '#app',
     data: () => ({
-      selectedSamples: [],
-      samples: []
+      searchKey: "",
+      preSamples: [],
+      postSamples: [],
+      preSelected: [],
+      postSelected: [],
+      samples: [],
+      selectedEmpty: true
     }),
+    methods: {
+      addSelected(){},
+      removeSelected(){}
+    },
     computed: {
       count () {
         return this.selectedSamples.map(s => s.text)
@@ -65,13 +87,17 @@
 
       console.log(this.error)
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      this.preSamples = this.samples
       console.log(this.samples)
     },
   })
 </script>
 
 <style>
-
+.my-button {  
+  float: right;
+  margin-top: 0.3em
+}
 .centered-container {
   display: flex;
   align-items: center;
