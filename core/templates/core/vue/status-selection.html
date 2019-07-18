@@ -5,7 +5,6 @@
 
 <div id="app">
   <div class="centered-container">
-      {{error}}
     <b-modal id="my-modal" ok-only>{{error}}</b-modal>
     <form action="{% url 'core:pipeline_status_create' %}" method="POST" class="md-layout">
         {% csrf_token %}
@@ -58,7 +57,7 @@
       }
     },
     mounted() {
-      if (true) this.$bvModal.show('my-modal')
+      if ("{{error}}" !== "None") this.$bvModal.show('my-modal')
     },
     created () {
       this.error = "{{error}}";

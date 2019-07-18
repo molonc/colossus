@@ -3,6 +3,8 @@
 
 {% block body %}
 <div id="app">
+  {% verbatim %}{{montage_ready}}{% endverbatim %}
+  <b-modal id="my-modal" ok-only>Are you sure you want to delete Tag: {% verbatim %}{{selected_tag.title}}{% endverbatim %}</b-modal>
   <b-container fluid id="main-container">
     <b-row class="text-center custom-row">
       <b-col class="main-menu" style="margin-right: 4px">
@@ -16,11 +18,11 @@
           <md-divider></md-divider>
           <md-card-content class="tag-list">
             <button class="project-button"  @click="fetchWetlab()" squared><span>Wetlab</span></button>
-            <button v-for="tag in tags" @click="fetchSamples(tag.id)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+            <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
           </md-card-content>
           <md-card-actions >
-                <md-button>Edit</md-button>
-                <md-button>Add</md-button>
+                <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
+                <md-button @click="removeTag()"><md-icon>remove</md-icon></md-button>
           </md-card-actions>
         </md-card>
       </b-col>
@@ -61,12 +63,13 @@ var Row =  {
       return window.origin + type + "/" + pk
       },
     returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
+    returnMontageURL(jira) {return "//https://52.235.35.201/?dashboard=" + jira}
   },
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
     <b-button squared class="row-button sample-name" style="width:140px;" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
     <b-button v-if="sample.library" class="row-button" style="width:110px;" :href="returnURL('/dlp/library',sample.library)">
-        {% verbatim %}{{sample.library}}{% endverbatim %}
+        {% verbatim %}{{sample.montage}}{% endverbatim %}
     </b-button>
     <b-button class="row-button" v-else style="width:110px;" >
     <b-badge variant="warning">No DLP</b-badge> 
@@ -95,7 +98,8 @@ var Row =  {
       </b-badge>
     </b-button>
     <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
-    <b-button class="row-button" style="width:100px;" :href="returnJiraURL(sample.jira)">Link</b-button>
+    <b-button v-if="sample.montage" class="row-button" style="width:100px;" :href="returnMontageURL(sample.jira)">Link</b-button>
+    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
     <b-button class="row-button">
       <b-badge :variant="sample.pipeline.align">align</b-badge>
       <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
@@ -127,9 +131,15 @@ var Row =  {
     data: {
       samples: [],
       tags: [],
+      selected_tag: "",
+      montages: [],
+      // is montage ready
+      montage_ready: false,
       search: "",
     },
     methods: {  
+      createTag(){window.location.href = "{% url 'core:pipeline_status_create' %}"},
+      removeTag(){if(this.selected_tag)this.$bvModal.show('my-modal')},
       setPipeline(i) {
         this.samples[i].pipeline["qc"] = "primary"
       },    
@@ -151,6 +161,7 @@ var Row =  {
       },
       fetchWetlab() {
         console.log("fetchWetlab")
+        this.selected_tag = ""
         axios({
                 method: 'post',
                 url: "{% url 'core:pipeline_status_request_handler' %}",
@@ -163,14 +174,19 @@ var Row =  {
             ).then( (response) => {
               this.samples = response.data.samples  
               this.samples.forEach( sample => {
+                // if(montage_ready) {
+                //   if(montages.includes(sample.jira)) sample.montage = true
+                // } 
                 if(sample.jira) this.axiosVeifyTantalus(sample)
                 if(sample.jira) this.axiosVerifyColossus(sample.jira)
               })
               }
               )    
       },
-      fetchSamples (id) {
+      fetchSamples (tag) {
         console.log("fetchSamples")
+        id = tag.id
+        this.selected_tag = tag
         axios({
                 method: 'post',
                 url: "{% url 'core:pipeline_status_request_handler' %}",
@@ -183,6 +199,14 @@ var Row =  {
             ).then( (response) => {
               this.samples = response.data.samples  
               this.samples.forEach( sample => {
+                console.log("sAMPLE")
+                console.log(sample.jira)
+                console.log(this.montage_ready)
+                if(this.montage_ready) {
+                  console.log("MONTAGe")
+                  console.log(sample)
+                  if(this.montages.includes(sample.jira)) sample.montage = true
+                }
                 if(sample.jira) this.axiosVeifyTantalus(sample)
                 if(sample.jira) this.axiosVerifyColossus(sample.jira)
               })
@@ -191,7 +215,6 @@ var Row =  {
       },
       axiosVerifyColossus(jira){
         console.log("HELLO?")
-
         axios({
                 method: 'post',
                 url: "{% url 'core:pipeline_status_request_handler' %}",
@@ -209,8 +232,8 @@ var Row =  {
         console.log("axiosVeifyTantalus")
         jira = sample.jira
         library = sample.library
-        let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxOCwidXNlcm5hbWUiOiJzc29uZyIsImV4cCI6MTU2MzQwMTg5NSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2Mjc5NzA5NX0.hP70bhBNncnE4uLdb5hJUoHQga3Ocv63sB2wz0ujn5c"
-        const url = "http://127.0.0.1:8001/api/analysis/"
+        let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNiwidXNlcm5hbWUiOiJqcGhhbSIsImV4cCI6MTU2NDAwMTEzMSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2MzM5NjMzMX0.DpU0SFgS390B1KCMKI3bUMVUwFocw3X-Qodlz8K848A"
+        const url = "https://tantalus.canadacentral.cloudapp.azure.com/api/analysis/"
         
         // Qc, hmmcopy and align 
         axios
@@ -234,6 +257,28 @@ var Row =  {
         params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
         .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= this.setRunStatus(status)})
         .catch(e => {console.log(e.response)})        
+      },
+      axiosColossus(data){
+        return new Promise(function(resolve, reject) {
+          axios({
+                method: 'post',
+                url: "{% url 'core:pipeline_status_request_handler' %}",
+                dataType: "json",
+                data: data,
+                headers: {
+                  "X-CSRFToken": Cookies.get('csrftoken'),
+                  "content-type": "application/json"
+                }}).then( (response) => resolve(response.data)).catch( (e) => reject(e))
+        })
+      },
+      axiosVerifyMontage() {
+        re = /(SC-)\d{4}/g
+        console.log("MONTAGE")
+        this.axiosColossus({type : "fetchMontage"})
+        .then((r) => {
+          this.montage_ready=true
+          this.montages = r
+        })
       }
     },
     components:{
@@ -243,6 +288,7 @@ var Row =  {
       console.log("created")
       this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      this.axiosVerifyMontage()
     },
   })
 </script>

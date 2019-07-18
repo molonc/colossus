@@ -9,10 +9,12 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import os
 import csv
 import collections
+import re
 import subprocess
 import json
 from datetime import timedelta
 
+import requests
 from jira import JIRAError
 
 #============================
@@ -153,7 +155,6 @@ def analysis_info_dict(analysis):
 def validate_imported(jira):
     analysis = DlpAnalysisInformation.objects.get(analysis_jira_ticket=jira)
     val = all([ a.imported() for a in analysis.library.dlpsequencing_set.all()])
-    print(val)
     return val
 
 def get_wetlab_analyses():
@@ -176,32 +177,28 @@ def get_wetlab_analyses():
                                "library": a.library.pool_id}})
     return sample_list
 
+def fetch_montage():
+    r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
+    print(re.findall('sc-\d{4}', r))
+    return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
+
 def get_sample_info(id):
     sample_list = []
     samples = PipelineTag.objects.get(id=id).sample_set.all()
     print("SAMPLE STATUS")
-    print(samples)
     for s in samples:
-        print(s.id)
-        sample_dict = {"id": s.pk, "name": s.sample_id, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"} }
+        sample_dict = {"id": s.pk, "name": s.sample_id, "montage" : False, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"} }
         sample_imported = True
         libraries = s.dlplibrary_set.all()
         if libraries:
             for d in libraries:
-                print(d.pool_id)
                 analysis_set = d.dlpanalysisinformation_set.all()
-                print(d.dlpanalysisinformation_set.all())
                 if analysis_set:
-                    print("ANALYSIS EXIST")
                     for analysis in analysis_set:
-                        print(analysis.id)
                         sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
                 else:
-                    print("NOT EXIST")
                     sample_list.append({**sample_dict, **{"library" : d.pool_id}})
-                    print(sample_list)
         else: sample_list.append(sample_dict)
-        print(sample_list)
     return sample_list
 
 class PipeLineStatus(LoginRequiredMixin, TemplateView):
@@ -236,6 +233,8 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         elif data["type"] == "fetchWetlab":
             returnJson["samples"] = get_wetlab_analyses()
             return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "fetchMontage":
+            return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
             return HttpResponse(json.dumps(validate_imported(data["id"])))
 
