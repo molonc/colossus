@@ -17,7 +17,7 @@
           </md-card-content>
           <md-divider></md-divider>
           <md-card-content class="tag-list">
-            <button class="project-button"  @click="fetchWetlab()" squared><span>Wetlab</span></button>
+            <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
             <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
           </md-card-content>
           <md-card-actions >
@@ -161,73 +161,28 @@ var Row =  {
         });
         return variant
       },
-      fetchWetlab() {
-        console.log("fetchWetlab")
-        this.selected_tag = ""
-        axios({
-                method: 'post',
-                url: "{% url 'core:pipeline_status_request_handler' %}",
-                dataType: "json",
-                data: {"type" : "fetchWetlab"},
-                headers: {
-                  "X-CSRFToken": Cookies.get('csrftoken'),
-                  "content-type": "application/json"
-                }}
-            ).then( (response) => {
-              this.samples = response.data.samples
-              this.samples.forEach( sample => {
-                if(montage_ready) {
-                  if(montages.includes(sample.jira)) sample.montage = true
-                } 
-                if(sample.jira) this.axiosVerifyTantalus(sample)
-                if(sample.jira) this.axiosVerifyColossus(sample)                
-              })
-              }
-              )
-      },
       fetchSamples (tag) {
-        console.log("fetchSamples")
-        id = tag.id
-        this.selected_tag = tag
-        axios({
-                method: 'post',
-                url: "{% url 'core:pipeline_status_request_handler' %}",
-                dataType: "json",
-                data: {"type" : "fetchSample", "id" : id},
-                headers: {
-                  "X-CSRFToken": Cookies.get('csrftoken'),
-                  "content-type": "application/json"
-                }}
-            ).then( (response) => {
-              this.samples = response.data.samples
-              this.samples.forEach( sample => {
-                if(this.montage_ready) {
-                  if(this.montages.includes(sample.jira)) sample.montage = true
-                }
-                if(sample.jira) this.axiosVerifyTantalus(sample)
-                if(sample.jira) this.axiosVerifyColossus(sample)
-              })
+        if (tag !== undefined) {
+          var data =  {"type" : "fetchSample", "id" : tag.id}
+          this.selected_tag = tag
+        }
+        else var data =  {"type" : "fetchWetlab"}
+        this.axiosColossus(data)
+        .then((r) => {
+          this.samples = r.samples
+          this.samples.forEach( sample => {
+            if(this.montage_ready) if(this.montages.includes(sample.jira)) sample.montage = true
+            if(sample.jira) {
+              this.axiosVerifyTantalus(sample)
+              this.axiosVerifyColossus(sample)
               }
-              )
+          })
+        })
       },
       axiosVerifyColossus(sample){
         console.log("axiosVerifyColossus")
-        axios({
-                method: 'post',
-                url: "{% url 'core:pipeline_status_request_handler' %}",
-                dataType: "json",
-                data:{"type" : "validateColossus", "id" : jira},
-                headers: {
-                  "X-CSRFToken": Cookies.get('csrftoken'),
-                  "content-type": "application/json"
-                }}
-            ).then( (response) => {
-              console.log(`response is ${response.data}`)
-
-                sample.imported = response.data ? "background-color: #c8e6c5" : "background-color: #f2f2f2";
-                console.log(sample.imported)
-            }
-            )
+        this.axiosColossus({"type" : "validateColossus", "id" : jira})
+        .then((r) => sample.imported = r ? "background-color: #c8e6c5" : "background-color: #f2f2f2")
       },
       axiosVerifyTantalus (sample) {
         console.log("axiosVerifyTantalus")
@@ -237,18 +192,15 @@ var Row =  {
         const url = "https://tantalus.canadacentral.cloudapp.azure.com/api/analysis/"        
         // Qc, hmmcopy and align 
         axios
-        .get(url,{ headers : { Authorization : token},
-        params : {jira_ticket : jira}})
+        .get(url,{ headers : { Authorization : token}, params : {jira_ticket : jira}})
         .then(r => {
           r.data.results.forEach(a => {
             atype = a.analysis_type
             status = a.status
-            if (atype in sample.pipeline) {
-              sample["pipeline"][atype]= this.setRunStatus(status)
-              }
+            if (atype in sample.pipeline) sample["pipeline"][atype]= this.setRunStatus(status)
             })
             if ((sample.pipeline["align"] === "success") && (sample.pipeline["hmmcopy"] === "success")) sample["pipeline"]["qc"]= "success"
-            })
+          })
         .catch(e => {console.log(e.response)})
 
         // Pseudobulk
