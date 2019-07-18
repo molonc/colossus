@@ -2,13 +2,27 @@
 {% load staticfiles %}
 
 {% block body %}
-<div id="app">
+<div id="app">    
+    <b-modal id="modalPopover" title="Modal with Popover" ok-only>
+    <p>
+      This
+      <b-button v-b-popover="'Popover inside a modal!'" title="Popover">Button</b-button>
+      triggers a popover on click.
+    </p>
+    <p>
+      This <a href="#" v-b-tooltip title="Tooltip in a modal!">Link</a> will show a tooltip on
+      hover.
+    </p>
+  </b-modal>
+
     <div class="page-container">
         <md-app>
-          <md-app-toolbar class="md-primary">
+          <md-app-toolbar md-elevation="0">
             <span class="md-title">Analysis Status</span>
+            <md-button v-b-modal.modal-1>Click me<md-icon>contact_support</md-icon></md-button>
+            {% include "core/vue/status-tutorial.html" %}
           </md-app-toolbar>
-    
+          
           <md-app-drawer md-permanent="full">
               <md-card class="pipeline-tag">
                   <md-card-content>

@@ -1,0 +1,82 @@
+<div>
+    <b-modal id="modal-1" scrollable ok-only title="Tutorial">
+      <h4>Hi! :)</h4>
+      <h5>Welcome to Analysis Pipeline Status Page.</h5>
+      <p>
+        This is still beta, and there are still a lot of work to be done.<br>
+        I wrote a basic instruction on how to use this page, but these information might change as further changes are made.
+      </p>
+      <br>
+      <h5>So, what is this and why do I need this in my life?</h5>
+      <p>
+        I spend a lot of time on it and hopefully it means something in your life :( <br>
+        This page exists to help you track status of analyses.<br>
+        We reckon that it is slightly inconvenient to have multiple pages open to track analyses,
+        so we came up with this page to display all related information from different sources.
+      </p>
+      <br>
+      <h5>Cool, how do I use it?</h5>
+      <p>
+        If you work on a wetlab located in 3rd floor, just press
+      <button class="project-button" squared><span>Wetlab</span></button>
+        located in left menu.
+        This should load all the analyses that are:<br>
+        <b>1. Updated within last two weeks.</b><br>
+        <b>2. Related to sequencings with mismatching number of lanes to requested lane number.</b><br><br>
+        <b>3. Library has to be post 2019</b><br>
+        But let's say you want to create your own list.<br>
+        Then simply click  <md-icon>add</md-icon> located in lower left corner. <br>
+        This will take you to <b>ProjectTag</b> create page.<br>
+        <b>ProjectTag</b> is a new model we came up with. It currently only has 2 fields: Title and samples. 
+        You set the title and add all the samples you want to attach, then the table will be populated with all the analyses 
+        attached to that samples.<br>
+        Similarly, use <md-icon>remove</md-icon> to remove <b>ProjectTag</b>
+      </p>
+
+      <h5>Your table is weird and ugly, and I do not understand it</h5>
+      <p>Let us now look at how we interpret the table.</p><br>
+      <h6>Colour of the rows</h6>
+      <p>
+        Ok firstly if the row is pretty mint green<br>
+        <b-button squared class="row-button sample-name" style="background-color: #c8e6c5">CoolMintyGreen</b-button>
+        That means the data for the library is <b>imported.</b><br>
+        This one on the other hand is depressing grey.
+        <b-button squared class="row-button sample-name" style="background-color: #f2f2f2">UglyGrey</b-button>
+        This one is <b>not imported.</b><br>
+        For an analysis to be considered imported, it needs to have lane number equal or greater than requested number of lanes.<br>
+      </p>
+      <br>
+      <h6>Pipeline Status</h6>
+      <p>
+        So you can see 2 columns named <b>Pipeline</b> and <b>Pseudobulk</b>.<br>
+        These two columns fetch analysis status from Tantalus and highlight badges accordingly.<br>
+        What do each colours represent then?:<br>
+        <b-badge variant="secondary">Not found</b-badge>
+        <b-badge variant="primary">Archiving</b-badge>
+        <b-badge variant="success">Complete</b-badge>
+        <b-badge variant="info">Running</b-badge>
+        <b-badge variant="dark">Idle</b-badge>
+        <b-badge variant="danger">Error</b-badge><br>
+        You can simply hover over the cell to see this information.<br>
+      </p>
+      <br>
+      <h6>I want Montage.</h6>
+      <p>
+        If the Montage is marked as <b-button squared class="row-button ln110">N/A</b-button>, analysis is not yet uploaded to Montage.<br>
+      </p>
+      <br>
+      <h6>This is not enough, I demand more.</h6>
+      <p>
+        Yes this is incomplete at the moment, and a lot of features will be added and polished depending on how people like it.<br>
+        <b>
+          1. Column  Sorting.<br>
+          2. Search.<br>
+          3. Faster Loading.<br>
+        </b>
+        If you notice that something is broken, or want something more, please contact the dev team.
+        <br>
+        <small>Or idk maybe people will utterly hate this page and we will just remove and it throw away undone. Like many other things in my life.</small>
+
+      </p>
+    </b-modal>
+  </div>
