@@ -26,12 +26,12 @@
           </md-card-actions>
         </md-card>
       </b-col>
-      <b-col class="main-table"> 
+      <b-col class="main-table">
         <md-card class="main-content">
           <br />
           <div class="sample-table">
             <b-button-group style="margin-top : 1px; height: 40px;">
-                <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>                
+                <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>
                 <b-button class="menu-button" style="width:110px;">library ID</b-button>
                 <b-button class="menu-button" style="width:100px;">Analysis</b-button>
                 <b-button class="menu-button" style="width:100px;">Version</b-button>
@@ -43,7 +43,7 @@
                 <b-button class="menu-button" style="width:110px;">Submitted</b-button>
                 <b-button squared class="menu-button" style="width:130px;">Last Updated</b-button>
             </b-button-group>
-            <div class="content-table">         
+            <div class="content-table">
               <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
             </div>
           </div>
@@ -53,76 +53,77 @@
     </b-row>
   </b-container>
 </div>
+
 <script>
 
 var Row =  {
   props: ['sample'],
   methods: {
     setShow() {this.sample.show = !this.sample.show},
-    returnURL(type,pk) { 
+    returnURL(type,pk) {
       return window.origin + type + "/" + pk
       },
     returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
   },
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
-    <b-button squared class="row-button sample-name" style=width:140px;" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{{sample.imported}}{% endverbatim %}</b-button>
-    <b-button v-if="sample.library" class="row-button" style="width:110px;" :href="returnURL('/dlp/library',sample.library)">
+    <b-button squared class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    <b-button v-if="sample.library" class="row-button library-id" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
         {% verbatim %}{{sample.library}}{% endverbatim %}
     </b-button>
-    <b-button class="row-button" v-else style="width:110px;" >
-    <b-badge variant="warning">No DLP</b-badge> 
+    <b-button v-else class="row-button library-id" :style="sample.imported" >
+    <b-badge variant="warning">No DLP</b-badge>
     </b-button>
-    <b-button v-if="sample.jira" class="row-button" style="width:100px;" :href="returnJiraURL(sample.jira)">
+    <b-button v-if="sample.jira" class="row-button jira-ticket" :style="sample.imported" :href="returnJiraURL(sample.jira)">
      {% verbatim %}{{sample.jira}}{% endverbatim %}
     </b-button>
-    <b-button v-else class="row-button" style="width:100px;" >
-    <b-badge variant="warning">No Analysis</b-badge> 
+    <b-button v-else class="row-button jira-ticket" :style="sample.imported" >
+    <b-badge variant="warning">No Analysis</b-badge>
     </b-button>
-    <b-button v-if="sample.version" class="row-button" style="width:100px;">
+    <b-button v-if="sample.version" class="row-button version" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.version}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
-    <b-button v-if="sample.aligner" class="row-button" style="width:100px;">
+    <b-button v-else class="row-button version" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.aligner" class="row-button aligner" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.aligner}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
-    <b-button v-if="sample.lanes" class="row-button" style="width:100px;">
+    <b-button v-else class="row-button aligner" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.lanes" class="row-button lanes" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.lanes}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button v-else class="row-button" style="width:100px;">N/A</b-button>
-    <b-button class="row-button" style="width:100px;" :href="returnJiraURL(sample.jira)">Link</b-button>
-    <b-button class="row-button">
+    <b-button v-else class="row-button lanes" :style="sample.imported">N/A</b-button>
+    <b-button class="row-button jira-ticket" :style="sample.imported" :href="returnJiraURL(sample.jira)">Link</b-button>
+    <b-button class="row-button" :style="sample.imported">
       <b-badge :variant="sample.pipeline.align">align</b-badge>
       <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
       <b-badge :variant="sample.pipeline.qc">QC</b-badge>
     </b-button>
-    <b-button  class="row-button" style="width:110px;">
+    <b-button  class="row-button pseudobulk" :style="sample.imported">
       <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
     </b-button>
-    <b-button v-if="sample.submission" class="row-button" style="width:110px;">
+    <b-button v-if="sample.submission" class="row-button submission" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.submission}}{% endverbatim %}
       </b-badge>
     </b-button>
     <b-button v-else class="row-button" style="width:110px;">N/A</b-button>
-    <b-button squared v-if="sample.last_updated" class="row-button" style="width:130px;">
+    <b-button squared v-if="sample.last_updated" class="row-button last-updated" :style="sample.imported">
       <b-badge variant="primary">
       {% verbatim %}{{sample.last_updated}}{% endverbatim %}
       </b-badge>
     </b-button>
-    <b-button squared v-else class="row-button" style="width:130px;">N/A</b-button>
-  </b-button-group>   
-  
+    <b-button squared v-else class="row-button last-updated" :style="sample.imported">N/A</b-button>
+  </b-button-group>
+
   `
   }
-          
+
 
   var vm = new Vue({
     el: '#app',
@@ -133,14 +134,14 @@ var Row =  {
       searching: "",
       searchedTagResults: [],
     },
-    methods: {  
+    methods: {
       setPipeline(i) {
         this.samples[i].pipeline["qc"] = "primary"
-      },    
+      },
       setRunStatus(status) {
         // console.log("setRunStatus")
         let variant = "secondary"
-        let run_status = { 
+        let run_status = {
           dark: 'idle',
           info: 'running',
           primary: 'archiving',
@@ -165,14 +166,14 @@ var Row =  {
                   "content-type": "application/json"
                 }}
             ).then( (response) => {
-              this.samples = response.data.samples  
+              this.samples = response.data.samples
               this.samples.forEach( sample => {
                 if(sample.jira) this.axiosVerifyTantalus(sample)
                 if(sample.jira) this.axiosVerifyColossus(sample)
                 // console.log(`imported is ${sample.imported}`)
               })
               }
-              )    
+              )
       },
       fetchSamples (id) {
         console.log("fetchSamples")
@@ -186,7 +187,7 @@ var Row =  {
                   "content-type": "application/json"
                 }}
             ).then( (response) => {
-              this.samples = response.data.samples  
+              this.samples = response.data.samples
               this.samples.forEach( sample => {
                 if(sample.jira) this.axiosVerifyTantalus(sample)
                 if(sample.jira) this.axiosVerifyColossus(sample)
@@ -201,7 +202,7 @@ var Row =  {
                 method: 'post',
                 url: "{% url 'core:pipeline_status_request_handler' %}",
                 dataType: "json",
-                data:{"type" : "validateColossus", "id" : jira}, 
+                data:{"type" : "validateColossus", "id" : jira},
                 headers: {
                   "X-CSRFToken": Cookies.get('csrftoken'),
                   "content-type": "application/json"
@@ -209,7 +210,7 @@ var Row =  {
             ).then( (response) => {
               console.log(`response is ${response.data}`)
 
-                sample.imported = response.data ? "#c8e6c5" : "grey";
+                sample.imported = response.data ? "background-color: #c8e6c5" : "background-color: #f2f2f2";
                 console.log(sample.imported)
             }
             )
@@ -220,8 +221,8 @@ var Row =  {
         library = sample.library
         let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNiwidXNlcm5hbWUiOiJqcGhhbSIsImV4cCI6MTU2NDAwMTEzMSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2MzM5NjMzMX0.DpU0SFgS390B1KCMKI3bUMVUwFocw3X-Qodlz8K848A"
         const url = "https://tantalus.canadacentral.cloudapp.azure.com/api/analysis/"
-        
-        // Qc, hmmcopy and align 
+
+        // Qc, hmmcopy and align
         axios
         .get(url,{ headers : { Authorization : token},
         params : {jira_ticket : jira}})
@@ -242,17 +243,17 @@ var Row =  {
         .get(url,{ headers : { Authorization : token},
         params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
         .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= this.setRunStatus(status)})
-        .catch(e => {console.log(e.response)})        
+        .catch(e => {console.log(e.response)})
       },
 
       searchTags() {
 
-        for (var i; i < this.tags.length; i++){
-          if this.tags[i].title.includes(this.search) {
-            searchTags.push(this.tags[i].title)
-            console.log(`adding ${this.tags[i].title} to searchTags`)
-          }
-        }
+        // for (var i; i < this.tags.length; i++){
+        //   if this.tags[i].title.includes(this.search) {
+        //     searchTags.push(this.tags[i].title)
+        //     console.log(`adding ${this.tags[i].title} to searchTags`)
+        //   }
+        // }
       //     console.log("hello")
           // tags.forEach(function(tag) {
           //   if tag.includes(this.search) {
@@ -334,12 +335,46 @@ var Row =  {
   font-size: 10px;
   text-align: left;
   font-weight: 800;
+  width:140px;
+}
+
+.library-id {
+  width: 110px;
+}
+
+.jira-ticket {
+  width: 100px;
+}
+
+.version {
+  width: 100px;
+}
+
+.aligner {
+  width: 100px;
+}
+
+.lanes {
+  width: 100px;
+}
+
+.pseudobulk {
+  width: 110px;
+}
+
+.submission {
+  width: 110px;
+}
+
+.last-updated {
+  width: 130px;
 }
 
 .row-button {
   background-color:whitesmoke;
   color: black;
 }
+
 
 .row-imported {
   background-color: #c8e6c5;
@@ -348,4 +383,3 @@ var Row =  {
 </style>
 
 {% endblock %}
-
