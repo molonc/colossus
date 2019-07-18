@@ -3,55 +3,58 @@
 
 {% block body %}
 <div id="app">
-  <b-modal id="my-modal" ok-only>Are you sure you want to delete Tag: {% verbatim %}{{selected_tag.title}}{% endverbatim %}</b-modal>
-  <b-container fluid id="main-container">
-    <b-row class="text-center custom-row">
-      <b-col class="main-menu" style="margin-right: 4px">
-        <md-card class="pipeline-tag">
-          <md-card-content>
-          <md-field>
-            <label>Search by Title</label>
-            <md-input v-model="search"></md-input>
-          </md-field>
-          </md-card-content>
-          <md-divider></md-divider>
-          <md-card-content class="tag-list">
-            <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
-            <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
-          </md-card-content>
-          <md-card-actions >
-                <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
-                <md-button @click="removeTag()"><md-icon>remove</md-icon></md-button>
-          </md-card-actions>
-        </md-card>
-      </b-col>
-      <b-col class="main-table">
-        <md-card class="main-content">
-          <br />
-          <div class="sample-table">
-            <b-button-group style="margin-top : 1px; height: 40px;">
-                <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>
-                <b-button class="menu-button" style="width:110px;">library ID</b-button>
-                <b-button class="menu-button" style="width:100px;">Analysis</b-button>
-                <b-button class="menu-button" style="width:100px;">Version</b-button>
-                <b-button class="menu-button" style="width:100px;">Aligner</b-button>
-                <b-button class="menu-button" style="width:100px;">Lanes</b-button>
-                <b-button class="menu-button" style="width:100px;">Montage</b-button>
-                <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
-                <b-button class="menu-button" style="width:110px;">Pseudobulk</b-button>
-                <b-button class="menu-button" style="width:110px;">Submitted</b-button>
-                <b-button squared class="menu-button" style="width:130px;">Last Updated</b-button>
-            </b-button-group>
-            <div class="content-table">
-              <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
-            </div>
-          </div>
-          <br />
-        </md-card >
-      </b-col>
-    </b-row>
-  </b-container>
-</div>
+    <div class="page-container">
+        <md-app>
+          <md-app-toolbar class="md-primary">
+            <span class="md-title">Analysis Status</span>
+          </md-app-toolbar>
+    
+          <md-app-drawer md-permanent="full">
+              <md-card class="pipeline-tag">
+                  <md-card-content>
+                  <md-field>
+                    <label>Search by Title</label>
+                    <md-input v-model="search"></md-input>
+                  </md-field>
+                  </md-card-content>
+                  <md-divider></md-divider>
+                  <md-card-content class="tag-list">
+                    <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
+                    <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+                  </md-card-content>
+                  <md-divider></md-divider>
+                    <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
+                    <md-button @click="removeTag()"><md-icon>remove</md-icon></md-button>
+                </md-card>
+          </md-app-drawer>
+    
+          <md-app-content>
+              <div class="main-content">
+                  <br />
+                  <div class="sample-table">
+                    <b-button-group style="margin-top : 1px; height: 40px;">
+                        <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>
+                        <b-button class="menu-button" style="width:110px;">library ID</b-button>
+                        <b-button class="menu-button" style="width:100px;">Analysis</b-button>
+                        <b-button class="menu-button" style="width:100px;">Version</b-button>
+                        <b-button class="menu-button" style="width:100px;">Aligner</b-button>
+                        <b-button class="menu-button" style="width:100px;">Lanes</b-button>
+                        <b-button class="menu-button" style="width:100px;">Montage</b-button>
+                        <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
+                        <b-button class="menu-button" style="width:110px;">Pseudobulk</b-button>
+                        <b-button class="menu-button" style="width:110px;">Submitted</b-button>
+                        <b-button squared class="menu-button" style="width:130px;">Last Updated</b-button>
+                    </b-button-group>
+                    <div class="content-table">
+                      <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
+                    </div>
+                  </div>
+                  <br />
+                </div >
+          </md-app-content>
+        </md-app>
+      </div>
+  </div>
 
 <script>
 
@@ -246,90 +249,86 @@ var Row =  {
 </script>
 
 <style>
-#main-container {
-  padding-top: 4%;
-}
+  #app {
+    height: 100vh;
+  }
 
-.tag-list {
-  max-height:500px;
-  height: 430px;
-  overflow-y: scroll;
-}
+  .page-container {
+    height: 100%;
+  }
+  .md-app {
+    height: 100%;
+    border: 1px solid rgba(#000, .12);
+  }
 
-.main-menu {
-  max-width: 200px;
-}
+   
+  .md-drawer {
+    width: 230px;
+    max-width: calc(100vw - 125px);
+    height: 100%;
+  }
 
-.pipeline-tag {
-  width: 200px;
-  height: 600px;
-}
+  .pipeline-tag {
+    height: 100vh;
+    text-align: center;
+  }
+  .project-button {
+    border: none;
+    background-color: #a9a9b0;
+    width: 160px;
+    height: 33px;
+    margin: 1px;
+  }
+  
+  .ln110 {
+    width: 110px;
+  }
 
+  .ln100 {
+    width: 100px;
+  }
 
-.main-content {
-  overflow-x: auto;
-  width: 95%;
-}
+  .ln130 {
+    width: 130px;
+  }
+  .sample-name {
+  font-size: 10px;
+  text-align: left;
+  font-weight: 800;
+  width:140px;
+  }
 
-.main-table {
-  width: 200px;
-}
+  .tag-list {
+    height: 80vh;
+    overflow-y: scroll;
+  }
 
-.content-table {
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.sample-table {
-  border-radius: 5px;
-  padding: 2px;
-  min-width: 1280px;
+  .row-button {
+  background-color:whitesmoke;
+  color: black;
 }
 
 .menu-button {
   background-color:rgb(190, 182, 182);
   color: black;
 }
-
-.project-button {
-  border: none;
-  background-color: #a9a9b0;
-  width: 160px;
-  height: 33px;
-  margin: 1px;
+.content-table {
+  max-height: 600px;
+  overflow-y: auto;
 }
 
-.row-description {
-  background-color:whitesmoke;
-  border: 0.5px solid grey;
-}
-.sample-name {
-  font-size: 10px;
-  text-align: left;
-  font-weight: 800;
-  width:140px;
+.sample-table {
+  text-align: center;
+  border-radius: 5px;
+  padding: 2px;
+  min-width: 1280px;
 }
 
-.ln110 {
-  width: 110px;
+.main-content {
+  overflow-x: auto;
+  width: 95%;
 }
 
-.ln100 {
-  width: 100px;
-}
-
-.ln130 {
-  width: 130px;
-}
-
-.row-button {
-  background-color:whitesmoke;
-  color: black;
-}
-
-.row-imported {
-  background-color: #c8e6c5;
-}
 
 </style>
 
