@@ -6,7 +6,7 @@
     <div class="page-container">
         <md-app>
           <md-app-toolbar md-elevation="0">
-            <span class="md-title">Analysis Status</span>
+            <span class="md-title">Analysis Status {% verbatim %}{{selected_tag.title}}{% endverbatim %}</span>
             <md-button v-b-modal.modal-1>Guide <md-icon>contact_support</md-icon></md-button>
             {% include "core/vue/status-tutorial.html" %}
           </md-app-toolbar>
@@ -22,7 +22,7 @@
                   <md-divider></md-divider>
                   <md-card-content class="tag-list">
                     <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
-                    <button v-for="tag in tagDisplay" v-show="tag.show" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+                    <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
                   </md-card-content>
                   <md-divider></md-divider>
                     <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
@@ -48,7 +48,7 @@
                         <b-button squared class="menu-button" style="width:110px;">Pseudobulk</b-button>
                     </b-button-group>
                     <div class="content-table">
-                      <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
+                      <Row v-for="sample in samples" :sample="sample" />
                     </div>
                   </div>
                   <br />
@@ -146,8 +146,9 @@ var Row =  {
       searchTag: "",
     },
     created () {
-      console.log("created")
+      console.log("created")      
       this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
+      console.log(this.tags)
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
       this.username = "{{username| safe | escapejs}}"
       this.password = "{{password| safe | escapejs}}"
