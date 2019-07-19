@@ -212,7 +212,7 @@ def create_tag(request):
 
     if PipelineTag.objects.filter(title= data["title"]).exists():
     #     # return get_context_and_render(request, error="Title Name Already Exist")
-        return HttpResponseRedirect(reverse('core:pipeline_status'))
+        return HttpResponseRedirect(('core:pipeline_status'))
     pipelinetag = PipelineTag.objects.create(title = data["title"])
     pipelinetag.save()
     pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
