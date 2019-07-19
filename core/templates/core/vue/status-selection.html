@@ -85,7 +85,6 @@
       removeSelected: function() {
         for (var i=0; i < this.allSamples.length; i++){
           if (this.postSelected.includes(this.allSamples[i].value)){
-            console.log(`removing ${this.allSamples[i].text}`)
             Vue.set(this.allSamples[i], "userselect", false)
             this.samplesSelected.pop(this.allSamples[i].text)
           }
@@ -95,7 +94,6 @@
       removeAll: function() {
           for (var i=0; i < this.allSamples.length; i++){
             if (this.allSamples[i].userselect) {
-              console.log(`removing ${this.allSamples[i].text}`)
               this.allSamples[i].userselect = false
             }
             this.samplesSelected = []
@@ -113,7 +111,6 @@
               selectedlist.push(this.allSamples[i].value)
           }
         }
-        console.log(`SELECTED LIST ${selectedlist}`)
         axios(
           {
             method: 'post',
@@ -131,7 +128,6 @@
           }
         ).then(
           r => {
-            console.log(r)
             if(r.data === "success") window.location.href = "{% url 'core:pipeline_status' %}"
             else this.$bvModal.show('my-modal');
           })
