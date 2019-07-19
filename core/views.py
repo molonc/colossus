@@ -159,35 +159,32 @@ def validate_imported(jira):
 
 def get_wetlab_analyses():
     sample_list = []
-    time_threshold = datetime.datetime.now() - timedelta(days=14)
-    analyses = DlpAnalysisInformation.objects.filter(analysis_run__last_updated__gte=time_threshold)
-    sequencings = DlpSequencing.objects.annotate(lane_count=Count('dlplane')).filter(Q(lane_count__lte=0)|Q(lane_count__lt=F('number_of_lanes_requested')))
+    analyses = DlpAnalysisInformation.objects.filter(analysis_run__last_updated__gte=datetime.datetime.now() - timedelta(days=14))
+    sequencings = DlpSequencing.objects.annotate(lane_count=Count('dlplane')).filter(Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))
     for s in sequencings.all():
-        for analysis in s.library.dlpanalysisinformation_set.iterator():
-
-            sample_list.append({**analysis_info_dict(analysis),
-                **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"},
-                 "library": s.library.pool_id}})
-
+        if not s.library.history.earliest().history_date.date() < datetime.date(2019, 1, 1):
+            analysis_iter =  s.library.dlpanalysisinformation_set.all()
+            if analysis_iter:
+                for analysis in analysis_iter:
+                    sample_list.append({**analysis_info_dict(analysis),
+                        **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+            else: sample_list.append({**{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
     for a in analyses.all():
-        sample_list.append({**analysis_info_dict(a),
-                            **{"id": a.library.sample.pk, "name": a.library.sample.sample_id,
-                               "pipeline": {"qc": "secondary", "align": "secondary", "hmmcopy": "secondary",
-                                            "pseudo": "secondary"},
-                               "library": a.library.pool_id}})
+        if not a.library.history.earliest().history_date.date() < datetime.date(2019, 1, 1):
+            sample_list.append({**analysis_info_dict(a),
+                                    **{"id": a.library.sample.pk, "name": a.library.sample.sample_id,
+                                       "library": a.library.pool_id}})
     return sample_list
 
 def fetch_montage():
     r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
-    print(re.findall('sc-\d{4}', r))
     return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
 
 def get_sample_info(id):
     sample_list = []
     samples = PipelineTag.objects.get(id=id).sample_set.all()
-    print("SAMPLE STATUS")
     for s in samples:
-        sample_dict = {"id": s.pk, "name": s.sample_id, "montage" : False, "pipeline" : {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"} }
+        sample_dict = {"id": s.pk, "name": s.sample_id}
         sample_imported = True
         libraries = s.dlplibrary_set.all()
         if libraries:
@@ -224,8 +221,8 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=request.POST.getlist('samples'))))
         return HttpResponseRedirect(reverse('core:pipeline_status'))
 
-    # def delete(request):
-    #     PipelineTag.objects.get(id=request.POST.get('id')
+    def delete(request):
+        PipelineTag.objects.get(id=request.POST.get('id')).delete()
 
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
@@ -240,6 +237,13 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
             return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
             return HttpResponse(json.dumps(validate_imported(data["id"])))
+        elif data["type"] =="deleteTag":
+            try:
+                PipelineTag.objects.get(id=request.POST.get('id')).delete()
+                return HttpResponseRedirect("deleted")
+            except:
+                return HttpResponseRedirect("error")
+
 
         return None
 
@@ -247,7 +251,7 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
       pipelinetags = list(PipelineTag.objects.values("id", "title"))
       sample_list = []
       return render( request, "core/vue/status-page.html",
-                     { "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
+                     { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
 #============================
 # End of Pipeline Status
 #----------------------------

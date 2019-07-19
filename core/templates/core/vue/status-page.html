@@ -3,23 +3,11 @@
 
 {% block body %}
 <div id="app">    
-    <b-modal id="modalPopover" title="Modal with Popover" ok-only>
-    <p>
-      This
-      <b-button v-b-popover="'Popover inside a modal!'" title="Popover">Button</b-button>
-      triggers a popover on click.
-    </p>
-    <p>
-      This <a href="#" v-b-tooltip title="Tooltip in a modal!">Link</a> will show a tooltip on
-      hover.
-    </p>
-  </b-modal>
-
     <div class="page-container">
         <md-app>
           <md-app-toolbar md-elevation="0">
             <span class="md-title">Analysis Status</span>
-            <md-button v-b-modal.modal-1>Click me<md-icon>contact_support</md-icon></md-button>
+            <md-button v-b-modal.modal-1>Guide <md-icon>contact_support</md-icon></md-button>
             {% include "core/vue/status-tutorial.html" %}
           </md-app-toolbar>
           
@@ -34,7 +22,7 @@
                   <md-divider></md-divider>
                   <md-card-content class="tag-list">
                     <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
-                    <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+                    <button v-for="tag in tags" v-show="tag.show" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
                   </md-card-content>
                   <md-divider></md-divider>
                     <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
@@ -47,7 +35,9 @@
                   <br />
                   <div class="sample-table">
                     <b-button-group style="margin-top : 1px; height: 40px;">
-                        <b-button squared class="menu-button" style="width:140px;">sample ID</b-button>
+                        <b-button squared class="menu-button" style="width:110px;">Submitted</b-button>
+                        <b-button class="menu-button" style="width:130px;">Last Updated</b-button>
+                        <b-button class="menu-button" style="width:140px;">sample ID</b-button>
                         <b-button class="menu-button" style="width:110px;">library ID</b-button>
                         <b-button class="menu-button" style="width:100px;">Analysis</b-button>
                         <b-button class="menu-button" style="width:100px;">Version</b-button>
@@ -55,9 +45,7 @@
                         <b-button class="menu-button" style="width:100px;">Lanes</b-button>
                         <b-button class="menu-button" style="width:100px;">Montage</b-button>
                         <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
-                        <b-button class="menu-button" style="width:110px;">Pseudobulk</b-button>
-                        <b-button class="menu-button" style="width:110px;">Submitted</b-button>
-                        <b-button squared class="menu-button" style="width:130px;">Last Updated</b-button>
+                        <b-button squared class="menu-button" style="width:110px;">Pseudobulk</b-button>
                     </b-button-group>
                     <div class="content-table">
                       <Row v-for="sample in samples" :key="sample.id" :sample="sample" />
@@ -71,7 +59,6 @@
   </div>
 
 <script>
-
 var Row =  {
   props: ['sample'],
   methods: {
@@ -84,7 +71,19 @@ var Row =  {
   },
   template: `
   <b-button-group @click="setShow" style="margin-top : 1px;">
-    <b-button squared class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    <b-button squared v-if="sample.submission" class="row-button ln110" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.submission}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button squared v-else class="row-button ln110">N/A</b-button>
+    <b-button v-if="sample.last_updated" class="row-button ln130" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.last_updated}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln130" :style="sample.imported">N/A</b-button>
+    <b-button class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
     <b-button v-if="sample.library" class="row-button ln110" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
         {% verbatim %}{{sample.library}}{% endverbatim %}
     </b-button>
@@ -117,26 +116,14 @@ var Row =  {
     <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
     <b-button v-if="sample.montage" class="row-button ln100" :style="sample.imported" :href="returnMontageURL(sample.jira)">Link</b-button>
     <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button class="row-button" :style="sample.imported">
+    <b-button squared class="row-button" :style="sample.imported">
       <b-badge :variant="sample.pipeline.align">align</b-badge>
       <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
       <b-badge :variant="sample.pipeline.qc">QC</b-badge>
     </b-button>
-    <b-button  class="row-button ln110" :style="sample.imported">
+    <b-button squared class="row-button ln110" :style="sample.imported">
       <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
     </b-button>
-    <b-button v-if="sample.submission" class="row-button ln110" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.submission}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln110">N/A</b-button>
-    <b-button squared v-if="sample.last_updated" class="row-button ln130" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.last_updated}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button squared v-else class="row-button ln130" :style="sample.imported">N/A</b-button>
   </b-button-group>
 
   `
@@ -145,19 +132,27 @@ var Row =  {
 
   var vm = new Vue({
     el: '#app',
+    components:{
+      Row
+    },
     data: {
+      username: "",
+      password: "",
       samples: [],
       tags: [],
       selected_tag: "",
       montages: [],
-      // is montage ready
       montage_ready: false,
       search: "",
       searchedTagResults: [],
     },
     methods: {  
       createTag(){window.location.href = "{% url 'core:pipeline_status_create' %}"},
-      removeTag(){if(this.selected_tag)this.$bvModal.show('my-modal')},
+      removeTag(){
+        if(this.selected_tag){
+          this.axiosColossus({type : "deleteTag", id : this.selected_tag.id}).then()
+        }
+      },
       setPipeline(i) {
         this.samples[i].pipeline["qc"] = "primary"
       },
@@ -186,18 +181,20 @@ var Row =  {
         this.axiosColossus(data)
         .then((r) => {
           this.samples = r.samples
-          this.samples.forEach( sample => {
-            if(this.montage_ready) if(this.montages.includes(sample.jira)) sample.montage = true
-            if(sample.jira) {
-              this.axiosVerifyTantalus(sample)
-              this.axiosVerifyColossus(sample)
+          for (let i = 0; i < this.samples.length; i ++) {
+            Vue.set(this.samples[i], "pipeline", {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"})
+            Vue.set(this.samples[i], "montage", false)
+            if(this.montage_ready) if(this.montages.includes(this.samples[i].jira)) this.samples[i].montage = true
+            if(this.samples[i].jira) {
+              this.axiosVerifyTantalus(this.samples[i])
+              this.axiosVerifyColossus(this.samples[i])
               }
-          })
+          }          
         })
       },
       axiosVerifyColossus(sample){
         console.log("axiosVerifyColossus")
-        this.axiosColossus({"type" : "validateColossus", "id" : jira})
+        this.axiosColossus({"type" : "validateColossus", "id" : sample.jira})
         .then((r) => sample.imported = r ? "background-color: #c8e6c5" : "background-color: #f2f2f2")
       },
       axiosVerifyTantalus (sample) {
@@ -208,7 +205,7 @@ var Row =  {
         const url = "https://tantalus.canadacentral.cloudapp.azure.com/api/analysis/"        
         // Qc, hmmcopy and align 
         axios
-        .get(url,{ headers : { Authorization : token}, params : {jira_ticket : jira}})
+        .get(url,{  params : {jira_ticket : jira}, auth: {username: this.username,password: this.password},})
         .then(r => {
           r.data.results.forEach(a => {
             atype = a.analysis_type
@@ -221,7 +218,7 @@ var Row =  {
 
         // Pseudobulk
         axios
-        .get(url,{ headers : { Authorization : token},
+        .get(url,{auth: {username: this.username,password: this.password},
         params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
         .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= this.setRunStatus(status)})
         .catch(e => {console.log(e.response)})        
@@ -240,7 +237,6 @@ var Row =  {
         })
       },
       axiosVerifyMontage() {
-        re = /(SC-)\d{4}/g
         console.log("MONTAGE")
         this.axiosColossus({type : "fetchMontage"})
         .then((r) => {
@@ -250,13 +246,13 @@ var Row =  {
 
       }
     },
-    components:{
-      Row
-    },
     created () {
       console.log("created")
       this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
+      this.tags.forEach(t => Vue.set(t, "show", true))
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      this.username = "{{username| safe | escapejs}}"
+      this.password = "{{password| safe | escapejs}}"
       this.axiosVerifyMontage()
     },
   })

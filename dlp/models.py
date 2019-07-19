@@ -428,8 +428,6 @@ class DlpSequencing(models.Model, FieldValue):
         return reverse(self.library_type + ":sequencing_detail", kwargs={"pk": self.pk})
 
     def imported(self):
-        print(self.number_of_lanes_requested )
-        print(self.dlplane_set.count())
         return (self.number_of_lanes_requested <= self.dlplane_set.count())
 
     def save(self, *args, **kwargs):

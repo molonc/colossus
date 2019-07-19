@@ -1,0 +1,71 @@
+<template>
+<b-button-group @click="setShow" style="margin-top : 1px;">
+    <b-button squared v-if="sample.submission" class="row-button ln110" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.submission}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button squared v-else class="row-button ln110">N/A</b-button>
+    <b-button v-if="sample.last_updated" class="row-button ln130" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.last_updated}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln130" :style="sample.imported">N/A</b-button>
+    <b-button class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    <b-button v-if="sample.library" class="row-button ln110" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
+        {% verbatim %}{{sample.library}}{% endverbatim %}
+    </b-button>
+    <b-button v-else class="row-button ln110" :style="sample.imported" >
+    <b-badge variant="warning">No DLP</b-badge>
+    </b-button>
+    <b-button v-if="sample.jira" class="row-button ln100" :style="sample.imported" :href="returnJiraURL(sample.jira)">
+     {% verbatim %}{{sample.jira}}{% endverbatim %}
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported" >
+    <b-badge variant="warning">No Analysis</b-badge>
+    </b-button>
+    <b-button v-if="sample.version" class="row-button ln100" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.version}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.aligner" class="row-button ln100" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.aligner}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.lanes" class="row-button ln100" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.lanes}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.montage" class="row-button ln100" :style="sample.imported" :href="returnMontageURL(sample.jira)">Link</b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button squared class="row-button" :style="sample.imported">
+      <b-badge :variant="sample.pipeline.align">align</b-badge>
+      <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
+      <b-badge :variant="sample.pipeline.qc">QC</b-badge>
+    </b-button>
+    <b-button squared class="row-button ln110" :style="sample.imported">
+      <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
+    </b-button>
+  </b-button-group>
+</template>
+<script>
+  export default {
+    name: 'row',
+    props: ['sample'],
+    methods: {
+      setShow() {this.sample.show = !this.sample.show},
+      returnURL(type,pk) {
+        return window.origin + type + "/" + pk
+      },
+      returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
+      returnMontageURL(jira) {return "//https://52.235.35.201/?dashboard=" + jira}
+    },
+  }
+</script>
