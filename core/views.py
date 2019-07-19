@@ -204,6 +204,20 @@ def get_sample_info(id):
         print(sample_list)
     return sample_list
 
+def create_tag(request):
+    data = json.loads(request.body.decode('utf-8'))
+    print("DATA", data)
+    print("DATA", type(data))
+    print("DATA", dir(data))
+
+    if PipelineTag.objects.filter(title= data["title"]).exists():
+    #     # return get_context_and_render(request, error="Title Name Already Exist")
+        return HttpResponseRedirect(reverse('core:pipeline_status'))
+    pipelinetag = PipelineTag.objects.create(title = data["title"])
+    pipelinetag.save()
+    pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
+    return HttpResponseRedirect(reverse('core:pipeline_status'))
+
 class PipeLineStatus(LoginRequiredMixin, TemplateView):
     """
     List of samples.
