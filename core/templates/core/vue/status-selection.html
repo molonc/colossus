@@ -120,19 +120,17 @@
         axios(
           {
             method: 'post',
-            url: window.origin + "/core/status/create_tag",
+            url: "{% url 'core:pipeline_status_create' %}",
             dataType: "json",
             data: {
               "title": this.title,
-              "selected" : selectedlist
+              "selected" : selectedlist,
+              "type": "createTag", 
               },
             headers: {
               "X-CSRFToken": Cookies.get('csrftoken'),
               "content-type": "application/json"
             }
-          }
-        ).then( (response) => {
-          this.results = response.data
           }
         )
       }

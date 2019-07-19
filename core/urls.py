@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^project/detail/(?P<pk>\d+)$', views.ProjectDetail.as_view(), name='project_detail'),
     url(r'^gsc$', views.gsc_submission_form, name='gsc_submission_form'),
     url(r'^status/create$', views.PipeLineStatus.as_view(), name='pipeline_status_create'),
-    url(r'^status/create_tag$', views.create_tag, name='create_tag'),
     url(r'^status$', views.PipeLineStatus.pipeline_status_page, name='pipeline_status'),
     url(r'^status/request$', views.PipeLineStatus.handle_request, name='pipeline_status_request_handler'),
     url(r'^gsc_data$', views.gsc_info_post, name='gsc_retreive_data'),
