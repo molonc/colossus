@@ -130,7 +130,7 @@ class Sample(models.Model, FieldValue):
     )
     notes = create_textfield("Notes")
 
-    pipeline_tag = models.ForeignKey(PipelineTag, blank=True, null=True)
+    pipeline_tag = models.ForeignKey(PipelineTag, on_delete=models.SET_NULL, blank=True, null=True)
 
     def has_additional_sample_information(self):
         return hasattr(self, 'additionalsampleinformation')
