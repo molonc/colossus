@@ -77,7 +77,7 @@ from .utils import (
     create_doublet_info_model,
     generate_samplesheet,
     generate_gsc_form,
-)
+    get_sample_info, get_wetlab_analyses, fetch_montage, validate_imported)
 from .jira_templates.templates import (
     get_reference_genome_from_sample_id,
     generate_dlp_jira_description,
@@ -142,62 +142,6 @@ def gsc_submission_form(request):
 #============================
 # Pipeline Status
 #----------------------------
-def analysis_info_dict(analysis):
-    return { "jira": analysis.analysis_jira_ticket,
-             "date": analysis.analysis_submission_date,
-            "lanes": analysis.lanes.count(),
-            "version": analysis.version.version,
-            "run_status": analysis.analysis_run.run_status,
-            "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
-            "submission": analysis.analysis_submission_date,
-            "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
-
-def validate_imported(jira):
-    analysis = DlpAnalysisInformation.objects.get(analysis_jira_ticket=jira)
-    val = all([ a.imported() for a in analysis.library.dlpsequencing_set.all()])
-    return val
-
-def get_wetlab_analyses():
-    sample_list = []
-    analyses = DlpAnalysisInformation.objects.filter(analysis_run__last_updated__gte=datetime.datetime.now() - timedelta(days=14))
-    sequencings = DlpSequencing.objects.annotate(lane_count=Count('dlplane')).filter(Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))
-    for s in sequencings.all():
-        if not s.library.history.earliest().history_date.date() < datetime.date(2019, 1, 1):
-            analysis_iter =  s.library.dlpanalysisinformation_set.all()
-            if analysis_iter:
-                for analysis in analysis_iter:
-                    sample_list.append({**analysis_info_dict(analysis),
-                        **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
-            else: sample_list.append({**{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
-    for a in analyses.all():
-        if not a.library.history.earliest().history_date.date() < datetime.date(2019, 1, 1):
-            sample_list.append({**analysis_info_dict(a),
-                                    **{"id": a.library.sample.pk, "name": a.library.sample.sample_id,
-                                       "library": a.library.pool_id}})
-    return sample_list
-
-def fetch_montage():
-    r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
-    return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
-
-def get_sample_info(id):
-    sample_list = []
-    samples = PipelineTag.objects.get(id=id).sample_set.all()
-    for s in samples:
-        sample_dict = {"id": s.pk, "name": s.sample_id}
-        sample_imported = True
-        libraries = s.dlplibrary_set.all()
-        if libraries:
-            for d in libraries:
-                analysis_set = d.dlpanalysisinformation_set.all()
-                if analysis_set:
-                    for analysis in analysis_set:
-                        sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
-                else:
-                    sample_list.append({**sample_dict, **{"library" : d.pool_id}})
-        else: sample_list.append(sample_dict)
-    return sample_list
-
 class PipeLineStatus(LoginRequiredMixin, TemplateView):
     """
     List of samples.
