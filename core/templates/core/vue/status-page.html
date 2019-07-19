@@ -34,19 +34,19 @@
               <div class="main-content">
                   <br />
                   <div class="sample-table">
-                    <b-button-group style="margin-top : 1px; height: 40px;">
-                        <b-button squared class="menu-button" style="width:110px;">Submitted</b-button>
-                        <b-button class="menu-button" style="width:130px;">Last Updated</b-button>
-                        <b-button class="menu-button" style="width:140px;">sample ID</b-button>
-                        <b-button class="menu-button" style="width:110px;">library ID</b-button>
-                        <b-button class="menu-button" style="width:100px;">Analysis</b-button>
-                        <b-button class="menu-button" style="width:100px;">Version</b-button>
-                        <b-button class="menu-button" style="width:100px;">Aligner</b-button>
-                        <b-button class="menu-button" style="width:100px;">Lanes</b-button>
-                        <b-button class="menu-button" style="width:100px;">Montage</b-button>
-                        <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
-                        <b-button squared class="menu-button" style="width:110px;">Pseudobulk</b-button>
-                    </b-button-group>
+                      <b-button-group style="margin-top : 1px; height: 40px;">
+                          <b-button squared class="menu-button" style="width:110px;">Submitted</b-button>
+                          <b-button class="menu-button" style="width:130px;">Last Updated</b-button>
+                          <b-button class="menu-button" style="width:140px;">sample ID</b-button>
+                          <b-button class="menu-button" style="width:110px;">library ID</b-button>
+                          <b-button class="menu-button" style="width:100px;">Analysis</b-button>
+                          <b-button class="menu-button" style="width:100px;">Version</b-button>
+                          <b-button class="menu-button" style="width:100px;">Aligner</b-button>
+                          <b-button class="menu-button" style="width:100px;">Lanes</b-button>
+                          <b-button class="menu-button" style="width:100px;">Montage</b-button>
+                          <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
+                          <b-button squared class="menu-button" style="width:110px;">Pseudobulk</b-button>
+                      </b-button-group>
                     <div class="content-table">
                       <Row v-for="sample in samples" :sample="sample" />
                     </div>
@@ -291,7 +291,7 @@ var Row =  {
     height: 33px;
     margin: 1px;
   }
-  
+
   .ln110 {
     width: 110px;
   }
@@ -311,11 +311,17 @@ var Row =  {
   }
 
   .tag-list {
-    height: 80vh;
+    height: calc(100vh - 160px);
     overflow-y: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+  .tag-list::-webkit-scrollbar { /* WebKit */
+      width: 0;
+      height: 0;
   }
 
-  .row-button {
+.row-button {
   background-color:whitesmoke;
   color: black;
 }
@@ -325,8 +331,14 @@ var Row =  {
   color: black;
 }
 .content-table {
-  max-height: 600px;
-  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+.content-table::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
 }
 
 .sample-table {
