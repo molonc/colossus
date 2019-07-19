@@ -213,6 +213,7 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
 
     def get_context_and_render(self, request, error=None):
         samples = list(Sample.objects.annotate(text=F('sample_id'), value=F('pk')).values("text", "value"))
+
         context =  {"error" : error, "samples": json.dumps(list(samples), cls=DjangoJSONEncoder)}
         return render(request, self.template_name, context)
 

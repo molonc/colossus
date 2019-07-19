@@ -4,8 +4,8 @@
 {% block body %}
 
 <div id="app">
+  <!-- {% verbatim %}{{ preSamples }}{% endverbatim %} -->
   <div class="centered-container">
-      {{error}}
     <b-modal id="my-modal" ok-only>{{error}}</b-modal>
     <form action="{% url 'core:pipeline_status_create' %}" method="POST" class="md-layout">
         {% csrf_token %}
@@ -25,54 +25,144 @@
               <div class="md-layout md-gutter">
                   
                 <div class="md-layout-item">
-                    <md-field v-b-tooltip.hover title="Hold down control to select multiple.">
-                      <b-form-select name="samples" v-model="selectedSamples" :options="samples" multiple :select-size="4"></b-form-select>
-                    </md-field>
+                    <b-row >
+                        <b-col>
+                            <i class="fa fa-child" ></i></i> Samples:
+                            <b-form-input v-model="searchSampleKey"></b-form-input>
+                            <b-form-select v-model="preSelected" :options="sampleDisplay" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button"  v-on:click="addSelected" variant="primary">Add</b-button>
+                        </b-col>
+                        <b-col>
+                            <i class="fa fa-edit"></i> Selected:
+                            <b-form-input v-model="searchSelectedKey"></b-form-input>
+                            <b-form-select v-model="postSelected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button" v-show="!selectedEmpty" v-on:click="removeAll" variant="primary">Remove All</b-button>
+                            <b-button class="my-button  remove-button" v-show="!selectedEmpty" v-on:click="removeSelected" variant="primary">Remove</b-button>
+                        </b-col>
+                    </b-row>
+
                 </div>
               </div>
               <div>
                   <strong>Selected samples:</strong>
-                  <span>{% verbatim %}{{ selectedSamples }}{% endverbatim %}</span>
+                  <span>{% verbatim %}{{ postSamplesNames }}{% endverbatim %}</span>
               </div>
 
               <div class="actions md-layout md-alignment-center-space-between">
                 <a href="{% url 'core:pipeline_status' %}">I already have my project</a>
-                <md-button class="md-raised md-primary" type="submit" name="create" value="Ok">Create</md-button>
+                <md-button class="md-raised md-primary" type="submit" name="create" value="Ok" @click="createTag">Create</md-button>
               </div>
 
             </md-card-content>
         </md-card>
     </form>
     </div>
+  }
 </div>
 <script>
-  new Vue({
+  vm = new Vue({
     el: '#app',
     data: () => ({
-      selectedSamples: [],
-      samples: []
+      searchKey: "",
+      searchSampleKey: "",
+      searchSelectedKey: "",
+      preSamples: [],
+      postSamples: [],
+      postSamplesNames: [],
+      preSelected: [],
+      postSelected: [],
+      samples: [],
+      selectedEmpty: true
     }),
+    methods: {
+      addSelected() {
+        for (var i=0; i < this.preSamples.length; i++){
+          if (this.preSelected.includes(this.preSamples[i].value)){
+             // vm.$set(vm.preSamples[i], userselect, true)
+            this.preSamples[i].userselect = true
+            console.log(`adding ${this.preSamples[i].text}`)
+            this.postSamples.push(this.preSamples[i])
+            this.postSamplesNames.push(this.preSamples[i].text)
+          }
+        }
+        this.showRemoveButton()
+      },
+      removeSelected: function() {
+        for (var i=0; i < this.preSamples.length; i++){
+          if (this.postSelected.includes(this.preSamples[i].value)){
+            console.log(`removing ${this.preSamples[i].text}`)
+            this.preSamples[i].userselect = false
+            // vm.$set(vm.preSamples[i], userselect, false)
+            this.postSamples.pop(this.preSamples[i])
+            this.postSamplesNames.pop(this.preSamples[i].text)
+          }
+        }
+        this.showRemoveButton()
+      },
+
+      removeAll() {
+        this.postSamples = []
+        this.selectedEmpty = true
+        this.postSamplesNames = []
+      },
+
+      showRemoveButton: function() {
+        this.selectedEmpty = this.postSamples.length === 0
+
+      },
+      createTag() {
+
+      }
+    },
     computed: {
       count () {
         return this.selectedSamples.map(s => s.text)
-      }
+      },
+      sampleDisplay() {
+        console.log("HELLO")
+        var filter = this.searchSampleKey
+        search_results = this.preSamples.filter(function (sample) {
+          return !sample.userselect && sample.text.toLowerCase().includes(filter.toLowerCase())
+        })
+        search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+        return search_results
+      },
+      selectedDisplay() {
+        var filter = this.searchSelectedKey
+
+        search_results = this.postSamples.filter(function (sample) {
+          return sample.userselect && sample.text.toLowerCase().includes(filter.toLowerCase())
+        })
+        search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+        return search_results
+      },
     },
     mounted() {
-      if (true) this.$bvModal.show('my-modal')
+      if ("{{error}}" !== "None") this.$bvModal.show('my-modal');
     },
     created () {
       this.error = "{{error}}";
       
-
       console.log(this.error)
       this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      this.preSamples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
       console.log(this.samples)
+      console.log(this.preSamples)
+      // for (var i=0; i < this.preSamples.length; i++){
+      //   vm.$set(vm.preSamples[i], userselect, false)
+      // }
+      this.preSamples.forEach((sample) => 
+        sample.userselect = false
+      )
     },
   })
 </script>
 
 <style>
-
+.my-button {  
+  float: right;
+  margin-top: 0.3em
+}
 .centered-container {
   display: flex;
   align-items: center;
@@ -84,6 +174,24 @@ span {
   display:block;
   width:300px;
   word-wrap:break-word;
+}
+
+.my-button {
+  background-color: #6ea5ff;
+  border-color: #6ea5ff;
+  float: right;
+  margin-top: 0.3em
+}
+.my-button:hover {
+  background-color: #4c86e6;
+  border-color: #4c86e6;
+}
+.submit-button {
+    float: right;
+    margin-top: 0.3em
+}
+.remove-button {
+    margin: 5px;
 }
 </style>
 
