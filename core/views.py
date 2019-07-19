@@ -225,7 +225,7 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         PipelineTag.objects.get(id=request.POST.get('id')).delete()
 
     def handle_request(request):
-        data = json.loads(request.body.decode('utf-8'))
+        data = json.loads(request.body.decode('utf-8can you push'))
         returnJson = {}
         if data["type"] == "fetchSample":
             returnJson["samples"] = get_sample_info(data["id"])

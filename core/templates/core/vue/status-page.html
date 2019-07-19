@@ -16,13 +16,13 @@
                   <md-card-content>
                   <md-field>
                     <label>Search by Title</label>
-                    <md-input v-model="search"></md-input>
+                    <md-input v-model="searchTag"></md-input>
                   </md-field>
                   </md-card-content>
                   <md-divider></md-divider>
                   <md-card-content class="tag-list">
                     <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
-                    <button v-for="tag in tags" v-show="tag.show" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+                    <button v-for="tag in tagDisplay" v-show="tag.show" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
                   </md-card-content>
                   <md-divider></md-divider>
                     <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
@@ -143,8 +143,20 @@ var Row =  {
       selected_tag: "",
       montages: [],
       montage_ready: false,
-      search: "",
-      searchedTagResults: [],
+      searchTag: "",
+    },
+    created () {
+      console.log("created")
+      this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
+      this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      this.username = "{{username| safe | escapejs}}"
+      this.password = "{{password| safe | escapejs}}"
+      this.axiosVerifyMontage()
+    },
+    computed: {
+      tagDisplay() {
+        return this.tags.filter(tag => {return tag.title.toLowerCase().includes(this.searchTag.toLowerCase())})
+      }
     },
     methods: {  
       createTag(){window.location.href = "{% url 'core:pipeline_status_create' %}"},
@@ -245,15 +257,6 @@ var Row =  {
         })
 
       }
-    },
-    created () {
-      console.log("created")
-      this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
-      this.tags.forEach(t => Vue.set(t, "show", true))
-      this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
-      this.username = "{{username| safe | escapejs}}"
-      this.password = "{{password| safe | escapejs}}"
-      this.axiosVerifyMontage()
     },
   })
 </script>
