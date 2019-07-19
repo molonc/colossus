@@ -67,6 +67,10 @@ class Project(models.Model, FieldValue):
         ordering = ['name']
 
 
+class PipelineTag(models.Model):
+    history = HistoricalRecords(table_name='pipeline_tag_history')
+    title = models.CharField(max_length=150, unique=True)
+
 #============================
 # Sample models
 #----------------------------
@@ -125,6 +129,8 @@ class Sample(models.Model, FieldValue):
         blank=True,
     )
     notes = create_textfield("Notes")
+
+    pipeline_tag = models.ForeignKey(PipelineTag, null=True)
 
     def has_additional_sample_information(self):
         return hasattr(self, 'additionalsampleinformation')
@@ -445,3 +451,4 @@ class JiraUser(models.Model):
 
     def __str__(self):
         return self.name
+

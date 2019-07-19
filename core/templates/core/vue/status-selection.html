@@ -1,0 +1,199 @@
+{% extends "../vue/header.html" %}
+{% load staticfiles %}
+
+{% block body %}
+
+<div id="app">
+  <div class="centered-container">
+    <b-modal id="my-modal" ok-only>A projecttag with the title already exist.</b-modal>
+      <form>
+        {% csrf_token %}
+        <md-card class="md-layout-item">
+            <md-card-header>
+              <div class="md-title">Choose Samples</div>
+            </md-card-header>
+            <md-card-content>
+              <div class="md-layout md-gutter">
+                  <div class="md-layout-item">
+                    <md-field >
+                    <label for="title">Title</label>
+                    <md-input v-model="title" id="first-name" autocomplete="given-name"  />
+                    </md-field>
+                  </div>
+              </div>
+              <div class="md-layout md-gutter">
+
+                <div class="md-layout-item">
+                    <b-row >
+                        <b-col>
+                            <i class="fa fa-child" ></i></i> Libraries:
+                            <b-form-input v-model="searchSample"></b-form-input>
+                            <b-form-select v-model="preSelected" :options="sampleDisplay" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button"  v-on:click="addSelected" variant="primary">Add</b-button>
+                        </b-col>
+                        <b-col>
+                            <i class="fa fa-edit"></i> Selected:
+                            <b-form-input v-model="searchSelected"></b-form-input>
+                            <b-form-select v-model="postSelected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button" v-show="!selectedEmpty" v-on:click="removeAll" variant="primary">Remove All</b-button>
+                            <b-button class="my-button  remove-button" v-show="!selectedEmpty" v-on:click="removeSelected" variant="primary">Remove</b-button>
+                        </b-col>
+                    </b-row>
+
+                </div>
+              </div>
+              <div>
+                  <strong>Selected samples:</strong>
+                  <span>{% verbatim %}{{ samplesSelected }}{% endverbatim %}</span>
+              </div>
+              <div class="actions md-layout md-alignment-center-space-between">
+                <a href="{% url 'core:pipeline_status' %}">I already have my project</a>
+                <!-- <md-button class="md-raised md-primary" type="submit" name="create" value="Ok" @click="createTag">Create</md-button> -->
+                <md-button class="md-raised md-primary" name="create" @click="createTag">Create</md-button>
+              </div>
+            </md-card-content>
+        </md-card>
+    </form>
+    </div>
+  }
+</div>
+<script>
+  vm = new Vue({
+    el: '#app',
+    data: () => ({
+      title: "",
+      searchKey: "",
+      searchSample: "",
+      searchSelected: "",
+      preSelected: [],
+      postSelected: [],
+      allSamples: [],
+      selectedEmpty: true,
+      samplesSelected: [],
+
+    }),
+    methods: {
+      addSelected: function() {
+        for (var i=0; i < this.allSamples.length; i++){
+          if (this.preSelected.includes(this.allSamples[i].value)){
+            Vue.set(this.allSamples[i], "userselect", true)
+            this.samplesSelected.push(this.allSamples[i].text)
+          }
+        }
+        this.showRemoveButton()
+      },
+      removeSelected: function() {
+        for (var i=0; i < this.allSamples.length; i++){
+          if (this.postSelected.includes(this.allSamples[i].value)){
+            console.log(`removing ${this.allSamples[i].text}`)
+            Vue.set(this.allSamples[i], "userselect", false)
+            this.samplesSelected.pop(this.allSamples[i].text)
+          }
+        }
+        this.showRemoveButton()
+      },
+      removeAll: function() {
+          for (var i=0; i < this.allSamples.length; i++){
+            if (this.allSamples[i].userselect) {
+              console.log(`removing ${this.allSamples[i].text}`)
+              this.allSamples[i].userselect = false
+            }
+            this.samplesSelected = []
+          }
+          this.showRemoveButton()
+      },
+      showRemoveButton: function() {
+        this.selectedEmpty = (this.samplesSelected.length == 0 ? true: false)
+      },
+
+      createTag: function(){
+        var selectedlist = []
+        for (var i=0; i < this.allSamples.length; i++){
+            if (this.allSamples[i].userselect) {
+              selectedlist.push(this.allSamples[i].value)
+          }
+        }
+        console.log(`SELECTED LIST ${selectedlist}`)
+        axios(
+          {
+            method: 'post',
+            url: "{% url 'core:pipeline_status_create' %}",
+            dataType: "json",
+            data: {
+              "title": this.title,
+              "selected" : selectedlist,
+              "type": "createTag", 
+              },
+            headers: {
+              "X-CSRFToken": Cookies.get('csrftoken'),
+              "content-type": "application/json"
+            }
+          }
+        ).then(
+          r => {
+            console.log(r)
+            if(r.data === "success") window.location.href = "{% url 'core:pipeline_status' %}"
+            else this.$bvModal.show('my-modal');
+          })
+      }
+    },
+    computed: {
+      count () {
+        return this.selectedSamples.map(s => s.text)
+      },
+      sampleDisplay() {
+        // Right now this is only called when searchSample is changing. 
+        // Doesnt detect when allSamples changes since its an object...
+        var filter = this.searchSample
+        search_results = this.allSamples.filter(function (sample) {
+          return !sample.userselect && sample.text.toLowerCase().includes(filter.toLowerCase())
+        })
+        search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+        return search_results
+      },
+      selectedDisplay() {
+        var filter = this.searchSelected
+        search_results = this.allSamples.filter(function (sample) {
+          return sample.userselect && sample.text.toLowerCase().includes(filter.toLowerCase())
+        })
+        search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+        return search_results
+      },
+    },
+    created () {
+      this.allSamples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+    },
+  })
+</script>
+
+<style>
+.centered-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 100vh;
+  }
+span {
+  display:block;
+  width:300px;
+  word-wrap:break-word;
+}
+
+.my-button {
+  background-color: #6ea5ff;
+  border-color: #6ea5ff;
+  float: right;
+  margin-top: 0.3em
+}
+.my-button:hover {
+  background-color: #4c86e6;
+  border-color: #4c86e6;
+}
+
+.remove-button {
+    margin: 5px;
+}
+</style>
+
+{% endblock %}

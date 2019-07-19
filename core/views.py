@@ -9,13 +9,18 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import os
 import csv
 import collections
+import re
 import subprocess
 import json
+from datetime import timedelta
+
+import requests
 from jira import JIRAError
 
 #============================
 # Django imports
 #----------------------------
+from django.db.models import F, Count, Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required #, permission_required
@@ -53,6 +58,7 @@ from .models import (
     MetadataField,
     JiraUser,
     Project,
+    PipelineTag
 )
 
 from sisyphus.models import *
@@ -132,6 +138,121 @@ def gsc_submission_form(request):
               cls=DjangoJSONEncoder)}
     )
 
+
+#============================
+# Pipeline Status
+#----------------------------
+def analysis_info_dict(analysis):
+    return { "jira": analysis.analysis_jira_ticket,
+             "date": analysis.analysis_submission_date,
+            "lanes": analysis.lanes.count(),
+            "version": analysis.version.version,
+            "run_status": analysis.analysis_run.run_status,
+            "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
+            "submission": analysis.analysis_submission_date,
+            "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
+
+def validate_imported(jira):
+    analysis = DlpAnalysisInformation.objects.get(analysis_jira_ticket=jira)
+    val = all([ a.imported() for a in analysis.library.dlpsequencing_set.all()])
+    return val
+
+def get_wetlab_analyses():
+    sample_list = []
+    analyses = DlpAnalysisInformation.objects.filter(analysis_run__last_updated__gte=datetime.datetime.now() - timedelta(days=14))
+    sequencings = DlpSequencing.objects.annotate(lane_count=Count('dlplane')).filter(Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))
+    for s in sequencings.all():
+        if not s.library.history.earliest().history_date.date() < datetime.date(2019, 1, 1):
+            analysis_iter =  s.library.dlpanalysisinformation_set.all()
+            if analysis_iter:
+                for analysis in analysis_iter:
+                    sample_list.append({**analysis_info_dict(analysis),
+                        **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+            else: sample_list.append({**{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+    for a in analyses.all():
+        if not a.library.history.earliest().history_date.date() < datetime.date(2019, 1, 1):
+            sample_list.append({**analysis_info_dict(a),
+                                    **{"id": a.library.sample.pk, "name": a.library.sample.sample_id,
+                                       "library": a.library.pool_id}})
+    return sample_list
+
+def fetch_montage():
+    r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
+    return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
+
+def get_sample_info(id):
+    sample_list = []
+    samples = PipelineTag.objects.get(id=id).sample_set.all()
+    for s in samples:
+        sample_dict = {"id": s.pk, "name": s.sample_id}
+        sample_imported = True
+        libraries = s.dlplibrary_set.all()
+        if libraries:
+            for d in libraries:
+                analysis_set = d.dlpanalysisinformation_set.all()
+                if analysis_set:
+                    for analysis in analysis_set:
+                        sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
+                else:
+                    sample_list.append({**sample_dict, **{"library" : d.pool_id}})
+        else: sample_list.append(sample_dict)
+    return sample_list
+
+class PipeLineStatus(LoginRequiredMixin, TemplateView):
+    """
+    List of samples.
+    """
+    login_url = LOGIN_URL
+    template_name = "core/vue/status-selection.html"
+
+    def get_context_and_render(self, request, error=None):
+        samples = list(Sample.objects.annotate(text=F('sample_id'), value=F('pk')).values("text", "value"))
+        context =  {"error" : error, "samples": json.dumps(list(samples), cls=DjangoJSONEncoder)}
+        return render(request, self.template_name, context)
+
+    def get(self, request):
+        return self.get_context_and_render(request)
+
+    def post(self, request):
+        data = json.loads(request.body.decode('utf-8'))
+        if PipelineTag.objects.filter(title= data["title"]).exists():
+            return HttpResponse("fail")
+        pipelinetag = PipelineTag.objects.create(title = data["title"])
+        pipelinetag.save()
+        pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
+        return HttpResponse("success")
+
+    def handle_request(request):
+        data = json.loads(request.body.decode('utf-8'))
+        returnJson = {}
+        if data["type"] == "fetchSample":
+            returnJson["samples"] = get_sample_info(data["id"])
+            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "fetchWetlab":
+            returnJson["samples"] = get_wetlab_analyses()
+            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "fetchMontage":
+            return HttpResponse(json.dumps(fetch_montage()))
+        elif data["type"] == "validateColossus":
+            return HttpResponse(json.dumps(validate_imported(data["id"])))
+        elif data["type"] =="deleteTag":
+            print(request.POST.get('id'))
+            PipelineTag.objects.get(id=data['id']).delete()
+            return HttpResponse("deleted")
+            
+
+
+        return None
+
+    def pipeline_status_page(request):
+      pipelinetags = list(PipelineTag.objects.values("id", "title"))
+      sample_list = []
+      return render( request, "core/vue/status-page.html",
+                     { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
+#============================
+# End of Pipeline Status
+#----------------------------
+
 def gsc_info_post(request):
     selected = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
     returnJson = [{
@@ -152,7 +273,6 @@ def gsc_info_post(request):
         "Quantification Method" : library.dlplibraryquantificationandstorage.quantification_method,
     } for library in selected]
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
-
 
 def download_sublibrary_info(request):
     library = get_object_or_404(DlpLibrary, pk=json.loads(request.body.decode('utf-8'))["libraryPk"])
@@ -273,7 +393,7 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
         get_object_or_404(Sample, pk=pk).delete()
         msg = "Successfully deleted the Sample."
         messages.success(request, msg)
-        return HttpResponseRedirect(reverse('core:sample_list'))
+        return HttpResponseRedirect(reverse('core:pipeline_status'))
 
 @Render("core/sample_detail.html")
 @login_required
