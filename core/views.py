@@ -212,7 +212,8 @@ def create_tag(request):
 
     if PipelineTag.objects.filter(title= data["title"]).exists():
     #     # return get_context_and_render(request, error="Title Name Already Exist")
-        return HttpResponseRedirect(('core:pipeline_status'))
+        print("title already exists")
+        return HttpResponseRedirect(reverse('core:pipeline_status'))
     pipelinetag = PipelineTag.objects.create(title = data["title"])
     pipelinetag.save()
     pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
@@ -235,11 +236,13 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         return self.get_context_and_render(request)
 
     def post(self, request):
-        if PipelineTag.objects.filter(title = request.POST.get('title')).exists():
+        data = json.loads(request.body.decode('utf-8'))
+        print("DATA", data)
+        if PipelineTag.objects.filter(title= data["title"]).exists():
             return self.get_context_and_render(request, error="Title Name Already Exist")
-        pipelinetag = PipelineTag.objects.create(title = request.POST.get('title'))
+        pipelinetag = PipelineTag.objects.create(title = data["title"])
         pipelinetag.save()
-        pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=request.POST.getlist('samples'))))
+        pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
         return HttpResponseRedirect(reverse('core:pipeline_status'))
 
     def handle_request(request):
@@ -253,7 +256,6 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
             return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
         elif data["type"] == "validateColossus":
             return HttpResponse(json.dumps(validate_imported(data["id"])))
-
         return None
 
     def pipeline_status_page(request):
