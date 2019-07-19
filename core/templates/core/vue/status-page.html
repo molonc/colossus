@@ -162,8 +162,9 @@ var Row =  {
     methods: {  
       createTag(){window.location.href = "{% url 'core:pipeline_status_create' %}"},
       removeTag(){
+        console.log(this.selected_tag)
         if(this.selected_tag){
-          this.axiosColossus({type : "deleteTag", id : this.selected_tag.id}).then()
+          this.axiosColossus({type : "deleteTag", id : this.selected_tag.id}).then(r => console.log(r.data))
         }
       },
       setPipeline(i) {
@@ -190,7 +191,10 @@ var Row =  {
           var data =  {"type" : "fetchSample", "id" : tag.id}
           this.selected_tag = tag
         }
-        else var data =  {"type" : "fetchWetlab"}
+        else {
+          this.selected_tag = {title : "wetlab"}
+          var data =  {"type" : "fetchWetlab"}
+        }
         this.axiosColossus(data)
         .then((r) => {
           this.samples = r.samples

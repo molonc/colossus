@@ -5,8 +5,7 @@
 
 <div id="app">
   <div class="centered-container">
-    <b-modal id="my-modal" ok-only>{{error}}</b-modal>
-    <!-- <form action="{% url 'core:pipeline_status_create' %}" method="POST" class="md-layout"> -->
+    <b-modal id="my-modal" ok-only>A projecttag with the title already exist.</b-modal>
       <form>
         {% csrf_token %}
         <md-card class="md-layout-item">
@@ -47,13 +46,11 @@
                   <strong>Selected samples:</strong>
                   <span>{% verbatim %}{{ samplesSelected }}{% endverbatim %}</span>
               </div>
-
               <div class="actions md-layout md-alignment-center-space-between">
                 <a href="{% url 'core:pipeline_status' %}">I already have my project</a>
                 <!-- <md-button class="md-raised md-primary" type="submit" name="create" value="Ok" @click="createTag">Create</md-button> -->
                 <md-button class="md-raised md-primary" name="create" @click="createTag">Create</md-button>
               </div>
-
             </md-card-content>
         </md-card>
     </form>
@@ -66,13 +63,13 @@
     data: () => ({
       title: "",
       searchKey: "",
-          searchSample: "",
-          searchSelected: "",
-          preSelected: [],
-          postSelected: [],
-          allSamples: [],
-          selectedEmpty: true,
-          samplesSelected: [],
+      searchSample: "",
+      searchSelected: "",
+      preSelected: [],
+      postSelected: [],
+      allSamples: [],
+      selectedEmpty: true,
+      samplesSelected: [],
 
     }),
     methods: {
@@ -132,7 +129,12 @@
               "content-type": "application/json"
             }
           }
-        )
+        ).then(
+          r => {
+            console.log(r)
+            if(r.data === "success") window.location.href = "{% url 'core:pipeline_status' %}"
+            else this.$bvModal.show('my-modal');
+          })
       }
     },
     computed: {
@@ -158,12 +160,7 @@
         return search_results
       },
     },
-    mounted() {
-      if ("{{error}}" !== "None") this.$bvModal.show('my-modal');
-    },
     created () {
-      this.error = "{{error}}";
-      console.log(this.error)
       this.allSamples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
     },
   })
