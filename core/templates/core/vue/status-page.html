@@ -1,0 +1,347 @@
+{% extends "../vue/header.html" %}
+{% load staticfiles %}
+
+{% block body %}
+<div id="app">    
+    <div class="page-container">
+        <md-app>
+          <md-app-toolbar md-elevation="0">
+            <span class="md-title">Analysis Status {% verbatim %}{{selected_tag.title}}{% endverbatim %}</span>
+            <md-button v-b-modal.modal-1>Guide <md-icon>contact_support</md-icon></md-button>
+            {% include "core/vue/status-tutorial.html" %}
+          </md-app-toolbar>
+          
+          <md-app-drawer md-permanent="full">
+              <md-card class="pipeline-tag">
+                  <md-card-content>
+                  <md-field>
+                    <label>Search by Title</label>
+                    <md-input v-model="searchTag"></md-input>
+                  </md-field>
+                  </md-card-content>
+                  <md-divider></md-divider>
+                  <md-card-content class="tag-list">
+                    <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
+                    <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+                  </md-card-content>
+                  <md-divider></md-divider>
+                    <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
+                    <md-button @click="removeTag()"><md-icon>remove</md-icon></md-button>
+                </md-card>
+          </md-app-drawer>
+    
+          <md-app-content>
+              <div class="main-content">
+                  <br />
+                  <div class="sample-table">
+                    <b-button-group style="margin-top : 1px; height: 40px;">
+                        <b-button squared class="menu-button" style="width:110px;">Submitted</b-button>
+                        <b-button class="menu-button" style="width:130px;">Last Updated</b-button>
+                        <b-button class="menu-button" style="width:140px;">sample ID</b-button>
+                        <b-button class="menu-button" style="width:110px;">library ID</b-button>
+                        <b-button class="menu-button" style="width:100px;">Analysis</b-button>
+                        <b-button class="menu-button" style="width:100px;">Version</b-button>
+                        <b-button class="menu-button" style="width:100px;">Aligner</b-button>
+                        <b-button class="menu-button" style="width:100px;">Lanes</b-button>
+                        <b-button class="menu-button" style="width:100px;">Montage</b-button>
+                        <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
+                        <b-button squared class="menu-button" style="width:110px;">Pseudobulk</b-button>
+                    </b-button-group>
+                    <div class="content-table">
+                      <Row v-for="sample in samples" :sample="sample" />
+                    </div>
+                  </div>
+                  <br />
+                </div >
+          </md-app-content>
+        </md-app>
+      </div>
+  </div>
+
+<script>
+var Row =  {
+  props: ['sample'],
+  methods: {
+    setShow() {this.sample.show = !this.sample.show},
+    returnURL(type,pk) {
+      return window.origin + type + "/" + pk
+      },
+    returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
+    returnMontageURL(jira) {return "//https://52.235.35.201/?dashboard=" + jira}
+  },
+  template: `
+  <b-button-group @click="setShow" style="margin-top : 1px;">
+    <b-button squared v-if="sample.submission" class="row-button ln110" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.submission}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button squared v-else class="row-button ln110">N/A</b-button>
+    <b-button v-if="sample.last_updated" class="row-button ln130" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.last_updated}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln130" :style="sample.imported">N/A</b-button>
+    <b-button class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
+    <b-button v-if="sample.library" class="row-button ln110" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
+        {% verbatim %}{{sample.library}}{% endverbatim %}
+    </b-button>
+    <b-button v-else class="row-button ln110" :style="sample.imported" >
+    <b-badge variant="warning">No DLP</b-badge>
+    </b-button>
+    <b-button v-if="sample.jira" class="row-button ln100" :style="sample.imported" :href="returnJiraURL(sample.jira)">
+     {% verbatim %}{{sample.jira}}{% endverbatim %}
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported" >
+    <b-badge variant="warning">No Analysis</b-badge>
+    </b-button>
+    <b-button v-if="sample.version" class="row-button ln100" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.version}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.aligner" class="row-button ln100" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.aligner}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.lanes" class="row-button ln100" :style="sample.imported">
+      <b-badge variant="primary">
+      {% verbatim %}{{sample.lanes}}{% endverbatim %}
+      </b-badge>
+    </b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button v-if="sample.montage" class="row-button ln100" :style="sample.imported" :href="returnMontageURL(sample.jira)">Link</b-button>
+    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
+    <b-button squared class="row-button" :style="sample.imported">
+      <b-badge :variant="sample.pipeline.align">align</b-badge>
+      <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
+      <b-badge :variant="sample.pipeline.qc">QC</b-badge>
+    </b-button>
+    <b-button squared class="row-button ln110" :style="sample.imported">
+      <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
+    </b-button>
+  </b-button-group>
+
+  `
+  }
+
+
+  var vm = new Vue({
+    el: '#app',
+    components:{
+      Row
+    },
+    data: {
+      username: "",
+      password: "",
+      samples: [],
+      tags: [],
+      selected_tag: "",
+      montages: [],
+      montage_ready: false,
+      searchTag: "",
+    },
+    created () {
+      this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
+      this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
+      this.username = "{{username| safe | escapejs}}"
+      this.password = "{{password| safe | escapejs}}"
+      this.axiosVerifyMontage()
+    },
+    computed: {
+      tagDisplay() {
+        return this.tags.filter(tag => {return tag.title.toLowerCase().includes(this.searchTag.toLowerCase())})
+      }
+    },
+    methods: {  
+      createTag(){window.location.href = "{% url 'core:pipeline_status_create' %}"},
+      removeTag(){
+        if(this.selected_tag){
+          this.axiosColossus({type : "deleteTag", id : this.selected_tag.id}).then(r => console.log(r.data))
+        }
+      },
+      setPipeline(i) {
+        this.samples[i].pipeline["qc"] = "primary"
+      },
+      setRunStatus(status) {
+        // console.log("setRunStatus")
+        let variant = "secondary"
+        let run_status = {
+          dark: 'idle',
+          info: 'running',
+          primary: 'archiving',
+          danger: 'error',
+          success:'complete'}
+        Object.entries(run_status).forEach(([key, val]) => {
+          if(status.includes(val)) {
+            variant = key
+          }
+        });
+        return variant
+      },
+      fetchSamples (tag) {
+        if (tag !== undefined) {
+          var data =  {"type" : "fetchSample", "id" : tag.id}
+          this.selected_tag = tag
+        }
+        else {
+          this.selected_tag = {title : "wetlab"}
+          var data =  {"type" : "fetchWetlab"}
+        }
+        this.axiosColossus(data)
+        .then((r) => {
+          this.samples = r.samples
+          for (let i = 0; i < this.samples.length; i ++) {
+            Vue.set(this.samples[i], "pipeline", {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"})
+            Vue.set(this.samples[i], "montage", false)
+            if(this.montage_ready) if(this.montages.includes(this.samples[i].jira)) this.samples[i].montage = true
+            if(this.samples[i].jira) {
+              this.axiosVerifyTantalus(this.samples[i])
+              this.axiosVerifyColossus(this.samples[i])
+              }
+          }          
+        })
+      },
+      axiosVerifyColossus(sample){
+        this.axiosColossus({"type" : "validateColossus", "id" : sample.jira})
+        .then((r) => sample.imported = r ? "background-color: #c8e6c5" : "background-color: #f2f2f2")
+      },
+      axiosVerifyTantalus (sample) {
+        jira = sample.jira
+        library = sample.library
+        let token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNiwidXNlcm5hbWUiOiJqcGhhbSIsImV4cCI6MTU2NDAwMTEzMSwiZW1haWwiOiIiLCJvcmlnX2lhdCI6MTU2MzM5NjMzMX0.DpU0SFgS390B1KCMKI3bUMVUwFocw3X-Qodlz8K848A"
+        const url = "https://tantalus.canadacentral.cloudapp.azure.com/api/analysis/"        
+        // Qc, hmmcopy and align 
+        axios
+        .get(url,{  params : {jira_ticket : jira}, auth: {username: this.username,password: this.password},})
+        .then(r => {
+          r.data.results.forEach(a => {
+            atype = a.analysis_type
+            status = a.status
+            if (atype in sample.pipeline) sample["pipeline"][atype]= this.setRunStatus(status)
+            })
+            if ((sample.pipeline["align"] === "success") && (sample.pipeline["hmmcopy"] === "success")) sample["pipeline"]["qc"]= "success"
+          })
+        .catch(e => {console.log(e.response)})
+
+        // Pseudobulk
+        axios
+        .get(url,{auth: {username: this.username,password: this.password},
+        params : {input_datasets__library__library_id : library, analysis_type__name: "pseudobulk"}})
+        .then(r => {if(r.data.count > 0) sample["pipeline"]["pseudo"]= this.setRunStatus(status)})
+        .catch(e => {console.log(e.response)})        
+      },
+      axiosColossus(data){
+        return new Promise(function(resolve, reject) {
+          axios({
+                method: 'post',
+                url: "{% url 'core:pipeline_status_request_handler' %}",
+                dataType: "json",
+                data: data,
+                headers: {
+                  "X-CSRFToken": Cookies.get('csrftoken'),
+                  "content-type": "application/json"
+                }}).then( (response) => resolve(response.data)).catch( (e) => reject(e))
+        })
+      },
+      axiosVerifyMontage() {
+        this.axiosColossus({type : "fetchMontage"})
+        .then((r) => {
+          this.montage_ready=true
+          this.montages = r
+        })
+
+      }
+    },
+  })
+</script>
+
+<style>
+  #app {
+    height: 100vh;
+  }
+
+  .page-container {
+    height: 100%;
+  }
+  .md-app {
+    height: 100%;
+    border: 1px solid rgba(#000, .12);
+  }
+
+   
+  .md-drawer {
+    width: 230px;
+    max-width: calc(100vw - 125px);
+    height: 100%;
+  }
+
+  .pipeline-tag {
+    height: 100vh;
+    text-align: center;
+  }
+  .project-button {
+    border: none;
+    background-color: #a9a9b0;
+    width: 160px;
+    height: 33px;
+    margin: 1px;
+  }
+  
+  .ln110 {
+    width: 110px;
+  }
+
+  .ln100 {
+    width: 100px;
+  }
+
+  .ln130 {
+    width: 130px;
+  }
+  .sample-name {
+  font-size: 10px;
+  text-align: left;
+  font-weight: 800;
+  width:140px;
+  }
+
+  .tag-list {
+    height: 80vh;
+    overflow-y: scroll;
+  }
+
+  .row-button {
+  background-color:whitesmoke;
+  color: black;
+}
+
+.menu-button {
+  background-color:rgb(190, 182, 182);
+  color: black;
+}
+.content-table {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.sample-table {
+  text-align: center;
+  border-radius: 5px;
+  padding: 2px;
+  min-width: 1280px;
+}
+
+.main-content {
+  overflow-x: auto;
+  width: 95%;
+}
+
+
+</style>
+
+{% endblock %}

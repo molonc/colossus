@@ -57,7 +57,6 @@
                         <li>
                             <a style="color: white;" href="{% url 'api:schema-redoc' %}">API Reference</a>
                         </li>
-
                         <form name="search-form" class="navbar-form navbar-right" action="{% url 'search' %}" role="search">
                             <div class="form-group right-inner-addon">
                                 <i class="icon-search"></i>
@@ -65,6 +64,7 @@
                             </div>
                         </form>
                     </ul>
+                    <button class="btn btn-danger navbar-btn" style="float: right;" ><a style="color: white;" href="{% url 'core:pipeline_status' %}">Status <span class="badge">BETA</span></a></button>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
         </nav><br>

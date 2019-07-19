@@ -168,10 +168,13 @@ DEFAULT_FILE_STORAGE = 'colossus.custom_azure.AzureMediaStorage'
 STATICFILES_STORAGE = 'colossus.custom_azure.AzureStaticStorage'
 
 
+
 AZURE_ACCOUNT_NAME = "olympusbackups"
 AZURE_ACCOUNT_KEY = os.environ.get('STORAGE_SECRET_KEY')
+
 STATIC_URL = f'https://olympusbackups.blob.core.windows.net/colossus-static/'
 MEDIA_URL = f'https://olympusbackups.blob.core.windows.net/colossus-media/'
+
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

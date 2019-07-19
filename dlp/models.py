@@ -427,6 +427,9 @@ class DlpSequencing(models.Model, FieldValue):
     def get_absolute_url(self):
         return reverse(self.library_type + ":sequencing_detail", kwargs={"pk": self.pk})
 
+    def imported(self):
+        return (self.number_of_lanes_requested <= self.dlplane_set.count())
+
     def save(self, *args, **kwargs):
         if self.number_of_lanes_requested != self.old_number_of_lanes_requested:
             self.old_number_of_lanes_requested = self.number_of_lanes_requested
