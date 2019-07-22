@@ -39,17 +39,18 @@ from django.core.exceptions import ValidationError
 #============================
 # Pipeline Status
 #----------------------------
-def analysis_info_dict(analysis):
-    sequencing_set = analysis.library.dlpsequencing_set.all()
-    submission_date = max([sequencing.submission_date for sequencing in sequencing_set]) if sequencing_set else  analysis.analysis_submission_date
+def get_sequence_date_from_library(library):
+    sequencing_set = library.dlpsequencing_set.all()
+    return max([sequencing.submission_date for sequencing in sequencing_set]) if sequencing_set else  None
 
+def analysis_info_dict(analysis):
+    submission_date = get_sequence_date_from_library(analysis.library)
     return { "jira": analysis.analysis_jira_ticket,
-             "date": analysis.analysis_submission_date,
             "lanes": analysis.lanes.count(),
             "version": analysis.version.version,
             "run_status": analysis.analysis_run.run_status,
             "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
-            "submission": submission_date,
+            "submission": submission_date if submission_date else analysis.analysis_run.analysis_submission_date,
             "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
 
 def validate_imported(jira):
@@ -68,7 +69,8 @@ def get_wetlab_analyses():
                 for analysis in analysis_iter:
                     sample_list.append({**analysis_info_dict(analysis),
                         **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
-            else: sample_list.append({**{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+            else: sample_list.append({**{"submission" : get_sequence_date_from_library(s.library), 
+                "id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
     for a in analyses.all():
         if not a.library.history.earliest().history_date.date() < date(2019, 1, 1):
             sample_list.append({**analysis_info_dict(a),
@@ -94,7 +96,7 @@ def get_sample_info(id):
                     for analysis in analysis_set:
                         sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
                 else:
-                    sample_list.append({**sample_dict, **{"library" : d.pool_id}})
+                    sample_list.append({**sample_dict, **{"library" : d.pool_id, "submission" : get_sequence_date_from_library(d)}})
         else: sample_list.append(sample_dict)
     return sample_list
 
