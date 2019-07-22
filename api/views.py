@@ -17,11 +17,12 @@ from rest_framework import pagination, viewsets, generics, mixins
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404, redirect
 
 #============================
 # App imports
 #----------------------------
-from core.utils import generate_samplesheet
+from core.utils import generate_samplesheet, generate_tenx_pool_sample_csv
 from .serializers import (
     SampleSerializer,
     LibrarySerializer,
@@ -40,17 +41,20 @@ from .serializers import (
     TenxChipSerializer,
     ProjectSerializer,
     TenxPoolSerializer,
-    AnalysisSerializer, KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
+    TenxAnalysisSerializer,
+    KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
     KuduSampleSerializer, KuduAnalysisSerializer, KuduDLPAnalysisSerializer, KuduDLPSequencingSerializer,
     KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer)
+
 
 from core.models import (
     Sample,
     SublibraryInformation,
     ChipRegion,
     JiraUser,
-    Project,
-    Analysis)
+    Project
+)
+
 from dlp.models import (
     DlpLibrary,
     DlpSequencing,
@@ -60,9 +64,8 @@ from dlp.models import (
 
 from tenx.models import *
 from api.filters import (
-    AnalysisFilter,
     SublibraryInformationFilter,
-    AnalysisInformationFilter)
+    AnalysisInformationFilter, TenxAnalysisFilter)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
@@ -158,14 +161,6 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'id',
         'sample_id',
     )
-
-class AnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    permission_classes = (AllowAny, )
-    queryset = Analysis.objects.all()
-    serializer_class = AnalysisSerializer
-    pagination_class = VariableResultsSetPagination
-    filter_class = AnalysisFilter
-
 
 class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
@@ -331,6 +326,13 @@ class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
 
     )
 
+class TenxAnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = TenxAnalysis.objects.all()
+    serializer_class = TenxAnalysisSerializer
+    pagination_class = VariableResultsSetPagination
+    filter_class = TenxAnalysisFilter
+
 class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxSequencing.objects.all()
     serializer_class = TenxSequencingSerializer
@@ -407,6 +409,12 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
         msg = "Multiple flowcells with ID {} found.".format(flowcell)
         return HttpResponse(msg)
 
+def tenx_pool_sample_sheet(request, pk):
+    return generate_tenx_pool_sample_csv(pk)
+
+def pool_name_to_id_redirect(request, pool_name):
+    pk = get_object_or_404(TenxPool, pool_name=pool_name).pk
+    return redirect('api:tenx_pool_sample_sheet', pk=pk)
 
 #============================
 # KUDU API
@@ -425,7 +433,7 @@ class KuduSampleList(KuduList):
     serializer_class = KuduSampleSerializer
 
 class KuduAnalysisList(KuduList):
-    queryset = Analysis.objects.all()
+    queryset = TenxAnalysis.objects.all()
     serializer_class = KuduAnalysisSerializer
 
 #DLP
@@ -459,7 +467,4 @@ class KuduTenxSequencingList(KuduList):
     serializer_class = KuduTenxSequencingSerializer
 
 
-#============================
-# KUDU API
-#----------------------------
 

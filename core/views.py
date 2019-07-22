@@ -7,13 +7,20 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 """
 
 import os
+import csv
 import collections
+import re
 import subprocess
+import json
+from datetime import timedelta
+
+import requests
 from jira import JIRAError
 
 #============================
 # Django imports
 #----------------------------
+from django.db.models import F, Count, Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required #, permission_required
@@ -22,7 +29,7 @@ from django.shortcuts import get_object_or_404, render_to_response, render
 from django.views.generic.base import TemplateView, View
 from django.db import transaction
 from django.shortcuts import redirect
-
+from django.core.serializers.json import DjangoJSONEncoder
 import pandas as pd
 from django.conf import settings
 
@@ -30,6 +37,9 @@ from django.conf import settings
 # App imports
 #----------------------------
 from core.search_util.search_helper import return_text_search
+from dlp.models import (
+    DlpLibrary
+)
 from pbal.models import (
     PbalLibrary
 )
@@ -48,7 +58,7 @@ from .models import (
     MetadataField,
     JiraUser,
     Project,
-    Analysis
+    PipelineTag
 )
 
 from sisyphus.models import *
@@ -60,13 +70,14 @@ from .forms import (
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
-    SublibraryForm
+    SublibraryForm,
 )
 from .utils import (
     create_sublibrary_models,
+    create_doublet_info_model,
     generate_samplesheet,
     generate_gsc_form,
-)
+    get_sample_info, get_wetlab_analyses, fetch_montage, validate_imported)
 from .jira_templates.templates import (
     get_reference_genome_from_sample_id,
     generate_dlp_jira_description,
@@ -99,7 +110,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         context = {
             'sample_size': Sample.objects.count(),
             'project_size' : Project.objects.count(),
-            'analysis_size': Analysis.objects.count(),
+            'tenxanalysis_size': TenxAnalysis.objects.count(),
             'dlp_library_size': DlpLibrary.objects.count(),
             'dlp_sequencing_size': DlpSequencing.objects.count(),
             'pbal_library_size': PbalLibrary.objects.count(),
@@ -112,6 +123,111 @@ class IndexView(LoginRequiredMixin, TemplateView):
             'analysisrun_size':AnalysisRun.objects.count(),
         }
         return context
+
+@login_required
+def gsc_submission_form(request):
+  return render(
+      request,
+      "core/gsc_form.html",
+      {"libraries" :
+          json.dumps([{
+                "value" : library.pk,
+                "text" : "{}_{}".format(library.pool_id,library.sample.sample_id),
+                "userselect" : False,
+            } for library in DlpLibrary.objects.all()],
+              cls=DjangoJSONEncoder)}
+    )
+
+
+#============================
+# Pipeline Status
+#----------------------------
+class PipeLineStatus(LoginRequiredMixin, TemplateView):
+    """
+    List of samples.
+    """
+    login_url = LOGIN_URL
+    template_name = "core/vue/status-selection.html"
+
+    def get_context_and_render(self, request, error=None):
+        samples = list(Sample.objects.annotate(text=F('sample_id'), value=F('pk')).values("text", "value"))
+        context =  {"error" : error, "samples": json.dumps(list(samples), cls=DjangoJSONEncoder)}
+        return render(request, self.template_name, context)
+
+    def get(self, request):
+        return self.get_context_and_render(request)
+
+    def post(self, request):
+        data = json.loads(request.body.decode('utf-8'))
+        if PipelineTag.objects.filter(title= data["title"]).exists():
+            return HttpResponse("fail")
+        pipelinetag = PipelineTag.objects.create(title = data["title"])
+        pipelinetag.save()
+        pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
+        return HttpResponse("success")
+
+    def handle_request(request):
+        data = json.loads(request.body.decode('utf-8'))
+        returnJson = {}
+        if data["type"] == "fetchSample":
+            returnJson["samples"] = get_sample_info(data["id"])
+            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "fetchWetlab":
+            returnJson["samples"] = get_wetlab_analyses()
+            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "fetchMontage":
+            return HttpResponse(json.dumps(fetch_montage()))
+        elif data["type"] == "validateColossus":
+            return HttpResponse(json.dumps(validate_imported(data["id"])))
+        elif data["type"] =="deleteTag":
+            print(request.POST.get('id'))
+            PipelineTag.objects.get(id=data['id']).delete()
+            return HttpResponse("deleted")
+        return None
+
+    def pipeline_status_page(request):
+      pipelinetags = list(PipelineTag.objects.values("id", "title"))
+      return render( request, "core/vue/status-page.html",
+                     { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
+#============================
+# End of Pipeline Status
+#----------------------------
+
+def gsc_info_post(request):
+    selected = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
+    returnJson = [{
+        "Pool ID" : library.pool_id,
+        "Sample ID" : library.sample.sample_id,
+        "Sample Type": library.sample.sample_type,
+        "Number of Sublibraries": library.num_sublibraries,
+        "Anonymous Patient ID" : library.sample.anonymous_patient_id,
+        "Sex" : library.sample.additionalsampleinformation.sex,
+        "Anatomic Site" : library.sample.additionalsampleinformation.anatomic_site,
+        "Pathology Disease Name" : library.sample.additionalsampleinformation.pathology_disease_name,
+        "Construction Method" : "NanoWellSingleCellGenome",
+        "Size Range" : library.dlplibraryquantificationandstorage.size_range,
+        "Average Size" : library.dlplibraryquantificationandstorage.average_size,
+        "Xenograph" : "Yes",
+        "Concentration(nM)" : library.dlplibraryquantificationandstorage.dna_concentration_nm,
+        "Volume" : library.dlplibraryquantificationandstorage.dna_volume,
+        "Quantification Method" : library.dlplibraryquantificationandstorage.quantification_method,
+    } for library in selected]
+    return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+
+def download_sublibrary_info(request):
+    library = get_object_or_404(DlpLibrary, pk=json.loads(request.body.decode('utf-8'))["libraryPk"])
+    sublibraries = library.sublibraryinformation_set.all()
+
+    csvString = "Sub-Library ID,Index Sequence\n"
+    for sublib in sublibraries:
+        csvString += "{},{}-{}\n".format(
+            sublib.get_sublibrary_id(),
+            sublib.primer_i7,
+            sublib.primer_i5
+        )
+
+    return HttpResponse(csvString)
+
 
 
 #============================
@@ -217,38 +333,13 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
         get_object_or_404(Sample, pk=pk).delete()
         msg = "Successfully deleted the Sample."
         messages.success(request, msg)
-        return HttpResponseRedirect(reverse('core:sample_list'))
-
-
-@Render("core/analysis_list.html")
-@login_required
-def analys_list(request):
-    context = {
-        'analyses': Analysis.objects.all().order_by('id'),
-    }
-    return context
-
-@Render("core/analysis_detail.html")
-@login_required
-def analysis_detail(request, pk):
-    analysis = get_object_or_404(Analysis, pk=pk)
-    library = analysis.__getattribute__(analysis.input_type.lower() + "_library")
-    sequencings = analysis.__getattribute__(analysis.input_type.lower() + "sequencing_set")
-    context = {
-        'analysis': analysis,
-        'library': library,
-        'sequencings': sequencings
-    }
-    if analysis.input_type.lower() == 'tenx':
-        tenx_pools = list(map(lambda x: x.tenx_pool, sequencings.all()))
-        context['tenx_pools'] = tenx_pools
-    return context
+        return HttpResponseRedirect(reverse('core:pipeline_status'))
 
 @Render("core/sample_detail.html")
 @login_required
 def sample_name_to_id_redirect(request, pk=None, sample_id=None):
     if pk is not None:
-        context = dict(            
+        context = dict(
             library_list=['dlp', 'pbal', 'tenx'],
             sample=get_object_or_404(Sample, pk=pk),
             pk=pk
@@ -258,7 +349,6 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
     elif sample_id is not None:
         pk = get_object_or_404(Sample, sample_id=sample_id).pk
         return redirect('/core/sample/{}'.format(pk))
-
 
 #============================
 # Library views
@@ -292,7 +382,17 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
 
     template_name = "core/library_detail.html"
 
-    def get_context_and_render(self, request, library, library_type, analyses=None, sublibinfo_fields=None, chip_metadata=None, metadata_fields=None):
+    def get_context_and_render(
+        self,
+        request,
+        library,
+        library_type,
+        analyses=None,
+        sublibinfo_fields=None,
+        chip_metadata=None,
+        metadata_fields=None,
+        doubletinfo_fields=None
+    ):
         library_dict = self.sort_library_order(library)
         context = {
             'library': library,
@@ -345,15 +445,14 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
     template_name = 'core/jira_ticket_confirm.html'
 
     def get(self, request):
-        jira_user = request.session['jira_user']
-        projects = get_projects(jira_user, request.session['jira_password'])
+        projects = get_projects(request.session['jira_user'], request.session['jira_password'])
         form = JiraConfirmationForm()
         #Set default values for DLP and TenX Library Ticket Creation
         #If default value can't be found, no error will be thrown, and the field will just be empty by default
         if(request.session['library_type'] == 'dlp'):
             form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
             form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
-            form.fields['reporter'].initial = jira_user                                                                                 
+            form.fields['reporter'].initial = 'elaks'
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
             form.fields['description'].initial = 'Awaiting first sequencing...'
@@ -459,21 +558,19 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
 
                     region_metadata = sublib_form.cleaned_data.get('smartchipapp_region_metadata')
                     sublib_results = sublib_form.cleaned_data.get('smartchipapp_results')
+                    doublet_info = sublib_form.cleaned_data.get('smartchipapp_doublet_info')
                     if region_metadata is not None and sublib_results is not None:
                         instance.sublibraryinformation_set.all().delete()
                         instance.chipregion_set.all().delete()
+                        context['doublet_info'] = doublet_info.to_dict()
                         create_sublibrary_models(instance, sublib_results, region_metadata)
+                        create_doublet_info_model(instance, doublet_info)
 
                     if all_valid and create:
                         if context['library_type'] != 'pbal':
                             jira_user = lib_form['jira_user'].value()
                             jira_password = lib_form['jira_password'].value()
                             additional_title = lib_form['additional_title'].value()
-
-                            jira_user_object = JiraUser.objects.get_or_create(
-                                username=jira_user,
-                                name=jira_user
-                            )
 
                         #Add these fields into Session so the JiraTicketConfirm View can access them
                         if validate_credentials(jira_user, jira_password):
@@ -548,7 +645,7 @@ class LibraryUpdate(LibraryCreate):
     Library update base class.
     """
 
-    class Meta: 
+    class Meta:
         abstract = True
 
     template_name = "core/library_update.html"
@@ -708,7 +805,7 @@ class SequencingList(LoginRequiredMixin, TemplateView):
             'sequencings': sequencing_list,
             'library_type': self.library_type,
         }
-        
+
         return context
 
 
@@ -1088,6 +1185,3 @@ class SearchView(TemplateView):
             return {"total" : 0}
 
         return return_text_search(query_str)
-
-
-
