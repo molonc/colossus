@@ -40,13 +40,16 @@ from django.core.exceptions import ValidationError
 # Pipeline Status
 #----------------------------
 def analysis_info_dict(analysis):
+    sequencing_set = analysis.library.dlpsequencing_set.all()
+    submission_date = max([sequencing.submission_date for sequencing in sequencing_set]) if sequencing_set else  analysis.analysis_submission_date
+
     return { "jira": analysis.analysis_jira_ticket,
              "date": analysis.analysis_submission_date,
             "lanes": analysis.lanes.count(),
             "version": analysis.version.version,
             "run_status": analysis.analysis_run.run_status,
             "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
-            "submission": analysis.analysis_submission_date,
+            "submission": submission_date,
             "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
 
 def validate_imported(jira):

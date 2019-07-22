@@ -183,16 +183,12 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
             print(request.POST.get('id'))
             PipelineTag.objects.get(id=data['id']).delete()
             return HttpResponse("deleted")
-            
-
-
         return None
 
     def pipeline_status_page(request):
       pipelinetags = list(PipelineTag.objects.values("id", "title"))
-      sample_list = []
       return render( request, "core/vue/status-page.html",
-                     { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "samples" : json.dumps(sample_list, cls=DjangoJSONEncoder), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
+                     { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
 #============================
 # End of Pipeline Status
 #----------------------------

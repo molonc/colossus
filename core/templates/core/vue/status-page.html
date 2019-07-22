@@ -4,11 +4,39 @@
 {% block body %}
 <div id="app">    
     <div class="page-container">
-        <md-app>
+        <md-app md-mode="fixed">
           <md-app-toolbar md-elevation="0">
             <span class="md-title">Analysis Status {% verbatim %}{{selected_tag.title}}{% endverbatim %}</span>
-            <md-button v-b-modal.modal-1>Guide <md-icon>contact_support</md-icon></md-button>
+            <md-button  @click="showDialog = true">Guide <md-icon>contact_support</md-icon></md-button>
             {% include "core/vue/status-tutorial.html" %}
+            <md-button @click="showFilter =true">Filter <md-icon>filter_list</md-icon></md-button>
+            <md-dialog :md-active.sync="showFilter">
+                <md-dialog-title>Filter Table</md-dialog-title>
+                <md-dialog-content> 
+                  <div>
+                      <md-field>
+                        <label>Sample ID, Library ID or JIRA </label>
+                        <md-input v-model="searchQuery.key"></md-input>
+                      </md-field>
+                      <md-datepicker v-model="searchQuery.submission">
+                          <label>Submitted date</label>
+                      </md-datepicker>
+                      <md-datepicker v-model="searchQuery.updated">
+                          <label>Updated date</label>
+                      </md-datepicker>
+                      
+                      <p>Only Completed:</p>
+                      <md-switch v-model="searchQuery.completed[0]">align</md-switch>
+                      <md-switch v-model="searchQuery.completed[1]">hmmcopy</md-switch>
+                      <md-switch v-model="searchQuery.completed[2]">qc</md-switch>
+                      <md-switch v-model="searchQuery.completed[3]">pseudobulk</md-switch>
+                    </div>
+                  <md-dialog-actions>
+                      <md-button class="md-primary" @click="resetFilter">Reset</md-button>
+                      <md-button class="md-primary" @click="showFilter = false">Close</md-button>
+                  </md-dialog-actions>
+                </md-dialog-content>
+            </md-dialog>
           </md-app-toolbar>
           
           <md-app-drawer md-permanent="full">
@@ -31,12 +59,15 @@
           </md-app-drawer>
     
           <md-app-content>
+              <md-card style="width: 600px;">
+                
+              </md-card>
               <div class="main-content">
                   <br />
                   <div class="sample-table">
                       <b-button-group style="margin-top : 1px; height: 40px;">
                           <b-button squared class="menu-button" style="width:110px;">Submitted</b-button>
-                          <b-button class="menu-button" style="width:130px;">Last Updated</b-button>
+                          <b-button class="menu-button" style="width:130px;">Updated</b-button>
                           <b-button class="menu-button" style="width:140px;">sample ID</b-button>
                           <b-button class="menu-button" style="width:110px;">library ID</b-button>
                           <b-button class="menu-button" style="width:100px;">Analysis</b-button>
@@ -45,10 +76,18 @@
                           <b-button class="menu-button" style="width:100px;">Lanes</b-button>
                           <b-button class="menu-button" style="width:100px;">Montage</b-button>
                           <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
-                          <b-button squared class="menu-button" style="width:110px;">Pseudobulk</b-button>
+                          <b-button squared id="pseudo" class="menu-button" style="width:110px;">Pseudobulk</b-button>
+                          <b-tooltip target="pseudo" placement="top">
+                              <b-badge variant="secondary">Not found</b-badge>
+                              <b-badge variant="primary">Archiving</b-badge>
+                              <b-badge variant="success">Complete</b-badge><br>
+                              <b-badge variant="info">Running</b-badge>
+                              <b-badge variant="dark">Idle</b-badge>
+                              <b-badge variant="danger">Error</b-badge><br>
+                            </b-tooltip>
                       </b-button-group>
                     <div class="content-table">
-                      <Row v-for="sample in samples" :sample="sample" />
+                      <Row v-for="sample in rowDisplay" :sample="sample" />
                     </div>
                   </div>
                   <br />
@@ -57,85 +96,22 @@
         </md-app>
       </div>
   </div>
-
+{% include "core/vue/status-row.html" %}
 <script>
-var Row =  {
-  props: ['sample'],
-  methods: {
-    setShow() {this.sample.show = !this.sample.show},
-    returnURL(type,pk) {
-      return window.origin + type + "/" + pk
-      },
-    returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
-    returnMontageURL(jira) {return "//https://52.235.35.201/?dashboard=" + jira}
-  },
-  template: `
-  <b-button-group @click="setShow" style="margin-top : 1px;">
-    <b-button squared v-if="sample.submission" class="row-button ln110" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.submission}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button squared v-else class="row-button ln110">N/A</b-button>
-    <b-button v-if="sample.last_updated" class="row-button ln130" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.last_updated}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln130" :style="sample.imported">N/A</b-button>
-    <b-button class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
-    <b-button v-if="sample.library" class="row-button ln110" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
-        {% verbatim %}{{sample.library}}{% endverbatim %}
-    </b-button>
-    <b-button v-else class="row-button ln110" :style="sample.imported" >
-    <b-badge variant="warning">No DLP</b-badge>
-    </b-button>
-    <b-button v-if="sample.jira" class="row-button ln100" :style="sample.imported" :href="returnJiraURL(sample.jira)">
-     {% verbatim %}{{sample.jira}}{% endverbatim %}
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported" >
-    <b-badge variant="warning">No Analysis</b-badge>
-    </b-button>
-    <b-button v-if="sample.version" class="row-button ln100" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.version}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.aligner" class="row-button ln100" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.aligner}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.lanes" class="row-button ln100" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.lanes}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.montage" class="row-button ln100" :style="sample.imported" :href="returnMontageURL(sample.jira)">Link</b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button squared class="row-button" :style="sample.imported">
-      <b-badge :variant="sample.pipeline.align">align</b-badge>
-      <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
-      <b-badge :variant="sample.pipeline.qc">QC</b-badge>
-    </b-button>
-    <b-button squared class="row-button ln110" :style="sample.imported">
-      <b-badge :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
-    </b-button>
-  </b-button-group>
-
-  `
-  }
-
-
   var vm = new Vue({
     el: '#app',
     components:{
       Row
     },
     data: {
+      showDialog: false,
+      showFilter: false,
+      searchQuery: {
+        key : "",
+        submission: null,
+        updated: null,
+        completed: [false, false, false, false]
+      },
       username: "",
       password: "",
       samples: [],
@@ -147,14 +123,37 @@ var Row =  {
     },
     created () {
       this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
-      this.samples = JSON.parse(unescape("{{samples| safe | escapejs}}"))
       this.username = "{{username| safe | escapejs}}"
       this.password = "{{password| safe | escapejs}}"
-      this.axiosVerifyMontage()
+      this.fetchSamples()
+      this.axiosColossus({type : "fetchMontage"})
+      .then((r) => {
+        this.montage_ready=true
+        this.montages = r
+        this.updateSampleMontage()
+      })
     },
     computed: {
       tagDisplay() {
         return this.tags.filter(tag => {return tag.title.toLowerCase().includes(this.searchTag.toLowerCase())})
+      },
+      rowDisplay() {
+        return this.samples.filter(sample => {
+          query = true
+          if (this.searchQuery.submission)
+            if(sample.submission) query &= (this.searchQuery.submission.toISOString().split('T')[0] === sample.submission)
+            else return false
+          if (this.searchQuery.updated)
+            if(sample.last_updated) query &= (this.searchQuery.updated.toISOString().split('T')[0] === sample.last_updated)
+            else return false
+          if(this.searchQuery.key)
+            query &= (sample.library + sample.name + ((sample.jira) ? sample.jira : "")).toLowerCase().includes(this.searchQuery.key.toLowerCase())
+          if(this.searchQuery.completed[0]) query &= (sample.pipeline.align === "success")
+          if(this.searchQuery.completed[1]) query &= (sample.pipeline.hmmcopy === "success")
+          if(this.searchQuery.completed[2]) query &= (sample.pipeline.qc === "success")
+          if(this.searchQuery.completed[3]) query &= (sample.pipeline.pseudo === "success")
+          return query
+        })
       }
     },
     methods: {  
@@ -164,11 +163,25 @@ var Row =  {
           this.axiosColossus({type : "deleteTag", id : this.selected_tag.id}).then(r => console.log(r.data))
         }
       },
-      setPipeline(i) {
-        this.samples[i].pipeline["qc"] = "primary"
+      resetFilter() {
+        this.searchQuery = {
+        key : "",
+        submission: null,
+        updated: null,
+        completed: [false, false, false, false]}
+      },
+      sortBySubmissionDate(samples) {
+        return samples.sort(function(a,b) {
+          a = a.submission
+          b = b.submission
+          if (a && !b || !b && !a) return -1
+          if (b && !a) return 1
+          a_date = a.split("-")
+          b_date = b.split("-")
+          return  new Date(b_date[0],b_date[1]-1,b_date[2]) - new Date(a_date[0],a_date[1]-1,a_date[2]) 
+        })
       },
       setRunStatus(status) {
-        // console.log("setRunStatus")
         let variant = "secondary"
         let run_status = {
           dark: 'idle',
@@ -194,16 +207,15 @@ var Row =  {
         }
         this.axiosColossus(data)
         .then((r) => {
-          this.samples = r.samples
+          this.samples = this.sortBySubmissionDate(r.samples)
           for (let i = 0; i < this.samples.length; i ++) {
             Vue.set(this.samples[i], "pipeline", {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"})
-            Vue.set(this.samples[i], "montage", false)
-            if(this.montage_ready) if(this.montages.includes(this.samples[i].jira)) this.samples[i].montage = true
             if(this.samples[i].jira) {
               this.axiosVerifyTantalus(this.samples[i])
               this.axiosVerifyColossus(this.samples[i])
               }
           }          
+          if(this.montage_ready) this.updateSampleMontage()
         })
       },
       axiosVerifyColossus(sample){
@@ -248,112 +260,24 @@ var Row =  {
                 }}).then( (response) => resolve(response.data)).catch( (e) => reject(e))
         })
       },
+      updateSampleMontage() {
+        this.samples.forEach( sample => {
+          if(this.montages.includes(sample.jira)) var montage = true
+          else var montage = false
+          Vue.set(sample,  "montage", montage)
+        })
+      },
       axiosVerifyMontage() {
         this.axiosColossus({type : "fetchMontage"})
         .then((r) => {
           this.montage_ready=true
           this.montages = r
+          this.updateSampleMontage()
         })
 
       }
     },
   })
 </script>
-
-<style>
-  #app {
-    height: 100vh;
-  }
-
-  .page-container {
-    height: 100%;
-  }
-  .md-app {
-    height: 100%;
-    border: 1px solid rgba(#000, .12);
-  }
-
-   
-  .md-drawer {
-    width: 230px;
-    max-width: calc(100vw - 125px);
-    height: 100%;
-  }
-
-  .pipeline-tag {
-    height: 100vh;
-    text-align: center;
-  }
-  .project-button {
-    border: none;
-    background-color: #a9a9b0;
-    width: 160px;
-    height: 33px;
-    margin: 1px;
-  }
-
-  .ln110 {
-    width: 110px;
-  }
-
-  .ln100 {
-    width: 100px;
-  }
-
-  .ln130 {
-    width: 130px;
-  }
-  .sample-name {
-  font-size: 10px;
-  text-align: left;
-  font-weight: 800;
-  width:140px;
-  }
-
-  .tag-list {
-    height: calc(100vh - 160px);
-    overflow-y: scroll;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE 10+ */
-}
-  .tag-list::-webkit-scrollbar { /* WebKit */
-      width: 0;
-      height: 0;
-  }
-
-.row-button {
-  background-color:whitesmoke;
-  color: black;
-}
-
-.menu-button {
-  background-color:rgb(190, 182, 182);
-  color: black;
-}
-.content-table {
-  max-height: calc(100vh - 200px);
-  overflow-y: scroll;
-  scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE 10+ */
-}
-.content-table::-webkit-scrollbar { /* WebKit */
-    width: 0;
-    height: 0;
-}
-
-.sample-table {
-  text-align: center;
-  border-radius: 5px;
-  padding: 2px;
-  min-width: 1280px;
-}
-
-.main-content {
-  overflow-x: auto;
-  width: 95%;
-}
-
-
-</style>
-
+{% include "core/vue/status-page-style.html" %}
 {% endblock %}
