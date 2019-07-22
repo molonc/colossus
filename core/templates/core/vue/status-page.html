@@ -77,14 +77,6 @@
                           <b-button class="menu-button" style="width:100px;">Montage</b-button>
                           <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
                           <b-button squared id="pseudo" class="menu-button" style="width:110px;">Pseudobulk</b-button>
-                          <b-tooltip target="pseudo" placement="top">
-                              <b-badge variant="secondary">Not found</b-badge>
-                              <b-badge variant="primary">Archiving</b-badge>
-                              <b-badge variant="success">Complete</b-badge><br>
-                              <b-badge variant="info">Running</b-badge>
-                              <b-badge variant="dark">Idle</b-badge>
-                              <b-badge variant="danger">Error</b-badge><br>
-                            </b-tooltip>
                       </b-button-group>
                     <div class="content-table">
                       <Row v-for="sample in rowDisplay" :sample="sample" />
@@ -279,5 +271,105 @@
     },
   })
 </script>
+<<<<<<< HEAD
 {% include "core/vue/status-page-style.html" %}
+=======
+
+<style>
+  #app {
+    height: 100vh;
+  }
+
+  .page-container {
+    height: 100%;
+  }
+  .md-app {
+    height: 100%;
+    border: 1px solid rgba(#000, .12);
+  }
+
+   
+  .md-drawer {
+    width: 230px;
+    max-width: calc(100vw - 125px);
+    height: 100%;
+  }
+
+  .pipeline-tag {
+    height: 100vh;
+    text-align: center;
+  }
+  .project-button {
+    border: none;
+    background-color: #a9a9b0;
+    width: 160px;
+    height: 33px;
+    margin: 1px;
+  }
+
+  .ln110 {
+    width: 110px;
+  }
+
+  .ln100 {
+    width: 100px;
+  }
+
+  .ln130 {
+    width: 130px;
+  }
+  .sample-name {
+  font-size: 10px;
+  text-align: left;
+  font-weight: 800;
+  width:140px;
+  }
+
+  .tag-list {
+    height: calc(100vh - 160px);
+    overflow-y: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+  .tag-list::-webkit-scrollbar { /* WebKit */
+      width: 0;
+      height: 0;
+  }
+
+.row-button {
+  background-color:whitesmoke;
+  color: black;
+}
+
+.menu-button {
+  background-color:rgb(190, 182, 182);
+  color: black;
+}
+.content-table {
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+.content-table::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+}
+
+.sample-table {
+  text-align: center;
+  border-radius: 5px;
+  padding: 2px;
+  min-width: 1280px;
+}
+
+.main-content {
+  overflow-x: auto;
+  width: 95%;
+}
+
+
+</style>
+
+>>>>>>> origin/master
 {% endblock %}
