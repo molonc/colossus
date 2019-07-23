@@ -3,32 +3,34 @@
 from django.db import models
 from django.db.models import Q
 from django_filters import rest_framework as filters
+from django_filters import FilterSet
 from django_filters import Filter, DateFromToRangeFilter
 from django_filters.fields import Lookup
 from core.models import (
-    Analysis,
     SublibraryInformation
 )
 
 from sisyphus.models import DlpAnalysisInformation
 import re
 
-class AnalysisFilter(filters.FilterSet):
+from tenx.models import TenxAnalysis
+
+
+class TenxAnalysisFilter(filters.FilterSet):
     """Filters for Analysis."""
 
     def __init__(self, *args, **kwargs):
-        super(AnalysisFilter, self).__init__(*args, **kwargs)
-        self.filters["dlp_library__pool_id"].label = "DLP Library Chip ID"
+        super(TenxAnalysisFilter, self).__init__(*args, **kwargs)
         self.filters["tenx_library__name"].label = "TenX Library Chip ID"
 
     class Meta():
-        model = Analysis
+        model = TenxAnalysis
         fields = {
+            "id": ["exact"],
             "input_type": ["exact"],
             "version": ["exact"],
-            "jira_ticket": ["in"],
+            "jira_ticket": ["exact"],
             "run_status": ["exact"],
-            "dlp_library__pool_id": ["exact"],
             "tenx_library__name": ["exact"],
         }
 
@@ -59,21 +61,20 @@ class AnalysisInformationFilter(filters.FilterSet):
 
         return queryset
 
-    analysis_jira_ticket = ListFilter(name='analysis_jira_ticket')
+    jira_tickets = ListFilter(name='analysis_jira_ticket')
 
     class Meta:
         model = DlpAnalysisInformation
         fields = [
-        'priority_level',
-        'analysis_jira_ticket',
-        'version',
-        'analysis_submission_date',
-        'reference_genome',
-        'analysis_run',
         'id',
+        'aligner',
+        'version',
+        'analysis_jira_ticket',
+        'analysis_submission_date',
         'analysis_run__run_status',
         'analysis_run__last_updated',
-        'library__pool_id'
+        'library__pool_id',
+        'reference_genome'
         ]
 
 class CellIdFilter(filters.Filter):

@@ -67,6 +67,10 @@ class Project(models.Model, FieldValue):
         ordering = ['name']
 
 
+class PipelineTag(models.Model):
+    history = HistoricalRecords(table_name='pipeline_tag_history')
+    title = models.CharField(max_length=150, unique=True)
+
 #============================
 # Sample models
 #----------------------------
@@ -125,6 +129,8 @@ class Sample(models.Model, FieldValue):
         blank=True,
     )
     notes = create_textfield("Notes")
+
+    pipeline_tag = models.ForeignKey(PipelineTag, on_delete=models.SET_NULL, blank=True, null=True)
 
     def has_additional_sample_information(self):
         return hasattr(self, 'additionalsampleinformation')
@@ -217,49 +223,6 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     def __str__(self):
         res = '_'.join([self.sample.sample_id, 'additional_information'])
         return res
-
-
-class Analysis(models.Model, FieldValue):
-    class Meta:
-        ordering = ['id']
-
-    input_type = create_chrfield("Input Type", choices=INPUT_TYPE, null=False)
-
-    version = create_chrfield("Analysis Version", blank=False)
-
-    jira_ticket =  create_chrfield("Analysis Jira Ticket", blank=False)
-
-    run_status = create_chrfield(
-        "Run Status",
-        blank=False,
-        null=False,
-        default=IDLE,
-        choices=RUN_STATUS_CHOICES
-    )
-
-    last_updated_date = models.DateTimeField("Last Updated Date", auto_now=True)
-
-    submission_date = models.DateField(
-        "Analysis Submission Date",
-        default=datetime.date.today, # this needs to be a date (not datetime)
-    )
-
-    description = create_textfield("Description")
-
-    #Avoid using GenericForeignKey
-    #All are set to None but one
-    dlp_library = models.ForeignKey('dlp.DlpLibrary', null=True)
-    pbal_library = models.ForeignKey('pbal.PbalLibrary', null=True)
-    tenx_library = models.ForeignKey('tenx.TenxLibrary', null=True)
-
-    tenx_lanes =  models.ManyToManyField('tenx.TenxLane', blank=True)
-
-    def __str__(self):
-        res = str(self.id).zfill(3) + "_ANALYSIS_" + self.input_type
-        return res
-
-    def get_absolute_url(self):
-        return reverse("core:analysis_detail" , kwargs={"pk": self.pk})
 
 
 class ChipRegion(models.Model, FieldValue):
@@ -356,6 +319,69 @@ class SublibraryInformation(models.Model, FieldValue):
         return self.get_sublibrary_id()
 
 
+class DoubletInformation(models.Model):
+
+    history = HistoricalRecords(table_name='doublet_information_history')
+
+    fields_to_exclude = ['Library']
+    values_to_exclude = ['library']
+
+    library = models.OneToOneField(
+        'dlp.DlpLibrary',
+        verbose_name="Library",
+        on_delete=models.CASCADE,
+    )
+
+    live_single = create_intfield(
+        "Number of live single cells",
+        default=0,
+    )
+
+    dead_single = create_intfield(
+        "Number of dead single cells",
+        default=0,
+    )
+
+    other_single = create_intfield(
+        "Number of other single cells",
+        default=0,
+    )
+
+    live_doublet = create_intfield(
+        "Number of live doublet cells",
+        default=0,
+    )
+
+    dead_doublet = create_intfield(
+        "Number of dead doublet cells",
+        default=0,
+    )
+    
+    other_doublet = create_intfield(
+        "Number of mixed doublet cells",
+        default=0,
+    )
+
+    live_gt_doublet = create_intfield(
+        "More than two live cells",
+        default=0,
+    )
+
+    dead_gt_doublet = create_intfield(
+        "More than two dead cells",
+        default=0,
+    )
+    
+    other_gt_doublet = create_intfield(
+        "More than two other cells",
+        default=0,
+    )
+
+    def __str__(self):
+        return self.library
+
+
+
 class MetadataField(models.Model):
 
     """
@@ -425,3 +451,4 @@ class JiraUser(models.Model):
 
     def __str__(self):
         return self.name
+

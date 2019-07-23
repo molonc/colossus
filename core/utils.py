@@ -5,18 +5,29 @@ Created on June 6, 2016
 
 Updated Nov 21, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 """
-
+import csv
 import os, sys, io
+import re
+
 import pandas as pd
+import numpy as np
+import requests
 import yaml
 from string import Template
 from collections import OrderedDict
-from datetime import date
+from datetime import date, datetime, timedelta
 
 #===============
 # Django imports
 #---------------
-from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField
+from django.db.models import Count, Q, F
+from django.http import HttpResponse
+
+from sisyphus.models import DlpAnalysisInformation
+from tenx.models import TenxPool
+from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, DoubletInformation, \
+    PipelineTag
+
 from dlp.models import (
     DlpLane,
     DlpSequencing
@@ -25,6 +36,72 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 
+#============================
+# Pipeline Status
+#----------------------------
+def get_sequence_date_from_library(library):
+    sequencing_set = library.dlpsequencing_set.all()
+    return max([sequencing.submission_date for sequencing in sequencing_set]) if sequencing_set else  None
+
+def analysis_info_dict(analysis):
+    submission_date = get_sequence_date_from_library(analysis.library)
+
+    return { "jira": analysis.analysis_jira_ticket,
+            "lanes": analysis.lanes.count(),
+            "version": analysis.version.version,
+            "run_status": analysis.analysis_run.run_status,
+            "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
+            "submission": submission_date if submission_date else analysis.analysis_run.analysis_submission_date,
+            "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
+
+def validate_imported(jira):
+    analysis = DlpAnalysisInformation.objects.get(analysis_jira_ticket=jira)
+    val = all([ a.imported() for a in analysis.library.dlpsequencing_set.all()])
+    return val
+
+def get_wetlab_analyses():
+    sample_list = []
+    analyses = DlpAnalysisInformation.objects.filter(analysis_run__last_updated__gte=datetime.now() - timedelta(days=14))
+    sequencings = DlpSequencing.objects.annotate(lane_count=Count('dlplane')).filter(Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))
+    for s in sequencings.all():
+        if not s.library.history.earliest().history_date.date() < date(2019, 1, 1):
+            analysis_iter =  s.library.dlpanalysisinformation_set.all()
+            if analysis_iter:
+                for analysis in analysis_iter:
+                    sample_list.append({**analysis_info_dict(analysis),
+                        **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+            else: sample_list.append({**{"submission" : get_sequence_date_from_library(s.library), 
+                "id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+    for a in analyses.all():
+        if not a.library.history.earliest().history_date.date() < date(2019, 1, 1):
+            sample_list.append({**analysis_info_dict(a),
+                                    **{"id": a.library.sample.pk, "name": a.library.sample.sample_id,
+                                       "library": a.library.pool_id}})
+    return sample_list
+
+def fetch_montage():
+    r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
+    return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
+
+def get_sample_info(id):
+    sample_list = []
+    samples = PipelineTag.objects.get(id=id).sample_set.all()
+    for s in samples:
+        sample_dict = {"id": s.pk, "name": s.sample_id}
+        sample_imported = True
+        libraries = s.dlplibrary_set.all()
+        if libraries:
+            for d in libraries:
+                analysis_set = d.dlpanalysisinformation_set.all()
+                if analysis_set:
+                    for analysis in analysis_set:
+                        sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
+                else:
+                    sample_list.append({**sample_dict, **{"library" : d.pool_id, "submission" : get_sequence_date_from_library(d)}})
+        else: sample_list.append(sample_dict)
+    return sample_list
+
+
 #==================================================
 # Upload, parse and populate Sublibrary Information
 #--------------------------------------------------
@@ -32,13 +109,79 @@ def read_excel_sheets(filename, sheetnames):
     """ Read the excel sheet.
     """
     try:
-        data = pd.read_excel(filename, sheetname=None)
+        data = pd.read_excel(filename, sheet_name=None)
     except IOError:
         raise ValueError('unable to find file', filename)
     for sheetname in sheetnames:
         if sheetname not in data:
             raise ValueError('unable to read sheet(s)', sheetname)
         yield data[sheetname]
+
+
+def check_smartchip_row(index, smartchip_row):
+    row_sum = sum(smartchip_row)
+
+    single_matrix = np.identity(3)
+    doublet_matrix = np.identity(3)*2
+
+    # Row does not have cells
+    if smartchip_row == [0,0,0]:
+        cell = None
+
+    # TODO: Clean up code; use identity matrices
+    # Row is singlet
+    elif row_sum == 1:
+        for row in range(len(smartchip_row)):
+            if np.array_equal(smartchip_row, single_matrix[row]):
+                cell = [row,0]
+
+    # Row is doublet and is strictly live/dead/other
+    elif row_sum == 2 and len(np.where(np.array(smartchip_row) == 0)[0]) == 2:
+        for row in range(len(smartchip_row)):
+            if np.array_equal(smartchip_row, doublet_matrix[row]):
+                cell = [row,1]
+
+    # Row is doublet but mixed
+    elif row_sum == 2 and len(np.where(np.array(smartchip_row) == 0)[0]) != 2:
+        cell = [2,1]
+
+    # Greater than doublet row and row is multiple of unit vector
+    elif row_sum > 2 and row_sum in smartchip_row:
+        non_zero_index = np.where(smartchip_row != 0)
+        cell = [non_zero_index[0][0],2]
+
+    else:
+        cell = [2,2]
+
+    return cell
+
+
+def generate_doublet_info(filename):
+    """ Read SmartChipApp results and record doublet info
+    """
+
+    col_names = ["live", "dead", "other"]
+    row_names = ["single", "doublet", "more_than_doublet"]
+
+    data = np.zeros((3,3))
+    doublet_table = pd.DataFrame(data, columns=col_names, index=row_names, dtype=int)
+
+    results = pd.read_excel(filename, sheet_name="Summary")
+    results = results[results["Condition"] != "~"]
+
+    for index, row in results.iterrows():
+        smartchip_row = [row["Num_Live"], row["Num_Dead"], row["Num_Other"]]
+        override_row = [row["Rev_Live"], row["Rev_Dead"], row["Rev_Other"]]
+        if np.array_equal(override_row, [-1, -1, -1]):
+            cell = check_smartchip_row(index, smartchip_row)
+
+        else:
+            cell = check_smartchip_row(index, override_row)
+
+        if cell is not None:
+            doublet_table[col_names[cell[0]]][row_names[cell[1]]] += 1
+
+    return doublet_table
 
 def parse_smartchipapp_results_file(filename):
     """ Parse the result file of SmartChipApp.
@@ -110,6 +253,24 @@ def create_sublibrary_models(library, sublib_results, region_metadata):
     library.num_sublibraries = len(sublib_results.index)
     library.save()
 
+
+def create_doublet_info_model(library, doublet_info):
+
+    doublet_info = DoubletInformation(
+        live_single=doublet_info["live"]["single"],
+        dead_single=doublet_info["dead"]["single"],
+        other_single=doublet_info["other"]["single"],
+        live_doublet=doublet_info["live"]["doublet"],
+        dead_doublet=doublet_info["dead"]["doublet"],
+        other_doublet=doublet_info["other"]["doublet"],
+        live_gt_doublet=doublet_info["live"]["more_than_doublet"],
+        dead_gt_doublet=doublet_info["dead"]["more_than_doublet"],
+        other_gt_doublet=doublet_info["other"]["more_than_doublet"],
+    )
+    doublet_info.library_id = library.pk
+    doublet_info.save()
+
+
 #=================
 # History manager
 #-----------------
@@ -138,6 +299,28 @@ class HistoryManager(object):
                 str(h.history_user),
                 ]))
             print( '-' * 100)
+
+
+def generate_tenx_pool_sample_csv(id):
+    buffer = io.StringIO()
+    pool = TenxPool.objects.get(id=id)
+    list_of_dict = []
+    for library in pool.libraries.all():
+        index = library.tenxlibraryconstructioninformation.index_used
+        list_of_dict.append({
+            "lane" : "*" ,
+            "sample" : library.name,
+            "index" : index.split(",")[0] if index else "None"})
+
+    wr = csv.DictWriter(buffer, fieldnames=["lane","sample","index"])
+    wr.writeheader()
+    wr.writerows(list_of_dict)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={}_tenxpool_sample.csv'.format(pool.id)
+    return response
+
 
 #======================
 # Generate sample sheet

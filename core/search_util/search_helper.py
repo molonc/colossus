@@ -13,8 +13,7 @@ def return_text_search(query):
     context = {
         "core": {
             "Samples": [],
-            "Projects": [],
-            "Analyses": []
+            "Projects": []
         },
         "dlp": {
             "Libraries": [],
@@ -29,6 +28,7 @@ def return_text_search(query):
             "Chip": [],
             "Libraries": [],
             "Sequencings": [],
+            "Analyses": []
         },
         "query" : query,
         "total" : 0
@@ -36,11 +36,10 @@ def return_text_search(query):
 
     context["core"]["Samples"].extend(list(Sample.objects.annotate(search=SearchVector(*SAMPLE)).filter(Q(search=query) | Q(search__icontains=query))))
     context["core"]["Projects"].extend(list(Project.objects.annotate(search=SearchVector(*PROJECT)).filter(Q(search=query) | Q(search__icontains=query))))
-    context["core"]["Analyses"].extend(list(Analysis.objects.annotate(search=SearchVector(*ANALYSIS)).filter(Q(search=query) | Q(search__icontains=query))))
 
     context["dlp"]["Libraries"].extend(list(DlpLibrary.objects.annotate(search=SearchVector(*(CORE_LIBRARY + DLP_LIBRARY))).filter(Q(search=query) | Q(search__icontains=query))))
     context["dlp"]["Sequencings"].extend(list(DlpSequencing.objects.annotate(search=SearchVector(*(CORE_SEQUENCING + DLP_SEQUENCING))).filter(Q(search=query) | Q(search__icontains=query))))
-    context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.annotate(search=SearchVector(*CORE_ANALYSES)).filter(Q(search=query) | Q(search__icontains=query))))
+    context["dlp"]["Analyses"].extend(list(DlpAnalysisInformation.objects.annotate(search=SearchVector(*DLP_ANALYSES)).filter(Q(search=query) | Q(search__icontains=query))))
 
     context["pbal"]["Libraries"].extend(list(PbalLibrary.objects.annotate(search=SearchVector(*(CORE_LIBRARY + PBAL_LIBRARY))).filter(Q(search=query) | Q(search__icontains=query))))
     context["pbal"]["Sequencings"].extend(list(PbalSequencing.objects.annotate(search=SearchVector(*(CORE_SEQUENCING + PBAL_SEQUENCING))).filter(Q(search=query) | Q(search__icontains=query))))
@@ -48,13 +47,14 @@ def return_text_search(query):
     context["tenx"]["Chip"].extend(list(TenxChip.objects.annotate(search=SearchVector(*TENX_CHIP)).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Libraries"].extend(list(TenxLibrary.objects.annotate(search=SearchVector(*(CORE_LIBRARY + TENX_LIBRARY))).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Sequencings"].extend(list(TenxSequencing.objects.annotate(search=SearchVector(*TENX_SEQUENCING)).filter(Q(search=query) | Q(search__icontains=query))))
+    context["tenx"]["Analyses"].extend(list(TenxAnalysis.objects.annotate(search=SearchVector(*TENX_ANALYSIS)).filter(Q(search=query) | Q(search__icontains=query))))
 
     dict_sample_type_choices = dict((y, x) for x, y in Sample.sample_type_choices)
     dict_run_status = dict((y, x) for x, y in RUN_STATUS_CHOICES)
     if partial_key_match(query, dict_sample_type_choices):
         context["core"]["Samples"].extend(list(Sample.objects.filter(sample_type=partial_key_match(query, dict_sample_type_choices))))
     if partial_key_match(query, dict_run_status):
-        context["core"]["Analyses"].extend(list(Analysis.objects.filter(run_status=partial_key_match(query, dict_run_status))))
+        context["tenx"]["Analyses"].extend(list(TenxAnalysis.objects.filter(run_status=partial_key_match(query, dict_run_status))))
     dict_pathology_occurrence_choices = dict((y, x) for x, y in pathology_occurrence_choices)
     dict_sex_choices = dict((y, x) for x, y in sex_choices)
     dict_tissue_type_choices = dict((y, x) for x, y in tissue_type_choices)
@@ -148,7 +148,7 @@ def return_text_search(query):
 
     context["total"] = len(context["core"]["Samples"] + context["dlp"]["Libraries"] + context["dlp"]["Sequencings"]+ context["dlp"]["Analyses"] +
                            context["pbal"]["Libraries"] +  context["pbal"]["Sequencings"] +  context["tenx"]["Chip"] + context["core"]["Projects"] +
-                           context["tenx"]["Libraries"] + context["tenx"]["Sequencings"] + context["core"]["Analyses"] )
+                           context["tenx"]["Libraries"] + context["tenx"]["Sequencings"] + context["tenx"]["Analyses"] )
 
     return context
 
@@ -174,5 +174,5 @@ def remove_duplicate(context):
     context["core"]["Projects"] = list(set(context["core"]["Projects"]))
     context["tenx"]["Libraries"] = list(set(context["tenx"]["Libraries"]))
     context["tenx"]["Sequencings"] = list(set(context["tenx"]["Sequencings"]))
-    context["core"]["Analyses"] = list(set(context["core"]["Analyses"]))
+    context["tenx"]["Analyses"] = list(set(context["tenx"]["Analyses"]))
     return context

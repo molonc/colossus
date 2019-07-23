@@ -230,6 +230,7 @@ def dlp_get_filtered_sublib_count(sublibs):
     filtered_count = unfiltered_count - blankwells_count
     return filtered_count
 
+
 def dlp_get_cell_graph(request):
 
     data = []
@@ -255,7 +256,7 @@ def dlp_get_cell_graph(request):
 
 
     rscript_path = os.path.join(settings.BASE_DIR, "scripts", "every_cell_count_plot.R")
-    cmd = "Rscript {rscript} {input_csv} {media_dir}/output.pdf".format(rscript=rscript_path, input_csv=output_csv_path, media_dir=settings.MEDIA_ROOT)
+    cmd = "Rscript {rscript} {input_csv} {media_dir}output.pdf".format(rscript=rscript_path, input_csv=output_csv_path, media_dir=settings.MEDIA_ROOT)
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     r_stdout, r_stderr = p.communicate()
     if p.returncode != 0:
@@ -263,8 +264,8 @@ def dlp_get_cell_graph(request):
 
     output_plots_path = os.path.join(settings.MEDIA_ROOT, "output.pdf")
 
-    with open(output_plots_path, 'r') as plots_pdf:
-
+    with open(output_plots_path, 'rb') as f:
+        plots_pdf = f.read()
         response = HttpResponse(plots_pdf, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename=%s' % ("cell-count_" + today + ".pdf")
     os.remove(output_csv_path)

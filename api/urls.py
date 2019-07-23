@@ -24,7 +24,7 @@ router = routers.DefaultRouter()
 router.register(r'project', views.ProjectViewSet, base_name='project')
 router.register(r'sample', views.SampleViewSet)
 router.register(r'lane', views.LaneViewSet)
-router.register(r'analysis', views.AnalysisViewSet, base_name='analysis')
+
 router.register(r'sequencing', views.SequencingViewSet)
 router.register(r'library', views.LibraryViewSet, base_name='library')
 router.register(r'sublibraries', views.SublibraryViewSet, base_name='sublibraries')
@@ -39,6 +39,7 @@ router.register(r'tenxchip', views.TenxChipViewSet, base_name='tenxchip')
 router.register(r'tenxlibrary', views.TenxLibraryViewSet, base_name='tenxlibrary')
 router.register(r'tenxsequencing', views.TenxSequencingViewSet, base_name='tenxsequencing')
 router.register(r'tenxlane', views.TenxLaneViewSet, base_name='tenxlane')
+router.register(r'tenxanalysis', views.TenxAnalysisViewSet, base_name='tenxanalysis')
 
 
 
@@ -48,6 +49,8 @@ urlpatterns = [
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^samplesheet/(?P<pk>\d+)$', views.dlp_sequencing_get_samplesheet, name='dlp_sequencing_get_queried_samplesheet'),
     url(r'^samplesheet_query/(?P<flowcell>.+)$', views.dlp_sequencing_get_queried_samplesheet, name='dlp_sequencing_get_queried_samplesheet'),
+    url(r'^tenxpool_sheet/(?P<pk>\d+)$', views.tenx_pool_sample_sheet, name='tenx_pool_sample_sheet'),
+    url(r'^tenxpool_sheet/(?P<pool_name>(TENXPOOL\d{4}))$', views.pool_name_to_id_redirect),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

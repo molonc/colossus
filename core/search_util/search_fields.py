@@ -21,7 +21,6 @@ SAMPLE = ["sample_id", "taxonomy_id", "anonymous_patient_id", "cell_line_id",
                  "additionalsampleinformation__stage", "additionalsampleinformation__tumour_content",
                  "additionalsampleinformation__family_information"]
 
-ANALYSIS = ["input_type", "version", "jira_ticket", "run_status", "description"]
 
 CORE_LIBRARY = ["description", "result"]
 DLP_LIBRARY = ["pool_id", "jira_ticket", "title","sample__sample_id",
@@ -85,6 +84,5 @@ DLP_SEQUENCING = ["rev_comp_override", "dlplane__flow_cell_id", "dlplane__path_t
 PBAL_SEQUENCING = ["pballane__flow_cell_id", "pballane__path_to_archive"]
 TENX_SEQUENCING = ["sequencing_instrument", "sequencer_id", "sequencing_center", "sequencer_notes"]
 
-CORE_ANALYSES = [ "priority_level", "smoothing", "verified", "reference_genome__reference_genome", "version__version", "analysis_jira_ticket"]
-
-TENX_ANALYSES = ["genome"]
+DLP_ANALYSES = [ "priority_level", "smoothing", "verified", "reference_genome__reference_genome", "version__version", "analysis_jira_ticket"]
+TENX_ANALYSIS = ["version", "jira_ticket", "run_status", "description"]

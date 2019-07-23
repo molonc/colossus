@@ -17,11 +17,12 @@ from rest_framework import pagination, viewsets, generics, mixins
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404, redirect
 
 #============================
 # App imports
 #----------------------------
-from core.utils import generate_samplesheet
+from core.utils import generate_samplesheet, generate_tenx_pool_sample_csv
 from .serializers import (
     SampleSerializer,
     LibrarySerializer,
@@ -40,15 +41,17 @@ from .serializers import (
     TenxChipSerializer,
     ProjectSerializer,
     TenxPoolSerializer,
-    AnalysisSerializer)
+    TenxAnalysisSerializer
+)
 
 from core.models import (
     Sample,
     SublibraryInformation,
     ChipRegion,
     JiraUser,
-    Project,
-    Analysis)
+    Project
+)
+
 from dlp.models import (
     DlpLibrary,
     DlpSequencing,
@@ -58,10 +61,8 @@ from dlp.models import (
 
 from tenx.models import *
 from api.filters import (
-    AnalysisFilter,
-    AnalysisInformationFilter,
-    SublibraryInformationFilter
-)
+    SublibraryInformationFilter,
+    AnalysisInformationFilter, TenxAnalysisFilter)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
@@ -157,13 +158,6 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'id',
         'sample_id',
     )
-
-class AnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
-    queryset = Analysis.objects.all()
-    serializer_class = AnalysisSerializer
-    pagination_class = VariableResultsSetPagination
-    filter_class = AnalysisFilter
 
 
 class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
@@ -263,8 +257,8 @@ class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     queryset = DlpAnalysisInformation.objects.all()
     permission_classes = (IsAuthenticated, )
-    filter_class = AnalysisInformationFilter
     pagination_class = VariableResultsSetPagination
+    filter_class=AnalysisInformationFilter
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -329,6 +323,13 @@ class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
         'sample__sample_id'
 
     )
+
+class TenxAnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = TenxAnalysis.objects.all()
+    serializer_class = TenxAnalysisSerializer
+    pagination_class = VariableResultsSetPagination
+    filter_class = TenxAnalysisFilter
 
 class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxSequencing.objects.all()
@@ -405,3 +406,12 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
     except DlpSequencing.MultipleObjectsReturned:
         msg = "Multiple flowcells with ID {} found.".format(flowcell)
         return HttpResponse(msg)
+
+def tenx_pool_sample_sheet(request, pk):
+    return generate_tenx_pool_sample_csv(pk)
+
+def pool_name_to_id_redirect(request, pool_name):
+    pk = get_object_or_404(TenxPool, pool_name=pool_name).pk
+    return redirect('api:tenx_pool_sample_sheet', pk=pk)
+
+
