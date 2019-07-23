@@ -525,16 +525,6 @@ class KuduSampleSerializer(serializers.ModelSerializer):
             'anonymous_patient_id',
         )
 
-class KuduAnalysisSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Analysis
-        fields = (
-            'id',
-            'input_type',
-            'jira_ticket',
-            'version',
-            'run_status'
-        )
 
 class KuduProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -658,3 +648,13 @@ class KuduTenxSequencingSerializer(serializers.ModelSerializer):
             'lane_requested_date',
         )
 
+class KuduTenxAnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxAnalysis
+        fields = (
+            'id',
+            'input_type',
+            'jira_ticket',
+            'version',
+            'run_status'
+        )

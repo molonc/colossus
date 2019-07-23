@@ -45,7 +45,6 @@ router.register(r'tenxanalysis', views.TenxAnalysisViewSet, base_name='tenxanaly
 #Kudu core
 router.register(r'kuduproject_list', views.KuduProjectList, base_name="kudu_project_list")
 router.register(r'kudusample_list', views.KuduSampleList, base_name="kudu_sample_list")
-router.register(r'kuduanalysis_list', views.KuduAnalysisList, base_name="kudu_analysis_list")
 
 #Kudu dlp
 router.register(r'kududlplibrary_list', views.KuduDLPLibraryList, base_name='kudu_dlp_library_list')
@@ -58,6 +57,7 @@ router.register(r'kudutenxlibrary_list', views.KuduTenxLibraryList, base_name='k
 router.register(r'kudutenxchip_list', views.KuduTenxChipList, base_name='kudu_tenx_chip_list')
 router.register(r'kudutenxpool_list', views.KuduTenxPoolList, base_name='kudu_tenx_pool_list')
 router.register(r'kudutenxsequencing_list', views.KuduTenxSequencingList, base_name='kudu_tenx_sequencing_list')
+router.register(r'kudutenxanalysis_list', views.KuduTenxAnalysisList, base_name="kudu_tenx_analysis_list")
 
 app_name='api'
 urlpatterns = [

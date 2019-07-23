@@ -43,7 +43,7 @@ from .serializers import (
     TenxPoolSerializer,
     TenxAnalysisSerializer,
     KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
-    KuduSampleSerializer, KuduAnalysisSerializer, KuduDLPAnalysisSerializer, KuduDLPSequencingSerializer,
+    KuduSampleSerializer, KuduTenxAnalysisSerializer, KuduDLPAnalysisSerializer, KuduDLPSequencingSerializer,
     KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer)
 
 
@@ -432,10 +432,6 @@ class KuduSampleList(KuduList):
     queryset = Sample.objects.all()
     serializer_class = KuduSampleSerializer
 
-class KuduAnalysisList(KuduList):
-    queryset = TenxAnalysis.objects.all()
-    serializer_class = KuduAnalysisSerializer
-
 #DLP
 class KuduDLPLibraryList(KuduList):
     queryset = DlpLibrary.objects.all()
@@ -465,6 +461,11 @@ class KuduTenxPoolList(KuduList):
 class KuduTenxSequencingList(KuduList):
     queryset = TenxSequencing.objects.all()
     serializer_class = KuduTenxSequencingSerializer
+
+class KuduTenxAnalysisList(KuduList):
+    queryset = TenxAnalysis.objects.all()
+    serializer_class = KuduTenxAnalysisSerializer
+
 
 
 
