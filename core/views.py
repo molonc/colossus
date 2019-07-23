@@ -58,7 +58,6 @@ from .models import (
     MetadataField,
     JiraUser,
     Project,
-    PipelineTag
 )
 
 from sisyphus.models import *
@@ -157,14 +156,14 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
     def get(self, request):
         return self.get_context_and_render(request)
 
-    def post(self, request):
-        data = json.loads(request.body.decode('utf-8'))
-        if PipelineTag.objects.filter(title= data["title"]).exists():
-            return HttpResponse("fail")
-        pipelinetag = PipelineTag.objects.create(title = data["title"])
-        pipelinetag.save()
-        pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
-        return HttpResponse("success")
+    # def post(self, request):
+    #     data = json.loads(request.body.decode('utf-8'))
+    #     if PipelineTag.objects.filter(title= data["title"]).exists():
+    #         return HttpResponse("fail")
+    #     pipelinetag = PipelineTag.objects.create(title = data["title"])
+    #     pipelinetag.save()
+    #     pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
+    #     return HttpResponse("success")
 
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
@@ -179,14 +178,14 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
             return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
             return HttpResponse(json.dumps(validate_imported(data["id"])))
-        elif data["type"] =="deleteTag":
-            print(request.POST.get('id'))
-            PipelineTag.objects.get(id=data['id']).delete()
-            return HttpResponse("deleted")
+        # elif data["type"] =="deleteTag":
+        #     print(request.POST.get('id'))
+        #     PipelineTag.objects.get(id=data['id']).delete()
+        #     return HttpResponse("deleted")
         return None
 
     def pipeline_status_page(request):
-      pipelinetags = list(PipelineTag.objects.values("id", "title"))
+      pipelinetags = list(Project.objects.values("id", "name"))
       return render( request, "core/vue/status-page.html",
                      { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
 #============================

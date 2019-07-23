@@ -6,7 +6,7 @@
     <div class="page-container">
         <md-app md-mode="fixed">
           <md-app-toolbar md-elevation="0">
-            <span class="md-title">Analysis Status {% verbatim %}{{selected_tag.title}}{% endverbatim %}</span>
+            <span class="md-title">Analysis Status {% verbatim %}{{selected_tag.name}}{% endverbatim %}</span>
             <md-button  @click="showDialog = true">Guide <md-icon>contact_support</md-icon></md-button>
             {% include "core/vue/status-tutorial.html" %}
             <md-button @click="showFilter =true">Filter <md-icon>filter_list</md-icon></md-button>
@@ -50,7 +50,7 @@
                   <md-divider></md-divider>
                   <md-card-content class="tag-list">
                     <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
-                    <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.title}}{% endverbatim %}</span></button>
+                    <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.name}}{% endverbatim %}</span></button>
                   </md-card-content>
                   <md-divider></md-divider>
                     <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
@@ -151,7 +151,7 @@
       }
     },
     methods: {  
-      createTag(){window.location.href = "{% url 'core:pipeline_status_create' %}"},
+      createTag(){window.location.href = ""},
       removeTag(){
         if(this.selected_tag){
           this.axiosColossus({type : "deleteTag", id : this.selected_tag.id}).then(r => console.log(r.data))

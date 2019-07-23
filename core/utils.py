@@ -25,8 +25,7 @@ from django.http import HttpResponse
 
 from sisyphus.models import DlpAnalysisInformation
 from tenx.models import TenxPool
-from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, DoubletInformation, \
-    PipelineTag
+from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, DoubletInformation
 
 from dlp.models import (
     DlpLane,
@@ -85,7 +84,8 @@ def fetch_montage():
 
 def get_sample_info(id):
     sample_list = []
-    samples = PipelineTag.objects.get(id=id).sample_set.all()
+    # samples = PipelineTag.objects.get(id=id).sample_set.all()
+    samples= []
     for s in samples:
         sample_dict = {"id": s.pk, "name": s.sample_id}
         sample_imported = True
