@@ -169,7 +169,7 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         data = json.loads(request.body.decode('utf-8'))
         returnJson = {}
         if data["type"] == "fetchSample":
-            returnJson["samples"] = get_sample_info(data["id"])
+            returnJson["samples"] = get_sample_info(data["name"])
             return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
         elif data["type"] == "fetchWetlab":
             returnJson["samples"] = get_wetlab_analyses()

@@ -6,7 +6,7 @@
     <div class="page-container">
         <md-app md-mode="fixed">
           <md-app-toolbar md-elevation="0">
-            <span class="md-title">Analysis Status {% verbatim %}{{selected_tag.name}}{% endverbatim %}</span>
+            <span class="md-title">Analysis Status {% verbatim %}{{radio}}{% endverbatim %}</span>
             <md-button  @click="showDialog = true">Guide <md-icon>contact_support</md-icon></md-button>
             {% include "core/vue/status-tutorial.html" %}
             <md-button @click="showFilter =true">Filter <md-icon>filter_list</md-icon></md-button>
@@ -40,22 +40,25 @@
           </md-app-toolbar>
           
           <md-app-drawer md-permanent="full">
-              <md-card class="pipeline-tag">
-                  <md-card-content>
-                  <md-field>
-                    <label>Search by Title</label>
-                    <md-input v-model="searchTag"></md-input>
-                  </md-field>
-                  </md-card-content>
-                  <md-divider></md-divider>
-                  <md-card-content class="tag-list">
-                    <button class="project-button"  @click="fetchSamples()" squared><span>Wetlab</span></button>
-                    <button v-for="tag in tags" @click="fetchSamples(tag)" class="project-button" squared><span>{% verbatim %}{{tag.name}}{% endverbatim %}</span></button>
-                  </md-card-content>
-                  <md-divider></md-divider>
-                    <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
-                    <md-button @click="removeTag()"><md-icon>remove</md-icon></md-button>
-                </md-card>
+            <md-list class="md-double-line" style="height: 100vh;">
+              <md-subheader>Hello Ssong</md-subheader>
+              <md-list-item>
+                <md-field>
+                  <label>Search by Title</label>
+                  <md-input v-model="searchTag"></md-input>
+                </md-field>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-subheader>My Projects List</md-subheader>
+              <div class="project-list">                
+              <md-list-item v-for="tag in tags">
+                <md-radio v-model="radio" :value="tag.name" @change="fetchSamples"/>
+                <span class="md-list-item-text"> {% verbatim %}{{tag.name}}{% endverbatim %}</span>
+              </md-list-item>
+              </div>
+              <md-button @click="createTag()"><md-icon>add</md-icon></md-button>
+            </md-list>
+            
           </md-app-drawer>
     
           <md-app-content>
@@ -65,22 +68,78 @@
               <div class="main-content">
                   <br />
                   <div class="sample-table">
-                      <b-button-group style="margin-top : 1px; height: 40px;">
-                          <b-button squared class="menu-button" style="width:110px;">Submitted</b-button>
-                          <b-button class="menu-button" style="width:130px;">Updated</b-button>
-                          <b-button class="menu-button" style="width:140px;">sample ID</b-button>
-                          <b-button class="menu-button" style="width:110px;">library ID</b-button>
-                          <b-button class="menu-button" style="width:100px;">Analysis</b-button>
-                          <b-button class="menu-button" style="width:100px;">Montage</b-button>
-                          <b-button class="menu-button" style="width:100px;">Version</b-button>
-                          <b-button class="menu-button" style="width:100px;">Aligner</b-button>
-                          <b-button class="menu-button" style="width:100px;">Lanes</b-button>
-                          <b-button class="menu-button" style="width:170px;">Pipeline</b-button>
-                          <b-button squared id="pseudo" class="menu-button" style="width:110px;">Pseudobulk</b-button>
-                      </b-button-group>
-                    <div class="content-table">
-                      <Row v-for="sample in rowDisplay" :sample="sample" />
-                    </div>
+                      <md-table v-model="rowDisplay" md-fixed-header md-height="calc(80vh - 40px)" md-sort="submitted" md-sort-order="asc">
+                          <md-table-row slot="md-table-row" slot-scope="{ item }" :style="item.imported">
+                            <md-table-cell class="ln140" md-label="Submitted" md-sort-by="submitted" >
+                              <div v-if="item.submission">
+                                {% verbatim %}{{item.submission}}{% endverbatim %}
+                              </div>
+                              <b-badge variant="secondary" v-else>N/A</b-button>                              
+                            </md-table-cell>
+                            <md-table-cell md-label="Updated">
+                              <div v-if="item.last_updated">
+                              {% verbatim %}{{item.last_updated}}{% endverbatim %}
+                              </div>
+                              <b-badge variant="secondary" v-else>N/A</b-button>                               
+                            </md-table-cell>
+                            <md-table-cell md-label="Sample ID">
+                              <a :href="returnURL('/core/sample',item.name)">
+                              {% verbatim %}{{item.name}}{% endverbatim %}
+                              </a>
+                            </md-table-cell>
+                            <md-table-cell md-label="Library">
+                              <div v-if="item.library">
+                                <a :href="returnURL('/dlp/library',item.library)">
+                                {% verbatim %}{{item.library}}{% endverbatim %}
+                                </a>
+                              </div>
+                              <b-badge variant="secondary" v-else>N/A</b-button>                              
+                            </md-table-cell>                            
+                            <md-table-cell md-label="Analysis">
+                              <div v-if="item.jira">
+                                <a href="returnJiraURL(item.jira)">
+                                {% verbatim %}{{item.jira}}{% endverbatim %}
+                                </a>
+                              </div>
+                              <b-badge variant="secondary" v-else>N/A</b-button>                              
+                            </md-table-cell>
+                            <md-table-cell md-label="Montage">
+                              <div v-if="item.montage">
+                                <a :href="returnMontageURL(item.jira)"> Link </a>
+                              </div>
+                              <b-badge variant="secondary" v-else>N/A</b-button>
+                            </md-table-cell>
+                            <md-table-cell  md-label="Version">
+                              <div v-if="item.version">
+                                {% verbatim %}{{item.version}}{% endverbatim %}
+                              </div>
+                              <b-badge variant="secondary" v-else>N/A</b-button>
+                            </md-table-cell>
+                            <md-table-cell md-label="Aligner">
+                              <div v-if="item.aligner">
+                                {% verbatim %}{{item.aligner}}{% endverbatim %}
+                              </div>
+                              <b-badge variant="secondary" v-else>N/A</b-button>
+                            </md-table-cell>
+                            <md-table-cell md-label="Lanes">  
+                              <div v-if="item.lanes" variant="primary">
+                                {% verbatim %}{{item.lanes}}{% endverbatim %}
+                              </div>
+                              <b-badge  variant="secondary" v-else>N/A</b-badge>
+                            </md-table-cell>
+                            <md-table-cell style="min-width: 180px;" md-label="Pipeline">
+                              <div>
+                                <b-badge :variant="item.pipeline.align">align</b-badge>
+                                <b-badge :variant="item.pipeline.hmmcopy">hmmcopy</b-badge>
+                                <b-badge :variant="item.pipeline.qc">QC</b-badge>
+                              </div>
+                            </md-table-cell>
+                            <md-table-cell md-label="Pseudobulk">
+                              <b-badge :variant="item.pipeline.pseudo">pseudobulk</b-badge>
+                            </md-table-cell>
+                          </md-table-row>
+                        </md-table-row>
+                      </md-table>
                   </div>
                   <br />
                 </div >
@@ -98,6 +157,7 @@
     data: {
       showDialog: false,
       showFilter: false,
+      showWetlab: true,
       searchQuery: {
         key : "",
         submission: null,
@@ -108,13 +168,17 @@
       password: "",
       samples: [],
       tags: [],
-      selected_tag: "",
+      radio: "Wetlab",
       montages: [],
       montage_ready: false,
       searchTag: "",
     },
     created () {
       this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
+      this.tags.forEach( tag => {
+        Vue.set(tag,"selected",false)
+      })
+      this.tags.unshift({name: 'Wetlab',selected : true, id:-1})
       this.username = "ssong"
       this.password = "Iamsuperstar1#"
       // this.username = "{{username| safe | escapejs}}"
@@ -151,12 +215,12 @@
       }
     },
     methods: {  
-      createTag(){window.location.href = ""},
-      removeTag(){
-        if(this.selected_tag){
-          this.axiosColossus({type : "deleteTag", id : this.selected_tag.id}).then(r => console.log(r.data))
-        }
+      returnURL(type,pk) {
+      return window.origin + type + "/" + pk
       },
+      returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
+      returnMontageURL(jira) {return "//https://52.235.35.201/?dashboard=" + jira},
+      createTag(){window.location.href = ""},
       resetFilter() {
         this.searchQuery = {
         key : "",
@@ -190,20 +254,17 @@
         });
         return variant
       },
-      fetchSamples (tag) {
-        if (tag !== undefined) {
-          var data =  {"type" : "fetchSample", "id" : tag.id}
-          this.selected_tag = tag
-        }
-        else {
-          this.selected_tag = {title : "wetlab"}
-          var data =  {"type" : "fetchWetlab"}
-        }
+      fetchSamples () {
+        if (this.radio !== "Wetlab") var data =  {"type" : "fetchSample", "name" : this.radio}
+        else  var data =  {"type" : "fetchWetlab"}
+        
         this.axiosColossus(data)
         .then((r) => {
+          console.log(r.samples)
           this.samples = this.sortBySubmissionDate(r.samples)
           for (let i = 0; i < this.samples.length; i ++) {
             Vue.set(this.samples[i], "pipeline", {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"})
+            Vue.set(this.samples[i],"imported","background-color: #ffffff")
             if(this.samples[i].jira) {
               this.axiosVerifyTantalus(this.samples[i])
               this.axiosVerifyColossus(this.samples[i])
@@ -213,8 +274,9 @@
         })
       },
       axiosVerifyColossus(sample){
+        // ff7043ffffff
         this.axiosColossus({"type" : "validateColossus", "id" : sample.jira})
-        .then((r) => sample.imported = r ? "background-color: #c8e6c5" : "background-color: #f2f2f2")
+        .then((r) => {if(r) sample.imported = "background-color: #e8f5e9"})
       },
       axiosVerifyTantalus (sample) {
         jira = sample.jira

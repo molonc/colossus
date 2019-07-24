@@ -23,7 +23,7 @@ from datetime import date, datetime, timedelta
 from django.db.models import Count, Q, F
 from django.http import HttpResponse
 
-from sisyphus.models import DlpAnalysisInformation
+from sisyphus.models import DlpAnalysisInformation, Project
 from tenx.models import TenxPool
 from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadata, MetadataField, DoubletInformation
 
@@ -40,7 +40,7 @@ from django.core.exceptions import ValidationError
 #----------------------------
 def get_sequence_date_from_library(library):
     sequencing_set = library.dlpsequencing_set.all()
-    return max([sequencing.submission_date for sequencing in sequencing_set]) if sequencing_set else  None
+    return max([sequencing.lane_requested_date for sequencing in sequencing_set]) if sequencing_set else  None
 
 def analysis_info_dict(analysis):
     submission_date = get_sequence_date_from_library(analysis.library)
@@ -50,7 +50,7 @@ def analysis_info_dict(analysis):
             "version": analysis.version.version,
             "run_status": analysis.analysis_run.run_status,
             "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
-            "submission": submission_date if submission_date else analysis.analysis_run.analysis_submission_date,
+            "submission": submission_date if submission_date else None,
             "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
 
 def validate_imported(jira):
@@ -68,13 +68,13 @@ def get_wetlab_analyses():
             if analysis_iter:
                 for analysis in analysis_iter:
                     sample_list.append({**analysis_info_dict(analysis),
-                        **{"id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+                        **{"name": s.library.sample.sample_id, "library": s.library.pool_id}})
             else: sample_list.append({**{"submission" : get_sequence_date_from_library(s.library), 
-                "id": s.library.sample.pk, "name": s.library.sample.sample_id, "library": s.library.pool_id}})
+                "name": s.library.sample.sample_id, "library": s.library.pool_id}})
     for a in analyses.all():
         if not a.library.history.earliest().history_date.date() < date(2019, 1, 1):
             sample_list.append({**analysis_info_dict(a),
-                                    **{"id": a.library.sample.pk, "name": a.library.sample.sample_id,
+                                    **{"name": a.library.sample.sample_id,
                                        "library": a.library.pool_id}})
     return sample_list
 
@@ -82,24 +82,19 @@ def fetch_montage():
     r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
     return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
 
-def get_sample_info(id):
-    sample_list = []
-    # samples = PipelineTag.objects.get(id=id).sample_set.all()
-    samples= []
-    for s in samples:
-        sample_dict = {"id": s.pk, "name": s.sample_id}
-        sample_imported = True
-        libraries = s.dlplibrary_set.all()
-        if libraries:
-            for d in libraries:
-                analysis_set = d.dlpanalysisinformation_set.all()
-                if analysis_set:
-                    for analysis in analysis_set:
-                        sample_list.append({**sample_dict, **{"library" : d.pool_id}, **analysis_info_dict(analysis)})
-                else:
-                    sample_list.append({**sample_dict, **{"library" : d.pool_id, "submission" : get_sequence_date_from_library(d)}})
-        else: sample_list.append(sample_dict)
-    return sample_list
+def get_sample_info(name):
+    analysis_list = []
+    libraries = Project.objects.get(name=name).dlplibrary_set.all()
+    for d in libraries:
+        sample_dict = {"name": d.sample.sample_id}
+        analysis_set = d.dlpanalysisinformation_set.all()
+        if analysis_set:
+            for analysis in analysis_set:
+                analysis_list.append({**sample_dict, **{"library": d.pool_id}, **analysis_info_dict(analysis)})
+        else:
+            analysis_list.append({**sample_dict, **{"library": d.pool_id, "submission": get_sequence_date_from_library(d)}})
+
+    return analysis_list
 
 
 #==================================================
