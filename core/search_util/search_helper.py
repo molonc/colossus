@@ -26,9 +26,10 @@ def return_text_search(query):
         },
         "tenx": {
             "Chip": [],
+            "Pool": [],
             "Libraries": [],
             "Sequencings": [],
-            "Analyses": []
+            "Analyses": [],
         },
         "query" : query,
         "total" : 0
@@ -45,6 +46,7 @@ def return_text_search(query):
     context["pbal"]["Sequencings"].extend(list(PbalSequencing.objects.annotate(search=SearchVector(*(CORE_SEQUENCING + PBAL_SEQUENCING))).filter(Q(search=query) | Q(search__icontains=query))))
 
     context["tenx"]["Chip"].extend(list(TenxChip.objects.annotate(search=SearchVector(*TENX_CHIP)).filter(Q(search=query) | Q(search__icontains=query))))
+    context["tenx"]["Pool"].extend(list(TenxPool.objects.annotate(search=SearchVector(*(TENX_POOL))).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Libraries"].extend(list(TenxLibrary.objects.annotate(search=SearchVector(*(CORE_LIBRARY + TENX_LIBRARY))).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Sequencings"].extend(list(TenxSequencing.objects.annotate(search=SearchVector(*TENX_SEQUENCING)).filter(Q(search=query) | Q(search__icontains=query))))
     context["tenx"]["Analyses"].extend(list(TenxAnalysis.objects.annotate(search=SearchVector(*TENX_ANALYSIS)).filter(Q(search=query) | Q(search__icontains=query))))
