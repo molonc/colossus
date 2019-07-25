@@ -29,8 +29,8 @@ from .models import Sample, SublibraryInformation, ChipRegion, ChipRegionMetadat
 
 from dlp.models import (
     DlpLane,
-    DlpSequencing
-)
+    DlpSequencing,
+    DlpLibrary)
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
@@ -40,61 +40,127 @@ from django.core.exceptions import ValidationError
 #----------------------------
 def get_sequence_date_from_library(library):
     sequencing_set = library.dlpsequencing_set.all()
-    return max([sequencing.lane_requested_date for sequencing in sequencing_set]) if sequencing_set else  None
+    try:
+        return max([sequencing.lane_requested_date for sequencing in sequencing_set])
+    except:
+        return None
 
-def analysis_info_dict(analysis):
+def analysis_info_dict(analysis,lanes,goal):
     submission_date = get_sequence_date_from_library(analysis.library)
-
     return { "jira": analysis.analysis_jira_ticket,
-            "lanes": analysis.lanes.count(),
+            "lanes": "{}/{}".format(lanes, goal),
             "version": analysis.version.version,
             "run_status": analysis.analysis_run.run_status,
             "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
             "submission": submission_date if submission_date else None,
             "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
 
-def validate_imported(jira):
-    analysis = DlpAnalysisInformation.objects.get(analysis_jira_ticket=jira)
-    val = all([ a.imported() for a in analysis.library.dlpsequencing_set.all()])
-    return val
-
-def get_wetlab_analyses():
-    sample_list = []
-    analyses = DlpAnalysisInformation.objects.filter(analysis_run__last_updated__gte=datetime.now() - timedelta(days=14))
-    sequencings = DlpSequencing.objects.annotate(lane_count=Count('dlplane')).filter(Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))
-    for s in sequencings.all():
-        if not s.library.history.earliest().history_date.date() < date(2019, 1, 1):
-            analysis_iter =  s.library.dlpanalysisinformation_set.all()
-            if analysis_iter:
-                for analysis in analysis_iter:
-                    sample_list.append({**analysis_info_dict(analysis),
-                        **{"name": s.library.sample.sample_id, "library": s.library.pool_id}})
-            else: sample_list.append({**{"submission" : get_sequence_date_from_library(s.library), 
-                "name": s.library.sample.sample_id, "library": s.library.pool_id}})
-    for a in analyses.all():
-        if not a.library.history.earliest().history_date.date() < date(2019, 1, 1):
-            sample_list.append({**analysis_info_dict(a),
-                                    **{"name": a.library.sample.sample_id,
-                                       "library": a.library.pool_id}})
-    return sample_list
-
 def fetch_montage():
     r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
     return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
 
-def get_sample_info(name):
-    analysis_list = []
-    libraries = Project.objects.get(name=name).dlplibrary_set.all()
-    for d in libraries:
-        sample_dict = {"name": d.sample.sample_id}
-        analysis_set = d.dlpanalysisinformation_set.all()
-        if analysis_set:
-            for analysis in analysis_set:
-                analysis_list.append({**sample_dict, **{"library": d.pool_id}, **analysis_info_dict(analysis)})
-        else:
-            analysis_list.append({**sample_dict, **{"library": d.pool_id, "submission": get_sequence_date_from_library(d)}})
+def analysis_to_row(analysis):
+    # Check if count(lanes attached to Analysis) is equal to sum(requested_lane_number of all attached sequencings)
+    lanes = analysis.dlplane_set.count()
+    goal = sum(s.requested_lane_number for s in analysis.dlpsequencing_set.all())
+    if lanes is goal:
+        return {**basic_dict, **analysis_info_dict(analysis, lanes, goal)}
+    # If False, display NA analysis with lane information
+    else:
+        return {**basic_dict, "lanes": "{}/{}".format(lanes, goal)}
 
-    return analysis_list
+# | Validate whether a given analysis is IMPORTED or not
+# | Input: Analysis
+# | Ouput: Boolean
+#          {True if imported}
+def validate_imported(analysis):
+    # Retrieve all lanes attached to Analysis and create a set of seqeuncings based on it
+    related_sequencings = set(l.sequencing for l in analysis.lanes.all())
+    # Check if count(lanes attached to analysis) is smaller or equal to count(lanes attached to related_sequencings)
+    return analysis.lanes.count() <= sum(s.dlplane_set.count() for s in related_sequencings)
+
+# | Fetch Row Information related to incomplete Analyses
+# | Input: None
+# | Ouput: List of Objects to populate Status Page Rows
+def fetch_rows_from_incomplete_analyses():
+    object_list = []
+    analyses = DlpAnalysisInformation.objects.exclude(analysis_run__run_status__in=['complete','align_complete','hmmcopy_complete'])
+    for a in analyses.all():
+        object_list.append(analysis_to_row(a))
+
+# | Fetch Row Information related to given a set of dlp libraries
+# | Input: Set of Dlp Libraries
+# | Ouput: List of Objects to populate Status Page Rows
+def fetch_rows_from_libraries(libraries, wetlab=False):
+    object_list = []
+    for library in libraries:
+        basic_dict = {"name": library.sample.sample_id, "library": library.pool_id}
+        # For each libraries retrieve all attached analyses
+        analyses = library.dlpanalysisinformation_set.all()
+        if analyses:
+            for analysis in analyses:
+                #Hide completed analysis if wetlab
+                if not wetlab:
+                    object_list.append((analysis_to_row(analysis)))
+        # If Library does not have any analysis, fill in NA information
+        else: object_list.append(basic_dict)
+    return object_list
+
+# | Fetch Row Information related to given a set of sequencings
+# | Input: Set of Sequencings
+# | Ouput: List of Objects to populate Status Page Rows
+def fetch_rows_from_sequencings(sequencings, wetlab=False):
+    object_list = []
+    for sequencing in sequencings:
+        object_list += fetch_rows_from_libraries(sequencing, wetlab)
+    return object_list
+
+# | Fetch Row Information related to libraries with no analyses but correct lane numbers
+# | Input: None
+# | Ouput: List of Objects to populate Status Page Rows
+def fetch_rows_from_no_analysis_libraries():
+    libraries = DlpLibrary.objects\
+        .annotate(lane_count=Count('dlpsequencing__dlplane'),lane_goal=Count('dlpsequencing__number_of_lanes_requested'))\
+        .filter(Q(dlpanalysisinformation_set=None)|Q(lane_count=F('lane_goal'))).all()
+    return fetch_rows_from_libraries(libraries)
+
+# | Fetch Row Information from sequencings with certain conditions:
+# |     1. Mismatching lane count
+# |     2. Lane requested within 2 months
+# |     3. Additionally, hide completed analyses
+# | Input: None
+# | Ouput: List of Objects to populate Status Page Rows
+def fetch_rows_for_wetlab():
+    sequencings = DlpSequencing.objects.\
+        annotate(lane_count=Count('dlplane'))\
+        .filter(Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested'))|Q(lane_requested_date=datetime.now() - timedelta(months=2)))
+    return fetch_rows_from_sequencings(sequencings, wetlab=True)
+
+# | List of Status Page Row Objects
+# |
+# | WETLAB:
+# |   Populate row from all sequencings with lane !== goal && recently submitted (2 months)
+# |
+# | NO ANALYSIS:
+# |   Populate row from all libraries with sum(sequencing's requested_lane_number) == sum(sequencing's lane count),
+# |   but no Analysis attached.
+# |
+# | INCOMPLETE:
+# |   Populate row from all analyses with run_status not set as either one of ['complete','align_complete','hmmcopy_complete']
+# |
+# | PROJECTS:
+# |   Populate rows from set of DlpLibraries of selected Project
+def fetch_row_objects(type, key):
+    if type is "PROJECTS":
+        return fetch_rows_from_libraries(Project.objects.get(name=key).dlplibrary_set.all())
+    elif type is "INCOMPLETE":
+        return fetch_rows_from_incomplete_analyses()
+    elif type is "NO ANALYSIS":
+        return fetch_rows_from_no_analysis_libraries()
+    elif type is "WETLAB":
+        return fetch_rows_for_wetlab()
+    else:
+        return
 
 
 #==================================================

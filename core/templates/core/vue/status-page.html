@@ -70,7 +70,7 @@
                   <div class="sample-table">
                       <md-table v-model="rowDisplay" md-fixed-header md-height="calc(80vh - 40px)" md-sort="submitted" md-sort-order="asc">
                           <md-table-row slot="md-table-row" slot-scope="{ item }" :style="item.imported">
-                            <md-table-cell class="ln140" md-label="Submitted" md-sort-by="submitted" >
+                            <md-table-cell class="ln140" md-label="Requested" >
                               <div v-if="item.submission">
                                 {% verbatim %}{{item.submission}}{% endverbatim %}
                               </div>
@@ -179,6 +179,7 @@
         Vue.set(tag,"selected",false)
       })
       this.tags.unshift({name: 'Wetlab',selected : true, id:-1})
+      this.tags.unshift({name: 'Incomplete',selected : false, id:-2})
       this.username = "ssong"
       this.password = "Iamsuperstar1#"
       // this.username = "{{username| safe | escapejs}}"
@@ -255,8 +256,10 @@
         return variant
       },
       fetchSamples () {
-        if (this.radio !== "Wetlab") var data =  {"type" : "fetchSample", "name" : this.radio}
-        else  var data =  {"type" : "fetchWetlab"}
+        console.log(this.radio)
+        if (this.radio === "Wetlab") var data =  {"type" : "fetchWetlab"}
+        else if(this.radio === "Incomplete") var data =  {"type" : "fetchIncomplete"}
+        else var data =  {"type" : "fetchSample", "name" : this.radio}
         
         this.axiosColossus(data)
         .then((r) => {

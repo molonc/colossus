@@ -76,7 +76,7 @@ from .utils import (
     create_doublet_info_model,
     generate_samplesheet,
     generate_gsc_form,
-    get_sample_info, get_wetlab_analyses, fetch_montage, validate_imported)
+    get_sample_info, get_wetlab_analyses, fetch_montage, validate_imported, get_all_incomplete)
 from .jira_templates.templates import (
     get_reference_genome_from_sample_id,
     generate_dlp_jira_description,
@@ -156,17 +156,9 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
     def get(self, request):
         return self.get_context_and_render(request)
 
-    # def post(self, request):
-    #     data = json.loads(request.body.decode('utf-8'))
-    #     if PipelineTag.objects.filter(title= data["title"]).exists():
-    #         return HttpResponse("fail")
-    #     pipelinetag = PipelineTag.objects.create(title = data["title"])
-    #     pipelinetag.save()
-    #     pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
-    #     return HttpResponse("success")
-
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
+        print(data)
         returnJson = {}
         if data["type"] == "fetchSample":
             returnJson["samples"] = get_sample_info(data["name"])
@@ -174,14 +166,13 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         elif data["type"] == "fetchWetlab":
             returnJson["samples"] = get_wetlab_analyses()
             return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+        elif data["type"] == "fetchIncomplete":
+            returnJson["samples"] = get_all_incomplete()
+            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
         elif data["type"] == "fetchMontage":
             return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
             return HttpResponse(json.dumps(validate_imported(data["id"])))
-        # elif data["type"] =="deleteTag":
-        #     print(request.POST.get('id'))
-        #     PipelineTag.objects.get(id=data['id']).delete()
-        #     return HttpResponse("deleted")
         return None
 
     def pipeline_status_page(request):
