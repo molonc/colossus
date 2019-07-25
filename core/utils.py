@@ -133,8 +133,7 @@ def fetch_rows_from_no_analysis_libraries():
     libraries = DlpLibrary.objects\
         .annotate(lane_count=Count('dlpsequencing__dlplane'),lane_goal=Count('dlpsequencing__number_of_lanes_requested'))\
         .filter(Q(dlpanalysisinformation=None)&Q(lane_count=F('lane_goal'))).all()
-    for li in libraries:
-        print(li.dlpanalysisinformation_set.all())
+
     return fetch_rows_from_libraries(libraries,no_analysis=True)
 
 # | (WETLAB) Fetch Row Information from sequencings with certain conditions:
@@ -165,7 +164,6 @@ def fetch_rows_for_wetlab():
 # | PROJECTS:
 # |   Populate rows from set of DlpLibraries of selected Project
 def fetch_row_objects(type, key=None):
-    print(type,key)
     type = type.strip()
     if type == "PROJECTS":
         return fetch_rows_from_libraries(Project.objects.get(name=key).dlplibrary_set.all())
