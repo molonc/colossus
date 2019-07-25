@@ -52,17 +52,19 @@ def analysis_info_dict(analysis,lanes,goal):
             "version": analysis.version.version,
             "run_status": analysis.analysis_run.run_status,
             "aligner": "bwa-aln" if analysis.aligner is "A" else "bwa-mem",
-            "submission": submission_date if submission_date else None,
-            "last_updated": analysis.analysis_run.last_updated.date() if analysis.analysis_run.last_updated else None}
+            "submission": str(submission_date) if submission_date else None,
+            "last_updated": str(analysis.analysis_run.last_updated.date()) if analysis.analysis_run.last_updated else None}
 
 def fetch_montage():
     r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
     return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
 
-def analysis_to_row(analysis):
+def analysis_to_row(analysis, basic_dict=None):
+    if not basic_dict:
+        basic_dict = {"name": analysis.library.sample.sample_id, "library": analysis.library.pool_id}
     # Check if count(lanes attached to Analysis) is equal to sum(requested_lane_number of all attached sequencings)
-    lanes = analysis.dlplane_set.count()
-    goal = sum(s.requested_lane_number for s in analysis.dlpsequencing_set.all())
+    lanes = analysis.lanes.count()
+    goal = sum(s.number_of_lanes_requested for s in analysis.sequencings.all())
     if lanes is goal:
         return {**basic_dict, **analysis_info_dict(analysis, lanes, goal)}
     # If False, display NA analysis with lane information
@@ -79,7 +81,7 @@ def validate_imported(analysis):
     # Check if count(lanes attached to analysis) is smaller or equal to count(lanes attached to related_sequencings)
     return analysis.lanes.count() <= sum(s.dlplane_set.count() for s in related_sequencings)
 
-# | Fetch Row Information related to incomplete Analyses
+# | (INCOMPLETE) Fetch Row Information related to incomplete Analyses
 # | Input: None
 # | Ouput: List of Objects to populate Status Page Rows
 def fetch_rows_from_incomplete_analyses():
@@ -87,23 +89,32 @@ def fetch_rows_from_incomplete_analyses():
     analyses = DlpAnalysisInformation.objects.exclude(analysis_run__run_status__in=['complete','align_complete','hmmcopy_complete'])
     for a in analyses.all():
         object_list.append(analysis_to_row(a))
+    return object_list
 
-# | Fetch Row Information related to given a set of dlp libraries
+# | (PROJECTS) Fetch Row Information related to given a set of dlp libraries
 # | Input: Set of Dlp Libraries
 # | Ouput: List of Objects to populate Status Page Rows
-def fetch_rows_from_libraries(libraries, wetlab=False):
+def fetch_rows_from_libraries(libraries, wetlab=None, no_analysis=None):
     object_list = []
     for library in libraries:
         basic_dict = {"name": library.sample.sample_id, "library": library.pool_id}
         # For each libraries retrieve all attached analyses
         analyses = library.dlpanalysisinformation_set.all()
-        if analyses:
+        if analyses and not no_analysis:
             for analysis in analyses:
                 #Hide completed analysis if wetlab
                 if not wetlab:
-                    object_list.append((analysis_to_row(analysis)))
+                    object_list.append((analysis_to_row(analysis, basic_dict)))
         # If Library does not have any analysis, fill in NA information
-        else: object_list.append(basic_dict)
+        else:
+            # if Wetlab display Sequencing lane info instead of Analysis lane info
+            if wetlab or no_analysis:
+                sequencings = library.dlpsequencing_set.all()
+                if sequencings:
+                    goal = sum(l.number_of_lanes_requested for l in sequencings)
+                    lane = sum(l.dlplane_set.count() for l in sequencings)
+                basic_dict = {**basic_dict, "lanes": "{}/{}".format(lane, goal) if sequencings else None,"submission": str(get_sequence_date_from_library(library))}
+            object_list.append(basic_dict)
     return object_list
 
 # | Fetch Row Information related to given a set of sequencings
@@ -112,28 +123,31 @@ def fetch_rows_from_libraries(libraries, wetlab=False):
 def fetch_rows_from_sequencings(sequencings, wetlab=False):
     object_list = []
     for sequencing in sequencings:
-        object_list += fetch_rows_from_libraries(sequencing, wetlab)
+        object_list += fetch_rows_from_libraries([sequencing.library], wetlab=wetlab)
     return object_list
 
-# | Fetch Row Information related to libraries with no analyses but correct lane numbers
+# | (NO ANALYSIS) Fetch Row Information related to libraries with no analyses but correct lane numbers
 # | Input: None
 # | Ouput: List of Objects to populate Status Page Rows
 def fetch_rows_from_no_analysis_libraries():
     libraries = DlpLibrary.objects\
         .annotate(lane_count=Count('dlpsequencing__dlplane'),lane_goal=Count('dlpsequencing__number_of_lanes_requested'))\
-        .filter(Q(dlpanalysisinformation_set=None)|Q(lane_count=F('lane_goal'))).all()
-    return fetch_rows_from_libraries(libraries)
+        .filter(Q(dlpanalysisinformation=None)&Q(lane_count=F('lane_goal'))).all()
+    for li in libraries:
+        print(li.dlpanalysisinformation_set.all())
+    return fetch_rows_from_libraries(libraries,no_analysis=True)
 
-# | Fetch Row Information from sequencings with certain conditions:
-# |     1. Mismatching lane count
-# |     2. Lane requested within 2 months
+# | (WETLAB) Fetch Row Information from sequencings with certain conditions:
+# |     1. (OR) Mismatching lane count
+# |     2. (AND) Lane requested within 2 months
 # |     3. Additionally, hide completed analyses
 # | Input: None
 # | Ouput: List of Objects to populate Status Page Rows
 def fetch_rows_for_wetlab():
     sequencings = DlpSequencing.objects.\
         annotate(lane_count=Count('dlplane'))\
-        .filter(Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested'))|Q(lane_requested_date=datetime.now() - timedelta(months=2)))
+        .filter((Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))&Q(lane_requested_date__gte=datetime.now() - timedelta(days=60))).all()
+
     return fetch_rows_from_sequencings(sequencings, wetlab=True)
 
 # | List of Status Page Row Objects
@@ -151,13 +165,15 @@ def fetch_rows_for_wetlab():
 # | PROJECTS:
 # |   Populate rows from set of DlpLibraries of selected Project
 def fetch_row_objects(type, key=None):
-    if type is "PROJECTS":
+    print(type,key)
+    type = type.strip()
+    if type == "PROJECTS":
         return fetch_rows_from_libraries(Project.objects.get(name=key).dlplibrary_set.all())
-    elif type is "INCOMPLETE":
+    elif type == "INCOMPLETE":
         return fetch_rows_from_incomplete_analyses()
-    elif type is "NO ANALYSIS":
+    elif type == "NO ANALYSIS":
         return fetch_rows_from_no_analysis_libraries()
-    elif type is "WETLAB":
+    elif type == "WETLAB":
         return fetch_rows_for_wetlab()
     else:
         return

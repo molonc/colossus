@@ -156,16 +156,12 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
 
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
-
-        returnJson = {}
-
         if data["type"] == "fetchMontage":
             return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
-            return HttpResponse(json.dumps(validate_imported(data["id"])))
+            return HttpResponse(json.dumps(validate_imported(DlpAnalysisInformation.objects.get(analysis_jira_ticket=data["id"]))))
         else:
-            returnJson["samples"] = fetch_row_objects(data["type"], data["name"])
-        return None
+            return HttpResponse(json.dumps(fetch_row_objects(data["type"], data["name"])))
 
     def pipeline_status_page(request):
       pipelinetags = list(Project.objects.values("id", "name"))

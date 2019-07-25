@@ -9,7 +9,8 @@
             <span class="md-title">Analysis Status {% verbatim %}{{radio}}{% endverbatim %}</span>
             <md-button  @click="showDialog = true">Guide <md-icon>contact_support</md-icon></md-button>
             {% include "core/vue/status-tutorial.html" %}
-            <md-button @click="showFilter =true">Filter <md-icon>filter_list</md-icon></md-button>
+            <md-button @click="showFilter =true" disabled>Filter <md-icon>filter_list</md-icon></md-button>
+            <md-progress-spinner v-if="loading" :md-diameter="30" :md-stroke="3" md-mode="indeterminate"></md-progress-spinner>
             <md-dialog :md-active.sync="showFilter">
                 <md-dialog-title>Filter Table</md-dialog-title>
                 <md-dialog-content> 
@@ -24,24 +25,28 @@
                       <md-datepicker v-model="searchQuery.updated">
                           <label>Updated date</label>
                       </md-datepicker>
-                      
-                      <p>Only Completed:</p>
-                      <md-switch v-model="searchQuery.completed[0]">align</md-switch>
-                      <md-switch v-model="searchQuery.completed[1]">hmmcopy</md-switch>
-                      <md-switch v-model="searchQuery.completed[2]">qc</md-switch>
-                      <md-switch v-model="searchQuery.completed[3]">pseudobulk</md-switch>
                     </div>
                   <md-dialog-actions>
                       <md-button class="md-primary" @click="resetFilter">Reset</md-button>
+                      <md-button class="md-primary" @click="applyFilter = true">Apply</md-button>
                       <md-button class="md-primary" @click="showFilter = false">Close</md-button>
                   </md-dialog-actions>
                 </md-dialog-content>
             </md-dialog>
+            <md-dialog-alert
+            :md-active.sync="showLaneMessage"
+            md-content="Everything is bit <b>SLOW</b>. But he is trying his best. <br>
+                        <b>WETLAB</b> and <b>NO ANALYSIS</b> view displays lane info related to Library, not analysis.<br> 
+                        <b>Filter</b> is currently <b>Disabled.</b><br>
+                        <b>Sorting by date</b> is currently Disabled.<br>
+                        <b>Guide</b> is Outdated.
+                        "
+            md-confirm-text="Cool!" />
           </md-app-toolbar>
           
           <md-app-drawer md-permanent="full">
             <md-list class="md-double-line" style="height: 100vh;">
-              <md-subheader>Hello Ssong</md-subheader>
+              <md-subheader>Welcome Stranger!</md-subheader>
               <md-list-item>
                 <md-field>
                   <label>Search by Title</label>
@@ -68,19 +73,24 @@
               <div class="main-content">
                   <br />
                   <div class="sample-table">
-                      <md-table v-model="rowDisplay" md-fixed-header md-height="calc(80vh - 40px)" md-sort="submitted" md-sort-order="asc">
+                      <md-button @click="indexIncrement(false)"><md-icon>keyboard_arrow_left</md-icon></md-button>
+                      <md-button disabled>{% verbatim %}{{index + 1}}{% endverbatim %}/{% verbatim %}{{pages}}{% endverbatim %}</md-button>
+                      <md-button @click="indexIncrement(true)"><md-icon>keyboard_arrow_right</md-icon></md-button>
+                      <md-chip v-if="applyFilter" class="md-accent">Filter Applied</md-chip>
+                      <md-button disabled>Total: {% verbatim %}{{total}}{% endverbatim %}</md-button>
+                      <md-table v-model="pagination" md-fixed-header md-height="calc(80vh - 40px)" md-sort="submitted" md-sort-order="asc">
                           <md-table-row slot="md-table-row" slot-scope="{ item }" :style="item.imported">
                             <md-table-cell class="ln140" md-label="Requested" >
                               <div v-if="item.submission">
                                 {% verbatim %}{{item.submission}}{% endverbatim %}
                               </div>
-                              <b-badge variant="secondary" v-else>N/A</b-button>                              
+                              <div v-else>None</div>                              
                             </md-table-cell>
                             <md-table-cell md-label="Updated">
                               <div v-if="item.last_updated">
                               {% verbatim %}{{item.last_updated}}{% endverbatim %}
                               </div>
-                              <b-badge variant="secondary" v-else>N/A</b-button>                               
+                              <b-badge variant="secondary" v-else>None</b-badge></b-button>                               
                             </md-table-cell>
                             <md-table-cell md-label="Sample ID">
                               <a :href="returnURL('/core/sample',item.name)">
@@ -149,29 +159,45 @@
   </div>
 {% include "core/vue/status-row.html" %}
 <script>
+  const PAGINATION = 100
   var vm = new Vue({
     el: '#app',
     components:{
       Row
     },
     data: {
+      //  Pop up
+      test : [],
       showDialog: false,
       showFilter: false,
-      showWetlab: true,
+      showLaneMessage: true,
+      // Search
       searchQuery: {
         key : "",
         submission: null,
         updated: null,
-        completed: [false, false, false, false]
       },
+      applyFilter: false,
+      searchTotal: 0,
+      searchIndex: 0,
+      searchPage: 1,
+      searchIndexes: [],
+      // Auth
       username: "",
       password: "",
+      // 
       samples: [],
       tags: [],
-      radio: "Wetlab",
+      radio: "D",
       montages: [],
       montage_ready: false,
       searchTag: "",
+      loading: false,
+      // Pagination
+      index: 0,
+      pages: 1,
+      total: 0,
+      selectedPage: []
     },
     created () {
       this.tags = JSON.parse(unescape("{{tags| safe | escapejs}}"))
@@ -181,6 +207,7 @@
       this.tags.unshift({name: 'WETLAB',selected : true, id:-1})
       this.tags.unshift({name: 'NO ANALYSIS',selected : false, id:-2})
       this.tags.unshift({name: 'INCOMPLETE',selected : false, id:-3})
+      this.radio = "WETLAB"
       this.username = "ssong"
       this.password = "Iamsuperstar1#"
       // this.username = "{{username| safe | escapejs}}"
@@ -208,13 +235,45 @@
             else return false
           if(this.searchQuery.key)
             query &= (sample.library + sample.name + ((sample.jira) ? sample.jira : "")).toLowerCase().includes(this.searchQuery.key.toLowerCase())
-          if(this.searchQuery.completed[0]) query &= (sample.pipeline.align === "success")
-          if(this.searchQuery.completed[1]) query &= (sample.pipeline.hmmcopy === "success")
-          if(this.searchQuery.completed[2]) query &= (sample.pipeline.qc === "success")
-          if(this.searchQuery.completed[3]) query &= (sample.pipeline.pseudo === "success")
           return query
         })
-      }
+      },
+      pagination() {
+        if(this.applyFilter) {
+          this.showFilter=false
+          if(this.searchIndexes.length <= 0){
+            this.searchIndexes = this.samples.reduce((acc, curr, index) => {
+              query = true
+              if (this.searchQuery.submission)
+                if(curr.submission) query &= (this.searchQuery.submission.toISOString().split('T')[0] === curr.submission)
+                else return false
+              if (this.searchQuery.updated)
+                if(curr.last_updated) query &= (this.searchQuery.updated.toISOString().split('T')[0] === curr.last_updated)
+                else return false
+              if(this.searchQuery.key)
+                query &= (curr.library + curr.name + ((curr.jira) ? curr.jira : "")).toLowerCase().includes(this.searchQuery.key.toLowerCase())
+              if(query) acc.push(index)
+              return acc
+            },[])          
+            this.searchTotal = this.searchIndexes.length
+            this.searchPage = Math.ceil((this.searchTotal)/PAGINATION) 
+          }
+          this.searchIndexes.forEach((i) => {this.computeRow(i)})   
+          var last = this.searchIndexes*PAGINATION + PAGINATION 
+          var display_indexes = this.searchIndexes.slice(this.searchIndexes*PAGINATION, (last < this.searchTotal ) ? last : this.searchTotal)
+          return display_indexes.reduce((acc,curr) => {
+            acc.push(this.samples[curr])
+            return acc
+          },[])
+        }
+        
+        var last = this.index*PAGINATION + PAGINATION
+        var j = ((last < this.total ) ? last : this.total)
+        for(var i = this.index*PAGINATION ; i < j; i++){
+          this.computeRow(i)
+        }
+        return this.samples.slice(this.index*PAGINATION, last)
+      },
     },
     methods: {  
       returnURL(type,pk) {
@@ -223,12 +282,36 @@
       returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
       returnMontageURL(jira) {return "//https://52.235.35.201/?dashboard=" + jira},
       createTag(){window.location.href = ""},
+      // Filter
       resetFilter() {
+        this.applyFilter = false
+        this.searchIndexes = []
+        this.searchIndex = 0
+
         this.searchQuery = {
         key : "",
         submission: null,
         updated: null,
         completed: [false, false, false, false]}
+      },
+      // 
+      computeRow(i) {
+        if(!('computed' in this.samples[i])){
+          Vue.set(this.samples[i],"computed",true)
+          Vue.set(this.samples[i], "pipeline", {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"})
+          Vue.set(this.samples[i],"imported","background-color: #ffffff")
+          if(this.montage_ready) {
+            Vue.set(this.samples[i],  "montage", (this.montages.includes(this.samples[i].jira)))
+          }
+          if(this.samples[i].jira) {
+            this.axiosVerifyTantalus(this.samples[i])
+            this.axiosVerifyColossus(this.samples[i])
+          }
+        }      
+      },
+      indexIncrement(increment) {
+        if(!increment) this.index = (this.index != 0) ? this.index - 1 : 0
+        if(increment) this.index = (this.index != this.pages-1) ? this.index + 1 : this.index
       },
       sortBySubmissionDate(samples) {
         return samples.sort(function(a,b) {
@@ -257,27 +340,27 @@
         return variant
       },
       fetchSamples () {
-        if(this.radio !== "WETLAB" || this.radio !== "INCOMPLETE" || this.radio !== "NO ANALYSIS") 
-          var data =  {"type" : "PROJECTS", "name" : this.radio}
-        else var data =  {"type" : this.radio}
+        this.index = 0
+        if(!this.loading){
+          this.loading = true
+          if(this.radio !== "WETLAB" && this.radio !== "INCOMPLETE" && this.radio !== "NO ANALYSIS") {
+            var data =  {"type" : "PROJECTS", "name" : this.radio}}
+          else var data =  {"type" : this.radio, "name" : null}
         
-        this.axiosColossus(data)
-        .then((r) => {
-          console.log(r.samples)
-          this.samples = this.sortBySubmissionDate(r.samples)
-          for (let i = 0; i < this.samples.length; i ++) {
-            Vue.set(this.samples[i], "pipeline", {"qc":"secondary", "align": "secondary", "hmmcopy": "secondary", "pseudo": "secondary"})
-            Vue.set(this.samples[i],"imported","background-color: #ffffff")
-            if(this.samples[i].jira) {
-              this.axiosVerifyTantalus(this.samples[i])
-              this.axiosVerifyColossus(this.samples[i])
-              }
-          }          
-          if(this.montage_ready) this.updateSampleMontage()
-        })
+        
+          this.axiosColossus(data)
+          .then((r) => {
+            // r = this.sortBySubmissionDate(r)
+            //  Pagination
+            this.samples = r
+            this.total = this.samples.length
+            this.pages = (this.total < PAGINATION) ? 1 :  Math.ceil((this.total)/PAGINATION)     
+            this.loading = false
+          })
+          .catch( (e) => { this.loading = false})
+        }
       },
       axiosVerifyColossus(sample){
-        // ff7043ffffff
         this.axiosColossus({"type" : "validateColossus", "id" : sample.jira})
         .then((r) => {if(r) sample.imported = "background-color: #e8f5e9"})
       },
@@ -325,9 +408,7 @@
       },
       updateSampleMontage() {
         this.samples.forEach( sample => {
-          if(this.montages.includes(sample.jira)) var montage = true
-          else var montage = false
-          Vue.set(sample,  "montage", montage)
+
         })
       },
       axiosVerifyMontage() {
