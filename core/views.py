@@ -64,8 +64,6 @@ from sisyphus.models import *
 from .forms import (
     SampleForm,
     AdditionalSampleInfoInlineFormset,
-    GSCFormDeliveryInfo,
-    GSCFormSubmitterInfo,
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
@@ -74,9 +72,9 @@ from .forms import (
 from .utils import (
     create_sublibrary_models,
     create_doublet_info_model,
-    generate_samplesheet,
-    generate_gsc_form,
-    get_sample_info, get_wetlab_analyses, fetch_montage, validate_imported, get_all_incomplete)
+    fetch_montage,
+    validate_imported,
+    fetch_row_objects)
 from .jira_templates.templates import (
     get_reference_genome_from_sample_id,
     generate_dlp_jira_description,
@@ -158,21 +156,15 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
 
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
-        print(data)
+
         returnJson = {}
-        if data["type"] == "fetchSample":
-            returnJson["samples"] = get_sample_info(data["name"])
-            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
-        elif data["type"] == "fetchWetlab":
-            returnJson["samples"] = get_wetlab_analyses()
-            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
-        elif data["type"] == "fetchIncomplete":
-            returnJson["samples"] = get_all_incomplete()
-            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
-        elif data["type"] == "fetchMontage":
+
+        if data["type"] == "fetchMontage":
             return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
             return HttpResponse(json.dumps(validate_imported(data["id"])))
+        else:
+            returnJson["samples"] = fetch_row_objects(data["type"], data["name"])
         return None
 
     def pipeline_status_page(request):

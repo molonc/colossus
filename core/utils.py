@@ -150,7 +150,7 @@ def fetch_rows_for_wetlab():
 # |
 # | PROJECTS:
 # |   Populate rows from set of DlpLibraries of selected Project
-def fetch_row_objects(type, key):
+def fetch_row_objects(type, key=None):
     if type is "PROJECTS":
         return fetch_rows_from_libraries(Project.objects.get(name=key).dlplibrary_set.all())
     elif type is "INCOMPLETE":

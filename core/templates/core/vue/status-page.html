@@ -178,8 +178,9 @@
       this.tags.forEach( tag => {
         Vue.set(tag,"selected",false)
       })
-      this.tags.unshift({name: 'Wetlab',selected : true, id:-1})
-      this.tags.unshift({name: 'Incomplete',selected : false, id:-2})
+      this.tags.unshift({name: 'WETLAB',selected : true, id:-1})
+      this.tags.unshift({name: 'NO ANALYSIS',selected : false, id:-2})
+      this.tags.unshift({name: 'INCOMPLETE',selected : false, id:-3})
       this.username = "ssong"
       this.password = "Iamsuperstar1#"
       // this.username = "{{username| safe | escapejs}}"
@@ -256,10 +257,9 @@
         return variant
       },
       fetchSamples () {
-        console.log(this.radio)
-        if (this.radio === "Wetlab") var data =  {"type" : "fetchWetlab"}
-        else if(this.radio === "Incomplete") var data =  {"type" : "fetchIncomplete"}
-        else var data =  {"type" : "fetchSample", "name" : this.radio}
+        if(this.radio !== "WETLAB" || this.radio !== "INCOMPLETE" || this.radio !== "NO ANALYSIS") 
+          var data =  {"type" : "PROJECTS", "name" : this.radio}
+        else var data =  {"type" : this.radio}
         
         this.axiosColossus(data)
         .then((r) => {
