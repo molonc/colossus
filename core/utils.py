@@ -38,15 +38,23 @@ from django.core.exceptions import ValidationError
 #============================
 # Pipeline Status
 #----------------------------
-def get_sequence_date_from_library(library):
-    sequencing_set = library.dlpsequencing_set.all()
+def get_sequence_date(analysis, library=None):
     try:
+        # Is it for Library?
+        if library: sequencing_set = analysis.dlpsequencing_set.all()
+        # Does Analysis have lanes, if then retrieve latest lane_requested_date from sequencings related to lanes
+        elif analysis.lanes.all(): sequencing_set = set(l.sequencing for l in analysis.lanes.all())
+        # Else, Does Analysis have sequencings, retrieve latest lane_requested_date from sequencings directly attached analysis
+        elif analysis.sequencings.all(): sequencing_set = analysis.sequencings.all()
+        # Else, Does Analysis's Library have sequencings
+        else: sequencing_set = analysis.library.dlpsequencing_set.all()
         return max([sequencing.lane_requested_date for sequencing in sequencing_set])
-    except:
-        return None
+    except: return None
 
-def analysis_info_dict(analysis,lanes,goal):
-    submission_date = get_sequence_date_from_library(analysis.library)
+def analysis_info_dict(analysis):
+    lanes = analysis.lanes.count()
+    goal = sum(s.number_of_lanes_requested for s in analysis.sequencings.all())
+    submission_date = get_sequence_date(analysis)
     return { "jira": analysis.analysis_jira_ticket,
             "lanes": "{}/{}".format(lanes, goal),
             "version": analysis.version.version,
@@ -59,17 +67,11 @@ def fetch_montage():
     r = requests.get('https://52.235.35.201/_cat/indices', verify=False, auth=("guest", "shahlab!Montage")).text
     return [j.replace("sc","SC") for j in re.findall('sc-\d{4}', r)]
 
-def analysis_to_row(analysis, basic_dict=None):
+def analysis_to_row(analysis, basic_dict=None, incomplete=None):
     if not basic_dict:
         basic_dict = {"name": analysis.library.sample.sample_id, "library": analysis.library.pool_id}
-    # Check if count(lanes attached to Analysis) is equal to sum(requested_lane_number of all attached sequencings)
-    lanes = analysis.lanes.count()
-    goal = sum(s.number_of_lanes_requested for s in analysis.sequencings.all())
-    if lanes is goal:
-        return {**basic_dict, **analysis_info_dict(analysis, lanes, goal)}
-    # If False, display NA analysis with lane information
-    else:
-        return {**basic_dict, "lanes": "{}/{}".format(lanes, goal)}
+    return {**basic_dict, **analysis_info_dict(analysis)}
+
 
 # | Validate whether a given analysis is IMPORTED or not
 # | Input: Analysis
@@ -88,7 +90,7 @@ def fetch_rows_from_incomplete_analyses():
     object_list = []
     analyses = DlpAnalysisInformation.objects.exclude(analysis_run__run_status__in=['complete','align_complete','hmmcopy_complete'])
     for a in analyses.all():
-        object_list.append(analysis_to_row(a))
+        object_list.append(analysis_to_row(a, incomplete=True))
     return object_list
 
 # | (PROJECTS) Fetch Row Information related to given a set of dlp libraries
@@ -113,8 +115,8 @@ def fetch_rows_from_libraries(libraries, wetlab=None, no_analysis=None):
                 if sequencings:
                     goal = sum(l.number_of_lanes_requested for l in sequencings)
                     lane = sum(l.dlplane_set.count() for l in sequencings)
-                basic_dict = {**basic_dict, "lanes": "{}/{}".format(lane, goal) if sequencings else None,"submission": str(get_sequence_date_from_library(library))}
-            object_list.append(basic_dict)
+                basic_dict = {**basic_dict, "lanes": "{}/{}".format(lane, goal) if sequencings else None}
+            object_list.append({**basic_dict,"submission": str(get_sequence_date(library,True))})
     return object_list
 
 # | Fetch Row Information related to given a set of sequencings
@@ -140,14 +142,25 @@ def fetch_rows_from_no_analysis_libraries():
 # |     1. (OR) Mismatching lane count
 # |     2. (AND) Lane requested within 2 months
 # |     3. Additionally, hide completed analyses
+# |     4. Recently COMPLETED
 # | Input: None
 # | Ouput: List of Objects to populate Status Page Rows
 def fetch_rows_for_wetlab():
-    sequencings = DlpSequencing.objects.\
-        annotate(lane_count=Count('dlplane'))\
-        .filter((Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))&Q(lane_requested_date__gte=datetime.now() - timedelta(days=60))).all()
+    threshold = datetime.now() - timedelta(days=60)
+    #  Unimported
+    sequencings = DlpSequencing.objects\
+        .annotate(lane_count=Count('dlplane'))\
+        .filter((Q(lane_count=0)|Q(lane_count__lt=F('number_of_lanes_requested')))&Q(lane_requested_date__gte=threshold))
 
-    return fetch_rows_from_sequencings(sequencings, wetlab=True)
+    #  Recently Finished or Updated
+    threshold = datetime.now() - timedelta(days=14)
+    analyses = DlpAnalysisInformation.objects\
+        .filter(Q(analysis_run__run_status__in=['complete','align_complete','hmmcopy_complete'])&Q(analysis_run__last_updated__gte=threshold))
+    analyses_list = [{**{"name": a.library.sample.sample_id,
+                      "library": a.library.pool_id},
+                      **analysis_info_dict(a)}
+                      for a in analyses]
+    return fetch_rows_from_sequencings(sequencings, wetlab=True) + analyses_list
 
 # | List of Status Page Row Objects
 # |
