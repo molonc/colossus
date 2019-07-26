@@ -206,10 +206,8 @@
       this.tags.unshift({name: 'NO ANALYSIS',selected : false, id:-2})
       this.tags.unshift({name: 'INCOMPLETE',selected : false, id:-3})
       this.radio = "WETLAB"
-      // this.username = "{{username| safe | escapejs}}"
-      // this.password = "{{password| safe | escapejs}}"
-      this.username="ssong"
-      this.password="Iamsuperstar1#"
+      this.username = "{{username| safe | escapejs}}"
+      this.password = "{{password| safe | escapejs}}"
       this.fetchSamples()
       this.axiosColossus({type : "fetchMontage"})
       .then((r) => {
