@@ -491,11 +491,12 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             sample = get_object_or_404(Sample, pk=pk)
         else:
             sample = None
-
+        sampleDetailInitial = None
+        if self.library_type is "tenx": sampleDetailInitial = [{"num_cells_targeted" : 3000}]
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
-            'libdetail_formset': self.libdetail_formset_class(),
+            'libdetail_formset': self.libdetail_formset_class(initial=sampleDetailInitial),
             'libcons_formset': self.libcons_formset_class(),
             'libqs_formset': self.libqs_formset_class(),
             'projects': Project.objects.all(),

@@ -14,6 +14,8 @@ class TenxChip(models.Model, FieldValue):
 
     # Chip Model for TenX Libraries
     history = HistoricalRecords(table_name='tenx_history_chip')
+    class Meta:
+        ordering = ['-id']
 
     LAB_NAMES = (
         ("SA", "Sam Aparicio"),
@@ -234,6 +236,7 @@ class TenxLibrarySampleDetail(models.Model, FieldValue):
         "Sample prep date",
         null=True,
         blank=True,
+        default=datetime.date.today
     )
     sorting_location = create_chrfield(
         "Sorting location",
