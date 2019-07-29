@@ -10,7 +10,6 @@
             <md-button  @click="showDialog = true">Guide <md-icon>contact_support</md-icon></md-button>
             {% include "core/vue/status-tutorial.html" %}
             <md-button @click="showFilter =true">Filter <md-icon>filter_list</md-icon></md-button>
-            <md-progress-spinner v-if="loading" :md-diameter="30" :md-stroke="3" md-mode="indeterminate"></md-progress-spinner>
             <md-dialog :md-active.sync="showFilter">
                 <md-dialog-title>Filter Table</md-dialog-title>
                 <md-dialog-content> 
@@ -27,13 +26,13 @@
                       </md-datepicker>
                     </div>
                   <md-dialog-actions>
-                      
                       <md-button class="md-primary" @click="resetFilter">Reset</md-button>
                       <md-button class="md-primary" @click="triggerFilter">Apply</md-button>
                       <md-button class="md-primary" @click="showFilter = false">Close</md-button>
                   </md-dialog-actions>
                 </md-dialog-content>
             </md-dialog>
+            <md-progress-spinner v-if="loading" :md-diameter="30" :md-stroke="3" md-mode="indeterminate"></md-progress-spinner>
             <md-chip v-if="applyFilter" class="md-accent">Filter Applied</md-chip>
           </md-app-toolbar>
           <md-app-drawer md-permanent="full">
@@ -185,15 +184,16 @@
           query = true
           if (this.searchQuery.submission)
             if(curr.submission) query &= (this.searchQuery.submission.toISOString().split('T')[0] === curr.submission)
-            else return false
+            else query = false
           if (this.searchQuery.updated)
             if(curr.last_updated) query &= (this.searchQuery.updated.toISOString().split('T')[0] === curr.last_updated)
-            else return false
+            else query =  false
           if(this.searchQuery.key)
             query &= (curr.library + curr.name + ((curr.jira) ? curr.jira : "")).toLowerCase().includes(this.searchQuery.key.toLowerCase())
           if(query) acc.push(index)
           return acc
-            },[])          
+            },[])   
+        console.log(this.searchIndexes)       
         this.searchTotal = this.searchIndexes.length
         this.searchPage = Math.ceil((this.searchTotal)/PAGINATION) 
       },
