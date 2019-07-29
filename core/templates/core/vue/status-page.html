@@ -35,17 +35,7 @@
                 </md-dialog-content>
             </md-dialog>
             <md-chip v-if="applyFilter" class="md-accent">Filter Applied</md-chip>
-            <md-dialog-alert
-            :md-active.sync="showLaneMessage"
-            md-content="Everything is bit <b>SLOW</b>. But he is trying his best. <br>
-                        <b>WETLAB</b> and <b>NO ANALYSIS</b> view display lane info related to Library, not analysis.<br> 
-                        <b>Filter</b> is currently <b>Disabled.</b><br>
-                        <b>Sorting by date</b> is currently Disabled.<br>
-                        <b>Guide</b> is Outdated.
-                        "
-            md-confirm-text="Cool!" />
           </md-app-toolbar>
-          
           <md-app-drawer md-permanent="full">
             <md-list class="md-double-line" style="height: 100vh;">
               <md-subheader>Welcome Stranger!</md-subheader>
@@ -101,7 +91,6 @@
       //  Pop up
       test : [],
       showDialog: false,
-      showLaneMessage: true,
       // Search
       searchQuery: {
         key : "",
