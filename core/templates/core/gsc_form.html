@@ -256,10 +256,6 @@
           },
 
           downloadTable: function() {
-            console.log(this.results)
-            console.log(typeof(this.results))
-            console.log(JSON.stringify(this.results))
-
             const replacer = (key, value) => value === null ? '' : value
 
             var element = document.createElement("a");
@@ -268,11 +264,9 @@
             csv.unshift(header.join(','))
             csv = csv.join('\r\n')
 
-            console.log(csv)
-
             element.setAttribute(
               "href",
-              "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(csv))
+              "data:text/plain;charset=utf-8," + encodeURIComponent(csv)
             )
 
             element.setAttribute("download", this.tableFilename);
