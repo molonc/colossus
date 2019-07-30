@@ -58,15 +58,12 @@ from .models import (
     MetadataField,
     JiraUser,
     Project,
-    PipelineTag
 )
 
 from sisyphus.models import *
 from .forms import (
     SampleForm,
     AdditionalSampleInfoInlineFormset,
-    GSCFormDeliveryInfo,
-    GSCFormSubmitterInfo,
     ProjectForm,
     JiraConfirmationForm,
     AddWatchersForm,
@@ -75,9 +72,9 @@ from .forms import (
 from .utils import (
     create_sublibrary_models,
     create_doublet_info_model,
-    generate_samplesheet,
-    generate_gsc_form,
-    get_sample_info, get_wetlab_analyses, fetch_montage, validate_imported)
+    fetch_montage,
+    validate_imported,
+    fetch_row_objects)
 from .jira_templates.templates import (
     get_reference_genome_from_sample_id,
     generate_dlp_jira_description,
@@ -157,36 +154,17 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
     def get(self, request):
         return self.get_context_and_render(request)
 
-    def post(self, request):
-        data = json.loads(request.body.decode('utf-8'))
-        if PipelineTag.objects.filter(title= data["title"]).exists():
-            return HttpResponse("fail")
-        pipelinetag = PipelineTag.objects.create(title = data["title"])
-        pipelinetag.save()
-        pipelinetag.sample_set.add(*list(Sample.objects.filter(pk__in=data["selected"])))
-        return HttpResponse("success")
-
     def handle_request(request):
         data = json.loads(request.body.decode('utf-8'))
-        returnJson = {}
-        if data["type"] == "fetchSample":
-            returnJson["samples"] = get_sample_info(data["id"])
-            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
-        elif data["type"] == "fetchWetlab":
-            returnJson["samples"] = get_wetlab_analyses()
-            return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
-        elif data["type"] == "fetchMontage":
+        if data["type"] == "fetchMontage":
             return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
-            return HttpResponse(json.dumps(validate_imported(data["id"])))
-        elif data["type"] =="deleteTag":
-            print(request.POST.get('id'))
-            PipelineTag.objects.get(id=data['id']).delete()
-            return HttpResponse("deleted")
-        return None
+            return HttpResponse(json.dumps(validate_imported(DlpAnalysisInformation.objects.get(analysis_jira_ticket=data["id"]))))
+        else:
+            return HttpResponse(json.dumps(fetch_row_objects(data["type"], data["name"])))
 
     def pipeline_status_page(request):
-      pipelinetags = list(PipelineTag.objects.values("id", "title"))
+      pipelinetags = list(Project.objects.values("id", "name"))
       return render( request, "core/vue/status-page.html",
                      { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
 #============================
@@ -445,6 +423,7 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
     template_name = 'core/jira_ticket_confirm.html'
 
     def get(self, request):
+        jira_user = request.session['jira_user']
         projects = get_projects(request.session['jira_user'], request.session['jira_password'])
         form = JiraConfirmationForm()
         #Set default values for DLP and TenX Library Ticket Creation
@@ -452,7 +431,7 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
         if(request.session['library_type'] == 'dlp'):
             form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
             form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
-            form.fields['reporter'].initial = 'elaks'
+            form.fields['reporter'].initial = jira_user 
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
             form.fields['description'].initial = 'Awaiting first sequencing...'
@@ -571,6 +550,10 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             jira_user = lib_form['jira_user'].value()
                             jira_password = lib_form['jira_password'].value()
                             additional_title = lib_form['additional_title'].value()
+                            jira_user_object = JiraUser.objects.get_or_create(
+                                username=jira_user,
+                                name=jira_user
+                            )
 
                         #Add these fields into Session so the JiraTicketConfirm View can access them
                         if validate_credentials(jira_user, jira_password):

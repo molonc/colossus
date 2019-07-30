@@ -1,5 +1,5 @@
 <div>
-  <md-dialog :md-active.sync="showDialog">
+  <md-dialog :md-active.sync="showDialog" style="width: 800px;">
       <md-dialog-title>Hi! :) Welcome to Analysis Pipeline Status Page.</md-dialog-title>
 
       <md-dialog-content>
@@ -18,20 +18,34 @@
       <h5>Cool, how do I use it?</h5>
       <p>
         If you work on a wetlab located in 3rd floor, just press
-      <button class="project-button" squared><span>Wetlab</span></button>
+      </p>
+      <div>
+        <md-radio />
+        <span class="md-list-item-text"> WETLAB</span>
+      </div>
+      <p>
         located on left menu.
         This should load all the analyses that are:<br>
-        <b>1. Updated within last two weeks.</b><br>
-        <b>2. Related to sequencings with mismatching number of lanes to requested lane number.</b><br>
+        <b>1. Completed within last 2 weeks.</b><br>
+        <b>2. Lane was requested within last 2 months, but not yet completed.</b><br>
         <b>3. Library has to be post-2019</b><br><br>
-        But let's say you want to create your own list.<br>
-        Then simply click  <md-icon>add</md-icon> located in lower left corner. <br>
-        This will take you to <b>ProjectTag</b> create page.<br>
-        <b>ProjectTag</b> is a new model we came up with. It currently only has 2 fields: Title and samples. 
-        You set the title and add all the samples you want to attach, then the table will be populated with all the analyses 
-        attached to that samples.<br>
-        Similarly, use <md-icon>remove</md-icon> to remove <b>ProjectTag</b>.<br>
-        It does not auto refresh at the moment.
+        There are also INCOMPLETE and NO ANALYSIS lists:
+      </p>
+      <p>
+          <b>NO ANALYSIS</b>: Get information from libraries with correct lane number but no analyses attached to it.<br>
+          <b>INCOMPLETE</b>: Get information from all analyses with run_status not set as either one of complete, align_complete or hmmcopy_complete.<br><br>
+          Or you can chose <b>Project</b> if you wants to have a customized collection of DLP libraries.<br><br>
+          
+          <h5>Excuse me, what is <b>Requested Date</b> and <b>Lane</b>?</h5>
+          <p>
+              <b>Requested Date</b>: How is it computed? Firstly, does the row have analysis attached to it? If yes, 
+              we look at all the sequencings related to that analysis and get the latest Lane Requested Date from sequencings. 
+              If no, we look at all the sequencings related to the library instead.<br> 
+              For WETLAB and NO ANALYSIS lists, second method is used as default. <br>
+              <b>Lane</b>: You can see that Lane value is displayed as a fraction. 
+              Numerator represents the number of lanes physically attached to the analysis.
+              Denominator is the sum of all the related sequencings' requested number of lanes.<br>
+          </p>
       </p>
       <br>
       <h5>Your table is weird and ugly, and I do not understand it</h5>
@@ -41,10 +55,10 @@
         Ok firstly if the row is pretty mint green<br>
         <b-button squared class="row-button sample-name" style="background-color: #c8e6c5">CoolMintyGreen</b-button>
         That means the data for the library is <b>imported.</b><br>
-        This one on the other hand is depressing grey.
-        <b-button squared class="row-button sample-name" style="background-color: #f2f2f2">UglyGrey</b-button>
+        This one on the other hand is depressingly boring greyish white colour.
+        <b-button squared class="row-button sample-name" style="background-color: #f2f2f2">Boring</b-button>
         This one is <b>not imported.</b><br>
-        For an analysis to be considered imported, it needs to have lane number equal or greater than requested number of lanes.<br>
+        For an analysis to be considered imported, it needs to have lane number equal or smaller than the total lane number of related sequencings.<br>
       </p>
       <br>
       <h6>Give me Filter</h6>
@@ -80,7 +94,6 @@
           1. Column  Sorting<br>
           2. Search<br>
           3. Faster Loading<br>
-          4. ProjectTag Edit<br>
         </b>
         If you notice that something is broken, or want something more, please contact the dev team.
         <br>

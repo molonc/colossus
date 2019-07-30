@@ -1,73 +1,69 @@
-<script>
-var Row =  {
-  props: ['sample'],
-  methods: {
-    showLegend() {},
-    setShow() {this.sample.show = !this.sample.show},
-    returnURL(type,pk) {
-      return window.origin + type + "/" + pk
-      },
-    returnJiraURL(jira) {return "//www.bcgsc.ca/jira/browse/" + jira },
-    returnMontageURL(jira) {return "//https://52.235.35.201/?dashboard=" + jira}
-  },
-  template: `
-  <b-button-group @click="setShow" style="margin-top : 1px;">
-    <b-button squared v-if="sample.submission" class="row-button ln110" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.submission}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button squared v-else class="row-button ln110">N/A</b-button>
-    <b-button v-if="sample.last_updated" class="row-button ln130" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.last_updated}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln130" :style="sample.imported">N/A</b-button>
-    <b-button class="row-button sample-name" :style="sample.imported" :href="returnURL('/core/sample',sample.id)">{% verbatim %}{{sample.name}}{% endverbatim %}</b-button>
-    <b-button v-if="sample.library" class="row-button ln110" :style="sample.imported" :href="returnURL('/dlp/library',sample.library)">
-        {% verbatim %}{{sample.library}}{% endverbatim %}
-    </b-button>
-    <b-button v-else class="row-button ln110" :style="sample.imported" >
-    <b-badge variant="warning">No DLP</b-badge>
-    </b-button>
-    <b-button v-if="sample.jira" class="row-button ln100" :style="sample.imported" :href="returnJiraURL(sample.jira)">
-     {% verbatim %}{{sample.jira}}{% endverbatim %}
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported" >
-    <b-badge variant="warning">No Analysis</b-badge>
-    </b-button>
-    <b-button v-if="sample.montage" class="row-button ln100" :style="sample.imported" :href="returnMontageURL(sample.jira)">Link</b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.version" class="row-button ln100" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.version}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.aligner" class="row-button ln100" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.aligner}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button v-if="sample.lanes" class="row-button ln100" :style="sample.imported">
-      <b-badge variant="primary">
-      {% verbatim %}{{sample.lanes}}{% endverbatim %}
-      </b-badge>
-    </b-button>
-    <b-button v-else class="row-button ln100" :style="sample.imported">N/A</b-button>
-    <b-button class="row-button" :style="sample.imported">
-      <b-badge :variant="sample.pipeline.align">align</b-badge>
-      <b-badge :variant="sample.pipeline.hmmcopy">hmmcopy</b-badge>
-      <b-badge :variant="sample.pipeline.qc">QC</b-badge>
-    </b-button>
-    <b-button squared class="row-button ln110" :style="sample.imported">
-      <b-badge @mouseover="showLegend" :variant="sample.pipeline.pseudo">pseudobulk</b-badge>
-    </b-button>
-  </b-button-group>
-
-  `
-  }
-
-  </script>
+<md-table-row slot="md-table-row" slot-scope="{ item }" :style="item.imported">
+    <md-table-cell class="ln140" md-label="Requested" >
+      <div v-if="item.submission">
+        {% verbatim %}{{item.submission}}{% endverbatim %}
+      </div>
+      <div v-else>None</div>                              
+    </md-table-cell>
+    <md-table-cell md-label="Updated">
+      <div v-if="item.last_updated">
+      {% verbatim %}{{item.last_updated}}{% endverbatim %}
+      </div>
+      <div v-else>None</div>   
+    </md-table-cell>
+    <md-table-cell style="min-width: 200px;" md-label="Sample ID">
+      <a :href="returnURL('/core/sample',item.name)">
+      {% verbatim %}{{item.name}}{% endverbatim %}
+      </a>
+    </md-table-cell>
+    <md-table-cell md-label="Library">
+      <div v-if="item.library">
+        <a :href="returnURL('/dlp/library',item.library)">
+        {% verbatim %}{{item.library}}{% endverbatim %}
+        </a>
+      </div>
+      <b-badge variant="secondary" v-else>N/A</b-button>                              
+    </md-table-cell>                            
+    <md-table-cell md-label="Analysis">
+      <div v-if="item.jira">
+        <a :href="returnJiraURL(item.jira)">
+        {% verbatim %}{{item.jira}}{% endverbatim %}
+        </a>
+      </div>
+      <b-badge variant="secondary" v-else>N/A</b-button>                              
+    </md-table-cell>
+    <md-table-cell md-label="Montage">
+      <div v-if="item.montage">
+        <a :href="returnMontageURL(item.jira)"> Link </a>
+      </div>
+      <b-badge variant="secondary" v-else>N/A</b-button>
+    </md-table-cell>
+    <md-table-cell  md-label="Version">
+      <div v-if="item.version">
+        {% verbatim %}{{item.version}}{% endverbatim %}
+      </div>
+      <b-badge variant="secondary" v-else>N/A</b-button>
+    </md-table-cell>
+    <md-table-cell md-label="Aligner">
+      <div v-if="item.aligner">
+        {% verbatim %}{{item.aligner}}{% endverbatim %}
+      </div>
+      <b-badge variant="secondary" v-else>N/A</b-button>
+    </md-table-cell>
+    <md-table-cell md-label="Lanes">  
+      <div v-if="item.lanes" variant="primary">
+        {% verbatim %}{{item.lanes}}{% endverbatim %}
+      </div>
+      <b-badge  variant="secondary" v-else>N/A</b-badge>
+    </md-table-cell>
+    <md-table-cell style="min-width: 180px;" md-label="Pipeline">
+      <div>
+        <b-badge :variant="item.pipeline.align">align</b-badge>
+        <b-badge :variant="item.pipeline.hmmcopy">hmmcopy</b-badge>
+        <b-badge :variant="item.pipeline.qc">QC</b-badge>
+      </div>
+    </md-table-cell>
+    <md-table-cell md-label="Pseudobulk">
+      <b-badge :variant="item.pipeline.pseudo">pseudobulk</b-badge>
+    </md-table-cell>
+</md-table-row>

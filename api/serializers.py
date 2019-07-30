@@ -134,6 +134,18 @@ class TagSerializerField(serializers.ModelSerializer):
         fields = (
             'id',
             'name'
+            'library',
+            'adapter',
+            'read_type',
+            'index_read_type',
+            'sequencing_instrument',
+            'submission_date',
+            'dlplane_set',
+            'gsc_library_id',
+            'sequencing_center',
+            'rev_comp_override',
+            'number_of_lanes_requested',
+            'lane_requested_date',
         )
 
 
