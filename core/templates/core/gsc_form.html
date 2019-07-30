@@ -77,6 +77,9 @@
                 {% verbatim %} {{errorMsg}}{% endverbatim %}
               </b-card-text>
             <b-table responsive hover small :items="results"></b-table>
+            <b-button class="show-hide" style="float: right; background-color:#76ccc7; border: none;" @click="downloadTable"> 
+              <i class="fas fa-download"></i>
+            </b-button>
           </b-container>
           </b-collapse>
 
@@ -91,7 +94,7 @@
           text-variant="white"
         >
           <b-container>
-            <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo"> Download CSV </b-button>
+            <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo"> <i class="fas fa-download"></i> Sublibrary Info</b-button>
             <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
             <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
           </b-container>
@@ -122,6 +125,7 @@
           log: [],
           selectedEmpty: true,
           downloaded: false,
+          tableFilename: "gsc_helper_table.csv",
           currentLibraryResponse: {},
           configData: {},
           librariesSelected: [],
@@ -250,6 +254,35 @@
               )
             }
           },
+
+          downloadTable: function() {
+            console.log(this.results)
+            console.log(typeof(this.results))
+            console.log(JSON.stringify(this.results))
+
+            const replacer = (key, value) => value === null ? '' : value
+
+            var element = document.createElement("a");
+            const header = Object.keys(this.results[0])
+            let csv = this.results.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+            csv.unshift(header.join(','))
+            csv = csv.join('\r\n')
+
+            console.log(csv)
+
+            element.setAttribute(
+              "href",
+              "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(csv))
+            )
+
+            element.setAttribute("download", this.tableFilename);
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+
+
+          }
         },
         computed: {
           libraryDisplay() {
@@ -350,7 +383,7 @@
       border-color: #a3a3a3;
       float: left;
       vertical-align: middle;
-      width: 9em;
+      width: 11em;
     }
     .container-fluid {
         width: 75% !important;
