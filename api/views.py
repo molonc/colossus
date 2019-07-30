@@ -341,6 +341,7 @@ class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'library',
         'tenx_pool',
         'sequencing_center',
+        'gsc_library_id'
     )
 
 class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):

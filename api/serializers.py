@@ -134,6 +134,7 @@ class SequencingSerializer(serializers.ModelSerializer):
             'sequencing_center',
             'rev_comp_override',
             'number_of_lanes_requested',
+            'lane_requested_date',
         )
 
 
