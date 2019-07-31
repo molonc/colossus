@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -8,21 +9,9 @@
 
     <title>GSC Form Submission</title>
 
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"
-    />
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
-    />
-    <link
-      rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
-      integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
-      crossorigin="anonymous"
-    >
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
     <script src="https://unpkg.com/vue"></script>
@@ -31,360 +20,497 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  </head>
+</head>
 
-  <body>
+<body>
     {% load staticfiles %}
-      <b-container fluid id="gsc-form">
-        <b-button @click="goHome" > <i class="fas fa-home"></i> Colossus</b-button>
-        <b-card
-        id="gsc-card"
-        overlay
-        style="background-color: #72ccc0; border-style: none; height: 100px"
-        class="mb-2 rounded-0"
-        text-variant="white"
-        >
-          <b-card-text class="show-hide">
-              <h3> GSC Submission Helper</h3>
-          </b-card-text>
+    <b-container fluid id="gsc-form">
+        <b-button @click="goHome"> <i class="fas fa-home"></i> Colossus</b-button>
+        <b-card id="gsc-card" overlay style="background-color: #72ccc0; border-style: none; height: 100px" class="mb-2 rounded-0" text-variant="white">
+            <b-card-text class="show-hide">
+                <h3> GSC Submission Helper</h3>
+            </b-card-text>
         </b-card>
 
         <b-card>
-          <b-collapse v-model="showCollapse" id="collapse-1">
-          <b-container id="bottom-selector">
-              <b-row >
-                  <b-col>
-                      <i class="fa fa-child" ></i></i> Libraries:
-                      <b-form-input v-model="searchLibraryKey"></b-form-input>
-                      <b-form-select v-model="selectedInLibs" :options="libraryDisplay" multiple :select-size="4"></b-form-select>
-                      <b-button class="my-button"  v-on:click="addSelectedLib" variant="primary">Add</b-button>
-                  </b-col>
-                  <b-col>
-                      <i class="fa fa-edit"></i> Selected:
-                      <b-form-input v-model="searchSelectedKey"></b-form-input>
-                      <b-form-select v-model="selectedInSelected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
-                      <b-button class="my-button" v-show="!selectedEmpty" v-on:click="removeAllLibs" variant="primary">Remove All</b-button>
-                      <b-button class="my-button  remove-button" v-show="!selectedEmpty" v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
-                  </b-col>
-              </b-row>
-          </b-container>
-          </b-collapse>
+            <b-collapse v-model="showCollapse" id="collapse-1">
+                <b-container id="bottom-selector">
+                    <b-row>
+                        <b-col>
+                            <i class="fa fa-child"></i></i> Libraries:
+                            <b-form-input v-model="searchLibraryKey"></b-form-input>
+                            <b-form-select v-model="selectedInLibs" :options="libraryDisplay" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button" v-on:click="addSelectedLib" variant="primary">Add</b-button>
+                        </b-col>
+                        <b-col>
+                            <i class="fa fa-edit"></i> Selected:
+                            <b-form-input v-model="searchSelectedKey"></b-form-input>
+                            <b-form-select v-model="selectedInSelected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
+                            <b-button class="my-button" v-show="!selectedEmpty" v-on:click="removeAllLibs" variant="primary">Remove All</b-button>
+                            <b-button class="my-button  remove-button" v-show="!selectedEmpty" v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
+                        </b-col>
+                    </b-row>
+                </b-container>
+            </b-collapse>
 
-          <b-collapse id="collapse-2">
-          <b-container fluid class="inner-container" id="bottom-result">
-              <b-card-text class="text-center" v-if="noLibrariesSelected">
-                {% verbatim %} {{errorMsg}}{% endverbatim %}
-              </b-card-text>
-            <b-table responsive hover small :items="results"></b-table>
-            <b-button class="show-hide" style="float: right; background-color:#76ccc7; border: none;" @click="downloadTable"> 
-              <i class="fas fa-download"></i>
-            </b-button>
-          </b-container>
-          </b-collapse>
+            <b-collapse id="collapse-2">
+                <b-container fluid class="inner-container" id="bottom-result">
+                    <b-card-text class="text-center" v-if="noLibrariesSelected">
+                        {% verbatim %} {{errorMsg}}{% endverbatim %}
+                    </b-card-text>
+                    <b-table responsive hover small :items="results">
+                        <template slot="HEAD_Pool ID" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col" :value="getPoolIds">
+                            </b-button>
+                        </template>
+                        <!-- <template slot="HEAD_Taxonomy ID" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Anatomic Site" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Pathology Disease Name" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Library Type" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Construction Method" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Size Range" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Average Size" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Xenograph" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Concentration(nM)" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Volume" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template>
+                        <template slot="HEAD_Quantification Method" slot-scope="data">
+                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
+                              <input type="hidden" id="copy-col">
+                            </b-button>
+                        </template> -->
+                    </b-table>
+                </b-container>
+            </b-collapse>
 
-
-
+            <b-card class="border-0" v-show="!showCollapse">
+                <b-button class="show-hide" style="float: right; background-color:#76ccc7; border: none;" @click="downloadTable">
+                    <i class="fas fa-download"></i>
+                </b-button>
+            </b-card>
         </b-card>
-        <b-card
-          id="gsc-card"
-          overlay
-          style="background-color: #72ccc0; border-style: none; height: 100px"
-          class="mb-2 rounded-0"
-          text-variant="white"
-        >
-          <b-container>
-            <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo"> <i class="fas fa-download"></i> Sublibrary Info</b-button>
-            <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
-            <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
-          </b-container>
+
+        <b-card id="gsc-card" overlay style="background-color: #72ccc0; border-style: none; height: 100px" class="mb-2 rounded-0" text-variant="white">
+            <b-container>
+                <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo"> <i class="fas fa-download"></i> Sublibrary Info</b-button>
+                <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
+                <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
+            </b-container>
         </b-card>
 
         <b-card v-for="(item) in log" v-model="log" v-bind:key="item.status">
-          {% verbatim %} {{item.status}} {% endverbatim %}
-          <div v-if="!downloaded" class="spinner-border spinner-border-sm float-right" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-          <div v-else style="float: right;"><i class="fas fa-check"></i></div>
+            {% verbatim %} {{item.status}} {% endverbatim %}
+            <div v-if="!downloaded" class="spinner-border spinner-border-sm float-right" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <div v-else style="float: right;"><i class="fas fa-check"></i></div>
         </b-card>
-      </b-container>
+    </b-container>
     </div>
 
     <script>
-      window.app = new Vue({
-        el: '#gsc-form',
-        data: {
-          showCollapse: true,
-          searchLibraryKey: "",
-          searchSelectedKey: "",
-          selectedInLibs: [],
-          selectedInSelected: [],
-          allLibraries: [],
-          results: [],
-          csvString: "",
-          log: [],
-          selectedEmpty: true,
-          downloaded: false,
-          tableFilename: "gsc_helper_table.csv",
-          currentLibraryResponse: {},
-          configData: {},
-          librariesSelected: [],
-          errorMsg: "No libraries were selected.",
-        },
-        methods: {
-          goHome: function() {
-            window.location = window.origin
-          },
-          addSelectedLib: function() {
-            for (var i=0; i < this.allLibraries.length; i++){
-              if (this.selectedInLibs.includes(this.allLibraries[i].value)){
-                this.allLibraries[i].userselect = true
-                this.librariesSelected.push(this.allLibraries[i])
-              }
-            }
-            this.showRemoveButton()
-          },
-          removeSelectedLib: function() {
-            for (var i=0; i < this.allLibraries.length; i++){
-              if (this.selectedInSelected.includes(this.allLibraries[i].value)){
-                console.log(`removing ${this.allLibraries[i].text}`)
-                this.allLibraries[i].userselect = false
-                this.librariesSelected.pop(this.allLibraries[i])
-              }
-            }
-            this.showRemoveButton()
-          },
-          removeAllLibs: function() {
-              for (var i=0; i < this.allLibraries.length; i++){
-                if (this.allLibraries[i].userselect) {
-                  console.log(`removing ${this.allLibraries[i].text}`)
-                  this.allLibraries[i].userselect = false
+        window.app = new Vue({
+            el: '#gsc-form',
+            data: {
+                showCollapse: true,
+                searchLibraryKey: "",
+                searchSelectedKey: "",
+                selectedInLibs: [],
+                selectedInSelected: [],
+                allLibraries: [],
+                results: [],
+                csvString: "",
+                log: [],
+                selectedEmpty: true,
+                downloaded: false,
+                tableFilename: "gsc_helper_table.csv",
+                currentLibraryResponse: {},
+                configData: {},
+                librariesSelected: [],
+                errorMsg: "No libraries were selected.",
+                showCopy: false
+            },
+            methods: {
+                goHome: function() {
+                    window.location = window.origin
+                },
+                addSelectedLib: function() {
+                    for (var i = 0; i < this.allLibraries.length; i++) {
+                        if (this.selectedInLibs.includes(this.allLibraries[i].value)) {
+                            this.allLibraries[i].userselect = true
+                            this.librariesSelected.push(this.allLibraries[i])
+                        }
+                    }
+                    this.showRemoveButton()
+                },
+                removeSelectedLib: function() {
+                    for (var i = 0; i < this.allLibraries.length; i++) {
+                        if (this.selectedInSelected.includes(this.allLibraries[i].value)) {
+                            console.log(`removing ${this.allLibraries[i].text}`)
+                            this.allLibraries[i].userselect = false
+                            this.librariesSelected.pop(this.allLibraries[i])
+                        }
+                    }
+                    this.showRemoveButton()
+                },
+                removeAllLibs: function() {
+                    for (var i = 0; i < this.allLibraries.length; i++) {
+                        if (this.allLibraries[i].userselect) {
+                            console.log(`removing ${this.allLibraries[i].text}`)
+                            this.allLibraries[i].userselect = false
+                        }
+                        this.librariesSelected = []
+                    }
+                    this.showRemoveButton()
+                },
+                showRemoveButton: function() {
+                    this.selectedEmpty = (this.librariesSelected.length == 0 ? true : false)
+                },
+                updateCollapse: function() {
+                    this.showCollapse = !this.showCollapse
+                },
+                showSelectedData: function() {
+                    this.updateCollapse()
+                    var selectedlist = []
+                    for (var i = 0; i < this.librariesSelected.length; i++) {
+                        selectedlist.push(this.librariesSelected[i].value)
+                        console.log(this.librariesSelected[i].value)
+                    }
+                    if (selectedlist.length == 0) {
+                        console.log("No libraries selected")
+                    } else {
+                        console.log(`${this.librariesSelected.length} selected`)
+                    }
+                    axios({
+                        method: 'post',
+                        url: window.origin + "/core/gsc_data",
+                        dataType: "json",
+                        data: {
+                            "selected": selectedlist
+                        },
+                        headers: {
+                            "X-CSRFToken": Cookies.get('csrftoken'),
+                            "content-type": "application/json"
+                        }
+                    }).then((response) => {
+                        this.results = response.data
+                        this.resultsHeader = Object.keys(this.results[0])
+                    })
+                },
+                createCSV: function() {
+                    this.csvString = this.currentLibraryResponse.data
+
+                    // create hyperlink element
+                    var element = document.createElement('a');
+                    // add attributes
+                    element.setAttribute(
+                        'href',
+                        // specify data's media type, and replace URL reserved characters with their UTF-8 encoding
+                        'data:text/plain;charset=utf-8,' + encodeURIComponent(this.csvString)
+                    );
+                    // when this link is clicked, download it with this name
+                    element.setAttribute('download', this.filename);
+                    // once this element is appended in the DOM, don't display this element
+                    element.style.display = 'none';
+                    // append in DOM, then clean up
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                    this.downloaded = true
+                    this.log.pop()
+                    status = `Downloaded ${this.filename}`
+                    this.log.push({
+                        status: status
+                    })
+                },
+                downloadSelectedSublibraryInfo: function() {
+                    this.log = []
+                    this.downloaded = false
+                    for (var i = 0; i < this.librariesSelected.length; i++) {
+                        axios({
+                            method: 'post',
+                            url: window.origin + "/core/download_sublibrary",
+                            dataType: "json",
+                            data: {
+                                "libraryPk": this.librariesSelected[i].value,
+                                "libraryName": this.librariesSelected[i].text
+                            },
+                            headers: {
+                                "X-CSRFToken": Cookies.get('csrftoken'),
+                                "content-type": "application/json"
+                            }
+                        }).then((response) => {
+                            this.currentLibraryResponse = response
+                            this.configData = JSON.parse(this.currentLibraryResponse.config.data)
+                            this.filename = `${this.configData.libraryName}_sublibrary_info.csv`
+                            var status = `Downloading ${this.filename}  \n`
+                            this.log.push({
+                                status: status
+                            })
+                            this.createCSV()
+                        })
+                    }
+                },
+
+                downloadTable: function() {
+                    const replacer = (key, value) => value === null ? '' : value
+
+                    var element = document.createElement("a");
+                    const header = Object.keys(this.results[0])
+                    let csv = this.results.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+                    csv.unshift(header.join(','))
+                    csv = csv.join('\r\n')
+
+                    element.setAttribute(
+                        "href",
+                        "data:text/plain;charset=utf-8," + encodeURIComponent(csv)
+                    )
+
+                    element.setAttribute("download", this.tableFilename);
+                    element.style.display = "none";
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+
+
+                },
+                copyColumn: function() {
+                    const copyToClipboard = document.querySelector('#copy-col')
+                    console.log(copyToClipboard)
+                    copyToClipboard.setAttribute('type', 'text')
+                    copyToClipboard.select()
+                    try {
+                        var successful = document.execCommand('copy');
+                        console.log("Copied!")
+                            // this.$notify.info({
+                            //     title: 'Info',
+                            //     message: 'This is an info message'
+                            // });
+                            // var msg = successful ? 'successful' : 'unsuccessful';
+                            // alert('Testing code was copied ' + msg);
+                    } catch (err) {
+                        alert('Oops, unable to copy');
+                    }
+                    copyToClipboard.setAttribute('type', 'hidden')
+                    window.getSelection().removeAllRanges()
+                },
+                // copyColumn: function() {
+                //     const copyToClipboard = document.querySelector('#copy-col')
+                //     console.log(copyToClipboard)
+                //     copyToClipboard.setAttribute('type', 'text')
+                //     copyToClipboard.select()
+                //     try {
+                //         var successful = document.execCommand('copy');
+                //         console.log("Copied!")
+                //             // this.$notify.info({
+                //             //     title: 'Info',
+                //             //     message: 'This is an info message'
+                //             // });
+                //             // var msg = successful ? 'successful' : 'unsuccessful';
+                //             // alert('Testing code was copied ' + msg);
+                //     } catch (err) {
+                //         alert('Oops, unable to copy');
+                //     }
+                //     copyToClipboard.setAttribute('type', 'hidden')
+                //     window.getSelection().removeAllRanges()
+                // },
+                mouseover: function() {
+                    this.showCopy = true
+                    console.log("SHOW COPY")
+                },
+                mouseleave: function() {
+                    this.showCopy = false
+                    console.log("DONT SHOW COPY")
                 }
-                this.librariesSelected = []
-              }
-              this.showRemoveButton()
-          },
-          showRemoveButton: function() {
-            this.selectedEmpty = (this.librariesSelected.length == 0 ? true: false)
-          },
-          updateCollapse: function() {
-            this.showCollapse = !this.showCollapse
-          },
-          showSelectedData: function() {
-            this.updateCollapse()
-            var selectedlist = []
-            for (var i=0; i < this.librariesSelected.length; i++){
-              selectedlist.push(this.librariesSelected[i].value)
-              console.log(this.librariesSelected[i].value)
-            }
-            if (selectedlist.length == 0){
-              console.log("No libraries selected")
-            }
-            else {
-              console.log(`${this.librariesSelected.length} selected`)
-            }
-            axios(
-              {
-                method: 'post',
-                url: window.origin + "/core/gsc_data",
-                dataType: "json",
-                data: {
-                  "selected" : selectedlist
-                  },
-                headers: {
-                  "X-CSRFToken": Cookies.get('csrftoken'),
-                  "content-type": "application/json"
-                }
-              }
-            ).then( (response) => {
-              this.results = response.data
-              }
-            )
-          },
-          createCSV: function() {
-              this.csvString = this.currentLibraryResponse.data
+            },
+            computed: {
+                libraryDisplay() {
+                    var filter = this.searchLibraryKey
+                    search_results = this.allLibraries.filter(function(library) {
+                        return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
+                    })
+                    search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
+                    return search_results
+                },
+                selectedDisplay() {
+                    var filter = this.searchSelectedKey
+                    search_results = this.allLibraries.filter(function(library) {
+                        return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
+                    })
+                    search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
 
-              // create hyperlink element
-              var element = document.createElement('a');
-              // add attributes
-              element.setAttribute(
-                  'href',
-                  // specify data's media type, and replace URL reserved characters with their UTF-8 encoding
-                  'data:text/plain;charset=utf-8,' + encodeURIComponent(this.csvString)
-              );
-              // when this link is clicked, download it with this name
-              element.setAttribute('download', this.filename);
-              // once this element is appended in the DOM, don't display this element
-              element.style.display = 'none';
-              // append in DOM, then clean up
-              document.body.appendChild(element);
-              element.click();
-              document.body.removeChild(element);
-              this.downloaded = true
-              this.log.pop()
-              status = `Downloaded ${this.filename}`
-              this.log.push({status: status})
-          },
-          downloadSelectedSublibraryInfo: function() {
-            this.log = []
-            this.downloaded = false
-            for (var i=0; i < this.librariesSelected.length; i++){
-              axios(
-                {
-                  method: 'post',
-                  url: window.origin + "/core/download_sublibrary",
-                  dataType: "json",
-                  data: {
-                    "libraryPk" : this.librariesSelected[i].value,
-                    "libraryName" : this.librariesSelected[i].text
-                  },
-                  headers: {
-                    "X-CSRFToken": Cookies.get('csrftoken'),
-                    "content-type": "application/json"
-                  }
-                }
-              ).then( (response) => {
-                  this.currentLibraryResponse = response
-                  this.configData = JSON.parse(this.currentLibraryResponse.config.data)
-                  this.filename = `${this.configData.libraryName}_sublibrary_info.csv`
-                  var status = `Downloading ${this.filename}  \n`
-                  this.log.push({status: status})
-                  this.createCSV()
-                }
-              )
-            }
-          },
+                    search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
 
-          downloadTable: function() {
-            const replacer = (key, value) => value === null ? '' : value
-
-            var element = document.createElement("a");
-            const header = Object.keys(this.results[0])
-            let csv = this.results.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
-            csv.unshift(header.join(','))
-            csv = csv.join('\r\n')
-
-            element.setAttribute(
-              "href",
-              "data:text/plain;charset=utf-8," + encodeURIComponent(csv)
-            )
-
-            element.setAttribute("download", this.tableFilename);
-            element.style.display = "none";
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-
-
-          }
-        },
-        computed: {
-          libraryDisplay() {
-            var filter = this.searchLibraryKey
-            search_results = this.allLibraries.filter(function (library) {
-              return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
-            })
-            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
-            return search_results
-          },
-          selectedDisplay() {
-            var filter = this.searchSelectedKey
-            search_results = this.allLibraries.filter(function (library) {
-              return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
-            })
-            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
-
-            search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
-            
-            return search_results
-          },
-          noLibrariesSelected() {
-            return this.librariesSelected.length === 0
-          },
-          get_error_message() {
-            return this.errorMsg
-          },
-        },
-        created: function() {
-          this.allLibraries = JSON.parse(unescape("{{libraries| safe | escapejs}}"))
-        },
-      })
+                    return search_results
+                },
+                noLibrariesSelected() {
+                    return this.librariesSelected.length === 0
+                },
+                get_error_message() {
+                    return this.errorMsg
+                },
+                getPoolIds: function() {
+                    var poolIds = (this.results.map(pool => pool["Pool ID"])).join("\r\n")
+                    console.log(poolIds)
+                    return poolIds
+                },
+            },
+            created: function() {
+                this.allLibraries = JSON.parse(unescape("{{libraries| safe | escapejs}}"))
+            },
+        })
     </script>
 
     <style>
-    #gsc-form {
-        padding-top: 4%;
-        width: 800px;
-    }
-
-    #gsc-card {
-      width: 100%;
-      margin: 0 auto;
-      border-radius: 100px;
-      padding: 10px;
-    }
-    .show-button {
-      background-color: #a3a3a3;
-      border-color: #a3a3a3;
-      float: right;
-      vertical-align: middle;
-      width: 7em;
-    }
-    #bottom-selector {
-      height:220px;
-      align-content: center;
-      padding: 10px;
-    }
-    #bottom-result {
-      padding: 10px;
-      max-height:500px;
-      overflow-y: scroll;
-    }
-    .show-hide {
-      display: none;
-    }
-    /* Hide/Show elements when window is resized*/
-    @media screen and (min-width: 768px) {
-      .show-hide  { display: block; }
-      #leftside > button { display: none; }
-    }
-    .my-button {
-      background-color: #76ccc7;
-      border-color: #76ccc7;
-      float: right;
-      margin-top: 0.3em
-    }
-    .my-button:hover {
-      background-color: #5faaa5;
-      border-color: #5faaa5;
-    }
-    .submit-button {
-        float: right;
-        margin-top: 0.3em
-    }
-    .remove-button {
-        margin: 5px;
-    }
-    .back-button {
-      background-color: #a3a3a3;
-      border-color: #a3a3a3;
-      float: right;
-      vertical-align: middle;
-      width: 7em;
-    }
-    .download-button {
-      background-color: #a3a3a3;
-      border-color: #a3a3a3;
-      float: left;
-      vertical-align: middle;
-      width: 11em;
-    }
-    .container-fluid {
-        width: 75% !important;
-    }
-    .inner-container {
-      width: 100% !important;
-    }
+        #gsc-form {
+            padding-top: 4%;
+            width: 800px;
+        }
+        
+        #gsc-card {
+            width: 100%;
+            margin: 0 auto;
+            border-radius: 100px;
+            padding: 10px;
+        }
+        
+        .show-button {
+            background-color: #a3a3a3;
+            border-color: #a3a3a3;
+            float: right;
+            vertical-align: middle;
+            width: 7em;
+        }
+        
+        #bottom-selector {
+            height: 220px;
+            align-content: center;
+            padding: 10px;
+        }
+        
+        #bottom-result {
+            padding: 10px;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+        
+        .show-hide {
+            display: none;
+        }
+        /* Hide/Show elements when window is resized*/
+        
+        @media screen and (min-width: 768px) {
+            .show-hide {
+                display: block;
+            }
+            #leftside>button {
+                display: none;
+            }
+        }
+        
+        .my-button {
+            background-color: #76ccc7;
+            border-color: #76ccc7;
+            float: right;
+            margin-top: 0.3em
+        }
+        
+        .my-button:hover {
+            background-color: #5faaa5;
+            border-color: #5faaa5;
+        }
+        
+        .submit-button {
+            float: right;
+            margin-top: 0.3em
+        }
+        
+        .remove-button {
+            margin: 5px;
+        }
+        
+        .back-button {
+            background-color: #a3a3a3;
+            border-color: #a3a3a3;
+            float: right;
+            vertical-align: middle;
+            width: 7em;
+        }
+        
+        .download-button {
+            background-color: #a3a3a3;
+            border-color: #a3a3a3;
+            float: left;
+            vertical-align: middle;
+            width: 11em;
+        }
+        
+        .copy-btn {
+            width: 100%;
+        }
+        
+        .container-fluid {
+            width: 75% !important;
+        }
+        
+        .inner-container {
+            width: 100% !important;
+        }
     </style>
-  </body>
-</html>
+</body>
+
+</html>;
