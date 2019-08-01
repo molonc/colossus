@@ -207,6 +207,7 @@ def gsc_info_post(request):
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
 
 def download_sublibrary_info(request):
+
     library = get_object_or_404(DlpLibrary, pk=json.loads(request.body.decode('utf-8'))["libraryPk"])
     sublibraries = library.sublibraryinformation_set.all()
 
@@ -214,7 +215,9 @@ def download_sublibrary_info(request):
     for sublib in sublibraries:
         csvString += "{},{}-{}\n".format(
             sublib.get_sublibrary_id(),
-            sublib.primer_i7,
+            # Reverse complement the first index
+            str(sublib.primer_i7[::-1]).translate(
+                str.maketrans("ACTGactg", "TGACtgac")),
             sublib.primer_i5
         )
 
