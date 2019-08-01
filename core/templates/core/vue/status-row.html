@@ -22,7 +22,7 @@
         {% verbatim %}{{item.library}}{% endverbatim %}
         </a>
       </div>
-      <b-badge variant="secondary" v-else>N/A</b-button>                              
+      <b-badge variant="secondary" v-else>N/A</b-badge>
     </md-table-cell>                            
     <md-table-cell md-label="Analysis">
       <div v-if="item.jira">
@@ -30,25 +30,25 @@
         {% verbatim %}{{item.jira}}{% endverbatim %}
         </a>
       </div>
-      <b-badge variant="secondary" v-else>N/A</b-button>                              
+      <b-badge variant="secondary" v-else>N/A</b-badge>
     </md-table-cell>
     <md-table-cell md-label="Montage">
       <div v-if="item.montage">
         <a :href="returnMontageURL(item.jira)"> Link </a>
       </div>
-      <b-badge variant="secondary" v-else>N/A</b-button>
+      <b-badge variant="secondary" v-else>N/A</b-badge>
     </md-table-cell>
     <md-table-cell  md-label="Version">
       <div v-if="item.version">
         {% verbatim %}{{item.version}}{% endverbatim %}
       </div>
-      <b-badge variant="secondary" v-else>N/A</b-button>
+      <b-badge variant="secondary" v-else>N/A</b-badge>
     </md-table-cell>
     <md-table-cell md-label="Aligner">
       <div v-if="item.aligner">
         {% verbatim %}{{item.aligner}}{% endverbatim %}
       </div>
-      <b-badge variant="secondary" v-else>N/A</b-button>
+      <b-badge variant="secondary" v-else>N/A</b-badge>
     </md-table-cell>
     <md-table-cell md-label="Lanes">  
       <div v-if="item.lanes" variant="primary">
