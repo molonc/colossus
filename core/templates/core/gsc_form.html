@@ -20,6 +20,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
@@ -60,79 +61,91 @@
                     <b-card-text class="text-center" v-if="noLibrariesSelected">
                         {% verbatim %} {{errorMsg}}{% endverbatim %}
                     </b-card-text>
-                    <b-table responsive hover small :items="results">
+                    <b-table responsive hover small fixed :items="results">
                         <template slot="HEAD_Pool ID" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col" :value="getPoolIds">
+                            <div v-show="!showCopyButtons.pool" @mouseover="mouseover('pool')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.pool" @mouseleave="mouseleave('pool')" variant="light" size="sm"
+                              @click="copyToClipboard('Pool ID')">
+                              <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <!-- <template slot="HEAD_Taxonomy ID" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                        <template slot="HEAD_Taxonomy ID" slot-scope="data">
+                            <div v-show="!showCopyButtons.taxonomy" @mouseover="mouseover('taxonomy')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.taxonomy" @mouseleave="mouseleave('taxonomy')" variant="light" size="sm"
+                                @click="copyToClipboard('Taxonomy ID')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Anatomic Site" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.anatomic" @mouseover="mouseover('anatomic')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.anatomic" @mouseleave="mouseleave('anatomic')" variant="light" size="sm"
+                                @click="copyToClipboard('Anatomic Site')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Pathology Disease Name" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.pathologyDisese" @mouseover="mouseover('pathologyDisese')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.pathologyDisese" @mouseleave="mouseleave('pathologyDisese')" variant="light"
+                                size="sm" @click="copyToClipboard('Pathology Disease Name')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Library Type" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.libraryType" @mouseover="mouseover('libraryType')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.libraryType" @mouseleave="mouseleave('libraryType')"
+                                variant="light" size="sm" @click="copyToClipboard('Library Type')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Construction Method" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.construction" @mouseover="mouseover('construction')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.construction" @mouseleave="mouseleave('construction')" variant="light"
+                                size="sm" @click="copyToClipboard('Construction Method')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Size Range" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.sizeRange" @mouseover="mouseover('sizeRange')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.sizeRange" @mouseleave="mouseleave('sizeRange')"
+                                variant="light" size="sm" @click="copyToClipboard('Size Range')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Average Size" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.averageSize" @mouseover="mouseover('averageSize')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.averageSize" @mouseleave="mouseleave('averageSize')" variant="light"
+                                size="sm" @click="copyToClipboard('Average Size')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Xenograph" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.xenograph" @mouseover="mouseover('xenograph')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.xenograph" @mouseleave="mouseleave('xenograph')" variant="light"
+                                size="sm" @click="copyToClipboard('Xenograph')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Concentration(nM)" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.concentration" @mouseover="mouseover('concentration')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.concentration" @mouseleave="mouseleave('concentration')" variant="light"
+                                size="sm" @click="copyToClipboard('Concentration(nM)')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Volume" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.volume" @mouseover="mouseover('volume')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.volume" @mouseleave="mouseleave('volume')"
+                                variant="light" size="sm" @click="copyToClipboard('Volume')">
+                                <i class="far fa-copy"></i>
                             </b-button>
                         </template>
                         <template slot="HEAD_Quantification Method" slot-scope="data">
-                            <div v-show="!showCopy" @mouseover="mouseover" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopy" @mouseleave="mouseleave" variant="light" size="sm" @click="copyColumn"><i class="far fa-copy"></i>
-                              <input type="hidden" id="copy-col">
+                            <div v-show="!showCopyButtons.quantificationMethod" @mouseover="mouseover('quantificationMethod')" v-text="data.label"></div>
+                            <b-button class="copy-btn" v-show="showCopyButtons.quantificationMethod" @mouseleave="mouseleave('quantificationMethod')" variant="light" size="sm"
+                                @click="copyToClipboard('Quantification Method')">
+                                <i class="far fa-copy"></i>
                             </b-button>
-                        </template> -->
+                        </template> 
                     </b-table>
                 </b-container>
             </b-collapse>
@@ -182,7 +195,20 @@
                 configData: {},
                 librariesSelected: [],
                 errorMsg: "No libraries were selected.",
-                showCopy: false
+                showCopyButtons: {
+                    "pool": false,
+                    "taxonomy": false,
+                    "anatomic": false,
+                    "pathologyDisese": false,
+                    "libraryType": false,
+                    "construction": false,
+                    "sizeRange": false,
+                    "averageSize": false,
+                    "xenograph": false,
+                    "concentration": false,
+                    "volume": false,
+                    "quantificationMethod": false,
+                }
             },
             methods: {
                 goHome: function() {
@@ -228,7 +254,6 @@
                     var selectedlist = []
                     for (var i = 0; i < this.librariesSelected.length; i++) {
                         selectedlist.push(this.librariesSelected[i].value)
-                        console.log(this.librariesSelected[i].value)
                     }
                     if (selectedlist.length == 0) {
                         console.log("No libraries selected")
@@ -325,57 +350,57 @@
                     document.body.appendChild(element);
                     element.click();
                     document.body.removeChild(element);
-
-
                 },
-                copyColumn: function() {
-                    const copyToClipboard = document.querySelector('#copy-col')
-                    console.log(copyToClipboard)
-                    copyToClipboard.setAttribute('type', 'text')
-                    copyToClipboard.select()
-                    try {
-                        var successful = document.execCommand('copy');
-                        console.log("Copied!")
-                            // this.$notify.info({
-                            //     title: 'Info',
-                            //     message: 'This is an info message'
-                            // });
-                            // var msg = successful ? 'successful' : 'unsuccessful';
-                            // alert('Testing code was copied ' + msg);
-                    } catch (err) {
-                        alert('Oops, unable to copy');
-                    }
-                    copyToClipboard.setAttribute('type', 'hidden')
-                    window.getSelection().removeAllRanges()
+                copyToClipboard: function (columnElements) {
+                    console.log(columnElements)
+                    var text = this.results.map(pool => pool[columnElements])
+                    var text = text.join("\r")
+                    console.log(text)
+
+                    var copyElement = document.createElement("span");
+                    copyElement.appendChild(document.createTextNode(text));
+                    copyElement.id = 'tempCopyToClipboard';
+                    angular.element(document.body.append(copyElement));
+
+                    // select the text
+                    var range = document.createRange();
+                    range.selectNode(copyElement);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+
+                    // copy & cleanup
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
+                    copyElement.remove();
                 },
-                // copyColumn: function() {
-                //     const copyToClipboard = document.querySelector('#copy-col')
-                //     console.log(copyToClipboard)
-                //     copyToClipboard.setAttribute('type', 'text')
-                //     copyToClipboard.select()
-                //     try {
-                //         var successful = document.execCommand('copy');
-                //         console.log("Copied!")
-                //             // this.$notify.info({
-                //             //     title: 'Info',
-                //             //     message: 'This is an info message'
-                //             // });
-                //             // var msg = successful ? 'successful' : 'unsuccessful';
-                //             // alert('Testing code was copied ' + msg);
-                //     } catch (err) {
-                //         alert('Oops, unable to copy');
-                //     }
-                //     copyToClipboard.setAttribute('type', 'hidden')
-                //     window.getSelection().removeAllRanges()
+                // copyToClipboard: function(columnElements) {
+                //     var text = columnElements.join("\r")
+
+                //     var copyElement = document.createElement("span");
+                //     copyElement.appendChild(document.createTextNode(text));
+                //     copyElement.id = 'tempCopyToClipboard';
+                //     angular.element(document.body.append(copyElement));
+
+                //     // select the text
+                //     var range = document.createRange();
+                //     range.selectNode(copyElement);
+                //     window.getSelection().removeAllRanges();
+                //     window.getSelection().addRange(range);
+
+                //     // copy & cleanup
+                //     document.execCommand('copy');
+                //     window.getSelection().removeAllRanges();
+                //     copyElement.remove();
                 // },
-                mouseover: function() {
-                    this.showCopy = true
-                    console.log("SHOW COPY")
+                mouseover: function(element) {
+
+                    this.showCopyButtons[element] = true
+                    console.log(`show ${element} copy`)
                 },
-                mouseleave: function() {
-                    this.showCopy = false
-                    console.log("DONT SHOW COPY")
-                }
+                mouseleave: function(element) {
+                    this.showCopyButtons[element] = false
+                    console.log(`show ${element} copy`)
+                },
             },
             computed: {
                 libraryDisplay() {
@@ -393,8 +418,6 @@
                     })
                     search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
 
-                    search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
-
                     return search_results
                 },
                 noLibrariesSelected() {
@@ -402,11 +425,6 @@
                 },
                 get_error_message() {
                     return this.errorMsg
-                },
-                getPoolIds: function() {
-                    var poolIds = (this.results.map(pool => pool["Pool ID"])).join("\r\n")
-                    console.log(poolIds)
-                    return poolIds
                 },
             },
             created: function() {
@@ -501,6 +519,7 @@
         
         .copy-btn {
             width: 100%;
+            height: 100%;
         }
         
         .container-fluid {
