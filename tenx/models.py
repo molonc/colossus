@@ -14,6 +14,8 @@ class TenxChip(models.Model, FieldValue):
 
     # Chip Model for TenX Libraries
     history = HistoricalRecords(table_name='tenx_history_chip')
+    class Meta:
+        ordering = ['-id']
 
     LAB_NAMES = (
         ("SA", "Sam Aparicio"),
@@ -36,6 +38,9 @@ class TenxChip(models.Model, FieldValue):
 
     def get_absolute_url(self):
         return reverse("tenx" + ":chip_detail", kwargs={"pk": self.pk})
+
+    def get_sample_list(self):
+        return set(t.sample.sample_id for t in self.tenxlibrary_set.all()) if self.tenxlibrary_set.all() else []
 
 
 
@@ -84,11 +89,6 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     chip_well = models.IntegerField(
         default=0,
         choices=CHIP_WELL
-    )
-
-    condition = create_chrfield(
-        "Condition",
-        blank=True,
     )
 
     google_sheet = create_chrfield(
@@ -163,7 +163,8 @@ class TenxPool(models.Model, FieldValue):
     def __str__(self):
         return self.pool_name
 
-
+    def get_sample_list(self):
+        return set(t.sample.sample_id for t in self.libraries.all()) if self.libraries.all() else []
 
     def get_library_ids(self):
         return [l.id for l in self.libraries.all()]
@@ -234,11 +235,9 @@ class TenxLibrarySampleDetail(models.Model, FieldValue):
         "Sample prep date",
         null=True,
         blank=True,
+        default=datetime.date.today
     )
-    sorting_location = create_chrfield(
-        "Sorting location",
-        default="TFL flow facility",
-    )
+
     num_cells_targeted = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
@@ -289,18 +288,14 @@ class TenxLibraryConstructionInformation(models.Model, FieldValue):
         "Library construction method",
         default="10x Genomics",
     )
-    library_type = create_chrfield(
-        "Library type",
-        default="transciptome",
-    )
     submission_date = models.DateField(
-        "Submission date",
+        "Library Prep Date",
         null=True,
         blank=True,
     )
     library_prep_location = create_chrfield(
         "Library prep location",
-        default="UBC-BRC",
+        default="BCCRC",
     )
     chip_lot_number = models.PositiveIntegerField(
         null=True,
@@ -317,8 +312,10 @@ class TenxLibraryConstructionInformation(models.Model, FieldValue):
         blank=True,
         choices=TENX_LIBRARY_TYPE_CHOICES,
         max_length=20,
+        default="3'",
         verbose_name="Library type",
     )
+
     index_used = models.CharField(
         max_length=150,
         null=True,
@@ -326,24 +323,13 @@ class TenxLibraryConstructionInformation(models.Model, FieldValue):
         choices=TENX_INDEX_CHOICES,
         verbose_name="Index used",
     )
-    pool = models.CharField(
-        max_length=150,
-        null=True,
-        blank=True,
-        verbose_name="Pool",
-    )
-    concentration = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        verbose_name="DNA concentration (nM)",
-    )
 
     chemistry_version = models.CharField(
         null=True,
         choices=CHEMISTRY_VERSION_CHOICES,
         verbose_name="Chemistry Version",
         max_length=150,
-        default="VERSION_2"
+        default="VERSION_3"
     )
 
 
@@ -519,4 +505,10 @@ class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
         "QC check",
         choices=qc_check_choices,
     )
+
     qc_notes = create_textfield("QC notes")
+
+    dna_concentration_nm = models.IntegerField("DNA Concentration(nM)", null=True, blank=True)
+    dna_concentration_ng = models.IntegerField("DNA Concentration(ng/uL)", null=True, blank=True)
+    dna_concentration_bp = models.IntegerField("DNA Concentration(bp)", null=True, blank=True)
+

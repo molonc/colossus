@@ -18,6 +18,7 @@
                     <th>Construction Location</th>
                     <th>Number of Tenx Libraries</th>
                     <th>Number of Tenx Sequencings</th>
+                    <th>List of Samples</th>
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -29,6 +30,11 @@
                         <td>{{ pool.construction_location }}</td>
                         <td>{{ pool.libraries.count }}</td>
                         <td>{{ pool.tenxsequencing_set.count }}</td>
+                        <td>
+                            {% for sample in pool.get_sample_list%}
+                            {{sample}}
+                            {% endfor %}
+                        </td>
                         <td>
                             <div style="float: right; min-width: 69px">
                                 <a href="{% url 'tenx:pool_update' pk=pool.pk %}"style="margin-right: 2px;" ><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
