@@ -125,7 +125,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 def gsc_submission_form(request):
   return render(
       request,
-      "core/gsc_form3.html",
+      "core/gsc_form.html",
       {"libraries" :
           json.dumps([{
                 "value" : library.pk,
