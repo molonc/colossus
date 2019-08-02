@@ -373,33 +373,16 @@
                     window.getSelection().removeAllRanges();
                     copyElement.remove();
                 },
-                // copyToClipboard: function(columnElements) {
-                //     var text = columnElements.join("\r")
-
-                //     var copyElement = document.createElement("span");
-                //     copyElement.appendChild(document.createTextNode(text));
-                //     copyElement.id = 'tempCopyToClipboard';
-                //     angular.element(document.body.append(copyElement));
-
-                //     // select the text
-                //     var range = document.createRange();
-                //     range.selectNode(copyElement);
-                //     window.getSelection().removeAllRanges();
-                //     window.getSelection().addRange(range);
-
-                //     // copy & cleanup
-                //     document.execCommand('copy');
-                //     window.getSelection().removeAllRanges();
-                //     copyElement.remove();
-                // },
                 mouseover: function(element) {
-
+                    Object.keys(this.showCopyButtons).forEach(element => {
+                        this.showCopyButtons[element] = false}
+                    )
                     this.showCopyButtons[element] = true
                     console.log(`show ${element} copy`)
                 },
                 mouseleave: function(element) {
                     this.showCopyButtons[element] = false
-                    console.log(`show ${element} copy`)
+                    console.log(`do not show ${element} copy`)
                 },
             },
             computed: {
