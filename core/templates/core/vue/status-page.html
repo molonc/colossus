@@ -206,7 +206,7 @@
             Vue.set(this.samples[i],  "montage", (this.montages.includes(this.samples[i].jira)))
           }
           if(this.samples[i].jira) {
-            // this.axiosVerifyTantalus(this.samples[i])
+            this.axiosVerifyTantalus(this.samples[i])
             this.axiosVerifyColossus(this.samples[i])
           }
         }      

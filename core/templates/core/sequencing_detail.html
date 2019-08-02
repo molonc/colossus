@@ -74,9 +74,8 @@
                 <thead>
                     <tr>
                         <th>Flow Cell ID</th>
-                        {% if library_type != 'tenx' %}
                         <th>Path To Archive</th>
-                        {% else %}
+                        {% if library_type == 'tenx' %}
                         <th>Tantalus Dataset</th>
                         {% endif %}
                         <th>Sequencing Date</th>
@@ -111,6 +110,7 @@
                         {% for lane in sequencing.tenxlane_set.all %}
                             <tr>
                                 <td>{{ lane.flow_cell_id }}</td>
+                                <td>{{ lane.path_to_archive }}</td>
                                 {% if lane.tantalus_datasets %}
                                 <td>
                                 {% for id in lane.tantalus_datasets %}
@@ -120,7 +120,7 @@
                                 {% else %}
                                 <td>None</td>
                                 {% endif %}
-
+                                <td>{{ lane.sequencing_date }}</td>
                                 <td style="min-width: 10em">
                                     <a href="{% url library_type|add:':lane_update' pk=lane.pk %}"><i class="fa fa-pencil" style="color: orange;"></i> update</a>
                                     <a href="{% url library_type|add:':lane_delete' pk=lane.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>

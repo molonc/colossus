@@ -477,7 +477,6 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'tenxanalysis_set',
             'chips',
             'chip_well',
-            'condition',
             'num_sublibraries',
             'tenxsequencing_set',
             'tenxlibraryconstructioninformation',

@@ -18,6 +18,7 @@
                     <th>Name</th>
                     <th>Lab Name</th>
                     <th>Number of Tenx Libraries</th>
+                    <th>List of Samples</th>
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -30,6 +31,11 @@
                         <td>{{ chip.get_id }}</td>
                         <td>{{ chip.lab_name }}</td>
                         <td>{{ chip.tenxlibrary_set.count }}</td>
+                        <td>
+                        {% for sample in chip.get_sample_list%}
+                        {{sample}}
+                        {% endfor %}
+                        </td>
                         <td>
                             <div style="float: right; min-width: 69px">
                                 <a href="{% url 'tenx:chip_update' chip.pk %}"style="margin-right: 2px;" ><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>

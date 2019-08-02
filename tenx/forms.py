@@ -53,7 +53,8 @@ class TenxLibraryForm(LibraryForm):
 
     class Meta:
         model = TenxLibrary
-        fields = '__all__'
+        # fields = '__all__'
+        exclude=['name']
         labels = {
             'primary sample': ('*Sample'),
         }
@@ -76,12 +77,13 @@ TenxLibrarySampleDetailInlineFormset = inlineformset_factory(
     form = SaveDefault,
     can_delete = False,
     fields = "__all__",
+    exclude=[""],
     widgets = {
         'sample_prep_date': SelectDateWidget(
             years=range(2000,2020),
             empty_label=('year', 'month', 'day'),
         )
-    }
+    },
 )
 
 TenxLibraryConstructionInfoInlineFormset =  inlineformset_factory(
