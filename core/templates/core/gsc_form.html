@@ -63,7 +63,7 @@
             </b-collapse>
 
             <b-collapse id="collapse-2">
-                <el-table :data="results" style="width: 100%;" max-height="500" stripe>
+                <el-table :data="results" style="width: 100%;" max-height="500" stripe :empty-text="errorMsg">
                     <el-table-column prop="pool_id" label="Pool Id">
                         <template slot="header" slot-scope="scope">
                             <span v-show="!showCopyButtons.pool" @mouseover="mouseover('pool')">Pool ID</span>
@@ -198,7 +198,8 @@
             </b-collapse>
 
             <b-card class="border-0" v-show="!showCollapse">
-                <b-button class="show-hide" style="float: right; background-color:#76ccc7; border: none;"
+                
+                <b-button v-show="!selectedEmpty" class="show-hide" style="float: right; background-color:#76ccc7; border: none;"
                     @click="downloadTable">
                     <i class="fas fa-download"></i>
                 </b-button>
