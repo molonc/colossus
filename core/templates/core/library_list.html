@@ -28,11 +28,9 @@
 
                     <th>Sample Spot Date</th>
 
-                    {% if library_type == 'dlp' %}
-                        <th>Library Prep Date</th>
-                    {% else %}
-                        <th>Submission Date</th>
-                    {% endif %}
+
+                    <th>Library Prep Date</th>
+
 
                     <th class="no-sort-col">Description</th>
 
@@ -42,12 +40,10 @@
 
                     <th>Project</th>
 
-                    {% if library_type == 'dlp' or library_type == 'tenx' %}
+                    {% if library_type == 'dlp'%}
                         <th>#Sublibraries</th>
-                    {% endif %}
-
                     <th class="sequenced">Sequenced</th>
-                    <th class="no-sort-col">Result</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -102,10 +98,8 @@
                             {% endfor %}
                         </td>
 
-                        {% if library_type == 'dlp' or library_type == 'tenx' %}
+                        {% if library_type == 'dlp' %}
                             <td style="text-align: center;">{{ library.num_sublibraries }}</td>
-                        {% endif %}
-
                         {% if library.dlplibraryquantificationandstorage.qc_check == 'N' %}
                             <td style="text-align: center"><i class="fa fa-times" aria-hidden="true" style="color: red" title="Will not sequence"></i></td>
                         {% elif library.num_sequencings != 0 and library.max_sequencing_analysis == library.num_sequencings %}
@@ -113,8 +107,7 @@
                         {% else %}
                              <td style="text-align: center"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: orange" title="Will sequence"></i></td>
                         {% endif %}
-
-                        <td>{{ library.result }}</td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>
