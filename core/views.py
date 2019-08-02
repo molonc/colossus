@@ -185,21 +185,7 @@ def gsc_info_post(request):
         "xenograph": "Yes",
         "concentration": library.dlplibraryquantificationandstorage.dna_concentration_nm,
         "volume": library.dlplibraryquantificationandstorage.dna_volume,
-        "quantification_method": library.dlplibraryquantificationandstorage.quantification_method,
-
-        # "Pool ID" : library.pool_id,
-        # "Taxonomy ID": library.sample.taxonomy_id,
-        # "Anatomic Site": library.sample.additionalsampleinformation.anatomic_site,
-        # "Pathology Disease Name": library.sample.additionalsampleinformation.pathology_disease_name,
-        # "Library Type": library.dlplibraryconstructioninformation.library_type,
-        # "Construction Method": library.dlplibraryconstructioninformation.library_construction_method,
-        # "Size Range": library.dlplibraryquantificationandstorage.size_range,
-        # "Average Size": library.dlplibraryquantificationandstorage.average_size,
-        # "Xenograph": "Yes",
-        # "Concentration(nM)": library.dlplibraryquantificationandstorage.dna_concentration_nm,
-        # "Volume": library.dlplibraryquantificationandstorage.dna_volume,
-        # "Quantification Method": library.dlplibraryquantificationandstorage.quantification_method,
-    
+        "quantification_method": library.dlplibraryquantificationandstorage.quantification_method,    
     } for library in selected]
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
 

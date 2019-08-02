@@ -11,25 +11,29 @@
 
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+        integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
     <script src="https://unpkg.com/vue"></script>
-    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!-- <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>-->
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 
 <body>
     {% load staticfiles %}
     <b-container fluid id="gsc-form">
-        <b-button @click="goHome"> <i class="fas fa-home"></i> Colossus</b-button>
-        <b-card id="gsc-card" overlay style="background-color: #72ccc0; border-style: none; height: 100px" class="mb-2 rounded-0" text-variant="white">
+        <b-button @click="goHome" class="rounded-0"> <i class="fas fa-home"></i> Colossus</b-button>
+        <b-card id="gsc-card" overlay style="background-color: #72ccc0; border-style: none; height: 100px"
+            class="rounded-0" text-variant="white">
             <b-card-text class="show-hide">
                 <h3> GSC Submission Helper</h3>
             </b-card-text>
@@ -37,132 +41,179 @@
 
         <b-card>
             <b-collapse v-model="showCollapse" id="collapse-1">
-                <b-container id="bottom-selector">
-                    <b-row>
-                        <b-col>
-                            <i class="fa fa-child"></i></i> Libraries:
-                            <b-form-input v-model="searchLibraryKey"></b-form-input>
-                            <b-form-select v-model="selectedInLibs" :options="libraryDisplay" multiple :select-size="4"></b-form-select>
-                            <b-button class="my-button" v-on:click="addSelectedLib" variant="primary">Add</b-button>
-                        </b-col>
-                        <b-col>
-                            <i class="fa fa-edit"></i> Selected:
-                            <b-form-input v-model="searchSelectedKey"></b-form-input>
-                            <b-form-select v-model="selectedInSelected" :options="selectedDisplay" multiple :select-size="4"></b-form-select>
-                            <b-button class="my-button" v-show="!selectedEmpty" v-on:click="removeAllLibs" variant="primary">Remove All</b-button>
-                            <b-button class="my-button  remove-button" v-show="!selectedEmpty" v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
-                        </b-col>
-                    </b-row>
-                </b-container>
+                <b-row>
+                    <b-col>
+                        <i class="fa fa-child"></i></i> Libraries:
+                        <b-form-input v-model="searchLibraryKey"></b-form-input>
+                        <b-form-select v-model="selectedInLibs" :options="libraryDisplay" multiple :select-size="4">
+                        </b-form-select>
+                        <b-button class="my-button" v-on:click="addSelectedLib" variant="primary">Add</b-button>
+                    </b-col>
+                    <b-col>
+                        <i class="fa fa-edit"></i> Selected:
+                        <b-form-input v-model="searchSelectedKey"></b-form-input>
+                        <b-form-select v-model="selectedInSelected" :options="selectedDisplay" multiple
+                            :select-size="4"></b-form-select>
+                        <b-button class="my-button" v-show="!selectedEmpty" v-on:click="removeAllLibs"
+                            variant="primary">Remove All</b-button>
+                        <b-button class="my-button  remove-button" v-show="!selectedEmpty"
+                            v-on:click="removeSelectedLib" variant="primary">Remove</b-button>
+                    </b-col>
+                </b-row>
             </b-collapse>
 
             <b-collapse id="collapse-2">
-                <b-container fluid class="inner-container" id="bottom-result">
-                    <b-card-text class="text-center" v-if="noLibrariesSelected">
-                        {% verbatim %} {{errorMsg}}{% endverbatim %}
-                    </b-card-text>
-                    <b-table responsive hover small fixed :items="results">
-                        <template slot="HEAD_Pool ID" slot-scope="data">
-                            <div v-show="!showCopyButtons.pool" @mouseover="mouseover('pool')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.pool" @mouseleave="mouseleave('pool')" variant="light" size="sm"
-                              @click="copyToClipboard('Pool ID')">
-                              <i class="far fa-copy"></i>
-                            </b-button>
-                        </template>
-                        <template slot="HEAD_Taxonomy ID" slot-scope="data">
-                            <div v-show="!showCopyButtons.taxonomy" @mouseover="mouseover('taxonomy')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.taxonomy" @mouseleave="mouseleave('taxonomy')" variant="light" size="sm"
-                                @click="copyToClipboard('Taxonomy ID')">
+                <el-table :data="results" style="width: 100%;" max-height="500" stripe>
+                    <el-table-column prop="pool_id" label="Pool Id">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.pool" @mouseover="mouseover('pool')">Pool ID</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.pool" @mouseleave="mouseleave('pool')"
+                                variant="light" size="sm" @click="copyToClipboard('pool_id')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Anatomic Site" slot-scope="data">
-                            <div v-show="!showCopyButtons.anatomic" @mouseover="mouseover('anatomic')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.anatomic" @mouseleave="mouseleave('anatomic')" variant="light" size="sm"
-                                @click="copyToClipboard('Anatomic Site')">
+                    </el-table-column>
+                    <el-table-column prop="taxonomy_id" label="Taxonomy ID">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.taxonomy" @mouseover="mouseover('taxonomy')">Taxnomy
+                                ID</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.taxonomy"
+                                @mouseleave="mouseleave('taxonomy')" variant="light" size="sm"
+                                @click="copyToClipboard('taxonomy_id')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Pathology Disease Name" slot-scope="data">
-                            <div v-show="!showCopyButtons.pathologyDisese" @mouseover="mouseover('pathologyDisese')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.pathologyDisese" @mouseleave="mouseleave('pathologyDisese')" variant="light"
-                                size="sm" @click="copyToClipboard('Pathology Disease Name')">
+                    </el-table-column>
+                    <el-table-column prop="anatomic_site" label="Anatomic Site">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.anatomic" @mouseover="mouseover('anatomic')">Anatomic
+                                Site</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.anatomic"
+                                @mouseleave="mouseleave('anatomic')" variant="light" size="sm"
+                                @click="copyToClipboard('anatomic_site')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Library Type" slot-scope="data">
-                            <div v-show="!showCopyButtons.libraryType" @mouseover="mouseover('libraryType')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.libraryType" @mouseleave="mouseleave('libraryType')"
-                                variant="light" size="sm" @click="copyToClipboard('Library Type')">
+                    </el-table-column>
+                    <el-table-column prop="pathology_disease" label="Pathology Disease">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.pathologyDisese"
+                                @mouseover="mouseover('pathologyDisese')">Pathology Disease Name</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.pathologyDisese"
+                                @mouseleave="mouseleave('pathologyDisese')" variant="light" size="sm"
+                                @click="copyToClipboard('pathology_disease')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Construction Method" slot-scope="data">
-                            <div v-show="!showCopyButtons.construction" @mouseover="mouseover('construction')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.construction" @mouseleave="mouseleave('construction')" variant="light"
-                                size="sm" @click="copyToClipboard('Construction Method')">
+                    </el-table-column>
+                    <el-table-column prop="library_type" label="Library Type">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.libraryType" @mouseover="mouseover('libraryType')">Library
+                                Type</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.libraryType"
+                                @mouseleave="mouseleave('libraryType')" variant="light" size="sm"
+                                @click="copyToClipboard('library_type')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Size Range" slot-scope="data">
-                            <div v-show="!showCopyButtons.sizeRange" @mouseover="mouseover('sizeRange')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.sizeRange" @mouseleave="mouseleave('sizeRange')"
-                                variant="light" size="sm" @click="copyToClipboard('Size Range')">
+                    </el-table-column>
+                    <el-table-column prop="construction_method" label="Construction Method">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.construction"
+                                @mouseover="mouseover('construction')">Construction Method</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.construction"
+                                @mouseleave="mouseleave('construction')" variant="light" size="sm"
+                                @click="copyToClipboard('construction_method')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Average Size" slot-scope="data">
-                            <div v-show="!showCopyButtons.averageSize" @mouseover="mouseover('averageSize')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.averageSize" @mouseleave="mouseleave('averageSize')" variant="light"
-                                size="sm" @click="copyToClipboard('Average Size')">
+                    </el-table-column>
+                    <el-table-column prop="size_range" label="Size Range">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.sizeRange" @mouseover="mouseover('sizeRange')">Size
+                                Range</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.sizeRange"
+                                @mouseleave="mouseleave('sizeRange')" variant="light" size="sm"
+                                @click="copyToClipboard('size_range')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Xenograph" slot-scope="data">
-                            <div v-show="!showCopyButtons.xenograph" @mouseover="mouseover('xenograph')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.xenograph" @mouseleave="mouseleave('xenograph')" variant="light"
-                                size="sm" @click="copyToClipboard('Xenograph')">
+                    </el-table-column>
+                    <el-table-column prop="average_size" label="Average Size">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.averageSize" @mouseover="mouseover('averageSize')">Average
+                                Size</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.averageSize"
+                                @mouseleave="mouseleave('averageSize')" variant="light" size="sm"
+                                @click="copyToClipboard('average_size')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Concentration(nM)" slot-scope="data">
-                            <div v-show="!showCopyButtons.concentration" @mouseover="mouseover('concentration')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.concentration" @mouseleave="mouseleave('concentration')" variant="light"
-                                size="sm" @click="copyToClipboard('Concentration(nM)')">
+                    </el-table-column>
+                    <el-table-column prop="xenograph" label="Xenograph">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.xenograph"
+                                @mouseover="mouseover('xenograph')">Xenograph</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.xenograph"
+                                @mouseleave="mouseleave('xenograph')" variant="light" size="sm"
+                                @click="copyToClipboard('xenograph')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Volume" slot-scope="data">
-                            <div v-show="!showCopyButtons.volume" @mouseover="mouseover('volume')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.volume" @mouseleave="mouseleave('volume')"
-                                variant="light" size="sm" @click="copyToClipboard('Volume')">
+                    </el-table-column>
+                    <el-table-column prop="concentration" label="Concentration(nM)">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.concentration"
+                                @mouseover="mouseover('concentration')">Concentration (nM)</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.concentration"
+                                @mouseleave="mouseleave('concentration')" variant="light" size="sm"
+                                @click="copyToClipboard('concentration')">
                                 <i class="far fa-copy"></i>
                             </b-button>
                         </template>
-                        <template slot="HEAD_Quantification Method" slot-scope="data">
-                            <div v-show="!showCopyButtons.quantificationMethod" @mouseover="mouseover('quantificationMethod')" v-text="data.label"></div>
-                            <b-button class="copy-btn" v-show="showCopyButtons.quantificationMethod" @mouseleave="mouseleave('quantificationMethod')" variant="light" size="sm"
-                                @click="copyToClipboard('Quantification Method')">
+                    </el-table-column>
+                    <el-table-column prop="volume" label="Volume">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.volume" @mouseover="mouseover('volume')">Volume</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.volume"
+                                @mouseleave="mouseleave('volume')" variant="light" size="sm"
+                                @click="copyToClipboard('volume')">
                                 <i class="far fa-copy"></i>
                             </b-button>
-                        </template> 
-                    </b-table>
-                </b-container>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="quantification_method" label="Quantification Method">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.quantificationMethod"
+                                @mouseover="mouseover('quantificationMethod')">Quantification Method
+                            </span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.quantificationMethod"
+                                @mouseleave="mouseleave('quantificationMethod')" variant="light" size="sm"
+                                @click="copyToClipboard('quantification_method')">
+                                <i class="far fa-copy"></i>
+                            </b-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </b-collapse>
 
             <b-card class="border-0" v-show="!showCollapse">
-                <b-button class="show-hide" style="float: right; background-color:#76ccc7; border: none;" @click="downloadTable">
+                <b-button class="show-hide" style="float: right; background-color:#76ccc7; border: none;"
+                    @click="downloadTable">
                     <i class="fas fa-download"></i>
                 </b-button>
             </b-card>
         </b-card>
 
-        <b-card id="gsc-card" overlay style="background-color: #72ccc0; border-style: none; height: 100px" class="mb-2 rounded-0" text-variant="white">
-            <b-container>
-                <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo"> <i class="fas fa-download"></i> Sublibrary Info</b-button>
-                <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Show List </b-button>
-                <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2 v-on:click="showSelectedData"> Back </b-button>
-            </b-container>
+        <b-card id="gsc-card" overlay
+            style="background-color: #72ccc0; border-style: none; height: 100px; padding-top: 20px"
+            class="mb-2 rounded-0" text-variant="white">
+            <b-button class="download-button show-hide" v-show="showCollapse" @click="downloadSelectedSublibraryInfo">
+                <i class="fas fa-download"></i> Sublibrary Info</b-button>
+            <b-button class="show-button show-hide" v-show="showCollapse" v-b-toggle.collapse-2
+                v-on:click="showSelectedData"> Show List </b-button>
+            <b-button class="back-button show-hide" v-show="!showCollapse" v-b-toggle.collapse-2
+                v-on:click="showSelectedData"> Back </b-button>
         </b-card>
 
         <b-card v-for="(item) in log" v-model="log" v-bind:key="item.status">
@@ -179,6 +230,7 @@
         window.app = new Vue({
             el: '#gsc-form',
             data: {
+                pool_id: "pool_id",
                 showCollapse: true,
                 searchLibraryKey: "",
                 searchSelectedKey: "",
@@ -208,13 +260,13 @@
                     "concentration": false,
                     "volume": false,
                     "quantificationMethod": false,
-                }
+                },
             },
             methods: {
-                goHome: function() {
+                goHome: function () {
                     window.location = window.origin
                 },
-                addSelectedLib: function() {
+                addSelectedLib: function () {
                     for (var i = 0; i < this.allLibraries.length; i++) {
                         if (this.selectedInLibs.includes(this.allLibraries[i].value)) {
                             this.allLibraries[i].userselect = true
@@ -223,7 +275,7 @@
                     }
                     this.showRemoveButton()
                 },
-                removeSelectedLib: function() {
+                removeSelectedLib: function () {
                     for (var i = 0; i < this.allLibraries.length; i++) {
                         if (this.selectedInSelected.includes(this.allLibraries[i].value)) {
                             console.log(`removing ${this.allLibraries[i].text}`)
@@ -233,7 +285,7 @@
                     }
                     this.showRemoveButton()
                 },
-                removeAllLibs: function() {
+                removeAllLibs: function () {
                     for (var i = 0; i < this.allLibraries.length; i++) {
                         if (this.allLibraries[i].userselect) {
                             console.log(`removing ${this.allLibraries[i].text}`)
@@ -243,13 +295,13 @@
                     }
                     this.showRemoveButton()
                 },
-                showRemoveButton: function() {
+                showRemoveButton: function () {
                     this.selectedEmpty = (this.librariesSelected.length == 0 ? true : false)
                 },
-                updateCollapse: function() {
+                updateCollapse: function () {
                     this.showCollapse = !this.showCollapse
                 },
-                showSelectedData: function() {
+                showSelectedData: function () {
                     this.updateCollapse()
                     var selectedlist = []
                     for (var i = 0; i < this.librariesSelected.length; i++) {
@@ -274,9 +326,10 @@
                     }).then((response) => {
                         this.results = response.data
                         this.resultsHeader = Object.keys(this.results[0])
+                        console.log(this.results, typeof (this.results))
                     })
                 },
-                createCSV: function() {
+                createCSV: function () {
                     this.csvString = this.currentLibraryResponse.data
 
                     // create hyperlink element
@@ -302,7 +355,7 @@
                         status: status
                     })
                 },
-                downloadSelectedSublibraryInfo: function() {
+                downloadSelectedSublibraryInfo: function () {
                     this.log = []
                     this.downloaded = false
                     for (var i = 0; i < this.librariesSelected.length; i++) {
@@ -331,7 +384,7 @@
                     }
                 },
 
-                downloadTable: function() {
+                downloadTable: function () {
                     const replacer = (key, value) => value === null ? '' : value
 
                     var element = document.createElement("a");
@@ -373,14 +426,15 @@
                     window.getSelection().removeAllRanges();
                     copyElement.remove();
                 },
-                mouseover: function(element) {
+                mouseover: function (element) {
                     Object.keys(this.showCopyButtons).forEach(element => {
-                        this.showCopyButtons[element] = false}
+                        this.showCopyButtons[element] = false
+                    }
                     )
                     this.showCopyButtons[element] = true
                     console.log(`show ${element} copy`)
                 },
-                mouseleave: function(element) {
+                mouseleave: function (element) {
                     this.showCopyButtons[element] = false
                     console.log(`do not show ${element} copy`)
                 },
@@ -388,7 +442,7 @@
             computed: {
                 libraryDisplay() {
                     var filter = this.searchLibraryKey
-                    search_results = this.allLibraries.filter(function(library) {
+                    search_results = this.allLibraries.filter(function (library) {
                         return !library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
                     })
                     search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
@@ -396,7 +450,7 @@
                 },
                 selectedDisplay() {
                     var filter = this.searchSelectedKey
-                    search_results = this.allLibraries.filter(function(library) {
+                    search_results = this.allLibraries.filter(function (library) {
                         return library.userselect && library.text.toLowerCase().includes(filter.toLowerCase())
                     })
                     search_results = search_results.sort((a, b) => (a.text > b.text) ? 1 : -1)
@@ -410,7 +464,7 @@
                     return this.errorMsg
                 },
             },
-            created: function() {
+            created: function () {
                 this.allLibraries = JSON.parse(unescape("{{libraries| safe | escapejs}}"))
             },
         })
@@ -421,14 +475,14 @@
             padding-top: 4%;
             width: 800px;
         }
-        
+
         #gsc-card {
             width: 100%;
             margin: 0 auto;
             border-radius: 100px;
-            padding: 10px;
+            /* padding: 10px; */
         }
-        
+
         .show-button {
             background-color: #a3a3a3;
             border-color: #a3a3a3;
@@ -436,54 +490,56 @@
             vertical-align: middle;
             width: 7em;
         }
-        
+
         #bottom-selector {
-            height: 220px;
+            height: 100%;
             align-content: center;
             padding: 10px;
         }
-        
+
         #bottom-result {
             padding: 10px;
             max-height: 500px;
             overflow-y: scroll;
         }
-        
+
         .show-hide {
             display: none;
         }
+
         /* Hide/Show elements when window is resized*/
-        
+
         @media screen and (min-width: 768px) {
             .show-hide {
                 display: block;
             }
+
             #leftside>button {
                 display: none;
             }
         }
-        
+
         .my-button {
             background-color: #76ccc7;
             border-color: #76ccc7;
             float: right;
             margin-top: 0.3em
         }
-        
+
         .my-button:hover {
             background-color: #5faaa5;
             border-color: #5faaa5;
         }
-        
+
         .submit-button {
             float: right;
             margin-top: 0.3em
         }
-        
+
         .remove-button {
             margin: 5px;
         }
-        
+
         .back-button {
             background-color: #a3a3a3;
             border-color: #a3a3a3;
@@ -491,7 +547,7 @@
             vertical-align: middle;
             width: 7em;
         }
-        
+
         .download-button {
             background-color: #a3a3a3;
             border-color: #a3a3a3;
@@ -499,20 +555,20 @@
             vertical-align: middle;
             width: 11em;
         }
-        
+
         .copy-btn {
             width: 100%;
             height: 100%;
         }
-        
+
         .container-fluid {
             width: 75% !important;
         }
-        
+
         .inner-container {
             width: 100% !important;
         }
     </style>
 </body>
 
-</html>;
+</html>
