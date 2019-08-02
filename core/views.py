@@ -565,8 +565,6 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             if(context['library_type'] == 'dlp'):
                                 request.session['pool_id'] = str(instance.pool_id)
                                 request.session['description'] = instance.description
-                            elif(context['library_type'] == 'tenx'):
-                                request.session['pool'] = request.POST['tenxlibraryconstructioninformation-0-pool']
                             if context['library_type'] != 'pbal':
                                 request.session['jira_user'] = jira_user
                                 request.session['jira_password'] = jira_password

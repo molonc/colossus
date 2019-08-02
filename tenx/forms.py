@@ -54,7 +54,7 @@ class TenxLibraryForm(LibraryForm):
     class Meta:
         model = TenxLibrary
         # fields = '__all__'
-        exclude=['name', 'condition']
+        exclude=['name']
         labels = {
             'primary sample': ('*Sample'),
         }
