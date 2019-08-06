@@ -65,7 +65,7 @@ from dlp.models import (
 from tenx.models import *
 from api.filters import (
     SublibraryInformationFilter,
-    AnalysisInformationFilter, TenxAnalysisFilter)
+    AnalysisInformationFilter, TenxAnalysisFilter, get_filter_model)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
@@ -428,44 +428,56 @@ class KuduList(RestrictedQueryMixin, viewsets.ModelViewSet):
 class KuduProjectList(KuduList):
     queryset = Project.objects.all()
     serializer_class = KuduProjectSerializer
+    filter_class = get_filter_model(Project)
+
+
 
 class KuduSampleList(KuduList):
     queryset = Sample.objects.all()
     serializer_class = KuduSampleSerializer
+    filter_class = get_filter_model(Sample)
 
 #DLP
 class KuduDLPLibraryList(KuduList):
     queryset = DlpLibrary.objects.all()
     serializer_class = KuduDLPLibraryListSerializer
+    filter_class = get_filter_model(DlpLibrary)
 
 class KuduDLPSequencingList(KuduList):
     queryset = DlpSequencing.objects.all()
     serializer_class = KuduDLPSequencingSerializer
+    filter_class = get_filter_model(DlpSequencing)
 
 class KuduDLPAnalysisList(KuduList):
     queryset = DlpAnalysisInformation.objects.all()
     serializer_class = KuduDLPAnalysisSerializer
+    filter_class = get_filter_model(DlpAnalysisInformation)
 
 #TenX
 class KuduTenxLibraryList(KuduList):
     queryset = TenxLibrary.objects.all()
     serializer_class = KuduTenxLibraryListSerializer
+    filter_class = get_filter_model(TenxLibrary)
 
 class KuduTenxChipList(KuduList):
     queryset = TenxChip.objects.all()
     serializer_class = KuduTenxChipSerializer
+    filter_class = get_filter_model(TenxChip)
 
 class KuduTenxPoolList(KuduList):
     queryset = TenxPool.objects.all()
     serializer_class = KuduTenxPoolSerializer
+    filter_class = get_filter_model(TenxPool)
 
 class KuduTenxSequencingList(KuduList):
     queryset = TenxSequencing.objects.all()
     serializer_class = KuduTenxSequencingSerializer
+    filter_class = get_filter_model(TenxSequencing)
 
 class KuduTenxAnalysisList(KuduList):
     queryset = TenxAnalysis.objects.all()
     serializer_class = KuduTenxAnalysisSerializer
+    filter_class = get_filter_model(TenxAnalysis)
 
 
 
