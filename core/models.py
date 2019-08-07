@@ -371,7 +371,7 @@ class DoubletInformation(models.Model):
     )
 
     def __str__(self):
-        return self.library
+        return self.library.pool_id
 
 
 
