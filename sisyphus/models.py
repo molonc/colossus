@@ -146,6 +146,14 @@ class DlpAnalysisInformation(models.Model):
         null=False,
     )
 
+    montage_status = create_chrfield(
+        "Montage State",
+        choices=MONTAGE_STATUS_CHOICES,
+        default="Pending",
+        blank=False,
+        null=False,
+    )
+
     # fields
     analysis_submission_date = models.DateField(
         "Analysis submission date",

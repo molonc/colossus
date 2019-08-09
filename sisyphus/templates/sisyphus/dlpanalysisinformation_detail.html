@@ -26,7 +26,13 @@
         </tr>
         <tr>
             <th id="thid">Montage:</th>
-            <td id="tdid" ><a href="https://52.235.35.201/?dashboard={{object.analysis_jira_ticket}}">{{object.analysis_jira_ticket}}</a></td>
+            <td id="tdid" >
+                {% if object.montage_status == 'Success' %}
+                <a href="https://52.235.35.201/?dashboard={{object.analysis_jira_ticket}}">{{object.montage_status}}</a>
+                {% else %}
+                {{object.montage_status}}
+                {% endif %}
+            </td>
         </tr>
         <tr>
             <th id="thid">Verified:</th>
