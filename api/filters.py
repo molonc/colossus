@@ -7,8 +7,8 @@ from django_filters import FilterSet
 from django_filters import Filter, DateFromToRangeFilter
 from django_filters.fields import Lookup
 from core.models import (
-    SublibraryInformation
-)
+    SublibraryInformation,
+    Project)
 
 from sisyphus.models import DlpAnalysisInformation
 import re
@@ -40,6 +40,18 @@ class ListFilter(Filter):
     def filter(self, qs, value):
         value_list = value.replace(" ", "").split(u',')
         return super(ListFilter, self).filter(qs, Lookup(value_list, 'in'))
+
+
+
+def get_filter_model(passed_model):
+    class ListFilterSet(filters.FilterSet):
+        class Meta:
+            model = passed_model
+            fields = {"id": ["in"]}
+    return ListFilterSet
+
+
+
 
 class AnalysisInformationFilter(filters.FilterSet):
     """"

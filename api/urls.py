@@ -8,6 +8,7 @@ from django.conf.urls import url, include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions, routers
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from . import views
 
 schema_view = get_schema_view(
@@ -41,7 +42,22 @@ router.register(r'tenxsequencing', views.TenxSequencingViewSet, base_name='tenxs
 router.register(r'tenxlane', views.TenxLaneViewSet, base_name='tenxlane')
 router.register(r'tenxanalysis', views.TenxAnalysisViewSet, base_name='tenxanalysis')
 
+#Kudu core
+router.register(r'kuduproject_list', views.KuduProjectList, base_name="kudu_project_list")
+router.register(r'kudusample_list', views.KuduSampleList, base_name="kudu_sample_list")
 
+#Kudu dlp
+router.register(r'kududlplibrary_list', views.KuduDLPLibraryList, base_name='kudu_dlp_library_list')
+router.register(r'kududlpsequencing_list', views.KuduDLPSequencingList, base_name='kudu_dlp_sequencing_list')
+router.register(r'kududlpanalysis_list', views.KuduDLPAnalysisList, base_name='kudu_dlp_analysis_list')
+
+
+#Kudu tenx
+router.register(r'kudutenxlibrary_list', views.KuduTenxLibraryList, base_name='kudu_tenx_library_list')
+router.register(r'kudutenxchip_list', views.KuduTenxChipList, base_name='kudu_tenx_chip_list')
+router.register(r'kudutenxpool_list', views.KuduTenxPoolList, base_name='kudu_tenx_pool_list')
+router.register(r'kudutenxsequencing_list', views.KuduTenxSequencingList, base_name='kudu_tenx_sequencing_list')
+router.register(r'kudutenxanalysis_list', views.KuduTenxAnalysisList, base_name="kudu_tenx_analysis_list")
 
 app_name='api'
 urlpatterns = [
@@ -53,4 +69,7 @@ urlpatterns = [
     url(r'^tenxpool_sheet/(?P<pool_name>(TENXPOOL\d{4}))$', views.pool_name_to_id_redirect),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    url(r'^kudusearch/(?P<query>.+)$', views.kudu_search, name='kudu_search_query'),
+    url(r'^auth/$', obtain_jwt_token),
+    url(r'^auth/refresh/$', refresh_jwt_token)
 ]

@@ -17,6 +17,7 @@ from rest_framework import serializers
 # App imports
 #----------------------------
 from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
 from core.models import (
     Sample,
@@ -35,7 +36,7 @@ from dlp.models import (
     DlpSequencing,
     DlpLane,
     DlpLibrary,
-)
+    DlpLibraryQuantificationAndStorage)
 
 from tenx.models import *
 
@@ -78,12 +79,15 @@ class SampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = (
+            'id',
             'anonymous_patient_id',
             'cell_line_id',
             'sample_id',
             'sample_type',
             'taxonomy_id',
             'xenograft_id',
+            'dlplibrary_set',
+            'tenxlibrary_set',
             'additionalsampleinformation',
         )
 
@@ -121,28 +125,16 @@ class SequencingSerializer(serializers.ModelSerializer):
     dlplane_set = LaneSerializer(many=True, read_only=True)
     class Meta:
         model = DlpSequencing
+        fields = "__all__"
+
+
+class TagSerializerField(serializers.ModelSerializer):
+    class Meta:
+        model = Project
         fields = (
             'id',
-            'library',
-            'adapter',
-            'read_type',
-            'index_read_type',
-            'sequencing_instrument',
-            'submission_date',
-            'dlplane_set',
-            'gsc_library_id',
-            'sequencing_center',
-            'rev_comp_override',
-            'number_of_lanes_requested',
-            'lane_requested_date',
+            'name',
         )
-
-
-class TagSerializerField(serializers.ListField):
-    child = serializers.CharField()
-
-    def to_representation(self, data):
-        return data.values_list('name', flat=True)
 
 
 class DlpLibraryConstructionInformationSerializer(serializers.ModelSerializer):
@@ -156,13 +148,18 @@ class DlpLibrarySampleDetailSerializer(serializers.ModelSerializer):
         model = DlpLibrarySampleDetail
         fields = '__all__'
 
+class DlpLibraryQuantificationAndStorageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpLibraryQuantificationAndStorage
+        fields = '__all__'
 
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer()
     dlplibraryconstructioninformation = DlpLibraryConstructionInformationSerializer()
     dlplibrarysampledetail = DlpLibrarySampleDetailSerializer()
+    dlplibraryquantificationandstorage = DlpLibraryQuantificationAndStorageSerializer()
     dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
-    projects = TagSerializerField()
+    projects = TagSerializerField(read_only=True, many=True)
     class Meta:
         model = DlpLibrary
         fields = (
@@ -182,6 +179,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             'projects',
             'dlplibraryconstructioninformation',
             'dlplibrarysampledetail',
+            'dlplibraryquantificationandstorage',
             'exclude_from_analysis',
         )
 
@@ -500,3 +498,159 @@ class TenxChipSerializer(serializers.ModelSerializer):
             'tenxlibrary_set',
         )
 
+
+#----------------------------
+#============================
+# KUDU API
+#----------------------------
+#----------------------------
+
+
+#============================
+# CORE
+#----------------------------
+class KuduSampleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sample
+        fields = (
+            'id',
+            'sample_id',
+            'sample_type',
+            'cell_line_id',
+            'xenograft_id',
+            'anonymous_patient_id',
+        )
+
+
+class KuduProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = (
+            'id',
+            'name',
+        )
+
+
+#============================
+# DLP
+#----------------------------
+class KuduDLPLibraryListSerializer(serializers.ModelSerializer):
+    projects = KuduProjectSerializer(many=True, read_only=True)
+    class Meta:
+        model = DlpLibrary
+        fields = (
+            'id',
+            'pool_id',
+            'sample_id',
+            'jira_ticket',
+            'num_sublibraries',
+            'projects',
+        )
+
+    def to_representation(self, instance):
+        value = super(KuduDLPLibraryListSerializer, self).to_representation(instance)
+        value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
+        value['projects'] = ", ".join([i["name"] for i in value['projects']])
+        return value
+
+class KuduDLPSequencingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpSequencing
+        fields = (
+            'id',
+            'library',
+            'gsc_library_id',
+            'submission_date'
+        )
+
+    def to_representation(self, instance):
+        value = super(KuduDLPSequencingSerializer, self).to_representation(instance)
+        temp_lib = get_object_or_404(DlpLibrary,id=value['library'])
+        value['jira_ticket'] = temp_lib.jira_ticket
+        value['sample_id'] = get_object_or_404(Sample,id=temp_lib.sample_id).sample_id
+        value['library'] = temp_lib.pool_id
+        return value
+
+class KuduDLPAnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpAnalysisInformation
+        fields = (
+            'id',
+            'analysis_run',
+            'analysis_jira_ticket',
+            'priority_level',
+        )
+    def to_representation(self, instance):
+        value = super(KuduDLPAnalysisSerializer, self).to_representation(instance)
+        temp_analysis = get_object_or_404(AnalysisRun,id=value['analysis_run'])
+        value['last_updated'] = temp_analysis.last_updated
+        value['run_status'] = temp_analysis.run_status
+        return value
+
+#============================
+# TENX
+#----------------------------
+
+class KuduTenxLibraryListSerializer(serializers.ModelSerializer):
+    projects = KuduProjectSerializer(many=True, read_only=True)
+    class Meta:
+        model = TenxLibrary
+        fields = (
+            'id',
+            'name',
+            'sample_id',
+            'num_sublibraries',
+            'projects',
+        )
+    def to_representation(self, instance):
+        value = super(KuduTenxLibraryListSerializer, self).to_representation(instance)
+        value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
+        value['projects'] = ", ".join([i["name"] for i in value['projects']])
+        return value
+
+
+class KuduTenxPoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxPool
+        fields = (
+            'id',
+            'pool_name',
+            'gsc_pool_name',
+            'construction_location',
+            'constructed_date'
+        )
+
+
+class KuduTenxChipSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="get_id")
+    class Meta:
+        model = TenxChip
+        fields = (
+            'id',
+            'lab_name',
+            'name'
+        )
+
+class KuduTenxSequencingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxSequencing
+        fields = (
+            'id',
+            'tenx_pool',
+            'sequencing_instrument',
+            'submission_date',
+            'sequencing_center',
+            'number_of_lanes_requested',
+            'lane_requested_date',
+        )
+
+class KuduTenxAnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxAnalysis
+        fields = (
+            'id',
+            'input_type',
+            'jira_ticket',
+            'version',
+            'run_status'
+        )
