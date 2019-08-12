@@ -174,21 +174,18 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
 def gsc_info_post(request):
     selected = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
     returnJson = [{
-        "Pool ID" : library.pool_id,
-        "Sample ID" : library.sample.sample_id,
-        "Sample Type": library.sample.sample_type,
-        "Number of Sublibraries": library.num_sublibraries,
-        "Anonymous Patient ID" : library.sample.anonymous_patient_id,
-        "Sex" : library.sample.additionalsampleinformation.sex,
-        "Anatomic Site" : library.sample.additionalsampleinformation.anatomic_site,
-        "Pathology Disease Name" : library.sample.additionalsampleinformation.pathology_disease_name,
-        "Construction Method" : "NanoWellSingleCellGenome",
-        "Size Range" : library.dlplibraryquantificationandstorage.size_range,
-        "Average Size" : library.dlplibraryquantificationandstorage.average_size,
-        "Xenograph" : "Yes",
-        "Concentration(nM)" : library.dlplibraryquantificationandstorage.dna_concentration_nm,
-        "Volume" : library.dlplibraryquantificationandstorage.dna_volume,
-        "Quantification Method" : library.dlplibraryquantificationandstorage.quantification_method,
+        "pool_id": library.pool_id,
+        "taxonomy_id": library.sample.taxonomy_id,
+        "anatomic_site": library.sample.additionalsampleinformation.anatomic_site,
+        "pathology_disease": library.sample.additionalsampleinformation.pathology_disease_name,
+        "library_type": library.dlplibraryconstructioninformation.library_type,
+        "construction_method": library.dlplibraryconstructioninformation.library_construction_method,
+        "size_range": library.dlplibraryquantificationandstorage.size_range,
+        "average_size": library.dlplibraryquantificationandstorage.average_size,
+        "xenograph": "Yes",
+        "concentration": library.dlplibraryquantificationandstorage.dna_concentration_nm,
+        "volume": library.dlplibraryquantificationandstorage.dna_volume,
+        "quantification_method": library.dlplibraryquantificationandstorage.quantification_method,    
     } for library in selected]
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
 
@@ -559,6 +556,11 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                                 name=jira_user
                             )
 
+                            jira_user_object = JiraUser.objects.get_or_create(
+                                username=jira_user,
+                                name=jira_user
+                            )
+
                         #Add these fields into Session so the JiraTicketConfirm View can access them
                         if validate_credentials(jira_user, jira_password):
                             #For DLP Libaries
@@ -630,7 +632,7 @@ class LibraryUpdate(LibraryCreate):
     Library update base class.
     """
 
-    class Meta:
+    class Meta: 
         abstract = True
 
     template_name = "core/library_update.html"

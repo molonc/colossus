@@ -73,13 +73,14 @@ class AnalysisInformationFilter(filters.FilterSet):
 
         return queryset
 
-    jira_tickets = ListFilter(name='analysis_jira_ticket')
+    # jira_tickets = ListFilter(name='analysis_jira_ticket')
 
     class Meta:
         model = DlpAnalysisInformation
         fields = [
         'id',
         'aligner',
+        'montage_status',
         'version',
         'analysis_jira_ticket',
         'analysis_submission_date',
@@ -88,6 +89,7 @@ class AnalysisInformationFilter(filters.FilterSet):
         'library__pool_id',
         'reference_genome'
         ]
+
 
 class CellIdFilter(filters.Filter):
     def filter(self, qs, value):

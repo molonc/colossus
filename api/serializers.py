@@ -272,6 +272,7 @@ class AnalysisInformationSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'library',
+            'montage_status',
             'priority_level',
             'analysis_jira_ticket',
             'version',
@@ -319,6 +320,7 @@ class AnalysisInformationCreateSerializer(serializers.ModelSerializer):
             'sequencings',
             'reference_genome',
             'analysis_run',
+            'montage_status',
             'aligner',
             'smoothing',
             'lanes',

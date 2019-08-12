@@ -342,20 +342,25 @@ def create_sublibrary_models(library, sublib_results, region_metadata):
     library.save()
 
 
-def create_doublet_info_model(library, doublet_info):
+def create_doublet_info_model(library, doublet_info_matrix):
 
-    doublet_info = DoubletInformation(
-        live_single=doublet_info["live"]["single"],
-        dead_single=doublet_info["dead"]["single"],
-        other_single=doublet_info["other"]["single"],
-        live_doublet=doublet_info["live"]["doublet"],
-        dead_doublet=doublet_info["dead"]["doublet"],
-        other_doublet=doublet_info["other"]["doublet"],
-        live_gt_doublet=doublet_info["live"]["more_than_doublet"],
-        dead_gt_doublet=doublet_info["dead"]["more_than_doublet"],
-        other_gt_doublet=doublet_info["other"]["more_than_doublet"],
-    )
-    doublet_info.library_id = library.pk
+    try:
+        doublet_info = DoubletInformation.objects.get(library=library)
+
+    except:
+        doublet_info = DoubletInformation.objects.create(library=library)
+        doublet_info.save()
+
+    doublet_info.live_single = doublet_info_matrix["live"]["single"]
+    doublet_info.dead_single = doublet_info_matrix["dead"]["single"]
+    doublet_info.other_single = doublet_info_matrix["other"]["single"]
+    doublet_info.live_doublet = doublet_info_matrix["live"]["doublet"]
+    doublet_info.dead_doublet = doublet_info_matrix["dead"]["doublet"]
+    doublet_info.other_doublet = doublet_info_matrix["other"]["doublet"]
+    doublet_info.live_gt_doublet = doublet_info_matrix["live"]["more_than_doublet"]
+    doublet_info.dead_gt_doublet = doublet_info_matrix["dead"]["more_than_doublet"]
+    doublet_info.other_gt_doublet = doublet_info_matrix["other"]["more_than_doublet"]
+
     doublet_info.save()
 
 
