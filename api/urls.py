@@ -69,6 +69,7 @@ urlpatterns = [
     url(r'^tenxpool_sheet/(?P<pool_name>(TENXPOOL\d{4}))$', views.pool_name_to_id_redirect),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    url(r'^kudusearch/(?P<query>.+)$', views.kudu_search, name='kudu_search_query'),
     url(r'^auth/$', obtain_jwt_token),
     url(r'^auth/refresh/$', refresh_jwt_token)
 ]

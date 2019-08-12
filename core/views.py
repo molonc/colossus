@@ -93,6 +93,10 @@ from .jira_templates.jira_wrapper import (
 
 from colossus.settings import LOGIN_URL
 
+
+def test(request):
+    return render(request,"")
+
 #============================
 # Index page
 #----------------------------
