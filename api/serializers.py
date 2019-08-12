@@ -137,11 +137,6 @@ class TagSerializerField(serializers.ModelSerializer):
         )
 
 
-    # def to_representation(self, data):
-    #     print(type(data.values_list('name', flat=True)))
-    #     return data.values_list('id', flat=True)
-
-
 class DlpLibraryConstructionInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = DlpLibraryConstructionInformation
