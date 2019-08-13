@@ -79,7 +79,8 @@ MIDDLEWARE_CLASSES = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_URLS_REGEX = r'^/api/.*$'
+CORS_URLS_REGEX = r'^.*$'
+
 
 ROOT_URLCONF = 'colossus.urls'
 

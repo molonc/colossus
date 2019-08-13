@@ -439,6 +439,16 @@ class TenxLibraryConstructionInformationSerializer(serializers.ModelSerializer):
         model = TenxLibraryConstructionInformation
         fields = "__all__"
 
+class TenxLibrarySampleDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxLibrarySampleDetail
+        fields = "__all__"
+
+class TenxLibraryQuantificationAndStorageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxLibraryQuantificationAndStorage
+        fields = "__all__"
+
 class TenxPoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenxPool
@@ -461,8 +471,10 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
     tenxsequencing_set = TenxSequencingSerializer(many=True, read_only=True)
     tenxpool_set = TenxPoolSerializer(many=True)
     tenxlibraryconstructioninformation = TenxLibraryConstructionInformationSerializer()
+    tenxlibrarysampledetail = TenxLibrarySampleDetailSerializer()
+    tenxlibraryquantificationandstorage = TenxLibraryQuantificationAndStorageSerializer()
     sample = SampleSerializer()
-    projects = TagSerializerField()
+    projects = TagSerializerField(many=True, read_only=True)
     class Meta:
         editable = False,
         model = TenxLibrary
@@ -477,6 +489,8 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'num_sublibraries',
             'tenxsequencing_set',
             'tenxlibraryconstructioninformation',
+            'tenxlibrarysampledetail',
+            'tenxlibraryquantificationandstorage',
             'projects',
             'sample',
             'relates_to_dlp',
