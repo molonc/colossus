@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^account/', include('account.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^sisyphus/', include('sisyphus.urls')),
+    url(r'^kudu', views.test, name='kudu_beta'),
 ]
 
 urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
