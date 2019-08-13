@@ -32,6 +32,7 @@ from django.shortcuts import redirect
 from django.core.serializers.json import DjangoJSONEncoder
 import pandas as pd
 from django.conf import settings
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 #============================
 # App imports
@@ -95,7 +96,7 @@ from colossus.settings import LOGIN_URL
 
 
 def test(request):
-    return render(request,"")
+    return render_to_response("core/deploy_beta.html")
 
 #============================
 # Index page
