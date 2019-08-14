@@ -196,6 +196,7 @@ MONTAGE_STATUS_CHOICES = (
     ('Error', 'Error'),
     ('Ignore', 'Ignore'),
     ('Pending', 'Pending')
+
 )
 
 
