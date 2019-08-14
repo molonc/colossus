@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'storages',
     'corsheaders',
-    'webpack_loader'
     # 'mod_wsgi.server',
 ]
 
