@@ -38,8 +38,9 @@ urlpatterns = [
     # url(r'^tenx/', include('tenx.urls')),
     # url(r'^account/', include('account.urls')),
     url(r'^api/', include('api.urls')),
-    # url(r'^sisyphus/', include('sisyphus.urls')),
     url(r'^.*$', TemplateView.as_view(template_name="index.html")),
+    # url(r'^sisyphus/', include('sisyphus.urls')),
+
 ]
 
 # urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
