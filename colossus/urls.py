@@ -24,21 +24,24 @@ Updated Oct 19, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 from django.conf import settings
 from django.conf.urls import url, include, static
 from django.contrib import admin
+from django.views.generic import TemplateView
+
 from core import views
 
 urlpatterns = [
-    url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^admin/', admin.site.urls),
-    url(r'^search/', views.SearchView.as_view(), name='search'),
-    url(r'^core/', include('core.urls')),
-    url(r'^dlp/', include('dlp.urls')),
-    url(r'^pbal/', include('pbal.urls')),
-    url(r'^tenx/', include('tenx.urls')),
-    url(r'^account/', include('account.urls')),
+    # url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^$', TemplateView.as_view(template_name='index.html')),
+    # url(r'^admin/', admin.site.urls),
+    # url(r'^search/', views.SearchView.as_view(), name='search'),
+    # url(r'^core/', include('core.urls')),
+    # url(r'^dlp/', include('dlp.urls')),
+    # url(r'^pbal/', include('pbal.urls')),
+    # url(r'^tenx/', include('tenx.urls')),
+    # url(r'^account/', include('account.urls')),
     url(r'^api/', include('api.urls')),
-    url(r'^sisyphus/', include('sisyphus.urls')),
-    url(r'^kudu', views.test, name='kudu_beta'),
+    # url(r'^sisyphus/', include('sisyphus.urls')),
 ]
 
-urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

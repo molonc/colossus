@@ -95,10 +95,6 @@ from .jira_templates.jira_wrapper import (
 from colossus.settings import LOGIN_URL
 
 
-def test(request):
-    return render_to_response("core/deploy_beta.html")
-
-
 #============================
 # Index page
 #----------------------------

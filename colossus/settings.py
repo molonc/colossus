@@ -88,8 +88,7 @@ ROOT_URLCONF = 'colossus.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-                 os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'dist')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -184,7 +183,6 @@ JWT_AUTH = {
 
 JIRA_URL = 'https://www.bcgsc.ca/jira/'
 
-# DEFAULT_FILE_STORAGE = 'colossus.custom_azure.AzureMediaStorage'
 
 # STATICFILES_DIRS = (
 #     os.path.join(BASE_DIR, 'dist'),
@@ -193,44 +191,47 @@ JIRA_URL = 'https://www.bcgsc.ca/jira/'
 #
 # STATIC_ROOT = os.path.join(BASE_DIR, 'public')
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
+# # Static files (CSS, JavaScript, Images)
+# # https://docs.djangoproject.com/en/1.9/howto/static-files/
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.environ.get(
+#     'COLOSSUS_STATIC_ROOT',
+#     os.path.join(BASE_DIR, 'static/'),)
+# STATICFILES_DIRS = (
+#     os.path.join(BASE_DIR, 'assets'),
+# )
+#
+# WEBPACK_LOADER = {
+#     'DEFAULT': {
+#         'CACHE': not DEBUG,
+#         'BUNDLE_DIR_NAME': 'webpack_bundles/', # must end with slash
+#         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+#         'POLL_INTERVAL': 0.1,
+#         'TIMEOUT': None,
+#         'IGNORE': [r'.+\.hot-update.js', r'.+\.map']
+#     }
+# }
+#
+#  # Media files
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = os.environ.get(
+#     'COLOSSUS_MEDIA_ROOT',
+#     os.path.join(BASE_DIR, 'media/'),)
+#
+
 STATIC_URL = '/static/'
-STATIC_ROOT = os.environ.get(
-    'COLOSSUS_STATIC_ROOT',
-    os.path.join(BASE_DIR, 'static/'),)
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'assets'),
-)
-
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'webpack_bundles/', # must end with slash
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
-        'POLL_INTERVAL': 0.1,
-        'TIMEOUT': None,
-        'IGNORE': [r'.+\.hot-update.js', r'.+\.map']
-    }
-}
-
- # Media files
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.environ.get(
-    'COLOSSUS_MEDIA_ROOT',
-    os.path.join(BASE_DIR, 'media/'),)
-
-
-
-
+STATICFILES_DIRS = [
+  os.path.join(BASE_DIR, 'dist/static'),
+]
+# DEFAULT_FILE_STORAGE = 'colossus.custom_azure.AzureMediaStorage'
+# STATICFILES_STORAGE = 'colossus.custom_azure.AzureStaticStorage'
+#
+#
+#
 # AZURE_ACCOUNT_NAME = "olympusbackups"
 # AZURE_ACCOUNT_KEY = os.environ.get('STORAGE_SECRET_KEY')
 #
-# STATIC_URL = 'static/'
-# STATICFILES_DIRS = [
-#   os.path.join(BASE_DIR, 'static'),
-# ]
-#
+# STATIC_URL = f'https://olympusbackups.blob.core.windows.net/colossus-static/'
 # MEDIA_URL = f'https://olympusbackups.blob.core.windows.net/colossus-media/'
 #
 #
