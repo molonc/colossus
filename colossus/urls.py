@@ -30,7 +30,7 @@ from core import views
 
 urlpatterns = [
     # url(r'^$', views.IndexView.as_view(), name='index'),
-    # url(r'^admin/', admin.site.urls),
+    url(r'^admin/', admin.site.urls),
     # url(r'^search/', views.SearchView.as_view(), name='search'),
     # url(r'^core/', include('core.urls')),
     # url(r'^dlp/', include('dlp.urls')),
