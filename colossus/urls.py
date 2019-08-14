@@ -30,7 +30,6 @@ from core import views
 
 urlpatterns = [
     # url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^$', TemplateView.as_view(template_name='index.html')),
     # url(r'^admin/', admin.site.urls),
     # url(r'^search/', views.SearchView.as_view(), name='search'),
     # url(r'^core/', include('core.urls')),
@@ -40,6 +39,7 @@ urlpatterns = [
     # url(r'^account/', include('account.urls')),
     url(r'^api/', include('api.urls')),
     # url(r'^sisyphus/', include('sisyphus.urls')),
+    url(r'^.*$', TemplateView.as_view(template_name="index.html")),
 ]
 
 # urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
