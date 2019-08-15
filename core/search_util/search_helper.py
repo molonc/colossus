@@ -149,7 +149,7 @@ def return_text_search(query):
     context = remove_duplicate(context)
 
     context["total"] = len(context["core"]["Samples"] + context["dlp"]["Libraries"] + context["dlp"]["Sequencings"]+ context["dlp"]["Analyses"] +
-                           context["pbal"]["Libraries"] +  context["pbal"]["Sequencings"] +  context["tenx"]["Chip"] + context["core"]["Projects"] +
+                           context["pbal"]["Libraries"] + context["pbal"]["Sequencings"] + context["tenx"]["Chip"] + context["tenx"]["Pool"] + context["core"]["Projects"] +
                            context["tenx"]["Libraries"] + context["tenx"]["Sequencings"] + context["tenx"]["Analyses"] )
 
     return context
