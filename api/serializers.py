@@ -9,6 +9,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 #============================
 # Django rest framework imports
 #----------------------------
+import collections
 import re
 
 from rest_framework import serializers
@@ -28,7 +29,7 @@ from core.models import (
     ChipRegion,
     JiraUser,
     Project,
-)
+    DoubletInformation)
 
 from dlp.models import (
     DlpLibraryConstructionInformation,
@@ -122,10 +123,34 @@ class LaneSerializer(serializers.ModelSerializer):
 
 class SequencingSerializer(serializers.ModelSerializer):
     library = serializers.SlugRelatedField(read_only=True, slug_field='pool_id')
-    dlplane_set = LaneSerializer(many=True, read_only=True)
     class Meta:
         model = DlpSequencing
-        fields = "__all__"
+        fields = [
+            "id",
+            "library",
+            "dlplane_set",
+            "rev_comp_override",
+            "adapter",
+            "format_for_data_submission",
+            "index_read_type",
+            "index_read1_length",
+            "index_read2_length",
+            "read_type",
+            "read1_length",
+            "read2_length",
+            "sequencing_instrument",
+            "sequencing_output_mode",
+            "short_description_of_submission",
+            "submission_date",
+            "number_of_lanes_requested",
+            "lane_requested_date",
+            "gsc_library_id",
+            "sequencer_id",
+            "sequencing_center",
+            "sequencer_notes",
+            "relates_to",
+            "dlplane_set"
+        ]
 
 
 class TagSerializerField(serializers.ModelSerializer):
@@ -153,12 +178,17 @@ class DlpLibraryQuantificationAndStorageSerializer(serializers.ModelSerializer):
         model = DlpLibraryQuantificationAndStorage
         fields = '__all__'
 
+class DoubletInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoubletInformation
+        exclude = ['library']
+
+
 class LibrarySerializer(serializers.ModelSerializer):
     sample = SampleSerializer()
     dlplibraryconstructioninformation = DlpLibraryConstructionInformationSerializer()
     dlplibrarysampledetail = DlpLibrarySampleDetailSerializer()
     dlplibraryquantificationandstorage = DlpLibraryQuantificationAndStorageSerializer()
-    dlpsequencing_set = SequencingSerializer(many=True, read_only=True)
     projects = TagSerializerField(read_only=True, many=True)
     class Meta:
         model = DlpLibrary
@@ -180,8 +210,28 @@ class LibrarySerializer(serializers.ModelSerializer):
             'dlplibraryconstructioninformation',
             'dlplibrarysampledetail',
             'dlplibraryquantificationandstorage',
+            'sublibraryinformation_set',
             'exclude_from_analysis',
         )
+    def to_representation(self, instance):
+        value = super(LibrarySerializer, self).to_representation(instance)
+
+        try:
+            doublet = instance.doubletinformation
+            value['doubletinformation'] = {
+                    'live' : { 'Single' : doublet.live_single, 'Doublet' : doublet.live_doublet, 'Other' : doublet.live_gt_doublet},
+                    'dead' : { 'Single' : doublet.dead_single, 'Doublet' : doublet.dead_doublet, 'Other' : doublet.dead_gt_doublet},
+                    'other': { 'Single' : doublet.other_single, 'Doublet' : doublet.other_doublet, 'Other' : doublet.other_gt_doublet},
+                }
+        except: value['doubletinformation'] = {}
+
+        for chip_region in instance.chipregion_set.all().order_by('region_code'):
+            metadata_set = chip_region.chipregionmetadata_set.all()
+            d1 = {}
+            for metadata in metadata_set:
+                d1[metadata.metadata_field.field] = metadata.metadata_value
+            value['metadata'] = d1
+        return value
 
 class SublibraryInformationSerializer(serializers.ModelSerializer):
     sample_id = SampleSerializer(read_only=True)
@@ -410,7 +460,6 @@ class TenxLaneSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TenxSequencingSerializer(serializers.ModelSerializer):
-    tenxlane_set = TenxLaneSerializer(many=True, read_only=True)
     class Meta:
         model = TenxSequencing
         fields = (
@@ -566,6 +615,36 @@ class KuduDLPLibraryListSerializer(serializers.ModelSerializer):
         value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
         value['projects'] = ", ".join([i["name"] for i in value['projects']])
         return value
+
+class KuduDLPSublibrariesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SublibraryInformation
+        fields = (
+            "sample",
+            "row",
+            "column",
+            "img_col",
+            "file_ch1",
+            "file_ch2",
+            "fld_section",
+            "fld_index",
+            "num_live",
+            "num_dead",
+            "num_other",
+            "rev_live",
+            "rev_dead",
+            "rev_other",
+            "condition",
+            "index_i7",
+            "primer_i7",
+            "index_i5",
+            "primer_i5",
+            "pick_met",
+            "spot_well",
+            "num_drops",
+            "library",
+            "chip_region",
+        )
 
 class KuduDLPSequencingSerializer(serializers.ModelSerializer):
     class Meta:

@@ -46,7 +46,7 @@ from .serializers import (
     TenxAnalysisSerializer,
     KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
     KuduSampleSerializer, KuduTenxAnalysisSerializer, KuduDLPAnalysisSerializer, KuduDLPSequencingSerializer,
-    KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer)
+    KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer, KuduDLPSublibrariesSerializer)
 
 
 from core.models import (
@@ -209,7 +209,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     )
 
 class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -436,7 +436,7 @@ def kudu_search(request, query):
 
 
 class KuduList(RestrictedQueryMixin, viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
     pagination_class = None
 
 #CORE
@@ -444,8 +444,6 @@ class KuduProjectList(KuduList):
     queryset = Project.objects.all()
     serializer_class = KuduProjectSerializer
     filter_class = get_filter_model(Project)
-
-
 
 class KuduSampleList(KuduList):
     queryset = Sample.objects.all()
@@ -457,6 +455,16 @@ class KuduDLPLibraryList(KuduList):
     queryset = DlpLibrary.objects.all()
     serializer_class = KuduDLPLibraryListSerializer
     filter_class = get_filter_model(DlpLibrary)
+
+class KuduDLPSublibraryList(KuduList):
+    queryset = SublibraryInformation.objects.all()
+    serializer_class = KuduDLPSublibrariesSerializer
+    filter_class = get_filter_model(SublibraryInformation)
+
+class KuduDLPLaneList(KuduList):
+    queryset = DlpLane.objects.all()
+    serializer_class = LaneSerializer
+    filter_class = get_filter_model(DlpLane)
 
 class KuduDLPSequencingList(KuduList):
     queryset = DlpSequencing.objects.all()
@@ -493,6 +501,11 @@ class KuduTenxAnalysisList(KuduList):
     queryset = TenxAnalysis.objects.all()
     serializer_class = KuduTenxAnalysisSerializer
     filter_class = get_filter_model(TenxAnalysis)
+
+class KuduTenxLaneList(KuduList):
+    queryset = TenxLane.objects.all()
+    serializer_class = TenxLaneSerializer
+    filter_class = get_filter_model(TenxLane)
 
 
 
