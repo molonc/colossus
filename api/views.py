@@ -44,30 +44,40 @@ from .serializers import (
     ProjectSerializer,
     TenxPoolSerializer,
     TenxAnalysisSerializer,
-    KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
-    KuduSampleSerializer, KuduTenxAnalysisSerializer, KuduDLPAnalysisSerializer, KuduDLPSequencingSerializer,
-    KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer, KuduDLPSublibrariesSerializer)
-
+    KuduTenxLibraryListSerializer,
+    KuduDLPLibraryListSerializer,
+    KuduProjectSerializer,
+    KuduSampleSerializer,
+    KuduTenxAnalysisSerializer,
+    KuduDLPAnalysisSerializer,
+    KuduDLPSequencingSerializer,
+    KuduTenxChipSerializer,
+    KuduTenxPoolSerializer,
+    KuduTenxSequencingSerializer,
+    KuduDLPSublibrariesSerializer,
+)
 
 from core.models import (
     Sample,
     SublibraryInformation,
     ChipRegion,
     JiraUser,
-    Project
+    Project,
 )
 
 from dlp.models import (
     DlpLibrary,
     DlpSequencing,
     DlpLane,
-
 )
 
 from tenx.models import *
 from api.filters import (
     SublibraryInformationFilter,
-    AnalysisInformationFilter, TenxAnalysisFilter, get_filter_model)
+    AnalysisInformationFilter,
+    TenxAnalysisFilter,
+    get_filter_model,
+)
 
 from sisyphus.models import DlpAnalysisInformation, AnalysisRun
 
@@ -85,14 +95,12 @@ class VariableResultsSetPagination(pagination.PageNumberPagination):
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
-        try: 
+        try:
             return super().get_paginated_response(data)
         except AttributeError:
             # Occurs when page_size is set to None. Still want response in same JSON format
-            return Response(OrderedDict([
-                ('count', len(data)),
-                ('results', data)
-            ]))
+            return Response(OrderedDict([('count', len(data)), ('results', data)]))
+
 
 class RestrictedQueryMixin(object):
     """Cause view to fail on invalid filter query parameter.
@@ -127,8 +135,7 @@ class RestrictedQueryMixin(object):
             if key in non_filter_params:
                 continue
             if key not in filters:
-                raise rest_framework.exceptions.APIException(
-                    'no filter %s' % key)
+                raise rest_framework.exceptions.APIException('no filter %s' % key)
 
         return qs
 
@@ -141,7 +148,7 @@ class ProjectViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
 
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
     filter_fields = (
         'id',
@@ -163,6 +170,7 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'id',
         'sample_id',
     )
+
 
 class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
@@ -208,8 +216,9 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'sequencing_center',
     )
 
+
 class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
     queryset = DlpLibrary.objects.all()
     serializer_class = LibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -262,7 +271,7 @@ class AnalysisInformationViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = DlpAnalysisInformation.objects.all()
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
-    filter_class=AnalysisInformationFilter
+    filter_class = AnalysisInformationFilter
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -286,7 +295,7 @@ class AnalysisRunViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'last_updated',
         'run_status',
         'dlpanalysisinformation',
-        'log_file'
+        'log_file',
     )
 
 
@@ -312,8 +321,9 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
 
+
 class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer
     pagination_class = VariableResultsSetPagination
@@ -324,9 +334,9 @@ class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
         'projects__name',
         'failed',
         'chips',
-        'sample__sample_id'
-
+        'sample__sample_id',
     )
+
 
 class TenxAnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
@@ -334,6 +344,7 @@ class TenxAnalysisViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = TenxAnalysisSerializer
     pagination_class = VariableResultsSetPagination
     filter_class = TenxAnalysisFilter
+
 
 class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     queryset = TenxSequencing.objects.all()
@@ -345,8 +356,9 @@ class TenxSequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'library',
         'tenx_pool',
         'sequencing_center',
-        'gsc_library_id'
+        'gsc_library_id',
     )
+
 
 class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
@@ -359,15 +371,14 @@ class TenxLaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'sequencing',
     )
 
+
 class TenxChipViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = TenxChip.objects.all()
     serializer_class = TenxChipSerializer
     pagination_class = VariableResultsSetPagination
-    filter_fields = (
-        "id",
-        "lab_name"
-    )
+    filter_fields = ("id", "lab_name")
+
 
 class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
@@ -379,11 +390,11 @@ class TenxPoolViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'libraries',
         'libraries__name',
         'gsc_pool_name',
-        'construction_location'
+        'construction_location',
     )
 
-def dlp_sequencing_get_samplesheet(request, pk):
 
+def dlp_sequencing_get_samplesheet(request, pk):
     """
     Generates downloadable samplesheet.
     """
@@ -397,8 +408,8 @@ def dlp_sequencing_get_samplesheet(request, pk):
     os.remove(ofilepath)
     return response
 
-def dlp_sequencing_get_queried_samplesheet(request, flowcell):
 
+def dlp_sequencing_get_queried_samplesheet(request, flowcell):
     """
     Makes downloading samplesheets from flowcell possible.
     """
@@ -412,12 +423,15 @@ def dlp_sequencing_get_queried_samplesheet(request, flowcell):
         msg = "Multiple flowcells with ID {} found.".format(flowcell)
         return HttpResponse(msg)
 
+
 def tenx_pool_sample_sheet(request, pk):
     return generate_tenx_pool_sample_csv(pk)
+
 
 def pool_name_to_id_redirect(request, pool_name):
     pk = get_object_or_404(TenxPool, pool_name=pool_name).pk
     return redirect('api:tenx_pool_sample_sheet', pk=pk)
+
 
 #============================
 # KUDU API
@@ -439,16 +453,19 @@ class KuduList(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (AllowAny, )
     pagination_class = None
 
+
 #CORE
 class KuduProjectList(KuduList):
     queryset = Project.objects.all()
     serializer_class = KuduProjectSerializer
     filter_class = get_filter_model(Project)
 
+
 class KuduSampleList(KuduList):
     queryset = Sample.objects.all()
     serializer_class = KuduSampleSerializer
     filter_class = get_filter_model(Sample)
+
 
 #DLP
 class KuduDLPLibraryList(KuduList):
@@ -456,25 +473,30 @@ class KuduDLPLibraryList(KuduList):
     serializer_class = KuduDLPLibraryListSerializer
     filter_class = get_filter_model(DlpLibrary)
 
+
 class KuduDLPSublibraryList(KuduList):
     queryset = SublibraryInformation.objects.all()
     serializer_class = KuduDLPSublibrariesSerializer
     filter_class = get_filter_model(SublibraryInformation)
+
 
 class KuduDLPLaneList(KuduList):
     queryset = DlpLane.objects.all()
     serializer_class = LaneSerializer
     filter_class = get_filter_model(DlpLane)
 
+
 class KuduDLPSequencingList(KuduList):
     queryset = DlpSequencing.objects.all()
     serializer_class = KuduDLPSequencingSerializer
     filter_class = get_filter_model(DlpSequencing)
 
+
 class KuduDLPAnalysisList(KuduList):
     queryset = DlpAnalysisInformation.objects.all()
     serializer_class = KuduDLPAnalysisSerializer
     filter_class = get_filter_model(DlpAnalysisInformation)
+
 
 #TenX
 class KuduTenxLibraryList(KuduList):
@@ -482,31 +504,32 @@ class KuduTenxLibraryList(KuduList):
     serializer_class = KuduTenxLibraryListSerializer
     filter_class = get_filter_model(TenxLibrary)
 
+
 class KuduTenxChipList(KuduList):
     queryset = TenxChip.objects.all()
     serializer_class = KuduTenxChipSerializer
     filter_class = get_filter_model(TenxChip)
+
 
 class KuduTenxPoolList(KuduList):
     queryset = TenxPool.objects.all()
     serializer_class = KuduTenxPoolSerializer
     filter_class = get_filter_model(TenxPool)
 
+
 class KuduTenxSequencingList(KuduList):
     queryset = TenxSequencing.objects.all()
     serializer_class = KuduTenxSequencingSerializer
     filter_class = get_filter_model(TenxSequencing)
+
 
 class KuduTenxAnalysisList(KuduList):
     queryset = TenxAnalysis.objects.all()
     serializer_class = KuduTenxAnalysisSerializer
     filter_class = get_filter_model(TenxAnalysis)
 
+
 class KuduTenxLaneList(KuduList):
     queryset = TenxLane.objects.all()
     serializer_class = TenxLaneSerializer
     filter_class = get_filter_model(TenxLane)
-
-
-
-
