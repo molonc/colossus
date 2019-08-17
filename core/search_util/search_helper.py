@@ -150,7 +150,7 @@ def return_text_search(query):
 
     context["total"] = len(context["core"]["sample"] + context["dlp"]["library"] + context["dlp"]["sequencing"]+ context["dlp"]["analysis"] +
                            context["pbal"]["library"] +  context["pbal"]["sequencing"] +  context["tenx"]["chip"] + context["core"]["project"] +
-                           context["tenx"]["library"] + context["tenx"]["sequencing"] + context["tenx"]["analysis"] )
+                           context["tenx"]["library"] + context["tenx"]["pool"] + context["tenx"]["sequencing"] + context["tenx"]["analysis"] )
 
     return context
 
@@ -178,3 +178,46 @@ def remove_duplicate(context):
     context["tenx"]["sequencing"] = list(set(context["tenx"]["sequencing"]))
     context["tenx"]["analysis"] = list(set(context["tenx"]["analysis"]))
     return context
+
+def get_model_names():
+
+    app_models = {
+        "core": {
+            "sample": {
+                "name": "sample_id",
+            },
+            "project": {
+                "name": "name",
+            },
+        },
+        "dlp": {
+            "library": {
+                "name": "pool_id",
+            },
+            "sequencing": {
+                "name": "",
+            },
+            "analysis": {
+                "name": "analysis_jira_ticket",
+            },
+        },
+        "tenx": {
+            "chip": {
+                "name": "name",
+            },
+            "pool": {
+                "name": "pool_name",
+            },
+            "library": {
+                "name": "name",
+            },
+            "sequencing": {
+                "name": ""
+            },
+            "analysis": {
+                "name": "jira_ticket"
+            },
+        }
+    }
+
+    return app_models

@@ -23,7 +23,7 @@ from django.shortcuts import get_object_or_404, redirect
 #============================
 # App imports
 #----------------------------
-from core.search_util.search_helper import return_text_search
+from core.search_util.search_helper import return_text_search, get_model_names
 from core.utils import generate_samplesheet, generate_tenx_pool_sample_csv
 from .serializers import (
     SampleSerializer,
@@ -437,14 +437,22 @@ def pool_name_to_id_redirect(request, pool_name):
 # KUDU API
 #----------------------------
 def kudu_search(request, query):
+    model_names = get_model_names()
     result_dict = {}
     query_dict = return_text_search(query)
     result_dict['query'] = query_dict.pop('query')
     result_dict['total'] = query_dict.pop('total')
     for app in query_dict:
+        if app not in model_names.keys():
+            continue
+
         result_dict[app] = {}
         for model in query_dict[app]:
-            result_dict[app][model] = [m.id for m in query_dict[app][model]]
+            name = model_names[app][model]["name"]
+            if name == "":
+                result_dict[app][model] = [dict(id=m.id, name=str(m)) for m in query_dict[app][model]]
+            else:
+                result_dict[app][model] = [dict(id=m.id, name=getattr(m, name)) for m in query_dict[app][model]]
 
     return HttpResponse(json.dumps(result_dict))
 
