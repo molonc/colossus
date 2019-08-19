@@ -46,7 +46,8 @@ from .serializers import (
     TenxAnalysisSerializer,
     KuduTenxLibraryListSerializer, KuduDLPLibraryListSerializer, KuduProjectSerializer,
     KuduSampleSerializer, KuduTenxAnalysisSerializer, KuduDLPAnalysisSerializer, KuduDLPSequencingSerializer,
-    KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer, KuduDLPSublibrariesSerializer)
+    KuduTenxChipSerializer, KuduTenxPoolSerializer, KuduTenxSequencingSerializer, KuduDLPSublibrariesSerializer,
+    KuduTenxLaneSerializer, KuduDLPLaneSerializer)
 
 
 from core.models import (
@@ -463,7 +464,7 @@ class KuduDLPSublibraryList(KuduList):
 
 class KuduDLPLaneList(KuduList):
     queryset = DlpLane.objects.all()
-    serializer_class = LaneSerializer
+    serializer_class = KuduDLPLaneSerializer
     filter_class = get_filter_model(DlpLane)
 
 class KuduDLPSequencingList(KuduList):
@@ -504,7 +505,7 @@ class KuduTenxAnalysisList(KuduList):
 
 class KuduTenxLaneList(KuduList):
     queryset = TenxLane.objects.all()
-    serializer_class = TenxLaneSerializer
+    serializer_class = KuduTenxLaneSerializer
     filter_class = get_filter_model(TenxLane)
 
 

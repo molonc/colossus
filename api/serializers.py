@@ -646,6 +646,17 @@ class KuduDLPSublibrariesSerializer(serializers.ModelSerializer):
             "chip_region",
         )
 
+class KuduDLPLaneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DlpLane
+        fields = (
+            'id',
+            'flow_cell_id',
+            'path_to_archive',
+            'sequencing_date',
+        )
+
+
 class KuduDLPSequencingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DlpSequencing
@@ -700,6 +711,17 @@ class KuduTenxLibraryListSerializer(serializers.ModelSerializer):
         value['sample_id'] = get_object_or_404(Sample,id=value['sample_id']).sample_id
         value['projects'] = ", ".join([i["name"] for i in value['projects']])
         return value
+
+
+class KuduTenxLaneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenxLane
+        fields = (
+            'id',
+            'flow_cell_id',
+            'path_to_archive',
+            'sequencing_date',
+        )
 
 
 class KuduTenxPoolSerializer(serializers.ModelSerializer):
