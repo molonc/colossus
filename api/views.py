@@ -220,7 +220,7 @@ class KuduTenxAnalysisList(KuduList):
     serializer_class = KuduTenxAnalysisSerializer
     filter_class = get_filter_model(TenxAnalysis)
 
-class KuduTenxAnalysisList(KuduList):
+class KuduTenxAnalysisDetail(KuduList):
     queryset = TenxAnalysis.objects.all()
     serializer_class = DetailTenxAnalysisSerializer
 
