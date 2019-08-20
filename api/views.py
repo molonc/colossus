@@ -417,6 +417,7 @@ def kudu_search(request, query):
             continue
 
         result_dict[app] = {}
+        print(model_names)
         for model in query_dict[app]:
             name = model_names[app][model]["name"]
             if name == "":

@@ -203,7 +203,7 @@ def get_model_names():
         },
         "tenx": {
             "chip": {
-                "name": "name",
+                "name": "",
             },
             "pool": {
                 "name": "pool_name",
