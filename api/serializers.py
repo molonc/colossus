@@ -24,13 +24,6 @@ from sisyphus.models import (
     AnalysisRun,
     )
 
-#----------------------------
-#============================
-# KUDU API
-#----------------------------
-#----------------------------
-
-
 #============================
 # CORE
 #----------------------------
@@ -174,7 +167,7 @@ class DoubletInformationSerializer(serializers.ModelSerializer):
         model = DoubletInformation
         exclude = ['library']
 
-class LibrarySerializer(serializers.ModelSerializer):
+class DetailDLPLibrarySerializer(serializers.ModelSerializer):
     dlplibraryconstructioninformation = DlpLibraryConstructionInformationSerializer()
     dlplibrarysampledetail = DlpLibrarySampleDetailSerializer()
     dlplibraryquantificationandstorage = DlpLibraryQuantificationAndStorageSerializer()
@@ -497,7 +490,7 @@ class KuduTenxChipSerializer(serializers.ModelSerializer):
             'name'
         )
 
-class TenxChipSerializer(serializers.ModelSerializer):
+class DetailTenxChipSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source="get_id")
     class Meta:
         model = TenxChip
