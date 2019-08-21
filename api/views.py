@@ -140,6 +140,10 @@ class KuduSampleDetail(KuduList):
 
     def create(self, request, *args, **kwargs):
         print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
 
 #DLP Library
 class KuduDLPLibraryList(KuduList):
