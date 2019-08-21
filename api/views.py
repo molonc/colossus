@@ -11,6 +11,7 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 import json
 import os
 
+from jira import JIRA
 from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
@@ -82,6 +83,15 @@ def pool_name_to_id_redirect(request, pool_name):
 #============================
 # KUDU API
 #----------------------------
+def jira_authenticate(request, payload):
+    print("HE:LLLLLOo")
+    print(request)
+    print(payload)
+    jira_api = JIRA('https://www.bcgsc.ca/jira/',
+                    basic_auth=(payload.auth.username, payload.auth.password))
+
+    return jira_api
+    
 def kudu_search(request, query):
     model_names = get_model_names()
     result_dict = {}

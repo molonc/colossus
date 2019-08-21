@@ -65,5 +65,6 @@ urlpatterns = [
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     url(r'^kudusearch/(?P<query>.+)$', views.kudu_search, name='kudu_search_query'),
     url(r'^auth/$', obtain_jwt_token),
-    url(r'^auth/refresh/$', refresh_jwt_token)
+    url(r'^auth/refresh/$', refresh_jwt_token),
+    url(r'^auth/jira/$', views.jira_authenticate, name="jira_authenticate"),
 ]
