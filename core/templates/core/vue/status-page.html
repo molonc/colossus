@@ -304,7 +304,7 @@
                 data: data,
                 headers: {
                   "X-CSRFToken": Cookies.get('csrftoken'),
-                  "content-type": "application/json"z
+                  "content-type": "application/json"
                 }}).then( (response) => resolve(response.data)).catch( (e) => reject(e))
         })
       },
