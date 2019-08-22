@@ -1,0 +1,71 @@
+<v-card flat>
+    <v-card-text class="text--primary">
+        <div class="headline">TenX Data Entry</div>
+        <div class="subtitle-1">Written By Jecy Wang</div>
+    </v-card-text>
+</v-card>
+<v-divider></v-divider>
+<v-card flat>
+    <v-card-title>Workflow for 10x Colossus entries</v-card-title>
+    <v-card-text class="text--primary">
+1. For new samples, you need to Create Samples before you can make a library<br>
+2. Create Chips (10x) for every chromium chip you are loading<br>
+3. Create Libraries (10x)<br>
+&emsp;a. Library information/details to be filled out after GEM generation<br>
+&emsp;b. Library construction information to be filled out after library construction<br>
+&emsp;c. Library quantification to be filled out after clean up/QC<br>
+4. Create Pool and Sequencings (10x) for submissions to GSC/BRC<br>
+&emsp;a. Increase sequencing goal if requesting additional lane from the same pool submission<br>
+&emsp;b. Make new sequencings if pools are re-submitted in new submissions or to different sequencing center<br>
+&emsp;c. Make new pools and corresponding sequencings for libraries that are re-submitted in a different pool<br>
+        </v-card-text>
+</v-card>
+
+<v-card flat>
+    <v-card-title>Create Samples</v-card-title>
+    <v-card-text class="text--primary">
+1. Go to https://colossus.canadacentral.cloudapp.azure.com/. Click Add to the right of Samples under Core section.<br>
+2. Fill in your sample information then click Create. (note: fields with asterisks are mandatory as they are required for submission for sequencing)<br>
+    </v-card-text>
+</v-card>
+<v-card flat>
+    <v-card-title>Create Chips (10x)</v-card-title>
+    <v-card-text class="text--primary">
+1. Go to https://colossus.canadacentral.cloudapp.azure.com/. Click Add to the right of Chips under 10x Genomics section. Click Create.<br>
+&emsp;a. Colossus auto-generates an unique chip ID for every chromium chip. You will need to select the chip when you create libraries. All libraries loaded on the same chip will use the same Chip ID.<br>
+    </v-card-text>
+</v-card>
+
+<v-card flat>
+    <v-card-title>Create Libraries (10x)</v-card-title>
+    <v-card-text class="text--primary">
+1. Go to https://colossus.canadacentral.cloudapp.azure.com/. Click Samples under Core section and find the sample associated with the library you are about to enter.<br>
+2. In the bottom of the Sample Details page, click Add 10x Library3. Fill in Library Information and Library Sample Details sections once cells have been spotted into chip<br>
+&emsp;a. Mandatory fields: Chip, Primary Sample, Chip well (well position in which the library was loaded), Additional title (this title is used as the Summary field on the Jira ticket associated with the library being created), Jira User, Jira Password<br>
+4. Click Create, which takes you to Jira Ticket Creation page, and click Create again. <br>
+5. To go back to the library you created, go to the main Colossus page and click Libraries under 10x Genomics section to search for your library. You can add/change/delete information by clicking Edit on the top right corner of the Library Details page.<br>
+6. Once the library has been constructed, fill in Library Construction Information section.<br>
+7. Once the library has been cleaned up and run on Agilent, fill in Library Quantification and Storage section.<br>
+    </v-card-text>
+</v-card>
+
+<v-card flat>
+    <v-card-title>Create Pool and Sequencings (10x))</v-card-title>
+    <v-card-text class="text--primary">
+1. Go to https://colossus.canadacentral.cloudapp.azure.com/. Click Add to the right of Pool under 10x Genomics section.<br>
+2. Find the libraries to be pooled and sequenced in the Library Select Search box and select them. Click > to add libraries to selected and < to remove libraries from selected.<br>
+3. Fill out the rest of the fields and click Create.<br>
+&emsp;a. Colossus auto-generates an unique pool ID for every pool you select.<br>
+4. In the bottom of the Pool Details page, click Add Sequencing.<br>
+5. Fill in Sequencing Information<br>
+&emsp;a. The default metrics has been set to HiSeqX at BCCAGSC. Make sure to change necessary fields if you are using a different sequencer or sequencing center.<br>
+&emsp;b. If you are requesting more than 1 lane of the library, please increase the Sequencing Goal appropriately. The goal is always set to 1 by default.<br>
+6. Click Create, which takes you to a page where you can select watchers and add comments for the corresponding Jira ticket, and click Create again.<br>
+7. For requesting additional lanes, go back to the sequencing you created and increase the sequencing goal appropriately.<br>
+&emsp;a. Find the sequencing in the bottom of the Pool Details page and click Edit in the bottom of the Sequencing Details page.<br>
+&emsp;b. Change Sequencing Goal and click Update. You need to input your Jira credential again to update the Jira ticket. <br>
+8. For re-submitting the same pool in a new submission or to a different sequencing center, always make a new sequencing!<br>
+9. For re-submitting libraries that are re-pooled differently, always make a new pool!<br>
+    </v-card-text>
+</v-card>
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/4.1.95/css/materialdesignicons.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+
+            <v-navigation-drawer class="deep-purple accent-4" dark permanent app>
+
+                <v-list-item>
+                    <v-list-item-content>
+                        <v-list-item-title class="title">User Guide</v-list-item-title>
+                        <v-list-item-subtitle>Colossus </v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+                <v-divider></v-divider>
+                <v-list nav>
+                    <v-list-item  href="/">
+                        <v-list-item-icon>
+                            <v-icon>mdi-fishbowl</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                        <v-list-item-title>Back to Colossus</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item @click="page='home'">
+                        <v-list-item-icon>
+                            <v-icon>mdi-pine-tree</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                        <v-list-item-title>Home</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item @click="page='dlp'">
+                        <v-list-item-icon>
+                            <v-icon>mdi-dna</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                        <v-list-item-title>DLP Data Entry</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item @click="page='tenx'">
+                        <v-list-item-icon>
+                            <v-icon>mdi-bacteria</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                        <v-list-item-title>TenX Data Entry</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </v-navigation-drawer>
+
+            <v-content>
+                <v-container fluid>
+                    <div v-if="page === 'home' ">{% include "core/vue/userguide_pages/home.html" %}</div>
+                    <div v-else-if="page === 'tenx' ">{% include "core/vue/userguide_pages/tenx.html" %}</div>
+                    <div v-else-if="page === 'dlp' ">{% include "core/vue/userguide_pages/dlp.html" %}</div>
+                </v-container>
+            </v-content>
+
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data() {
+                return {
+                    page: "home"
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

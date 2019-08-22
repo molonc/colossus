@@ -24,6 +24,8 @@ Updated Oct 19, 2017 by Spencer Vatrt-Watts (github.com/Spenca)
 from django.conf import settings
 from django.conf.urls import url, include, static
 from django.contrib import admin
+from django.views.generic import TemplateView
+
 from core import views
 
 urlpatterns = [
@@ -37,7 +39,7 @@ urlpatterns = [
     url(r'^account/', include('account.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^sisyphus/', include('sisyphus.urls')),
-    url(r'^kudu', views.test, name='kudu_beta'),
+    url(r'^userguide', TemplateView.as_view(template_name="core/vue/userguide.html"), name='userguide'),
 ]
 
 urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
