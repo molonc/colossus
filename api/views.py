@@ -8,8 +8,11 @@ Updated by Spencer Vatrt-Watts (github.com/Spenca)
 #============================
 # Django & Django rest framework imports
 #----------------------------
+from django.views.decorators.csrf import csrf_exempt
 import json
 import os
+import base64
+import jwt
 
 from jira import JIRA
 from django.http import HttpResponse
@@ -83,14 +86,35 @@ def pool_name_to_id_redirect(request, pool_name):
 #============================
 # KUDU API
 #----------------------------
-def jira_authenticate(request, payload):
-    print("HE:LLLLLOo")
-    print(request)
-    print(payload)
-    jira_api = JIRA('https://www.bcgsc.ca/jira/',
-                    basic_auth=(payload.auth.username, payload.auth.password))
+@csrf_exempt
+def jira_authenticate(request):
 
-    return jira_api
+    decoded_credentials = base64.b64decode(
+        request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+    ).decode("utf-8").split(':')
+    username = decoded_credentials[0]
+    password = decoded_credentials[1] 
+
+    try:
+        jira_api = JIRA('https://www.bcgsc.ca/jira/',
+                        basic_auth=(username, password), validate = True)
+        
+        encoded = jwt.encode(
+            {'username': username, 'password': password}, 'secret', algorithm='HS256')
+
+        token = encoded.decode("utf-8")
+        print("TOKEN")
+        print(token)
+
+        return HttpResponse(token)
+    
+    except Exception:
+        return HttpResponse("Invalid credentials")
+
+    # if request.POST:
+    #     print(request)
+    #     print(dir(request))
+    # return HttpResponse('Hello world')
     
 def kudu_search(request, query):
     model_names = get_model_names()
