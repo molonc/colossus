@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'^api/', include('api.urls')),
     url(r'^.*$', TemplateView.as_view(template_name="index.html")),
     # url(r'^sisyphus/', include('sisyphus.urls')),
-
+    url(r'^userguide', TemplateView.as_view(template_name="core/vue/userguide.html"), name='userguide'),
 ]
 
 # urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
