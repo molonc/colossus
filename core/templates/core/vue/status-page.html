@@ -80,7 +80,7 @@
       </div>
   </div>
 
-<script>  
+<script>
   const PAGINATION = 100
   var vm = new Vue({
     el: '#app',
@@ -304,7 +304,7 @@
                 data: data,
                 headers: {
                   "X-CSRFToken": Cookies.get('csrftoken'),
-                  "content-type": "application/json"
+                  "content-type": "application/json"z
                 }}).then( (response) => resolve(response.data)).catch( (e) => reject(e))
         })
       },
