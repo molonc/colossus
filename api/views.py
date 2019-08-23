@@ -152,6 +152,13 @@ class KuduProjectDetail(KuduList):
     queryset = Project.objects.all()
     serializer_class = DetailProjectSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
 #CORE Sample
 class KuduSampleList(KuduList):
     queryset = Sample.objects.all()
@@ -179,6 +186,13 @@ class KuduDLPLibraryDetail(KuduList):
     queryset = DlpLibrary.objects.all()
     serializer_class = DetailDLPLibrarySerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
 #DLP Sublibrary
 class KuduDLPSublibraryList(KuduList):
     queryset = SublibraryInformation.objects.all()
@@ -195,6 +209,13 @@ class KuduDLPLaneDetail(KuduList):
     queryset = DlpLane.objects.all()
     serializer_class = DetailDLPLaneSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
 #DLP Sequencing
 class KuduDLPSequencingList(KuduList):
     queryset = DlpSequencing.objects.all()
@@ -204,6 +225,13 @@ class KuduDLPSequencingList(KuduList):
 class KuduDLPSequencingDetail(KuduList):
     queryset = DlpSequencing.objects.all()
     serializer_class = DetailDLPSequencingSerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
 
 #DLP Analysis
 class KuduDLPAnalysisList(KuduList):
@@ -215,6 +243,13 @@ class KuduDLPAnalysisDetail(KuduList):
     queryset = DlpAnalysisInformation.objects.all()
     serializer_class = DetailDLPAnalysisSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
 #TENX Library
 class KuduTenxLibraryList(KuduList):
     queryset = TenxLibrary.objects.all()
@@ -224,6 +259,13 @@ class KuduTenxLibraryList(KuduList):
 class KuduTenxLibraryDetail(KuduList):
     queryset = TenxLibrary.objects.all()
     serializer_class = DetailTenxLibrarySerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
 
 #TENX Chip
 class KuduTenxChipList(KuduList):
@@ -235,6 +277,13 @@ class KuduTenxChipDetail(KuduList):
     queryset = TenxChip.objects.all()
     serializer_class = DetailTenxChipSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
 #TENX Pool
 class KuduTenxPoolList(KuduList):
     queryset = TenxPool.objects.all()
@@ -244,6 +293,13 @@ class KuduTenxPoolList(KuduList):
 class KuduTenxPoolDetail(KuduList):
     queryset = TenxPool.objects.all()
     serializer_class = DetailTenxPoolSerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
 
 #TENX Sequencing
 class KuduTenxSequencingList(KuduList):
@@ -255,6 +311,14 @@ class KuduTenxSequencingDetail(KuduList):
     queryset = TenxSequencing.objects.all()
     serializer_class = DetailTenxSequencingSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
+
 #TENX Analysis
 class KuduTenxAnalysisList(KuduList):
     queryset = TenxAnalysis.objects.all()
@@ -265,6 +329,13 @@ class KuduTenxAnalysisDetail(KuduList):
     queryset = TenxAnalysis.objects.all()
     serializer_class = DetailTenxAnalysisSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
 #TENX Lane
 class KuduTenxLaneList(KuduList):
     queryset = TenxLane.objects.all()
@@ -274,4 +345,12 @@ class KuduTenxLaneList(KuduList):
 class KuduTenxLaneDetail(KuduList):
     queryset = TenxLane.objects.all()
     serializer_class = DetailTenxLaneSerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.body)
+    def update(self, request, *args, **kwargs):
+        print(request.body)
+    def destroy(self, request, *args, **kwargs):
+        print(request.body)
+
 
