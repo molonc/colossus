@@ -86,35 +86,39 @@ def pool_name_to_id_redirect(request, pool_name):
 #============================
 # KUDU API
 #----------------------------
-@csrf_exempt
-def jira_authenticate(request):
 
-    decoded_credentials = base64.b64decode(
-        request.META['HTTP_AUTHORIZATION'].split(' ')[1]
-    ).decode("utf-8").split(':')
-    username = decoded_credentials[0]
-    password = decoded_credentials[1] 
+class Jira():
+    @csrf_exempt
+    def authenticate(request):
 
-    try:
-        jira_api = JIRA('https://www.bcgsc.ca/jira/',
-                        basic_auth=(username, password), validate=True, max_retries=0)
+        decoded_credentials = base64.b64decode(
+            request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+        ).decode("utf-8").split(':')
+        username = decoded_credentials[0]
+        password = decoded_credentials[1] 
+
+        try:
+            jira_api = JIRA('https://www.bcgsc.ca/jira/',
+                            basic_auth=(username, password), validate=True, max_retries=0)
+            
+            encoded = jwt.encode(
+                {'username': username, 'password': password}, 'secret', algorithm='HS256')
+
+            token = encoded.decode("utf-8")
+            print("TOKEN")
+            print(token)
+
+            return HttpResponse(token)
         
-        encoded = jwt.encode(
-            {'username': username, 'password': password}, 'secret', algorithm='HS256')
+        except Exception:
+            return HttpResponseBadRequest(content="Invalid Credentials")
 
-        token = encoded.decode("utf-8")
-        print("TOKEN")
-        print(token)
 
-        return HttpResponse(token)
-    
-    except Exception:
-        return HttpResponseBadRequest(content="Invalid Credentials")
+    def create_ticket(request):
 
-    # if request.POST:
-    #     print(request)
-    #     print(dir(request))
-    # return HttpResponse('Hello world')
+        return HttpResponse("ok")
+
+
     
 def kudu_search(request, query):
     model_names = get_model_names()

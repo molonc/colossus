@@ -67,5 +67,8 @@ urlpatterns = [
     url(r'^kudusearch/(?P<query>.+)$', views.kudu_search, name='kudu_search_query'),
     url(r'^auth/$', obtain_jwt_token),
     url(r'^auth/refresh/$', refresh_jwt_token),
-    url(r'^auth/jira/$', views.jira_authenticate, name="jira_authenticate"),
+    url(r'^auth/jira/authenticate/$',
+        views.Jira.authenticate, name="jira_authenticate"),
+    url(r'^auth/jira/create/$',
+        views.Jira.create_ticket, name="jira_create_ticket"),
 ]
