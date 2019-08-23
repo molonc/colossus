@@ -15,7 +15,7 @@ import base64
 import jwt
 
 from jira import JIRA
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from django.shortcuts import redirect
@@ -97,7 +97,7 @@ def jira_authenticate(request):
 
     try:
         jira_api = JIRA('https://www.bcgsc.ca/jira/',
-                        basic_auth=(username, password), validate = True)
+                        basic_auth=(username, password), validate=True, max_retries=0)
         
         encoded = jwt.encode(
             {'username': username, 'password': password}, 'secret', algorithm='HS256')
@@ -109,7 +109,7 @@ def jira_authenticate(request):
         return HttpResponse(token)
     
     except Exception:
-        return HttpResponse("Invalid credentials")
+        return HttpResponseBadRequest(content="Invalid Credentials")
 
     # if request.POST:
     #     print(request)
