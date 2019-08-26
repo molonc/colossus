@@ -170,9 +170,14 @@ class KuduSampleDetail(KuduList):
     serializer_class = DetailSampleSerializer
 
     def create(self, request, *args, **kwargs):
+        print("CREATE")
         print(request.body)
+
+
     def update(self, request, *args, **kwargs):
+        print("UPDATE")
         print(request.body)
+
     def destroy(self, request, *args, **kwargs):
         print(request.body)
 
