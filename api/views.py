@@ -14,7 +14,7 @@ import os
 import base64
 import jwt
 
-from jira import JIRA
+from jira import JIRA, JIRAError
 from django.http import HttpResponse, HttpResponseBadRequest
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
@@ -30,6 +30,7 @@ from .serializers import *
 
 from core.models import (
     SublibraryInformation,
+    JiraUser
 )
 
 from dlp.models import (
@@ -94,7 +95,6 @@ def jira_authenticate(request):
     ).decode("utf-8").split(':')
     username = decoded_credentials[0]
     password = decoded_credentials[1]
-    print(username, password)
     try:
         jira_api = JIRA('https://www.bcgsc.ca/jira/',
                         basic_auth=(username, password), validate=True, max_retries=0)
@@ -111,26 +111,30 @@ def jira_authenticate(request):
     except Exception:
         return HttpResponseBadRequest(content="Invalid Credentials")
 
-def jira(encoded_credentials):
+def get_jira_api(encoded_credentials):
+    
     try:
+        print("attempting to authenticate credentials")
         decoded_credentials = jwt.decode(
             encoded_credentials, 'secret', algorithms=['HS256'])
 
-        username = decoded_credentials[0]
-        password = decoded_credentials[1]
+        username = decoded_credentials["username"]
+        password = decoded_credentials["password"]
 
         jira_api = JIRA('https://www.bcgsc.ca/jira/',
                         basic_auth=(username, password), validate=True, max_retries=0)
 
         return jira_api
 
-    except:
-        raise Exception("invalid credentials")
+    except JIRAError as e:
+        raise JIRAError()
 
+
+@csrf_exempt
 def create_jira_ticket(request):
 
     try: 
-        jira_api = jira(request.body.token)
+        jira_api = get_jira_api(request.body.token)
     except:
         return HttpResponseBadRequest(content="Invalid credentials")
 
@@ -154,21 +158,47 @@ def create_jira_ticket(request):
     return HttpResponse(jira_ticket)
 
 
+@csrf_exempt
 def get_jira_users(request):
-    try:
-        jira_api = jira(request.body.token)
+    jira_users = JiraUser.objects.all().order_by('name')
+    jira_users = dict(users = [dict(name=user.name, user=user.username) for user in jira_users])
+    print(jira_users)
+    return HttpResponse(json.dumps(jira_users))
 
-    except:
-        return HttpResponseBadRequest(content="Invalid credentials")
+
+def get_user_list():
+    #Default empty choice for user_list
+    user_list = []
+    for user in JiraUser.objects.all().order_by('name'):
+        user_list.append((user.username, user.name))
+    return user_list
 
 
+@csrf_exempt
 def get_jira_projects(request):
     try:
-        jira_api = jira(request.body.token)
+        print("in jira projects")
+        body = request.body.decode("utf-8")
+        body_info = json.loads(body)
+        print(body_info)
+
+        jira_api = get_jira_api(body_info["token"])
         projects = sorted(
             jira_api.projects(), key=lambda project: project.name.strip())
-        return HttpResponse(projects)
-    except:
+
+        projects_names = dict(projects=[])
+        for project in projects:
+            projects_names["projects"].append(
+                dict(key=project.key, name=project.name))
+
+        # projects_names = dict(project_names=[project.key for project in projects])
+        # projects_names = [dict(project=dict.fromkeys(["key", "name"])]
+
+        print(projects_names)
+        return HttpResponse(json.dumps(projects_names))
+
+    except Exception as e:
+        print(e)
         return HttpResponseBadRequest(content="Invalid credentials")
 
 #============================
