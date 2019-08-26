@@ -15,7 +15,7 @@ import base64
 import jwt
 
 from jira import JIRA
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from django.shortcuts import redirect
@@ -84,7 +84,7 @@ def pool_name_to_id_redirect(request, pool_name):
 
 
 #============================
-# KUDU API
+# JIRA
 #----------------------------
 @csrf_exempt
 def jira_authenticate(request):
@@ -93,12 +93,12 @@ def jira_authenticate(request):
         request.META['HTTP_AUTHORIZATION'].split(' ')[1]
     ).decode("utf-8").split(':')
     username = decoded_credentials[0]
-    password = decoded_credentials[1] 
-
+    password = decoded_credentials[1]
+    print(username, password)
     try:
         jira_api = JIRA('https://www.bcgsc.ca/jira/',
-                        basic_auth=(username, password), validate = True)
-        
+                        basic_auth=(username, password), validate=True, max_retries=0)
+
         encoded = jwt.encode(
             {'username': username, 'password': password}, 'secret', algorithm='HS256')
 
@@ -107,15 +107,74 @@ def jira_authenticate(request):
         print(token)
 
         return HttpResponse(token)
-    
-    except Exception:
-        return HttpResponse("Invalid credentials")
 
-    # if request.POST:
-    #     print(request)
-    #     print(dir(request))
-    # return HttpResponse('Hello world')
-    
+    except Exception:
+        return HttpResponseBadRequest(content="Invalid Credentials")
+
+def jira(encoded_credentials):
+    try:
+        decoded_credentials = jwt.decode(
+            encoded_credentials, 'secret', algorithms=['HS256'])
+
+        username = decoded_credentials[0]
+        password = decoded_credentials[1]
+
+        jira_api = JIRA('https://www.bcgsc.ca/jira/',
+                        basic_auth=(username, password), validate=True, max_retries=0)
+
+        return jira_api
+
+    except:
+        raise Exception("invalid credentials")
+
+def create_jira_ticket(request):
+
+    try: 
+        jira_api = jira(request.body.token)
+    except:
+        return HttpResponseBadRequest(content="Invalid credentials")
+
+    task = {
+        'project': {'key': 'SC'}, # todo: get project key
+        'summary': request.body.title,
+        'issuetype': {'name': 'Task'},
+        'description': request.body.title,
+    }
+
+    task_issue = jira_api.create_issue(fields=task)
+    jira_ticket = task_issue.key
+
+    # Add watchers
+    username = request.body.username
+    jira_api.add_watcher(jira_ticket, username)
+
+    # Assign task to myself
+    task_issue.update(assignee={'name': username})
+
+    return HttpResponse(jira_ticket)
+
+
+def get_jira_users(request):
+    try:
+        jira_api = jira(request.body.token)
+
+    except:
+        return HttpResponseBadRequest(content="Invalid credentials")
+
+
+def get_jira_projects(request):
+    try:
+        jira_api = jira(request.body.token)
+        projects = sorted(
+            jira_api.projects(), key=lambda project: project.name.strip())
+        return HttpResponse(projects)
+    except:
+        return HttpResponseBadRequest(content="Invalid credentials")
+
+#============================
+# KUDU API
+#----------------------------
+
 def kudu_search(request, query):
     model_names = get_model_names()
     result_dict = {}
