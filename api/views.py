@@ -132,28 +132,23 @@ def get_jira_api(encoded_credentials):
 
 @csrf_exempt
 def create_jira_ticket(request):
-
     try: 
-        jira_api = get_jira_api(request.body.token)
+        body = json.loads(request.body.decode("utf-8"))
+        jira_api = get_jira_api(body["token"])
+        print(body)
     except:
         return HttpResponseBadRequest(content="Invalid credentials")
 
     task = {
-        'project': {'key': 'SC'}, # todo: get project key
-        'summary': request.body.title,
+        'project': {'key': body["project"]},
+        'summary': body["title"],
         'issuetype': {'name': 'Task'},
-        'description': request.body.title,
+        'description': body["description"],
+        'reporter':  body["reporter"],
     }
 
     task_issue = jira_api.create_issue(fields=task)
     jira_ticket = task_issue.key
-
-    # Add watchers
-    username = request.body.username
-    jira_api.add_watcher(jira_ticket, username)
-
-    # Assign task to myself
-    task_issue.update(assignee={'name': username})
 
     return HttpResponse(jira_ticket)
 
@@ -162,16 +157,9 @@ def create_jira_ticket(request):
 def get_jira_users(request):
     jira_users = JiraUser.objects.all().order_by('name')
     jira_users = dict(users = [dict(name=user.name, user=user.username) for user in jira_users])
+    jira_users["users"].append(dict(name="jpham", user="jpham"))
     print(jira_users)
     return HttpResponse(json.dumps(jira_users))
-
-
-def get_user_list():
-    #Default empty choice for user_list
-    user_list = []
-    for user in JiraUser.objects.all().order_by('name'):
-        user_list.append((user.username, user.name))
-    return user_list
 
 
 @csrf_exempt
@@ -190,9 +178,6 @@ def get_jira_projects(request):
         for project in projects:
             projects_names["projects"].append(
                 dict(key=project.key, name=project.name))
-
-        # projects_names = dict(project_names=[project.key for project in projects])
-        # projects_names = [dict(project=dict.fromkeys(["key", "name"])]
 
         print(projects_names)
         return HttpResponse(json.dumps(projects_names))
