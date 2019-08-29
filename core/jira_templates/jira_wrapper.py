@@ -86,8 +86,8 @@ def add_watchers(username, password, issue, watchers):
         print(e)
         raise JIRAError()
     for watcher in watchers:
-        print("ADDING", watcher)
-        Jira.add_watcher(jira_issue, watcher)
+        if watcher is not "dalai":
+            Jira.add_watcher(jira_issue, watcher)
 
 
 def add_jira_comment(username, password, issue, comment):
