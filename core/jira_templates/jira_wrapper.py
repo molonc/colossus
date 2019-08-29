@@ -85,7 +85,7 @@ def add_watchers(username, password, issue, watchers):
         print("ERROR")
         print(e)
         raise JIRAError()
-    for watcher in ['coflanagan', 'danlai', 'elaks', 'etrinh', 'jbiele', 'jbwang', 'jedwards', 'jpham', 'saparicio', 'sshah']:
+    for watcher in ['dalai']:
         print(watcher)
         Jira.add_watcher(jira_issue, watcher)
 
