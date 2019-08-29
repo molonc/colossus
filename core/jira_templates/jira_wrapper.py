@@ -73,7 +73,10 @@ def add_watchers(username, password, issue, watchers):
     '''
     Given a list of watchers, add them to the provided JIRA Issue
     '''
+    print("jira add watchers")
+    print(issue,watchers)
     Jira = JIRA(JIRA_URL, basic_auth=(username, password), max_retries=0)
+    print(Jira)
     try:
         jira_issue = Jira.issue(issue)
     except JIRAError as e:
