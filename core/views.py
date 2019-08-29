@@ -868,15 +868,15 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
                         messages.error(request, msg)
                         return self.get(request)
             elif request.session['library_type'] == 'dlp':
-                try:
-                    print("WTF")
-                    self.update_watchers(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['watchers'], form.cleaned_data['comment'])
-                except JIRAError as e:
-                    print("ERROR1")
-                    msg = e.text
-                    print(msg)
-                    messages.error(request, msg)
-                    return self.get(request)
+
+                print("WTF")
+                self.update_watchers(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['watchers'], form.cleaned_data['comment'])
+
+                print("ERROR1")
+
+                # print(msg)
+                # messages.error(request, msg)
+                return self.get(request)
             else:
                 print("ERROR2")
                 messages.error(request, "Failed to create Jira ticket")
