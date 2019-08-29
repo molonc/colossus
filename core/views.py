@@ -874,6 +874,7 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
                 except JIRAError as e:
                     print("ERROR1")
                     msg = e.text
+                    print(msg)
                     messages.error(request, msg)
                     return self.get(request)
             else:
