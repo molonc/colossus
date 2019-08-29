@@ -34,7 +34,7 @@ SECRET_KEY = os.environ.get('COLOSSUS_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get('COLOSSUS_DEBUG', False))
 
-ALLOWED_HOSTS = os.environ.get('COLOSSUS_ALLOWED_HOSTS', '127.0.0.1').split()
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
