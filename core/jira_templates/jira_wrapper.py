@@ -78,8 +78,12 @@ def add_watchers(username, password, issue, watchers):
     Jira = JIRA(JIRA_URL, basic_auth=(username, password), max_retries=0)
     print(Jira)
     try:
+        print("jira issue")
         jira_issue = Jira.issue(issue)
+        print(jira_issue)
     except JIRAError as e:
+        print("ERROR")
+        print(e)
         raise JIRAError()
     for watcher in watchers:
         Jira.add_watcher(jira_issue, watcher)
