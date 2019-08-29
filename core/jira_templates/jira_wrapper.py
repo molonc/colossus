@@ -85,9 +85,8 @@ def add_watchers(username, password, issue, watchers):
         print("ERROR")
         print(e)
         raise JIRAError()
-    for watcher in ['coflanagan']:
+    for watcher in ['jpham']:
         print(watcher)
-
         Jira.add_watcher(jira_issue, watcher)
 
 
@@ -99,6 +98,8 @@ def add_jira_comment(username, password, issue, comment):
     try:
         jira_issue = Jira.issue(issue)
     except JIRAError as e:
+        print("FAILED FAILURE")
+        print(e)
         raise JIRAError(text="JIRA Error {}: {}".format(e.response.status_code, e.response.reason))
     Jira.add_comment(jira_issue, comment)
 

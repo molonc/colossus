@@ -887,7 +887,9 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
     def update_watchers(self, user, password, ticket, watchers, comment):
         print("UPDATE")
         add_watchers(user, password, ticket, watchers)
+        print("UPDATE1")
         add_jira_comment(user, password, ticket, comment)
+        print("UPDATE2")
 
 
 class SequencingCreate(LoginRequiredMixin, TemplateView):
