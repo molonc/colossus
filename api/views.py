@@ -144,11 +144,13 @@ def create_jira_ticket(request):
         'summary': body["title"],
         'issuetype': {'name': 'Task'},
         'description': body["description"],
-        'reporter':  body["reporter"],
+        'reporter': {'name': body["reporter"]},
     }
 
     task_issue = jira_api.create_issue(fields=task)
     jira_ticket = task_issue.key
+    print("created")
+    print(jira_ticket)
 
     return HttpResponse(jira_ticket)
 
