@@ -38,6 +38,9 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 # App imports
 #----------------------------
 from core.search_util.search_helper import return_text_search
+from core.models import (
+    ChipRegionMetadata
+)
 from dlp.models import (
     DlpLibrary
 )
@@ -323,16 +326,35 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
 @login_required
 def sample_name_to_id_redirect(request, pk=None, sample_id=None):
     if pk is not None:
+        sample = get_object_or_404(Sample, pk=pk)
+
+        # Get all chip region metadata that include desired sample
+        chip_metadata = ChipRegionMetadata.objects.filter(
+            metadata_value=str(sample))
+
+        related_libraries = set()
+        for metadata in chip_metadata:
+            # Get dlp library related to each chip region metadata
+            chip_region_id = metadata.chip_region_id
+            library = DlpLibrary.objects.get(chipregion=chip_region_id)
+        
+            if str(library.sample_id) != pk:
+                related_libraries.add(library)
+
         context = dict(
             library_list=['dlp', 'pbal', 'tenx'],
-            sample=get_object_or_404(Sample, pk=pk),
-            pk=pk
+            sample=sample,
+            pk=pk,
+            related_libraries=related_libraries
         )
+
         return context
 
     elif sample_id is not None:
         pk = get_object_or_404(Sample, sample_id=sample_id).pk
         return redirect('/core/sample/{}'.format(pk))
+
+    
 
 #============================
 # Library views

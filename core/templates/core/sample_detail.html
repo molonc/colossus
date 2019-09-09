@@ -135,6 +135,45 @@
 </div>
 <!-- end of Library Information -->
 
+<!-- Related Libraries -->
+<div class="container detail-bordered-container">
+    <div class="table">
+        <table class="table">
+            {% if related_libraries %}
+            <thead>
+                <tr>
+                    <th>
+                        <h4>Related Libraries</h4>
+                    </th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Chip ID</th>
+                    <th>JIRA Ticket</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for related_lib in related_libraries%}
+                <tr>
+                    <td><a href="{{ related_lib.get_absolute_url }}">{{ related_lib.pool_id }}</a></td>
+                    <td><a href="https://www.bcgsc.ca/jira/browse/{{ related_lib.jira_ticket }}">{{ related_lib.jira_ticket }}</a></td>
+                    <td>{{ related_lib.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% else %}
+            <tr>
+                <h5><i class="text-warning">There are no related libraries for this sample!</i></h5>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+<!-- End of Related Libraries -->
+
+
 <!-- footer bottons -->
 <div class="container" style="margin-bottom: 5px;">
     <a class="btn btn-warning btn-sm" style="float: left; margin: 5px;" href="{% url 'core:sample_update' pk=sample.pk %}">Edit</a>
