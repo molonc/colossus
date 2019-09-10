@@ -77,6 +77,7 @@
                         <th>Path To Archive</th>
                         {% if library_type == 'tenx' %}
                         <th>Tantalus Dataset</th>
+                        <th>GSC Sublibraries</th>
                         {% endif %}
                         <th>Sequencing Date</th>
                         <th></th>
@@ -116,6 +117,15 @@
                                 {% for id in lane.tantalus_datasets %}
                                     <a href="https://tantalus.canadacentral.cloudapp.azure.com/datasets/{{id}}"></i> {{id}}</a>
                                 {% endfor %}
+                                </td>
+                                {% else %}
+                                <td>None</td>
+                                {% endif %}
+                                {% if lane.gsc_sublibrary_names %}
+                                <td>
+                                    {% for sublibrary in lane.gsc_sublibrary_names %}
+                                    {{sublibrary}}, 
+                                    {% endfor %}
                                 </td>
                                 {% else %}
                                 <td>None</td>

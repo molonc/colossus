@@ -452,10 +452,13 @@ class TenxLane(models.Model, FieldValue):
         "Path to archive",
         max_length=150,
         null=True,
-        blank=True,
+        blank=True, 
     )
 
     tantalus_datasets = ArrayField(models.IntegerField(null=True, blank=True), null=True, blank=True)
+
+    gsc_sublibrary_names = ArrayField(models.CharField(
+        null=True, blank=True, max_length=10,), null=True, blank=True)
 
     sequencing_date = models.DateTimeField(
         null=True
