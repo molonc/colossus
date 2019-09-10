@@ -84,7 +84,7 @@ CORE_SEQUENCING = ["adapter", "format_for_data_submission", "index_read_type", "
 
 DLP_SEQUENCING = ["rev_comp_override", "dlplane__flow_cell_id", "dlplane__path_to_archive", "library__pool_id", "library__sample__sample_id"]
 PBAL_SEQUENCING = ["pballane__flow_cell_id", "pballane__path_to_archive"]
-TENX_SEQUENCING = ["sequencing_instrument", "sequencer_id", "sequencing_center", "sequencer_notes", "gsc_library_id"]
+TENX_SEQUENCING = ["tenx_pool__pool_name", "sequencing_instrument", "sequencer_id", "sequencing_center", "sequencer_notes", "gsc_library_id", ]
 
 DLP_ANALYSES = [ "priority_level", "smoothing", "verified", "reference_genome__reference_genome", "version__version", "analysis_jira_ticket"]
 TENX_ANALYSIS = ["version", "jira_ticket", "run_status", "description"]
