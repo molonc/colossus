@@ -146,7 +146,7 @@ def return_text_search(query):
         sublibrary_id_fields = sublibrary_id_search(query)
         context["dlp"]["Libraries"].extend(list(DlpLibrary.objects.filter(pool_id=sublibrary_id_fields[1], sample__sample_id=sublibrary_id_fields[0])))
 
-    context = gsc_sublibrary_search(query, context)
+    context = gsc_tenx_sublibrary_search(query, context)
     context = remove_duplicate(context)
 
     context["total"] = len(context["core"]["Samples"] + context["dlp"]["Libraries"] + context["dlp"]["Sequencings"]+ context["dlp"]["Analyses"] +
@@ -169,7 +169,7 @@ def sublibrary_id_search(query):
     return False
 
 
-def gsc_sublibrary_search(query, context):
+def gsc_tenx_sublibrary_search(query, context):
     lanes = TenxLane.objects.filter(gsc_sublibrary_names__contains=[f"{query}"])
     context["tenx"]["Sequencings"].extend([lane.sequencing for lane in lanes])
     return context
