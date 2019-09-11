@@ -68,10 +68,13 @@ class TenxLibraryDetail(LibraryDetail):
         library = get_object_or_404(TenxLibrary, pk=pk)
         library_type = 'tenx'
 
+        analyses = TenxAnalysis.objects.filter(tenx_library=pk)
+
         return self.get_context_and_render(
             request=request,
             library=library,
             library_type=library_type,
+            analyses=analyses,
         )
 
 class TenxLibraryDelete(LibraryDelete):
