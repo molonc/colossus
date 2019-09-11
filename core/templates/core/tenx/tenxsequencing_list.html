@@ -17,7 +17,8 @@
                     <th>ID</th>
                     <th>Pool</th>
                     <th>Submission Date</th>
-                    <th>Sequncing Centre</th>
+                    <th>Sequencing Centre</th>
+                    <th>GSC Sublibraries</th>
                     <th class="no-sort-col"></th>
                 </tr>
             </thead>
@@ -33,6 +34,13 @@
                         {% endif %}
                         <td>{{ sequencing.submission_date }}</td>
                         <td>{{ sequencing.sequencing_center }}</td>
+                        <td>
+                            {% for lane in sequencing.tenxlane_set.all %}
+                            {% for sublib in lane.gsc_sublibrary_names %}
+                            {{sublib}}
+                            {% endfor %}
+                            {% endfor %}
+                        </td>
                         <td>
                             <div style="float: right; min-width: 69px">
                                 <a style="margin-right: 2px;" href="{% url 'tenx:sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
