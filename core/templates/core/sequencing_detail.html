@@ -122,10 +122,17 @@
                                 <td>None</td>
                                 {% endif %}
                                 {% if lane.gsc_sublibrary_names %}
+                                
                                 <td>
-                                    {% for sublibrary in lane.gsc_sublibrary_names %}
+                                    {% if lane.get_library_from_sublibrary.items %}
+                                    {% for sublibrary, library  in lane.get_library_from_sublibrary.items %}
+                                    {% if library is None %}
                                     {{sublibrary}}
+                                    {% else %}
+                                    <a href="{{ library.get_absolute_url}} ">{{sublibrary}}</a>
+                                    {% endif %}
                                     {% endfor %}
+                                    {% endif %}
                                 </td>
                                 {% else %}
                                 <td>None</td>

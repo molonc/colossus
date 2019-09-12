@@ -98,6 +98,12 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         max_length=255,
     )
 
+    gsc_library_id = create_chrfield(
+        "GSC Library ID",
+        blank=True,
+        null=True,
+    )
+
     def get_library_id(self):
         return '_'.join([self.sample.sample_id])
 
@@ -462,6 +468,18 @@ class TenxLane(models.Model, FieldValue):
     sequencing_date = models.DateTimeField(
         null=True
     )
+    def get_library_from_sublibrary(self):
+        sublib_to_lib_map = dict()
+        if self.gsc_sublibrary_names:
+            for sublib in self.gsc_sublibrary_names:
+                try:
+                    library = TenxLibrary.objects.get(gsc_library_id=sublib)
+                except:
+                    library = None
+                
+                sublib_to_lib_map[sublib] = library
+        
+        return sublib_to_lib_map
 
     def __str__(self):
         return self.flow_cell_id

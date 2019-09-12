@@ -32,6 +32,7 @@
                     </tr>
                     <tr>
                         <th>Library ID</th>
+                        <th>Library Name</th>
                         <th>Sample</th>
                         <th>JIRA Ticket</th>
                         <th>Description</th>
@@ -41,6 +42,7 @@
                     {% for library in pool.libraries.all %}
                         <tr>
                             <td><a href="{{ library.get_absolute_url }}">{{ library.id }}</a></td>
+                            <td><a href="{{ library.get_absolute_url }}">{{library.name}}</a></td>
                             <td><a href="{{ library.sample.get_absolute_url }}">{{ library.sample.sample_id }}</a></td>
                             <td><a href="https://www.bcgsc.ca/jira/browse/{{ library.jira_ticket }}">{{ library.jira_ticket }}</a></td>
                             <td>{{ library.description }}</td>
