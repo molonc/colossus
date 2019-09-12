@@ -59,7 +59,7 @@ PBAL_LIBRARY = ["pballibrarysampledetail__spotting_location", "pballibrarysample
 
                       "pballibraryquantificationandstorage__qc_check", "pballibraryquantificationandstorage__qc_notes"]
 
-TENX_LIBRARY = ["name", "jira_ticket", "experimental_condition", "google_sheet",
+TENX_LIBRARY = ["name", "jira_ticket", "experimental_condition", "google_sheet", "gsc_library_id",
                       "tenxlibrarysampledetail__cell_state",
                       "tenxlibrarysampledetail__label_of_original_sample_vial",
                       "tenxlibrarysampledetail__lims_vial_barcode",
