@@ -312,7 +312,7 @@ class JiraUserViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
 
-class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
+class TenxLibraryViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = TenxLibrary.objects.all()
     serializer_class = TenxLibrarySerializer

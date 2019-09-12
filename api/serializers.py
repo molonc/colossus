@@ -498,6 +498,7 @@ class TenxLibrarySerializer(serializers.ModelSerializer):
             'description',
             'result',
             'failed',
+            'gsc_library_id',
         )
 
 class TenxChipSerializer(serializers.ModelSerializer):
