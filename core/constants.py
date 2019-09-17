@@ -96,6 +96,7 @@ chip_format_choices = (
 qc_check_choices = (
     ('P', 'Will sequence'),
     ('N', 'Will not sequence'),
+    ('H', 'On Hold')
 )
 
 # fields
