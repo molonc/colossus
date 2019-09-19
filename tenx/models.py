@@ -21,6 +21,7 @@ class TenxChip(models.Model, FieldValue):
     LAB_NAMES = (
         ("SA", "Sam Aparicio"),
         ("DH", "David Huntsman"),
+        ("CS", "Christian Steidl"),
     )
 
     lab_name = create_chrfield(
