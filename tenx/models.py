@@ -14,6 +14,7 @@ class TenxChip(models.Model, FieldValue):
 
     # Chip Model for TenX Libraries
     history = HistoricalRecords(table_name='tenx_history_chip')
+
     class Meta:
         ordering = ['-id']
 
@@ -24,9 +25,9 @@ class TenxChip(models.Model, FieldValue):
 
     lab_name = create_chrfield(
         "Lab Name",
-        default = "SA",
+        default="SA",
         choices=LAB_NAMES,
-        blank = True
+        blank=True,
     )
 
     #TenXLibrary name depend on below methods, so please be mindful when making changes
@@ -34,14 +35,13 @@ class TenxChip(models.Model, FieldValue):
         return "CHIP" + format(self.id, "04")
 
     def __str__(self):
-        return self.get_id() +"_" + self.lab_name
+        return self.get_id() + "_" + self.lab_name
 
     def get_absolute_url(self):
         return reverse("tenx" + ":chip_detail", kwargs={"pk": self.pk})
 
     def get_sample_list(self):
         return set(t.sample.sample_id for t in self.tenxlibrary_set.all()) if self.tenxlibrary_set.all() else []
-
 
 
 class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
@@ -83,13 +83,10 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         TenxChip,
         verbose_name="Chip",
         on_delete=models.CASCADE,
-        null=True
+        null=True,
     )
 
-    chip_well = models.IntegerField(
-        default=0,
-        choices=CHIP_WELL
-    )
+    chip_well = models.IntegerField(default=0, choices=CHIP_WELL)
 
     google_sheet = create_chrfield(
         "Google Sheet Link",
@@ -109,13 +106,14 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
 
     def get_id(self):
         return self.name
+
     fields_to_exclude = ['ID', 'Primary Sample']
     values_to_exclude = ['id', 'primary sample']
 
     projects = models.ManyToManyField(
         Project,
         verbose_name="Project",
-        blank=True
+        blank=True,
     )
 
     # related sample
@@ -127,12 +125,12 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
 
     # related libraries
     relates_to_dlp = models.ManyToManyField(
-        'dlp.DlpLibrary',   # DlpLibrary hasn't been seen yet
+        'dlp.DlpLibrary', # DlpLibrary hasn't been seen yet
         verbose_name="Relates to (DLP)",
         blank=True,
     )
     relates_to_tenx = models.ManyToManyField(
-        'TenxLibrary',   # TenxLibrary hasn't been seen yet
+        'TenxLibrary', # TenxLibrary hasn't been seen yet
         verbose_name="Relates to (Tenx)",
         blank=True,
     )
@@ -141,11 +139,7 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     description = create_textfield("Description", max_length=1024)
     result = create_textfield("Result")
 
-    failed = models.BooleanField(
-        "Failed",
-        default=False,
-        blank=False
-    )
+    failed = models.BooleanField("Failed", default=False, blank=False)
 
     def __str__(self):
         return str(self.name)
@@ -153,17 +147,39 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
     def get_absolute_url(self):
         return reverse(self.library_type + ":library_detail", kwargs={"pk": self.pk})
 
+
 class TenxPool(models.Model, FieldValue):
     LOCATION = (
         ('BCCAGSC', 'GSC'),
         ('UBCBRC', 'UBC'),
     )
 
-    pool_name = create_chrfield("Pool Name", null=True, blank=True)
-    gsc_pool_name = create_chrfield("GSC Pool Name", null=True, blank=True)
-    construction_location = create_chrfield("Construction Location", choices=LOCATION, null=True, blank=True)
-    constructed_by = create_chrfield("Constructed By", null=True, blank=True)
-    constructed_date =models.DateField("Construction Date", null=True, blank=True)
+    pool_name = create_chrfield(
+        "Pool Name",
+        null=True,
+        blank=True,
+    )
+    gsc_pool_name = create_chrfield(
+        "GSC Pool Name",
+        null=True,
+        blank=True,
+    )
+    construction_location = create_chrfield(
+        "Construction Location",
+        choices=LOCATION,
+        null=True,
+        blank=True,
+    )
+    constructed_by = create_chrfield(
+        "Constructed By",
+        null=True,
+        blank=True,
+    )
+    constructed_date = models.DateField(
+        "Construction Date",
+        null=True,
+        blank=True,
+    )
     libraries = models.ManyToManyField(TenxLibrary)
 
     def __str__(self):
@@ -176,8 +192,8 @@ class TenxPool(models.Model, FieldValue):
         return [l.id for l in self.libraries.all()]
 
     def jira_tickets(self):
-        jira_tickets =[]
-        sample_ids =[]
+        jira_tickets = []
+        sample_ids = []
         for l in self.libraries.all():
             if l.jira_ticket:
                 jira_tickets.append(l.jira_ticket)
@@ -192,15 +208,25 @@ class TenxAnalysis(models.Model, FieldValue):
     class Meta:
         ordering = ['id']
 
-    input_type = create_chrfield("Input Type", choices=INPUT_TYPE, null=False)
-    version = create_chrfield("Analysis Version", blank=False)
-    jira_ticket =  create_chrfield("Analysis Jira Ticket", blank=False)
+    input_type = create_chrfield(
+        "Input Type",
+        choices=INPUT_TYPE,
+        null=False,
+    )
+    version = create_chrfield(
+        "Analysis Version",
+        blank=False,
+    )
+    jira_ticket = create_chrfield(
+        "Analysis Jira Ticket",
+        blank=False,
+    )
     run_status = create_chrfield(
         "Run Status",
         blank=False,
         null=False,
         default=IDLE,
-        choices=RUN_STATUS_CHOICES
+        choices=RUN_STATUS_CHOICES,
     )
 
     last_updated_date = models.DateTimeField("Last Updated Date", auto_now=True)
@@ -218,10 +244,10 @@ class TenxAnalysis(models.Model, FieldValue):
         return res
 
     def get_absolute_url(self):
-        return reverse("tenx:tenxanalysis_detail" , kwargs={"pk": self.pk})
+        return reverse("tenx:tenxanalysis_detail", kwargs={"pk": self.pk})
+
 
 class TenxLibrarySampleDetail(models.Model, FieldValue):
-
     """
     10x library sample details.
     """
@@ -241,7 +267,7 @@ class TenxLibrarySampleDetail(models.Model, FieldValue):
         "Sample prep date",
         null=True,
         blank=True,
-        default=datetime.date.today
+        default=datetime.date.today,
     )
 
     num_cells_targeted = models.PositiveSmallIntegerField(
@@ -253,7 +279,6 @@ class TenxLibrarySampleDetail(models.Model, FieldValue):
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
 
-
     # fields
     cell_state = create_chrfield(
         "Cell state",
@@ -263,18 +288,16 @@ class TenxLibrarySampleDetail(models.Model, FieldValue):
     label_of_original_sample_vial = create_chrfield("Label of original sample vial")
     lims_vial_barcode = create_chrfield("LIMS vial barcode")
     original_storage_temperature = create_intfield("Original storage temperature (C)")
-    passage_of_cell_line  = create_intfield("Passage")
+    passage_of_cell_line = create_intfield("Passage")
     sample_notes = create_textfield("Sample notes")
     sample_preparation_method = create_textfield("Sample preparation method")
     sample_preservation_method = create_chrfield("Sample preservation method")
 
 
 class TenxLibraryConstructionInformation(models.Model, FieldValue):
-
     """
     10x library construction information.
     """
-
 
     fields_to_exclude = ['ID', 'Library']
     values_to_exclude = ['id', 'library']
@@ -335,12 +358,11 @@ class TenxLibraryConstructionInformation(models.Model, FieldValue):
         choices=CHEMISTRY_VERSION_CHOICES,
         verbose_name="Chemistry Version",
         max_length=150,
-        default="VERSION_3"
+        default="VERSION_3",
     )
 
 
 class TenxSequencing(models.Model, FieldValue):
-
     """
     10x sequencing information.
     """
@@ -355,15 +377,19 @@ class TenxSequencing(models.Model, FieldValue):
         TenxLibrary,
         verbose_name="Library",
         on_delete=models.CASCADE,
-        null=True, blank=True
+        null=True,
+        blank=True,
     )
 
-    tenx_pool = models.ForeignKey(TenxPool, on_delete=models.SET_NULL ,null=True, blank=True)
-
+    tenx_pool = models.ForeignKey(
+        TenxPool,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     """
     Sequencing information base class.
     """
-
     class Meta:
         unique_together = ('library', 'sequencing_center', 'sequencing_instrument')
 
@@ -378,22 +404,22 @@ class TenxSequencing(models.Model, FieldValue):
 
     submission_date = models.DateField(
         "Submission date",
-        default= datetime.date.today
-        )
+        default=datetime.date.today,
+    )
 
     sequencer_id = create_chrfield("Sequencer ID")
     sequencing_center = create_chrfield(
         "Sequencing center",
         choices=SEQ_CENTER,
         default='BCCAGSC',
-        blank=False
+        blank=False,
     )
-    sequencer_notes = create_textfield("Sequencing notes")
+    sequencer_notes = create_textfield("Sequencing notes", )
 
     tenx_analysis = models.ManyToManyField(
         TenxAnalysis,
         verbose_name="Tenx Analysis",
-        blank=True
+        blank=True,
     )
 
     gsc_library_id = create_chrfield(
@@ -404,13 +430,11 @@ class TenxSequencing(models.Model, FieldValue):
 
     number_of_lanes_requested = models.PositiveIntegerField(
         default=1,
-        verbose_name="Sequencing Goal"
+        verbose_name="Sequencing Goal",
     )
 
     # Set to the last time number_of_lanes_requested was updated
-    lane_requested_date = models.DateField(
-        null=True,
-    )
+    lane_requested_date = models.DateField(null=True, )
 
     def __str__(self):
         return 'SEQ_' + str(self.id)
@@ -433,7 +457,6 @@ class TenxSequencing(models.Model, FieldValue):
 
 
 class TenxLane(models.Model, FieldValue):
-
     """
     10x lane information.
     """
@@ -458,16 +481,23 @@ class TenxLane(models.Model, FieldValue):
         "Path to archive",
         max_length=150,
         null=True,
-        blank=True, 
+        blank=True,
     )
 
-    tantalus_datasets = ArrayField(models.IntegerField(null=True, blank=True), null=True, blank=True)
-
-    gsc_sublibrary_names = ArrayField(models.CharField(null=True, blank=True, max_length=10,), null=True, blank=True)
-
-    sequencing_date = models.DateTimeField(
-        null=True
+    tantalus_datasets = ArrayField(
+        models.IntegerField(null=True, blank=True),
+        null=True,
+        blank=True,
     )
+
+    gsc_sublibrary_names = ArrayField(models.CharField(
+        null=True,
+        blank=True,
+        max_length=10,
+    ), null=True, blank=True)
+
+    sequencing_date = models.DateTimeField(null=True)
+
     def get_library_from_sublibrary(self):
         sublib_to_lib_map = dict()
         if self.gsc_sublibrary_names:
@@ -476,16 +506,16 @@ class TenxLane(models.Model, FieldValue):
                     library = TenxLibrary.objects.get(gsc_library_id=sublib)
                 except:
                     library = None
-                
+
                 sublib_to_lib_map[sublib] = library
-        
+
         return sublib_to_lib_map
 
     def __str__(self):
         return self.flow_cell_id
 
-class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
 
+class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
     """
     10x library quantification and storage.
     """
@@ -519,7 +549,6 @@ class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
         blank=True,
     )
 
-
     # fields
     qc_check = create_chrfield(
         "QC check",
@@ -528,7 +557,18 @@ class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
 
     qc_notes = create_textfield("QC notes")
 
-    dna_concentration_nm = models.IntegerField("DNA Concentration(nM)", null=True, blank=True)
-    dna_concentration_ng = models.IntegerField("DNA Concentration(ng/uL)", null=True, blank=True)
-    dna_concentration_bp = models.IntegerField("DNA Concentration(bp)", null=True, blank=True)
-
+    dna_concentration_nm = models.IntegerField(
+        "DNA Concentration(nM)",
+        null=True,
+        blank=True,
+    )
+    dna_concentration_ng = models.IntegerField(
+        "DNA Concentration(ng/uL)",
+        null=True,
+        blank=True,
+    )
+    dna_concentration_bp = models.IntegerField(
+        "DNA Concentration(bp)",
+        null=True,
+        blank=True,
+    )
