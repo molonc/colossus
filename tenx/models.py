@@ -153,6 +153,7 @@ class TenxPool(models.Model, FieldValue):
     LOCATION = (
         ('BCCAGSC', 'GSC'),
         ('UBCBRC', 'UBC'),
+        ('BCCRC', 'BCCRC'),
     )
 
     pool_name = create_chrfield(
