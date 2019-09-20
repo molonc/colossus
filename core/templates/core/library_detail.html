@@ -37,7 +37,14 @@
     <table class="table-condensed">
         <tr>
             <th id="thid"> Sample:</th>
-            <td id="tdid" class="notes"><a href="{{ library.sample.get_absolute_url }}">{{ library.sample }}</a></td>
+            <td id="tdid">
+                <a href="{{ library.sample.get_absolute_url }}">{{ library.sample }}</a>
+                {% if additional_samples %}
+                {% for sample in additional_samples %}
+                <br><a href="{{sample.get_absolute_url }}">{{ sample.sample_id }}</a>
+                {% endfor %}
+                {% endif %}
+            </td>
         </tr>
         <tr>
             {% if library_type == 'pbal' %}

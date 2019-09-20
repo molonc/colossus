@@ -397,7 +397,8 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
         sublibinfo_fields=None,
         chip_metadata=None,
         metadata_fields=None,
-        doubletinfo_fields=None
+        doubletinfo_fields=None,
+        additional_samples=None,
     ):
         library_dict = self.sort_library_order(library)
         context = {
@@ -408,6 +409,7 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
             'chip_metadata': chip_metadata,
             'metadata_fields': metadata_fields,
             'library_dict':library_dict,
+            'additional_samples': additional_samples,
         }
         return render(request, self.template_name, context)
 

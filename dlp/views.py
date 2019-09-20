@@ -67,13 +67,23 @@ class DlpLibraryDetail(LibraryDetail):
         sublibinfo = SublibraryInformation()
         fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
         metadata_dict = collections.OrderedDict()
-
+        controls_to_exclude = ["NCC", "gDNA", "hTERT", "NTC"]
+        additional_samples = []
         for chip_region in library.chipregion_set.all().order_by('region_code'):
             metadata_set = chip_region.chipregionmetadata_set.all()
             d1 = {}
 
             for metadata in metadata_set:
                 d1[metadata.metadata_field.field] = metadata.metadata_value
+                # Get additional non-control samples
+                if ((not any(control in chip_region.region_code for control in controls_to_exclude)) 
+                    and str(metadata.metadata_field) == "sample_id"):
+                    try:
+                        additional_samples.append(Sample.objects.get(
+                            sample_id=metadata.metadata_value,))
+                    except:
+                        continue
+
             row = []
 
             for field in fields:
@@ -84,7 +94,11 @@ class DlpLibraryDetail(LibraryDetail):
                 row.append(d1[field])
             metadata_dict[chip_region.region_code] = row
 
-        return self.get_context_and_render(request, library, library_type, analyses, sublibinfo.get_fields(), metadata_dict, fields)
+        # Remove duplicates and samples equaling primary sample
+        additional_samples = list(dict.fromkeys(additional_samples))
+        additional_samples = [a for a in additional_samples if a.sample_id != library.sample.sample_id]   
+
+        return self.get_context_and_render(request, library, library_type, analyses, sublibinfo.get_fields(), metadata_dict, fields, additional_samples=additional_samples,)
 
     def sort_library_order(self, library):
         new_library_order = ['Description', 'Result', 'Title', 'Jira ticket', 'Quality', 'Chip ID', 'Number of sublibraries']
