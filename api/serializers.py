@@ -89,6 +89,8 @@ class SampleSerializer(serializers.ModelSerializer):
             'dlplibrary_set',
             'tenxlibrary_set',
             'additionalsampleinformation',
+            'strain',
+            'notes',
         )
 
 
