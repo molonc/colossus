@@ -66,6 +66,7 @@ from dlp.models import (
 
 from tenx.models import *
 from api.filters import (
+    SampleFilter,
     SublibraryInformationFilter,
     AnalysisInformationFilter, TenxAnalysisFilter, get_filter_model)
 
@@ -159,11 +160,9 @@ class SampleViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     serializer_class = SampleSerializer
     permission_classes = (IsAuthenticated, )
     pagination_class = VariableResultsSetPagination
-    filter_fields = (
-        'id',
-        'sample_id',
-    )
+    filter_class = SampleFilter
 
+    
 class LaneViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
     """
     View for Lanes.

@@ -7,6 +7,7 @@ from django_filters import FilterSet
 from django_filters import Filter, DateFromToRangeFilter
 from django_filters.fields import Lookup
 from core.models import (
+    Sample,
     SublibraryInformation,
     Project)
 
@@ -115,3 +116,12 @@ class SublibraryInformationFilter(filters.FilterSet):
             'row',
             'column',
         )
+
+
+class SampleFilter(filters.FilterSet):
+    class Meta:
+        model = Sample
+        fields = {
+            'id': ["exact"],
+            'sample_id': ["exact", "contains"]
+        }
