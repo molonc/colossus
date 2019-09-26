@@ -187,6 +187,7 @@ def gsc_info_post(request):
         "taxonomy_id": library.sample.taxonomy_id,
         "anatomic_site": library.sample.additionalsampleinformation.anatomic_site,
         "pathology_disease": library.sample.additionalsampleinformation.pathology_disease_name,
+        "tissue_type": library.sample.additionalsampleinformation.tissue_type,
         "library_type": library.dlplibraryconstructioninformation.library_type,
         "construction_method": library.dlplibraryconstructioninformation.library_construction_method,
         "size_range": library.dlplibraryquantificationandstorage.size_range,

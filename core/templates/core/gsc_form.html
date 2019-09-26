@@ -106,6 +106,15 @@
                             </b-button>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="tissue_type" label="TissueType">
+                        <template slot="header" slot-scope="scope">
+                            <span v-show="!showCopyButtons.tissueType" @mouseover="mouseover('tissueType')">Tissue Type</span>
+                            <b-button class="copy-btn" v-show="showCopyButtons.tissueType" @mouseleave="mouseleave('tissueType')"
+                                variant="light" size="sm" @click="copyToClipboard('tissue_type')">
+                                <i class="far fa-copy"></i>
+                            </b-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="library_type" label="Library Type">
                         <template slot="header" slot-scope="scope">
                             <span v-show="!showCopyButtons.libraryType" @mouseover="mouseover('libraryType')">Library
@@ -252,6 +261,7 @@
                     "pool": false,
                     "taxonomy": false,
                     "anatomic": false,
+                    "tissueType": false, 
                     "pathologyDisese": false,
                     "libraryType": false,
                     "construction": false,
@@ -406,10 +416,8 @@
                     document.body.removeChild(element);
                 },
                 copyToClipboard: function (columnElements) {
-                    console.log(columnElements)
                     var text = this.results.map(pool => pool[columnElements])
                     var text = text.join("\r")
-                    console.log(text)
 
                     var copyElement = document.createElement("span");
                     copyElement.appendChild(document.createTextNode(text));
@@ -433,11 +441,9 @@
                     }
                     )
                     this.showCopyButtons[element] = true
-                    console.log(`show ${element} copy`)
                 },
                 mouseleave: function (element) {
                     this.showCopyButtons[element] = false
-                    console.log(`do not show ${element} copy`)
                 },
             },
             computed: {
