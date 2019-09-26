@@ -9,7 +9,7 @@ from core.models import Sample
 # Completely gutted by Mike Yue 2019-02-14 due to request by Justina (Steps are now obsolete)
 DLP_UNFORMATTED_TEMPLATE = """{description}
 
-Query [Colossus|http://colossus.bcgsc.ca/dlp/library/{id}] for detailed information.
+Query [Colossus|https://colossus.canadacentral.cloudapp.azure.com/dlp/library/{id}] for detailed information.
 
 """
 

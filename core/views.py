@@ -1001,7 +1001,8 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
             instance = form.save(commit=False)
             #Don't require JIRA integration if not updating the number of lanes field
             if(old_count != instance.number_of_lanes_requested):
-                jira_comment = "Sequencing Goal has been updated from {} to {} for this [Sequencing|http://colossus.bcgsc.ca/{}/sequencing/{}]".format(old_count, instance.number_of_lanes_requested, self.library_type, pk)
+                jira_comment = "Sequencing Goal has been updated from {} to {} for this [Sequencing|https://colossus.canadacentral.cloudapp.azure.com/{}/sequencing/{}]".format(
+                    old_count, instance.number_of_lanes_requested, self.library_type, pk)
                 try:
                     if self.library_type == "tenx" and instance.tenx_pool:
                         jira_tickets, sample_ids = instance.tenx_pool.jira_tickets()
