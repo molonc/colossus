@@ -8,6 +8,9 @@
 <div class="container" style="padding: 0; margin-bottom: 5px;">
     <h4 style="float: left;">Select a pool to view its details</h4>
     <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'tenx:pool_create' %}">Add TenxPool</a>
+    <button type="button" class="btn btn-primary  btn-sm" style="float: right; margin-top: 5px; margin-right: 5px;" data-toggle="modal" data-target="#gscForm">
+        Get GSC Submission Form
+    </button>
 </div>
 <div class="container" style="background-color: #F5F5F5;">
     <div class="table-responsive">
@@ -46,6 +49,50 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="modal fade" id="gscForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Please fill out the following information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="exampleFormControlInput1">Name</label>
+                        <input type="email" class="form-control" id="submitterName">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Email</label>
+                        <input type="email" class="form-control" id="submitterEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlInput1">Today's Date</label>
+                        <input type="email" class="form-control" id="date">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Choose TenX Pool</label>
+                        <select class="form-control" id="submitterEmail">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
     </div>
 </div>
 
