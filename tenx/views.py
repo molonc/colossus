@@ -5,7 +5,7 @@ from tenx.forms import *
 from tenx.utils import tenxpool_naming_scheme
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.views.generic import TemplateView
 
@@ -58,6 +58,21 @@ def analysis_detail(request, pk):
 def library_id_to_pk_redirect(request, pool_id):
     pk = get_object_or_404(TenxLibrary, name=pool_id).pk
     return redirect("/tenx/library/{}".format(pk))
+
+
+@login_required
+def get_gsc_submission_form(request):
+
+    if request.method == 'POST':
+        form = TenxGSCSubmissionForm(request.POST)
+
+        if form.is_valid():
+            return HttpResponseRedirect("/tenx/pool/list/")
+
+        # else:
+        #     form = TenxGSCSubmissionForm()
+
+    return render(request, 'core/tenx/tenxpool.html', {'form': form})
 
 
 class TenxLibraryDetail(LibraryDetail):
