@@ -7,7 +7,8 @@
 {% block body %}
 <div class="container" style="padding: 0; margin-bottom: 5px;">
     <h4 style="float: left;">Select a sequencing to view its details</h4>
-    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'tenx:sequencing_create' %}">Add TenxPool</a>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;"
+        href="{% url 'tenx:sequencing_create' %}">Add TenxPool</a>
 </div>
 <div class="container" style="background-color: #F5F5F5;">
     <div class="table-responsive">
@@ -23,38 +24,37 @@
                 </tr>
             </thead>
             <tbody>
-                <br/>
+                <br />
                 {% for sequencing in sequencings %}
-                    <tr>
-                        <td><a href="{% url 'tenx:sequencing_detail' pk=sequencing.pk %}">{{ sequencing.id }}</a></td>
+                <tr>
+                    <td><a href="{% url 'tenx:sequencing_detail' pk=sequencing.pk %}">{{ sequencing.id }}</a></td>
+                    {% if sequencing.tenx_pool %}
+                    <td><a href="{% url 'tenx:pool_detail' pk=sequencing.tenx_pool.pk %}">{{ sequencing.tenx_pool }}</a>
+                    </td>
+                    {% else %}
+                    <td> None </td>
+                    {% endif %}
+                    <td>{{ sequencing.submission_date }}</td>
+                    <td>{{ sequencing.sequencing_center }}</td>
+                    <td>
                         {% if sequencing.tenx_pool %}
-                        <td><a href="{% url 'tenx:pool_detail' pk=sequencing.tenx_pool.pk %}">{{ sequencing.tenx_pool }}</a></td>
-                        {% else %}
-                        <td> None </td>
+                        {% for library in sequencing.tenx_pool.libraries.all %}
+                        {% if library.gsc_library_id %}
+                        <a href="{{ library.get_absolute_url}} ">{{library.gsc_library_id}}</a>
                         {% endif %}
-                        <td>{{ sequencing.submission_date }}</td>
-                        <td>{{ sequencing.sequencing_center }}</td>
-                        <td>
-                            {% for lane in sequencing.tenxlane_set.all %}
-                                {% if lane.get_library_from_sublibrary.items %}
-                                    {% for sublibrary, library  in lane.get_library_from_sublibrary.items %}
-                                        {% if library is None %}
-                                            {{sublibrary}}
-                                        {% else %}
-                                            <a href="{{ library.get_absolute_url}} ">{{sublibrary}}</a>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            <div style="float: right; min-width: 69px">
-                                <a style="margin-right: 2px;" href="{% url 'tenx:sequencing_update' pk=sequencing.pk %}"><i class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
-                                <br>
-                                <a href="{% url 'tenx:sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign" style="color: red"></i> delete</a>
-                            </div>
-                        </td>
-                    </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="float: right; min-width: 69px">
+                            <a style="margin-right: 2px;" href="{% url 'tenx:sequencing_update' pk=sequencing.pk %}"><i
+                                    class="fa fa-pencil" aria-hidden="true" style="color: orange;"></i> edit</a>
+                            <br>
+                            <a href="{% url 'tenx:sequencing_delete' pk=sequencing.pk %}"><i class="icon-remove-sign"
+                                    style="color: red"></i> delete</a>
+                        </div>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -66,9 +66,9 @@
 
 {% block datatables_script %}
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         $("#datatable").DataTable({
-            "order": [[ 2, "desc" ]]
+            "order": [[2, "desc"]]
         });
     });
 </script>
