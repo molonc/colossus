@@ -1,11 +1,10 @@
-from django.forms import (
-    ModelForm,
-    inlineformset_factory,
-    forms)
+from django.forms import (ModelForm, inlineformset_factory, forms)
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from core.forms import LibraryForm, LibraryQuantificationAndStorageForm, SaveDefault, SequencingForm, LaneForm
 from .models import *
+
+import datetime
 
 
 class TenxChipForm(ModelForm):
@@ -26,6 +25,7 @@ class TenxPoolForm(ModelForm):
             )
         }
 
+
 class TenxLibraryForm(LibraryForm):
     field_order = [
         'chips',
@@ -39,13 +39,13 @@ class TenxLibraryForm(LibraryForm):
         'jira_ticket',
     ]
 
-    def __init__(self,*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(TenxLibraryForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             # Get Jira info
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, )
 
             # Remove the field which allows explicitly setting the Jira
             # ticket ID (since it's done automatically)
@@ -54,7 +54,7 @@ class TenxLibraryForm(LibraryForm):
     class Meta:
         model = TenxLibrary
         # fields = '__all__'
-        exclude=['name']
+        exclude = ['name']
         labels = {
             'primary sample': ('*Sample'),
         }
@@ -62,55 +62,49 @@ class TenxLibraryForm(LibraryForm):
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
         }
 
-class TenxLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
+class TenxLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
     """
     Clean uploaded 10x-related files.
     """
-
     class Meta(LibraryQuantificationAndStorageForm.Meta):
         model = TenxLibraryQuantificationAndStorage
+
 
 TenxLibrarySampleDetailInlineFormset = inlineformset_factory(
     TenxLibrary,
     TenxLibrarySampleDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
+    form=SaveDefault,
+    can_delete=False,
+    fields="__all__",
     exclude=[""],
-    widgets = {
-        'sample_prep_date': SelectDateWidget(
-            years=range(2000,2020),
-            empty_label=('year', 'month', 'day'),
-        )
-    },
+    widgets={'sample_prep_date': SelectDateWidget(
+        years=range(2000, 2020),
+        empty_label=('year', 'month', 'day'),
+    )},
 )
 
-TenxLibraryConstructionInfoInlineFormset =  inlineformset_factory(
+TenxLibraryConstructionInfoInlineFormset = inlineformset_factory(
     TenxLibrary,
     TenxLibraryConstructionInformation,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'submission_date': SelectDateWidget(
-            years=range(2000,2020),
-            empty_label=('year', 'month', 'day'),
-        )
-    }
-)
+    form=SaveDefault,
+    can_delete=False,
+    fields="__all__",
+    widgets={'submission_date': SelectDateWidget(
+        years=range(2000, 2020),
+        empty_label=('year', 'month', 'day'),
+    )})
 
-TenxLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
+TenxLibraryQuantificationAndStorageInlineFormset = inlineformset_factory(
     TenxLibrary,
     TenxLibraryQuantificationAndStorage,
-    can_delete = False,
-    form = TenxLibraryQuantificationAndStorageForm,
-    fields = "__all__",
+    can_delete=False,
+    form=TenxLibraryQuantificationAndStorageForm,
+    fields="__all__",
 )
 
 
 class TenxSequencingForm(SequencingForm):
-
     def __init__(self, *args, **kwargs):
         super(TenxSequencingForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
@@ -132,3 +126,12 @@ class TenxLaneForm(ModelForm):
         fields = "__all__"
         model = TenxLane
 
+
+TENX_POOLS = [(pool.id, pool.pool_name) for pool in TenxPool.objects.all()]
+
+
+class TenxGSCSubmissionForm(forms.Form):
+    name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-group'}))
+    email = forms.EmailField(max_length=50, widget=forms.EmailInput(attrs={'class': 'form-group'}))
+    date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'form-group'}))
+    tenxpools = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-group'}), choices=TENX_POOLS)
