@@ -2,6 +2,8 @@
 
 {% load staticfiles %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}List of TenX Pools{% endblock %}
 
 {% block body %}
@@ -63,10 +65,21 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/pool/gsc_form/">
+                <form action="/tenx/pool/gsc_form/" method="POST">
                     {% csrf_token %}
-                    {{form}}
+                    <!-- {{form|crispy}} -->
+                    {% for field in form.visible_fields %}
                     <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+
+                        <!-- <div class="row">
+                            <div class="column"></div>
+                            <div class="column"></div>
+                        </div> -->
+                    </div>
+                    {% endfor %}
+                    <!-- <div class="form-group">
                         <label for="name">Name</label>
                         <input type="email" class="form-control">
                     </div>
@@ -85,12 +98,12 @@
                             <option>{{ pool }} </option>
                             {% endfor %}
                         </select>
+                    </div> -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="sumbit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="sumbit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </div>

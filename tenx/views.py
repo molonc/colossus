@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 
 from tenx.models import *
 from tenx.forms import *
-from tenx.utils import tenxpool_naming_scheme
+from tenx.utils import tenxpool_naming_scheme, TenXGSCForm
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse
@@ -12,6 +12,7 @@ from django.views.generic import TemplateView
 from colossus.settings import LOGIN_URL
 from core.views import (LibraryList, LibraryDetail, LibraryDelete, LibraryCreate, LibraryUpdate, SequencingCreate,
                         SequencingDetail, SequencingUpdate, SequencingDelete, LaneCreate, LaneUpdate, LaneDelete)
+from core.utils import generate_gsc_form
 
 import json
 
@@ -51,6 +52,9 @@ def library_id_to_pk_redirect(request, pool_id):
 @login_required
 def get_gsc_submission_form(request):
 
+    print(dir(request))
+    print(request.session.keys())
+    print(json.dumps(request.session.decode('utf-8')))
     print(json.dumps(request.body.decode('utf-8')))
 
     print("hello")
@@ -60,6 +64,22 @@ def get_gsc_submission_form(request):
 
         if form.is_valid():
             print('form is valid')
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            date = form.cleaned_data['date']
+            tenxpool_pk = form.cleaned_data['tenxpools']
+            print(name, email, date, tenxpool_pk)
+
+            gsc_form = TenXGSCForm(tenxpool_pk)
+            # create excel here
+            # key = f"gsc_form_metadata_{tenxpool_pk}"
+            # metadata = request.session.pop(key)
+            # ofilename, buffer = generate_gsc_form(tenxpool_pk, metadata)
+            # buffer.seek(0)
+            # response = HttpResponse(
+            #     buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            # response['Content-Disposition'] = f'attachment; filename={ofilename}'
+            # return response
             return HttpResponseRedirect("/tenx/pool/list")
 
         else:

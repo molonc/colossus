@@ -131,7 +131,8 @@ TENX_POOLS = [(pool.id, pool.pool_name) for pool in TenxPool.objects.all()]
 
 
 class TenxGSCSubmissionForm(forms.Form):
-    name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-group'}))
-    email = forms.EmailField(max_length=50, widget=forms.EmailInput(attrs={'class': 'form-group'}))
-    date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'form-group'}))
-    tenxpools = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-group'}), choices=TENX_POOLS)
+    name = forms.CharField(max_length=50, widget=forms.TextInput())
+    email = forms.EmailField(max_length=50, widget=forms.EmailInput())
+    date = forms.DateField(widget=forms.SelectDateWidget(), initial=datetime.date.today())
+    tenxpools = forms.ChoiceField(
+        widget=forms.Select(), choices=TENX_POOLS, label="TenX Pool")
