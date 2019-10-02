@@ -6,7 +6,10 @@ Created Oct 23, 2017
 
 from django.conf.urls import url
 from tenx import views
-from core.views import (JiraTicketConfirm, AddWatchers)
+from core.views import (
+    JiraTicketConfirm, 
+    AddWatchers,
+)
 
 app_name = 'tenx'
 urlpatterns = [

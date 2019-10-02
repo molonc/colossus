@@ -184,8 +184,10 @@ class TenxPoolCreate(LoginRequiredMixin, TemplateView):
     template_name = "core/tenx/tenxpool_create.html"
 
     def get_context_data(self):
-        context = {'form': TenxPoolForm(
-        ), 'tenxlibraries': TenxLibrary.objects.all()}
+        context = {
+            'form': TenxPoolForm(), 
+            'tenxlibraries': TenxLibrary.objects.all(),
+        }
         return context
 
     def post(self, request):
