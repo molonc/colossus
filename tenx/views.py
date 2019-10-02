@@ -9,7 +9,7 @@ import requests
 
 from tenx.models import *
 from tenx.forms import *
-from tenx.utils import tenxpool_naming_scheme, TenXGSCForm
+from tenx.utils import tenxpool_naming_scheme, fill_submission_form
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse
@@ -59,148 +59,20 @@ def library_id_to_pk_redirect(request, pool_id):
 @login_required
 def get_gsc_submission_form(request):
 
-    # print(dir(request))
-    # print(request.session.keys())
-    # print(json.dumps(request.session.decode('utf-8')))
-    # print(json.dumps(request.body.decode('utf-8')))
-
-    print("hello")
-
     if request.method == 'POST':
         form = TenxGSCSubmissionForm(request.POST)
 
         if form.is_valid():
-            print('form is valid')
-            name = form.cleaned_data['name']
-            email = form.cleaned_data['email']
-            date = form.cleaned_data['date']
-            tenxpool_pk = form.cleaned_data['tenxpools']
-            print(name, email, date, tenxpool_pk)
-
-            # gsc_form = TenXGSCForm(tenxpool_pk, info=form.cleaned_data)
-            # todo: refactor below; ugly
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-            with open(os.path.join(base_dir, "core", "static", "tenx", "gsc_tenx_submission.xlsx"), 'rb') as f:
-                filename = "test.xlsx"
-                files = {"files": (filename, f)}
-
-                r = requests.post("http://127.0.0.1:8000/tenx/pool/create_form/",
-                                  files=files,)
-
-                print(r)
-
-
-            # create excel here
-            # key = f"gsc_form_metadata_{tenxpool_pk}"
-            # metadata = request.session.pop(key)
-            # ofilename, buffer = generate_gsc_form(tenxpool_pk, metadata)
-            # buffer.seek(0)
-            # response = HttpResponse(
-            #     buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            # response['Content-Disposition'] = f'attachment; filename={ofilename}'
-            # return response
-            return HttpResponseRedirect("/tenx/pool/list")
+            output_filename, workbook = fill_submission_form(form.cleaned_data)
+            response = HttpResponse(
+                workbook, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename={output_filename}'
+            return response
 
         else:
             form = TenxGSCSubmissionForm()
 
     return render(request, 'core/tenx/tenxpool.html', {'form': form})
-
-
-@csrf_exempt
-@login_required
-def fill_submission_form(request):
-
-    # TODO: need to define form info
-
-    print("hellooo")
-    print(request.FILES)
-
-    return HttpResponse("ok")
-
-    # gsc_tenx_submission_template = os.path.join(
-    #     settings.STATIC_URL, "tenx", "gsc_tenx_submission.xlsx")
-
-    # submission_form = workbook.create_sheet("sheetName")
-    # form_workbook = openpyxl.load_workbook(gsc_tenx_submission_template)
-    # worksheet = form_workbook["Submission Info"]
-
-    # pool_info_row = worksheet[74]
-    # pool_start_row = 66
-
-    # sublibrary_info_row = worksheet[74]
-    # sublibrary_start_row = 76
-
-    # # Submitting information: Name, Email, Date
-    # worksheet.cell(20, 2).value = form_info["name"]
-    # worksheet.cell(21, 2).value = form_info["email"]
-    # worksheet.cell(22, 2).value = form_info["date"]
-
-    # tenxpool = get_object_or_404(TenxPool, pk=form_info["tenxpools"])
-    # libraries = tenxpool.libraries.all()
-
-    # # Dna Volume is the number of sublibraries times 30
-    # worksheet.cell(66, 4).value = 30*len(libraries)
-
-    # for library in libraries:
-    #     sublibrary_info = {
-    #         'Sub-Library ID': library.name,
-    #         'Tube Label': "N/A",
-    #         'Taxonomy ID': library.sample.taxonomy_id,
-    #         'Anonymous Patient ID': library.sample.anonymous_patient_id,
-    #         'Strain': library.sample.strain,
-    #         'Disease Condition/Health Status': library.sample.additionalsampleinformation.disease_condition_health_status,
-    #         'Sex': library.sample.additionalsampleinformation.get_sex_display(),
-    #         'Sample Collection Date': library.tenxlibrarysampledetail.sample_prep_date,
-    #         'Anatomic Site': library.sample.additionalsampleinformation.anatomic_site,
-    #         'Anatomic Sub-Site': library.sample.additionalsampleinformation.anatomic_sub_site,
-    #         'Developmental Stage': library.sample.additionalsampleinformation.developmental_stage,
-    #         'Tissue Type': library.sample.additionalsampleinformation.get_tissue_type_display(),
-    #         'Cell Type (if sorted)': library.sample.additionalsampleinformation.cell_type,
-    #         'Cell Line ID': library.sample.cell_line_id,
-    #         'Pathology/Disease Name (for diseased sample only)': library.sample.additionalsampleinformation.pathology_disease_name,
-    #         'Additional Pathology Information': library.sample.additionalsampleinformation.additional_pathology_info,
-    #         'Grade': library.sample.additionalsampleinformation.grade,
-    #         'Stage': library.sample.additionalsampleinformation.stage,
-    #         'Tumor content (%)': library.sample.additionalsampleinformation.tumour_content,
-    #         'Pathology Occurrence': library.sample.additionalsampleinformation.get_pathology_occurrence_display(),
-    #         'Treatment Status': library.sample.additionalsampleinformation.get_treatment_status_display(),
-    #         'Family Information': library.sample.additionalsampleinformation.family_information,
-    #         'DNA Volume (uL)': "",
-    #         'DNA Concentration (nM)': "",
-    #         'Storage Medium': "",
-    #         'Quantification Method': "",
-    #         'Library Type': library.tenxlibraryconstructioninformation.library_type,
-    #         'Library Construction Method': library.tenxlibraryconstructioninformation.library_construction_method,
-    #         'Size Range (bp)': "",
-    #         'Average Size (bp)': "",
-    #         'Chromium Sample Index Name': library.tenxlibraryconstructioninformation.index_used.split(",")[0],
-    #         'Index Read Type (select from drop down list)': "Single Index (i7)",
-    #         'Index Sequence': "; ".join(library.tenxlibraryconstructioninformation.index_used.split(",")[1:]),
-    #         'No. of cells/IP': None,
-    #         'Crosslinking Method': None,
-    #         'Crosslinking Time': None,
-    #         'Sonication Time': None,
-    #         'Antibody Used': None,
-    #         'Antibody catalogue number': None,
-    #         'Antibody Lot number': None,
-    #         'Antibody Vendor': None,
-    #         'Amount of Antibody Used(ug)': None,
-    #         'Amount of Bead Used(ul)': None,
-    #         'Bead Type': None,
-    #         'Amount of Chromatin Used(ug)': None,
-    #     }
-
-    #     # for cell in worksheet[sublibrary_start_row]:
-    #     #     for values in sublibrary_info.values():
-    #     #         cell.value =
-
-    #     for values in sublibrary_info.values():
-    #         worksheet[sublibrary_start_row] = values
-    #         sublibrary_start_row += 1
-
-    # form_workbook.close()
 
 
 class TenxLibraryDetail(LibraryDetail):

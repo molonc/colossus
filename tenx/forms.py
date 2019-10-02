@@ -128,6 +128,7 @@ class TenxLaneForm(ModelForm):
 
 
 TENX_POOLS = [(pool.id, pool.pool_name) for pool in TenxPool.objects.all()]
+TENX_POOLS.sort()
 
 
 class TenxGSCSubmissionForm(forms.Form):
