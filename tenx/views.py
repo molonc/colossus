@@ -1,6 +1,3 @@
-import os
-import openpyxl
-
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
@@ -17,11 +14,21 @@ from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.views.generic import TemplateView
 
 from colossus.settings import LOGIN_URL
-from core.views import (LibraryList, LibraryDetail, LibraryDelete, LibraryCreate, LibraryUpdate, SequencingCreate,
-                        SequencingDetail, SequencingUpdate, SequencingDelete, LaneCreate, LaneUpdate, LaneDelete)
+from core.views import (
+    LibraryList,
+    LibraryDetail,
+    LibraryDelete,
+    LibraryCreate,
+    LibraryUpdate,
+    SequencingCreate,
+    SequencingDetail,
+    SequencingUpdate,
+    SequencingDelete,
+    LaneCreate,
+    LaneUpdate,
+    LaneDelete,
+)
 from core.utils import generate_gsc_form
-
-import json
 
 
 class TenxLibraryList(LibraryList):
@@ -43,9 +50,14 @@ def analys_list(request):
 @login_required
 def analysis_detail(request, pk):
     analysis = get_object_or_404(TenxAnalysis, pk=pk)
-    context = {'analysis': analysis, 'library': analysis.tenx_library, 'sequencings': analysis.tenxsequencing_set}
+    context = {
+        'analysis': analysis,
+        'library': analysis.tenx_library,
+        'sequencings': analysis.tenxsequencing_set,
+    }
 
-    tenx_pools = list(map(lambda x: x.tenx_pool, analysis.tenxsequencing_set.all()))
+    tenx_pools = list(
+        map(lambda x: x.tenx_pool, analysis.tenxsequencing_set.all()))
     context['tenx_pools'] = tenx_pools
     return context
 
@@ -172,7 +184,8 @@ class TenxPoolCreate(LoginRequiredMixin, TemplateView):
     template_name = "core/tenx/tenxpool_create.html"
 
     def get_context_data(self):
-        context = {'form': TenxPoolForm(), 'tenxlibraries': TenxLibrary.objects.all()}
+        context = {'form': TenxPoolForm(
+        ), 'tenxlibraries': TenxLibrary.objects.all()}
         return context
 
     def post(self, request):
@@ -194,7 +207,8 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
     template_name = "core/tenx/tenxpool_update.html"
 
     def get_context_data(self, pk):
-        pool_library = [l.pk for l in get_object_or_404(TenxPool, pk=pk).libraries.all()]
+        pool_library = [l.pk for l in get_object_or_404(
+            TenxPool, pk=pk).libraries.all()]
         context = {
             'pk': pk,
             'form': TenxPoolForm(instance=get_object_or_404(TenxPool, pk=pk)),
@@ -204,7 +218,8 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
         return context
 
     def post(self, request, pk):
-        form = TenxPoolForm(request.POST, instance=get_object_or_404(TenxPool, pk=pk))
+        form = TenxPoolForm(
+            request.POST, instance=get_object_or_404(TenxPool, pk=pk))
         if form.is_valid():
             instance = form.save(commit=False)
             form.save_m2m()
@@ -270,9 +285,9 @@ class TenxLaneDelete(LaneDelete):
     library_type = 'tenx'
 
 
-#============================
+# ============================
 # TenxChip views
-#----------------------------
+# ----------------------------
 class TenxChipCreate(LoginRequiredMixin, TemplateView):
 
     login_url = LOGIN_URL
@@ -325,7 +340,10 @@ class TenxChipUpdate(LoginRequiredMixin, TemplateView):
     def get_context_data(self, pk):
         chip = get_object_or_404(TenxChip, pk=pk)
         form = TenxChipForm(instance=chip)
-        context = {"form": form, "pk": pk}
+        context = {
+            "form": form, 
+            "pk": pk, 
+        }
         return context
 
     def post(self, request, pk):
