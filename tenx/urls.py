@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^pool/update/(?P<pk>\d+)$', views.TenxPoolUpdate.as_view(), name='pool_update'),
     url(r'^pool/delete/(?P<pk>\d+)$', views.TenxPoolDelete.as_view(), name='pool_delete'),
     url(r'^pool/gsc_form/$', views.get_gsc_submission_form, name='gsc_form'),
+    url(r'^pool/create_form/$', views.fill_submission_form, name='create_form'),
     url(r'^analysis/list$', views.analys_list, name='tenxanalysis_list'),
     url(r'^analysis/detail/(?P<pk>\d+)$', views.analysis_detail, name='tenxanalysis_detail'),
 ]
