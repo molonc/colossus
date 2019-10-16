@@ -569,8 +569,10 @@ class TenxLibraryQuantificationAndStorage(models.Model, FieldValue):
         null=True,
         blank=True,
     )
-    dna_concentration_bp = models.IntegerField(
-        "DNA Concentration(bp)",
+    average_size_bp = models.DecimalField(
+        "Average Size(bp)",
+        decimal_places=3,
+        max_digits=10,
         null=True,
         blank=True,
     )
