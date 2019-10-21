@@ -87,7 +87,20 @@ class TenxLibrary(models.Model, FieldValue, LibraryAssistant):
         null=True,
     )
 
-    chip_well = models.IntegerField(default=0, choices=CHIP_WELL)
+    chip_well = models.IntegerField(
+        default=0, 
+        verbose_name="Chip Well", 
+        choices=CHIP_WELL,
+    )
+    
+    well_partition = models.CharField(
+        blank=True, 
+        null=True, 
+        default="", 
+        max_length=1, 
+        verbose_name="Well Partition",
+        choices=WELL_PARTITIONS,
+    )
 
     google_sheet = create_chrfield(
         "Google Sheet Link",
