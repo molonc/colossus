@@ -53,13 +53,13 @@ class TenxLibraryForm(LibraryForm):
 
     class Meta:
         model = TenxLibrary
-        # fields = '__all__'
         exclude = ['name']
         labels = {
             'primary sample': ('*Sample'),
         }
         help_texts = {
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
+            'well_partition': ('Was this well split into multiple libraries? If so, please choose a UNIQUE well partition. This will be added as the suffix to the library name.')
         }
 
 

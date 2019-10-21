@@ -113,6 +113,10 @@ def fill_submission_form(form_info):
 
 
 def tenxlibrary_naming_scheme(library):
+    if library.well_partition:
+        return "_".join(
+            ["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4), str(library.chip_well).zfill(3)+str(library.well_partition)]
+        )
     return "_".join(
         ["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4), str(library.chip_well).zfill(3)]
     )
