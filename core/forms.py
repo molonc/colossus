@@ -27,6 +27,7 @@ from django.forms import (
     forms)
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
+from itertools import chain
 
 
 #===========================
@@ -38,6 +39,17 @@ from .models import (
     AdditionalSampleInformation,
     JiraUser,
     Project)
+
+from dlp.models import (
+    DlpLibrary,
+)
+from tenx.models import (
+    TenxLibrary,
+)
+from pbal.models import (
+    PbalLibrary,
+)
+
 from .utils import parse_smartchipapp_results_file
 from .utils import generate_doublet_info
 from .jira_templates.jira_wrapper import *
@@ -213,6 +225,20 @@ class ProjectForm(ModelForm):
     class Meta:
         model = Project
         fields = ['name', 'description']
+
+    dlp_library_set = forms.ModelMultipleChoiceField(
+        queryset=DlpLibrary.objects.all().order_by('id'),
+        required=False,
+    )
+    tenx_library_set = forms.ModelMultipleChoiceField(
+        queryset=TenxLibrary.objects.all().order_by('id'), 
+        required=False, 
+    )
+    pbal_library_set = forms.ModelMultipleChoiceField(
+        queryset=PbalLibrary.objects.all().order_by('id'),
+        required=False,
+    )
+    
 
 class AddWatchersForm(Form):
     watchers = forms.MultipleChoiceField(choices=get_user_list, widget=forms.CheckboxSelectMultiple())

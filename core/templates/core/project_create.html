@@ -9,7 +9,24 @@
     <form action="{% url 'core:project_create' %}" method="POST">
         {% csrf_token %}
         <table class="table-condensed">
-            {{ form }}
+            <tbody>
+                <tr>
+                    <th>
+                        {{ form.name.label_tag }}
+                    </th>
+                    <td>
+                        {{ form.name }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        {{ form.description.label_tag }}
+                    </th>
+                    <td>
+                        {{ form.description }}
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
         <br>

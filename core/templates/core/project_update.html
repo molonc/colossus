@@ -8,11 +8,116 @@
 <div class="container graybg">
     <form action="{% url 'core:project_update' pk=pk %}" method="POST">
         {% csrf_token %}
+
         <table class="table-condensed">
-            {{ form }}
+            <tbody>
+                <tr>
+                    <th>
+                        {{ form.name.label_tag }}
+                    </th>
+                    <td>
+                        {{ form.name }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        {{ form.description.label_tag }}
+                    </th>
+                    <td>
+                        {{ form.description }}
+                    </td>
+                </tr>
+            </tbody>
         </table>
+        <div id="id_dlp_library_set"></div>
+        <div id="id_tenx_library_set"></div>
+        <div id="id_pbal_library_set"></div>
+
 
         <br>
+        <!-- DLP Selection -->
+        <label for="id_dlp_library_set" style="padding: 5px">DLP libraries:</label>
+        <div  class="row" style="padding-left:20px;">
+            <div id="select-form" class="form-group" style="display: inline-block;">
+                <label for="sel1">Select:</label>
+                <input class="form-control" id="dlp_select_input" type="text" placeholder="Search.." style="width: 250px;">
+                <select multiple id="dlp_library_input" class="form-control" style="width: 250px;">
+                    {% for library in dlp_libraries %}
+                    <option value={{library.pk}}>{{library}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <div style="display: inline-block; vertical-align:top;">
+                <span id="add-dlp-items" class="glyphicon glyphicon-chevron-right" style="padding-top:30px"></span>
+                <br />
+                <span id="remove-dlp-items" class="glyphicon glyphicon-chevron-left"></span>
+            </div>
+        
+            <div class="form-group" style="display: inline-block; vertical-align:top;">
+                <label for="sel1">Selected:</label>
+                <input class="form-control" id="dlp_selected_input" type="text" placeholder="Search.." style="width: 250px;">
+                <select multiple id="dlp_library_output" class="form-control" style="width: 250px;">
+                </select>
+            </div>
+        </div>
+        <!-- End DLP Selection -->
+
+        <!-- Beginning of Tenx selection -->
+        <label for="id_tenx_library_set" style="padding: 5px">TenX libraries:</label>
+        <div id="id_tenx_library_set" class="row" style="padding-left:20px;">
+            <div id="select-form" class="form-group" style="display: inline-block;">
+                <label for="sel2">Select:</label>
+                <input class="form-control" id="tenx_select_input" type="text" placeholder="Search.." style="width: 250px;">
+                <select multiple id="tenx_library_input" class="form-control" style="width: 250px;">
+                    {% for library in tenx_libraries %}
+                    <option value={{library.pk}}>{{library}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <div style="display: inline-block; vertical-align:top;">
+                <span id="add-tenx-items" class="glyphicon glyphicon-chevron-right" style="padding-top:30px"></span>
+                <br />
+                <span id="remove-tenx-items" class="glyphicon glyphicon-chevron-left"></span>
+            </div>
+        
+            <div class="form-group" style="display: inline-block; vertical-align:top;">
+                <label for="sel2">Selected:</label>
+                <input class="form-control" id="tenx_selected_input" type="text" placeholder="Search.." style="width: 250px;">
+                <select multiple id="tenx_library_output" class="form-control" style="width: 250px;">
+                </select>
+            </div>
+        </div>
+        <!-- End Tenx Selection -->
+        
+        <!-- Beginning of pbal selection -->
+        <label for="id_pbal_library_set" style="padding: 5px">Pbal libraries::</label>
+        <div id="id_pbal_library_set" class="row" style="padding-left:20px;">
+            <div id="select-form" class="form-group" style="display: inline-block;">
+                <label for="sel3">Select:</label>
+                <input class="form-control" id="pbal_select_input" type="text" placeholder="Search.." style="width: 250px;">
+                <select multiple id="pbal_library_input" class="form-control" style="width: 250px;">
+                    {% for library in pbal_libraries %}
+                    <option value={{library.pk}}>{{library}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <div style="display: inline-block; vertical-align:top;">
+                <span id="add-pbal-items" class="glyphicon glyphicon-chevron-right" style="padding-top:30px"></span>
+                <br />
+                <span id="remove-pbal-items" class="glyphicon glyphicon-chevron-left"></span>
+            </div>
+        
+            <div class="form-group" style="display: inline-block; vertical-align:top;">
+                <label for="sel3">Selected:</label>
+                <input class="form-control" id="pbal_selected_input" type="text" placeholder="Search.." style="width: 250px;">
+                <select multiple id="pbal_library_output" class="form-control" style="width: 250px;">
+                </select>
+            </div>
+        </div>
+        <!-- End of pbal selection -->
 
         <input class="btn btn-primary btn-sm" type="submit" name="update" value="Update">
         <a class="btn btn-default btn-sm" href="{% url 'core:project_list' %}">Cancel</a>
@@ -20,4 +125,227 @@
 
     <br>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // TODO: Clean up and refactor following code
+    $(document).ready(function () {
+        init_edit()
+
+        // add search bars for dlp
+        document.getElementById('id_dlp_library_set').style.display = 'none';
+        $("#dlp_select_input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#dlp_library_input option").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+        $("#dlp_selected_input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#dlp_library_output option").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        // add search bars for tenx
+        document.getElementById('id_tenx_library_set').style.display = 'none';
+        $("#tenx_select_input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#tenx_library_input option").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+        $("#tenx_selected_input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#tenx_library_output option").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+        // add search bars for pbal
+        document.getElementById('id_pbal_library_set').style.display = 'none';
+        $("#pbal_select_input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#pbal_library_input option").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+        $("#pbal_selected_input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#pbal_library_output option").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+    // Beginning of dlp jquery methods
+    $('#add-dlp-items').on('click', function (e) {
+        var input = document.getElementById("dlp_library_input")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#dlp_library_output').append(opt)
+            }
+        }
+        update_dlp_field()
+    })
+
+    $('#remove-dlp-items').on('click', function (e) {
+        var input = document.getElementById("dlp_library_output")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#dlp_library_input').append(opt)
+            }
+        }
+        update_dlp_field()
+    })
+
+    function update_dlp_field() {
+        var input = document.getElementById("dlp_library_output")
+        var field = document.getElementById("id_dlp_library_set")
+        let result = []
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            result.push(input.options[i].value)
+        }
+        field.querySelector('div.selector option[value=valueB]')
+        for (var i = 0, len = field.options.length; i < len; i++) {
+            opt = field.options[i];
+            opt.selected = false
+            if (result.indexOf(opt.value) > -1) {
+                opt.selected = true
+            }
+        }
+    }
+    // End of dlp jquery methods
+
+    // Beginning of tenx jquery methods
+    $('#add-tenx-items').on('click', function (e) {
+        var input = document.getElementById("tenx_library_input")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#tenx_library_output').append(opt)
+            }
+        }
+        update_tenx_field()
+    })
+
+    $('#remove-tenx-items').on('click', function (e) {
+        var input = document.getElementById("tenx_library_output")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#tenx_library_input').append(opt)
+            }
+        }
+        update_tenx_field()
+    })
+
+    function update_tenx_field() {
+        var input = document.getElementById("tenx_library_output")
+        var field = document.getElementById("id_tenx_library_set")
+        let result = []
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            result.push(input.options[i].value)
+        }
+        field.querySelector('div.selector option[value=valueB]')
+        for (var i = 0, len = field.options.length; i < len; i++) {
+            opt = field.options[i];
+            opt.selected = false
+            if (result.indexOf(opt.value) > -1) {
+                opt.selected = true
+            }
+        }
+    }
+    // End of tenx methods
+
+    // Beginning of pbal methods
+    $('#add-pbal-items').on('click', function (e) {
+        var input = document.getElementById("pbal_library_input")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#pbal_library_output').append(opt)
+            }
+        }
+        update_pbal_field()
+    })
+
+    $('#remove-pbal-items').on('click', function (e) {
+        var input = document.getElementById("pbal_library_output")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (opt != undefined && opt.selected) {
+                len--
+                i--
+                $('#pbal_library_input').append(opt)
+            }
+        }
+        update_pbal_field()
+    })
+
+    function update_pbal_field() {
+        var input = document.getElementById("pbal_library_output")
+        var field = document.getElementById("id_pbal_library_set")
+        let result = []
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            result.push(input.options[i].value)
+        }
+        field.querySelector('div.selector option[value=valueB]')
+        for (var i = 0, len = field.options.length; i < len; i++) {
+            opt = field.options[i];
+            opt.selected = false
+            if (result.indexOf(opt.value) > -1) {
+                opt.selected = true
+            }
+        }
+    }
+    // End of pbal methods
+
+
+    function init_edit() {
+        var dlp_libs = {{ dlp_library_set }}
+        var input = document.getElementById("dlp_library_input")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (dlp_libs.indexOf(parseInt(opt.value)) > -1) {
+                $('#dlp_library_output').append(opt)
+                i--
+                len--
+            }
+        }
+        var tenx_libs = {{ tenx_library_set }}
+        var input = document.getElementById("tenx_library_input")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (tenx_libs.indexOf(parseInt(opt.value)) > -1) {
+                $('#tenx_library_output').append(opt)
+                i--
+                len--
+            }
+        }
+
+        var pbal_libs = {{ pbal_library_set }}
+        var input = document.getElementById("pbal_library_input")
+        for (var i = 0, len = input.options.length; i < len; i++) {
+            opt = input.options[i];
+            if (pbal_libs.indexOf(parseInt(opt.value)) > -1) {
+                $('#pbal_library_output').append(opt)
+                i--
+                len--
+            }
+        }
+    }
+</script>
 {% endblock %}

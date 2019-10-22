@@ -773,20 +773,42 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
     template_name = "core/project_update.html"
 
     def get_context_data(self, pk):
+        dlp_library_set = [library.pk for library in get_object_or_404(
+            Project, pk=pk).dlplibrary_set.all()]
+        tenx_library_set = [library.pk for library in get_object_or_404(
+            Project, pk=pk).tenxlibrary_set.all()]
+        pbal_library_set = [library.pk for library in get_object_or_404(
+            Project, pk=pk).pballibrary_projects.all()]
         context = {
             'pk': pk,
             'form': ProjectForm(instance=get_object_or_404(Project, pk=pk)),
+            'dlp_libraries': DlpLibrary.objects.all().order_by('id'),
+            'dlp_library_set': dlp_library_set,
+            'tenx_libraries': TenxLibrary.objects.all().order_by('id'),
+            'tenx_library_set': tenx_library_set,
+            'pbal_libraries': PbalLibrary.objects.all().order_by('id'),
+            'pbal_library_set': pbal_library_set,
         }
         return context
 
     def post(self, request, pk):
-        form = ProjectForm(request.POST, instance=get_object_or_404(Project, pk=pk))
+        form = ProjectForm(
+            request.POST, instance=get_object_or_404(Project, pk=pk))
         if form.is_valid():
             instance = form.save(commit=False)
+            instance.dlplibrary_set = instance.dlplibrary_set.all() | form.cleaned_data['dlp_library_set']
+            instance.tenxlibrary_set = instance.tenxlibrary_set.all() | form.cleaned_data['tenx_library_set']
+            instance.pballibrary_projects = instance.pballibrary_projects.all() | form.cleaned_data['pbal_library_set']
             instance.save()
             msg = "Successfully updated the Project."
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
+        else:
+            print("hello")
+            messages.info(request, form.errors)
+            return HttpResponseRedirect(request.get_full_path())
+
+
 
 #============================
 # Sequencing views
