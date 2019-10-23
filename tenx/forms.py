@@ -45,7 +45,8 @@ class TenxLibraryForm(LibraryForm):
             # Get Jira info
             self.fields['additional_title'] = forms.CharField(max_length=100)
             self.fields['jira_user'] = forms.CharField(max_length=100)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, )
+            self.fields['jira_password'] = forms.CharField(
+                widget=forms.PasswordInput, )
 
             # Remove the field which allows explicitly setting the Jira
             # ticket ID (since it's done automatically)
@@ -109,10 +110,13 @@ class TenxSequencingForm(SequencingForm):
         super(TenxSequencingForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             self.fields['jira_user'] = forms.CharField(max_length=100)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
+            self.fields['jira_password'] = forms.CharField(
+                widget=forms.PasswordInput)
         else:
-            self.fields['jira_user'] = forms.CharField(max_length=100, required=False)
-            self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput, required=False)
+            self.fields['jira_user'] = forms.CharField(
+                max_length=100, required=False)
+            self.fields['jira_password'] = forms.CharField(
+                widget=forms.PasswordInput, required=False)
 
     class Meta(SequencingForm.Meta):
         model = TenxSequencing
@@ -127,12 +131,14 @@ class TenxLaneForm(ModelForm):
         model = TenxLane
 
 
-TENX_POOLS = [(pool.id, pool.pool_name) for pool in TenxPool.objects.all().order_by('id')]
-
-
 class TenxGSCSubmissionForm(forms.Form):
     name = forms.CharField(max_length=50, widget=forms.TextInput())
     email = forms.EmailField(max_length=50, widget=forms.EmailInput())
-    date = forms.DateField(widget=forms.SelectDateWidget(), initial=datetime.date.today())
+    date = forms.DateField(widget=forms.SelectDateWidget(),
+                           initial=datetime.date.today())
     tenxpools = forms.ChoiceField(
-        widget=forms.Select(), choices=TENX_POOLS, label="TenX Pool")
+        widget=forms.Select(),
+        choices=[(pool.id, pool.pool_name)
+                 for pool in TenxPool.objects.all().order_by('id')],
+        label="TenX Pool",
+    )
