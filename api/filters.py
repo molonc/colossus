@@ -60,6 +60,11 @@ class AnalysisInformationFilter(filters.FilterSet):
     DateFromToRangeFiler() :it uses datetime format values instead of numerical values.
     It can be used with DateTimeField.
     """
+    
+    def __init__(self, *args, **kwargs):
+        super(AnalysisInformationFilter, self).__init__(*args, **kwargs)
+        self.filters["version__version"].label = "Analysis Version"
+        
     analysis_run__last_updated = DateFromToRangeFilter(
         method='filter_analysis_run__last_updated')
 
