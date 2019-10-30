@@ -82,7 +82,7 @@ class AnalysisInformationFilter(filters.FilterSet):
         'id',
         'aligner',
         'montage_status',
-        'version',
+        'version__version',
         'analysis_jira_ticket',
         'analysis_submission_date',
         'analysis_run__run_status',
