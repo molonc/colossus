@@ -195,7 +195,7 @@ def gsc_info_post(request):
         "xenograph": "Yes",
         "concentration": library.dlplibraryquantificationandstorage.dna_concentration_nm,
         "volume": library.dlplibraryquantificationandstorage.dna_volume,
-        "quantification_method": library.dlplibraryquantificationandstorage.quantification_method,    
+        "quantification_method": library.dlplibraryquantificationandstorage.quantification_method,
     } for library in selected]
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
 
@@ -338,7 +338,7 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
             # Get dlp library related to each chip region metadata
             chip_region_id = metadata.chip_region_id
             library = DlpLibrary.objects.get(chipregion=chip_region_id)
-        
+
             if str(library.sample_id) != pk:
                 related_libraries.add(library)
 
@@ -355,7 +355,7 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
         pk = get_object_or_404(Sample, sample_id=sample_id).pk
         return redirect('/core/sample/{}'.format(pk))
 
-    
+
 
 #============================
 # Library views
@@ -400,8 +400,17 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
         metadata_fields=None,
         doubletinfo_fields=None,
         additional_samples=None,
+        servers=None,
     ):
         library_dict = self.sort_library_order(library)
+        server_dict = {
+            'Test': '10.0.0.11',
+            'Production': '10.0.0.7',
+            'Collab_Brugge': '10.0.0.13',
+            'Collab_Imaxt': '10.0.0.39',
+            'Collab_Crick': '10.0.0.14',
+            'Collab_Tracerx_Peace': '10.0.0.15',
+        }
         context = {
             'library': library,
             'library_type': library_type,
@@ -411,6 +420,7 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
             'metadata_fields': metadata_fields,
             'library_dict':library_dict,
             'additional_samples': additional_samples,
+            "servers": server_dict,
         }
         return render(request, self.template_name, context)
 
@@ -462,7 +472,7 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
         if(request.session['library_type'] == 'dlp'):
             form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
             form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
-            form.fields['reporter'].initial = jira_user 
+            form.fields['reporter'].initial = jira_user
         elif(request.session['library_type'] == 'tenx'):
             form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
             form.fields['description'].initial = 'Awaiting first sequencing...'
@@ -657,7 +667,7 @@ class LibraryUpdate(LibraryCreate):
     Library update base class.
     """
 
-    class Meta: 
+    class Meta:
         abstract = True
 
     template_name = "core/library_update.html"
