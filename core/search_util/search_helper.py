@@ -147,6 +147,7 @@ def return_text_search(query):
         context["dlp"]["Libraries"].extend(list(DlpLibrary.objects.filter(pool_id=sublibrary_id_fields[1], sample__sample_id=sublibrary_id_fields[0])))
 
     context = gsc_tenx_sublibrary_search(query, context)
+    context = search_sample_from_metadata(query, context)
     context = remove_duplicate(context)
 
     context["total"] = len(context["core"]["Samples"] + context["dlp"]["Libraries"] + context["dlp"]["Sequencings"]+ context["dlp"]["Analyses"] +
@@ -174,6 +175,11 @@ def gsc_tenx_sublibrary_search(query, context):
     context["tenx"]["Sequencings"].extend([lane.sequencing for lane in lanes])
     return context
 
+def search_sample_from_metadata(query, context):
+    metadata = ChipRegionMetadata.objects.filter(metadata_value=query)
+    chip_metadata = [ChipRegion.objects.filter(chipregionmetadata__id=m.id) for m in metadata]
+    context["dlp"]["Libraries"].extend(chip[0].library for chip in chip_metadata)
+    return context
 
 def remove_duplicate(context):
     context["core"]["Samples"] = list(set(context["core"]["Samples"]))
