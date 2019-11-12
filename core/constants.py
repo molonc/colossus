@@ -51,17 +51,39 @@ TISSUE_STATES = (
     ('FROZ', 'Frozen'),
     ('FRES', 'Fresh'),
     ('DIG-FRES', 'Digested-Fresh'),
-
 )
 
-CHIP_WELL = (
-    (0, 'NOT SET'), (1, 'WELL_1'), (2, 'WELL_2'), (3, 'WELL_3'), (4, 'WELL_4'),
-    (5, 'WELL_5'), (6, 'WELL_6'), (7, 'WELL_7'), (8, 'WELL_8')
-)
+CHIP_WELL = ((0, 'NOT SET'), (1, 'WELL_1'), (2, 'WELL_2'), (3, 'WELL_3'), (4, 'WELL_4'), (5, 'WELL_5'), (6, 'WELL_6'),
+             (7, 'WELL_7'), (8, 'WELL_8'))
 
 WELL_PARTITIONS = (
-    ('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('F', 'F'), ('G', 'G'), ('H', 'H'), ('I', 'I'), ('J', 'J'), ('K', 'K'), ('L', 'L'), ('M', 'M'),
-    ('N', 'N'), ('O', 'O'), ('P', 'P'), ('Q', 'Q'), ('R', 'R'), ('S', 'S'), ('T', 'T'), ('U', 'U'), ('V', 'V'), ('W', 'W'), ('X', 'X'), ('Y', 'Y'), ('Z', 'Z'), ('', ''),
+    ('A', 'A'),
+    ('B', 'B'),
+    ('C', 'C'),
+    ('D', 'D'),
+    ('E', 'E'),
+    ('F', 'F'),
+    ('G', 'G'),
+    ('H', 'H'),
+    ('I', 'I'),
+    ('J', 'J'),
+    ('K', 'K'),
+    ('L', 'L'),
+    ('M', 'M'),
+    ('N', 'N'),
+    ('O', 'O'),
+    ('P', 'P'),
+    ('Q', 'Q'),
+    ('R', 'R'),
+    ('S', 'S'),
+    ('T', 'T'),
+    ('U', 'U'),
+    ('V', 'V'),
+    ('W', 'W'),
+    ('X', 'X'),
+    ('Y', 'Y'),
+    ('Z', 'Z'),
+    ('', ''),
 )
 
 TENX_LIBRARY_TYPE_CHOICES = (
@@ -70,10 +92,7 @@ TENX_LIBRARY_TYPE_CHOICES = (
     (VDJ, VDJ),
 )
 
-CHEMISTRY_VERSION_CHOICES = (
-    ("VERSION_2", "v2"),
-    ("VERSION_3", "v3")
-)
+CHEMISTRY_VERSION_CHOICES = (("VERSION_2", "v2"), ("VERSION_3", "v3"))
 
 spotting_location_choices = (
     ('AD', 'Aparicio Lab - Deckard'),
@@ -98,11 +117,7 @@ chip_format_choices = (
     ('O', 'Other'),
 )
 
-qc_check_choices = (
-    ('P', 'Will sequence'),
-    ('N', 'Will not sequence'),
-    ('H', 'On Hold')
-)
+qc_check_choices = (('P', 'Will sequence'), ('N', 'Will not sequence'), ('H', 'On Hold'))
 
 # fields
 rev_comp_override_choices = (
@@ -145,11 +160,7 @@ plate_type_choices = (
     ('stored', 'stored'),
 )
 
-INPUT_TYPE = (
-    ('DLP', "DLP"),
-    ('PBAL', "PBAL"),
-    ('TENX', "TenX")
-)
+INPUT_TYPE = (('DLP', "DLP"), ('PBAL', "PBAL"), ('TENX', "TenX"))
 
 ##########
 #SISYPHUS#
@@ -162,6 +173,7 @@ ARCHIVING = 'archiving'
 COMPLETE = 'complete'
 ALIGN_COMPLETE = 'align_complete'
 HMMCOPY_COMPLETE = 'hmmcopy_complete'
+ANNOTATION_COMPLETE = 'annotation_complete'
 
 RUN_STATUS_CHOICES = (
     (IDLE, 'Idle'),
@@ -171,6 +183,7 @@ RUN_STATUS_CHOICES = (
     (COMPLETE, 'Complete'),
     (ALIGN_COMPLETE, 'Align Complete'),
     (HMMCOPY_COMPLETE, 'Hmmcopy Complete'),
+    (ANNOTATION_COMPLETE, "Annotation Complete"),
 )
 
 # Aligner choices
@@ -197,13 +210,7 @@ verified_choices = (
     ('F', 'False'),
 )
 
-MONTAGE_STATUS_CHOICES = (
-    ('Success', 'Success'),
-    ('Error', 'Error'),
-    ('Ignore', 'Ignore'),
-    ('Pending', 'Pending')
-)
-
+MONTAGE_STATUS_CHOICES = (('Success', 'Success'), ('Error', 'Error'), ('Ignore', 'Ignore'), ('Pending', 'Pending'))
 
 # Enumeration for TenxLibraryConstructionInformation library_type
 # choices
@@ -403,7 +410,6 @@ TENX_INDEX_CHOICES = (
     (SI_GA_H11, "SI-GA-H11"),
     (SI_GA_H12, "SI-GA-H12"),
 )
-
 
 chromium_index_mapping = {
     'SI-GA-A1': 'GGTTTACT; CTAAACGG; TCGGCGTC; AACCGTAA',
