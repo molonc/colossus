@@ -53,8 +53,17 @@ TISSUE_STATES = (
     ('DIG-FRES', 'Digested-Fresh'),
 )
 
-CHIP_WELL = ((0, 'NOT SET'), (1, 'WELL_1'), (2, 'WELL_2'), (3, 'WELL_3'), (4, 'WELL_4'), (5, 'WELL_5'), (6, 'WELL_6'),
-             (7, 'WELL_7'), (8, 'WELL_8'))
+CHIP_WELL = (
+    (0, 'NOT SET'),
+    (1, 'WELL_1'),
+    (2, 'WELL_2'),
+    (3, 'WELL_3'),
+    (4, 'WELL_4'),
+    (5, 'WELL_5'),
+    (6, 'WELL_6'),
+    (7, 'WELL_7'),
+    (8, 'WELL_8'),
+)
 
 WELL_PARTITIONS = (
     ('A', 'A'),

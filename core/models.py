@@ -25,12 +25,10 @@ from django.core.validators import RegexValidator, MinValueValidator, MaxValueVa
 from .constants import *
 from .helpers import *
 
-
 #============================
 # 3rd-party app imports
 #----------------------------
 from simple_history.models import HistoricalRecords
-
 
 
 #============================
@@ -40,19 +38,15 @@ class SequencingManager(models.Manager):
     def with_data(self):
         return [obj for obj in self.get_queryset() if obj.library.is_sequenced()]
 
+
 #============================
 # Project models
 #----------------------------
 class Project(models.Model, FieldValue):
 
-    name = models.CharField(
-        max_length=100
-    )
+    name = models.CharField(max_length=100)
 
-    description = models.TextField(
-        null=True,
-        blank=True
-    )
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -61,20 +55,20 @@ class Project(models.Model, FieldValue):
         return reverse("core:project_detail", kwargs={"pk": self.pk})
 
     def get_libraries(self):
-        return list(self.dlplibrary_set.all()) + list(self.pballibrary_projects.all()) + list(self.tenxlibrary_set.all())
+        return list(self.dlplibrary_set.all()) + list(self.pballibrary_projects.all()) + list(
+            self.tenxlibrary_set.all())
 
     class Meta:
         ordering = ['name']
+
 
 #============================
 # Sample models
 #----------------------------
 class Sample(models.Model, FieldValue):
-
     """
     Base class of different sample types.
     """
-
     class Meta:
         ordering = ['sample_id']
 
@@ -83,11 +77,11 @@ class Sample(models.Model, FieldValue):
 
     # choices
     sample_type_choices = (
-        ('P','Patient'),
-        ('C','Cell Line'),
-        ('X','Xenograft'),
+        ('P', 'Patient'),
+        ('C', 'Cell Line'),
+        ('X', 'Xenograft'),
         ('Or', 'Organoid'),
-        ('O','Other'),
+        ('O', 'Other'),
     )
 
     # required fields
@@ -148,7 +142,6 @@ class Sample(models.Model, FieldValue):
 
 
 class AdditionalSampleInformation(models.Model, FieldValue):
-
     """
     Additional sample information.
     """
@@ -168,11 +161,11 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     )
     cancer_type = create_chrfield(
         "Cancer Type",
-        blank=True
+        blank=True,
     )
     cancer_subtype = create_chrfield(
         "Cancer Subtype",
-        blank=True
+        blank=True,
     )
     disease_condition_health_status = create_chrfield("Disease condition/health status")
     sex = create_chrfield(
@@ -197,7 +190,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
     )
     cell_type = create_chrfield("Cell type")
     pathology_disease_name = create_chrfield("Pathology/disease name (for diseased samples only)")
-    additional_pathology_info = create_chrfield("Additional pathology information")
+    receptor_status = create_chrfield("Receptor status")
     grade = create_chrfield("Grade")
     stage = create_chrfield("Stage")
     tumour_content = create_chrfield("Tumor content (%)")
@@ -205,8 +198,12 @@ class AdditionalSampleInformation(models.Model, FieldValue):
         "Pathology occurrence",
         choices=pathology_occurrence_choices,
     )
-    treatment_status = create_chrfield(
-        "Treatment status",
+    patient_treatment_status = create_chrfield(
+        "Patient treatment status",
+        choices=treatment_status_choices,
+    )
+    sample_treatment_status = create_chrfield(
+        "Sample treatment status",
         choices=treatment_status_choices,
     )
     family_information = create_chrfield("Family information")
@@ -219,7 +216,6 @@ class AdditionalSampleInformation(models.Model, FieldValue):
 
 
 class ChipRegion(models.Model, FieldValue):
-
     """
     Region code for a sublibrary. DLP only.
     """
@@ -243,7 +239,6 @@ class ChipRegion(models.Model, FieldValue):
 
 
 class SublibraryInformation(models.Model, FieldValue):
-
     """
     Sublibrary Information from the SmartChipApp output file.
     It's technically a table of cell information. DLP only.
@@ -301,12 +296,9 @@ class SublibraryInformation(models.Model, FieldValue):
 
     def get_sublibrary_id(self):
         return '-'.join([
-            self.sample_id.sample_id,
-            self.library.pool_id,
-            'R' + str(self.row).zfill(2),
+            self.sample_id.sample_id, self.library.pool_id, 'R' + str(self.row).zfill(2),
             'C' + str(self.column).zfill(2)
         ])
-
 
     def __str__(self):
         return self.get_sublibrary_id()
@@ -349,7 +341,7 @@ class DoubletInformation(models.Model):
         "Number of dead doublet cells",
         default=0,
     )
-    
+
     other_doublet = create_intfield(
         "Number of mixed doublet cells",
         default=0,
@@ -364,7 +356,7 @@ class DoubletInformation(models.Model):
         "More than two dead cells",
         default=0,
     )
-    
+
     other_gt_doublet = create_intfield(
         "More than two other cells",
         default=0,
@@ -374,9 +366,7 @@ class DoubletInformation(models.Model):
         return self.library.pool_id
 
 
-
 class MetadataField(models.Model):
-
     """
     Keeps track of the metadata fields used, and allows ease of creating but still controlling
     added new fields in table. DLP only.
@@ -395,7 +385,6 @@ class MetadataField(models.Model):
 
 
 class ChipRegionMetadata(models.Model, FieldValue):
-
     """
     Library/Sublibrary Metadata. DLP only.
     """
@@ -422,13 +411,10 @@ class ChipRegionMetadata(models.Model, FieldValue):
 
     def __str__(self):
         return "{chip_region_code} - {field}: {value}".format(
-            chip_region_code = self.chip_region.region_code,
-            field = self.metadata_field.field,
-            value = self.metadata_value,
+            chip_region_code=self.chip_region.region_code,
+            field=self.metadata_field.field,
+            value=self.metadata_value,
         )
-
-
-
 
 
 class JiraUser(models.Model):
@@ -444,4 +430,3 @@ class JiraUser(models.Model):
 
     def __str__(self):
         return self.name
-
