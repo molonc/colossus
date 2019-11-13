@@ -38,20 +38,14 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 # App imports
 #----------------------------
 from core.search_util.search_helper import return_text_search
-from core.models import (
-    ChipRegionMetadata
-)
-from dlp.models import (
-    DlpLibrary
-)
-from pbal.models import (
-    PbalLibrary
-)
+from core.models import (ChipRegionMetadata)
+from dlp.models import (DlpLibrary)
+from pbal.models import (PbalLibrary)
 from tenx.models import (
     TenxLibrary,
     TenxSequencing,
     TenxChip,
-    TenxPool
+    TenxPool,
 )
 
 from tenx.utils import tenxlibrary_naming_scheme
@@ -78,7 +72,8 @@ from .utils import (
     create_doublet_info_model,
     fetch_montage,
     validate_imported,
-    fetch_row_objects)
+    fetch_row_objects,
+)
 from .jira_templates.templates import (
     get_reference_genome_from_sample_id,
     generate_dlp_jira_description,
@@ -115,7 +110,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
     def get_context_data(self):
         context = {
             'sample_size': Sample.objects.count(),
-            'project_size' : Project.objects.count(),
+            'project_size': Project.objects.count(),
             'tenxanalysis_size': TenxAnalysis.objects.count(),
             'dlp_library_size': DlpLibrary.objects.count(),
             'dlp_sequencing_size': DlpSequencing.objects.count(),
@@ -125,24 +120,24 @@ class IndexView(LoginRequiredMixin, TemplateView):
             'tenx_sequencing_size': TenxSequencing.objects.count(),
             'tenx_chips_size': TenxChip.objects.count(),
             'tenx_pools_size': TenxPool.objects.count(),
-            'analysisinformation_size':DlpAnalysisInformation.objects.count(),
-            'analysisrun_size':AnalysisRun.objects.count(),
+            'analysisinformation_size': DlpAnalysisInformation.objects.count(),
+            'analysisrun_size': AnalysisRun.objects.count(),
         }
         return context
 
+
 @login_required
 def gsc_submission_form(request):
-  return render(
-      request,
-      "core/gsc_form.html",
-      {"libraries" :
-          json.dumps([{
-                "value" : library.pk,
-                "text" : "{}_{}".format(library.pool_id,library.sample.sample_id),
-                "userselect" : False,
+    return render(
+        request, "core/gsc_form.html", {
+            "libraries":
+            json.dumps([{
+                "value": library.pk,
+                "text": "{}_{}".format(library.pool_id, library.sample.sample_id),
+                "userselect": False,
             } for library in DlpLibrary.objects.all()],
-              cls=DjangoJSONEncoder)}
-    )
+                       cls=DjangoJSONEncoder)
+        })
 
 
 #============================
@@ -157,7 +152,7 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
 
     def get_context_and_render(self, request, error=None):
         samples = list(Sample.objects.annotate(text=F('sample_id'), value=F('pk')).values("text", "value"))
-        context =  {"error" : error, "samples": json.dumps(list(samples), cls=DjangoJSONEncoder)}
+        context = {"error": error, "samples": json.dumps(list(samples), cls=DjangoJSONEncoder)}
         return render(request, self.template_name, context)
 
     def get(self, request):
@@ -168,17 +163,25 @@ class PipeLineStatus(LoginRequiredMixin, TemplateView):
         if data["type"] == "fetchMontage":
             return HttpResponse(json.dumps(fetch_montage()))
         elif data["type"] == "validateColossus":
-            return HttpResponse(json.dumps(validate_imported(DlpAnalysisInformation.objects.get(analysis_jira_ticket=data["id"]))))
+            return HttpResponse(
+                json.dumps(validate_imported(DlpAnalysisInformation.objects.get(analysis_jira_ticket=data["id"]))))
         else:
             return HttpResponse(json.dumps(fetch_row_objects(data["type"], data["name"])))
 
     def pipeline_status_page(request):
-      pipelinetags = list(Project.objects.values("id", "name"))
-      return render( request, "core/vue/status-page.html",
-                     { "username" : os.environ.get("TANTALUS_USER"), "password" :os.environ.get("TANTALUS_PASSWORD"), "tags" : json.dumps(pipelinetags, cls=DjangoJSONEncoder) })
+        pipelinetags = list(Project.objects.values("id", "name"))
+        return render(
+            request, "core/vue/status-page.html", {
+                "username": os.environ.get("TANTALUS_USER"),
+                "password": os.environ.get("TANTALUS_PASSWORD"),
+                "tags": json.dumps(pipelinetags, cls=DjangoJSONEncoder)
+            })
+
+
 #============================
 # End of Pipeline Status
 #----------------------------
+
 
 def gsc_info_post(request):
     selected = DlpLibrary.objects.filter(pk__in=json.loads(request.body.decode('utf-8'))["selected"])
@@ -195,9 +198,10 @@ def gsc_info_post(request):
         "xenograph": "Yes",
         "concentration": library.dlplibraryquantificationandstorage.dna_concentration_nm,
         "volume": library.dlplibraryquantificationandstorage.dna_volume,
-        "quantification_method": library.dlplibraryquantificationandstorage.quantification_method,    
+        "quantification_method": library.dlplibraryquantificationandstorage.quantification_method,
     } for library in selected]
     return HttpResponse(json.dumps(returnJson, cls=DjangoJSONEncoder), content_type="application/json")
+
 
 def download_sublibrary_info(request):
 
@@ -209,13 +213,11 @@ def download_sublibrary_info(request):
         csvString += "{},{}-{}\n".format(
             sublib.get_sublibrary_id(),
             # Reverse complement the first index
-            str(sublib.primer_i7[::-1]).translate(
-                str.maketrans("ACTGactg", "TGACtgac")),
-            sublib.primer_i5
+            str(sublib.primer_i7[::-1]).translate(str.maketrans("ACTGactg", "TGACtgac")),
+            sublib.primer_i5,
         )
 
     return HttpResponse(csvString)
-
 
 
 #============================
@@ -240,7 +242,7 @@ class SampleCreate(LoginRequiredMixin, TemplateView):
     Sample create page.
     """
     login_url = LOGIN_URL
-    template_name="core/sample_create.html"
+    template_name = "core/sample_create.html"
 
     def get_context_and_render(self, request, form, formset, pk=None):
         context = {
@@ -259,6 +261,24 @@ class SampleCreate(LoginRequiredMixin, TemplateView):
         form = SampleForm(request.POST)
         formset = AdditionalSampleInfoInlineFormset(request.POST)
         if form.is_valid() and formset.is_valid():
+            sample_data = form.cleaned_data
+            additional_sample_data = formset[0].cleaned_data
+            if sample_data["sample_type"] in ["X", "O"]:
+                required_fields = [
+                    additional_sample_data["sex"],
+                    additional_sample_data["receptor_status"],
+                    additional_sample_data["pathology_occurrence"],
+                    additional_sample_data["patient_treatment_status"],
+                    additional_sample_data["sample_treatment_status"],
+                ]
+                if not all(field for field in required_fields):
+                    msg = """
+                    Sex, Receptor status, Pathology occurence, patient 
+                    treatment status and sample treatment status is required 
+                    for Xenografts and Organoid Samples."""
+                    messages.error(request, msg)
+                    return self.get_context_and_render(request, form, formset)
+
             instance = form.save(commit=False)
             formset.instance = instance
             instance.save()
@@ -273,7 +293,6 @@ class SampleCreate(LoginRequiredMixin, TemplateView):
 
 
 class SampleUpdate(SampleCreate):
-
     """
     Sample update page.
     """
@@ -282,8 +301,8 @@ class SampleUpdate(SampleCreate):
 
     def get(self, request, pk):
         sample = get_object_or_404(Sample, pk=pk)
-        form=SampleForm(instance=sample)
-        formset=AdditionalSampleInfoInlineFormset(instance=sample)
+        form = SampleForm(instance=sample)
+        formset = AdditionalSampleInfoInlineFormset(instance=sample)
         return self.get_context_and_render(request, form, formset, pk=pk)
 
     def post(self, request, pk):
@@ -303,7 +322,6 @@ class SampleUpdate(SampleCreate):
 
 
 class SampleDelete(LoginRequiredMixin, TemplateView):
-
     """
     Sample delete page.
     """
@@ -323,6 +341,7 @@ class SampleDelete(LoginRequiredMixin, TemplateView):
         messages.success(request, msg)
         return HttpResponseRedirect(reverse('core:pipeline_status'))
 
+
 @Render("core/sample_detail.html")
 @login_required
 def sample_name_to_id_redirect(request, pk=None, sample_id=None):
@@ -330,24 +349,18 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
         sample = get_object_or_404(Sample, pk=pk)
 
         # Get all chip region metadata that include desired sample
-        chip_metadata = ChipRegionMetadata.objects.filter(
-            metadata_value=str(sample))
+        chip_metadata = ChipRegionMetadata.objects.filter(metadata_value=str(sample))
 
         related_libraries = set()
         for metadata in chip_metadata:
             # Get dlp library related to each chip region metadata
             chip_region_id = metadata.chip_region_id
             library = DlpLibrary.objects.get(chipregion=chip_region_id)
-        
+
             if str(library.sample_id) != pk:
                 related_libraries.add(library)
 
-        context = dict(
-            library_list=['dlp', 'pbal', 'tenx'],
-            sample=sample,
-            pk=pk,
-            related_libraries=related_libraries
-        )
+        context = dict(library_list=['dlp', 'pbal', 'tenx'], sample=sample, pk=pk, related_libraries=related_libraries)
 
         return context
 
@@ -355,17 +368,16 @@ def sample_name_to_id_redirect(request, pk=None, sample_id=None):
         pk = get_object_or_404(Sample, sample_id=sample_id).pk
         return redirect('/core/sample/{}'.format(pk))
 
-    
 
 #============================
 # Library views
 #----------------------------
 class LibraryList(LoginRequiredMixin, TemplateView):
-
     """
     Library list base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -378,28 +390,29 @@ class LibraryList(LoginRequiredMixin, TemplateView):
         }
         return context
 
-class LibraryDetail(LoginRequiredMixin, TemplateView):
 
+class LibraryDetail(LoginRequiredMixin, TemplateView):
     """
     Library detail base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
     template_name = "core/library_detail.html"
 
     def get_context_and_render(
-        self,
-        request,
-        library,
-        library_type,
-        analyses=None,
-        sublibinfo_fields=None,
-        chip_metadata=None,
-        metadata_fields=None,
-        doubletinfo_fields=None,
-        additional_samples=None,
+            self,
+            request,
+            library,
+            library_type,
+            analyses=None,
+            sublibinfo_fields=None,
+            chip_metadata=None,
+            metadata_fields=None,
+            doubletinfo_fields=None,
+            additional_samples=None,
     ):
         library_dict = self.sort_library_order(library)
         context = {
@@ -409,7 +422,7 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
             'sublibinfo_fields': sublibinfo_fields,
             'chip_metadata': chip_metadata,
             'metadata_fields': metadata_fields,
-            'library_dict':library_dict,
+            'library_dict': library_dict,
             'additional_samples': additional_samples,
         }
         return render(request, self.template_name, context)
@@ -419,15 +432,16 @@ class LibraryDetail(LoginRequiredMixin, TemplateView):
         library_type = self.library_type
         return self.get_context_and_render(request, library, library_type)
 
-    def sort_library_order(self,library):
-            return library.get_field_values()
+    def sort_library_order(self, library):
+        return library.get_field_values()
+
 
 class LibraryDelete(LoginRequiredMixin, TemplateView):
-
     """
     Library delete base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -447,6 +461,7 @@ class LibraryDelete(LoginRequiredMixin, TemplateView):
         messages.success(request, msg)
         return HttpResponseRedirect(reverse(self.library_type + ':library_list'))
 
+
 class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
 
     login_url = LOGIN_URL
@@ -459,21 +474,23 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
         form = JiraConfirmationForm()
         #Set default values for DLP and TenX Library Ticket Creation
         #If default value can't be found, no error will be thrown, and the field will just be empty by default
-        if(request.session['library_type'] == 'dlp'):
-            form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'], request.session['pool_id'], request.session['additional_title'])
-            form.fields['description'].initial = generate_dlp_jira_description(request.session['description'], request.session['library_id'])
-            form.fields['reporter'].initial = jira_user 
-        elif(request.session['library_type'] == 'tenx'):
-            form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'], request.session['additional_title'])
+        if (request.session['library_type'] == 'dlp'):
+            form.fields['title'].initial = '{} - {} - {}'.format(request.session['sample_id'],
+                                                                 request.session['pool_id'],
+                                                                 request.session['additional_title'])
+            form.fields['description'].initial = generate_dlp_jira_description(request.session['description'],
+                                                                               request.session['library_id'])
+            form.fields['reporter'].initial = jira_user
+        elif (request.session['library_type'] == 'tenx'):
+            form.fields['title'].initial = '{} - {}'.format(request.session['sample_id'],
+                                                            request.session['additional_title'])
             form.fields['description'].initial = 'Awaiting first sequencing...'
             form.fields['reporter'].initial = 'coflanagan'
 
         form.fields['project'].choices = [(str(project.id), project.name) for project in projects]
-        form.fields['project'].initial = get_project_id_from_name(request.session['jira_user'], request.session['jira_password'], 'Single Cell')
-        context = {
-            'form': form,
-            'library_type': request.session['library_type']
-        }
+        form.fields['project'].initial = get_project_id_from_name(request.session['jira_user'],
+                                                                  request.session['jira_password'], 'Single Cell')
+        context = {'form': form, 'library_type': request.session['library_type']}
         return render(request, self.template_name, context)
 
     def post(self, request):
@@ -482,23 +499,24 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
         form.fields['project'].choices = [(str(project.id), project.name) for project in projects]
         if form.is_valid():
             try:
-                new_issue = create_ticket(username=request.session['jira_user'],
-                      password=request.session['jira_password'],
-                      project=form['project'].value(),
-                      title=form['title'].value(),
-                      description=form['description'].value(),
-                      reporter=form['reporter'].value(),
-                    )
+                new_issue = create_ticket(
+                    username=request.session['jira_user'],
+                    password=request.session['jira_password'],
+                    project=form['project'].value(),
+                    title=form['title'].value(),
+                    description=form['description'].value(),
+                    reporter=form['reporter'].value(),
+                )
             except JIRAError as e:
                 #Do Something
                 error_message = "Failed to create the Jira Ticket. {}".format(e.text)
                 messages.error(request, error_message)
                 return render(request, self.template_name)
-            if(request.session['library_type'] == 'dlp'):
+            if (request.session['library_type'] == 'dlp'):
                 library = DlpLibrary.objects.get(id=request.session['library_id'])
                 library.jira_ticket = new_issue
                 library.save()
-            elif(request.session['library_type'] == 'tenx'):
+            elif (request.session['library_type'] == 'tenx'):
                 library = TenxLibrary.objects.get(id=request.session['library_id'])
                 library.jira_ticket = new_issue
                 library.save()
@@ -506,7 +524,6 @@ class JiraTicketConfirm(LoginRequiredMixin, TemplateView):
 
 
 class LibraryCreate(LoginRequiredMixin, TemplateView):
-
     """
     Library create base class.
     """
@@ -523,7 +540,7 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
         else:
             sample = None
         sampleDetailInitial = None
-        if self.library_type is "tenx": sampleDetailInitial = [{"num_cells_targeted" : 3000}]
+        if self.library_type is "tenx": sampleDetailInitial = [{"num_cells_targeted": 3000}]
         context = {
             'lib_form': self.lib_form_class(),
             'sublib_form': SublibraryForm(),
@@ -583,13 +600,10 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                             jira_password = lib_form['jira_password'].value()
                             if validate_credentials(jira_user, jira_password):
                                 additional_title = lib_form['additional_title'].value()
-                                JiraUser.objects.get_or_create(
-                                    username=jira_user,
-                                    name=jira_user
-                                )
+                                JiraUser.objects.get_or_create(username=jira_user, name=jira_user)
 
                                 #For DLP Libaries
-                                if(context['library_type'] == 'dlp'):
+                                if (context['library_type'] == 'dlp'):
                                     request.session['pool_id'] = str(instance.pool_id)
                                     request.session['description'] = instance.description
                                 if context['library_type'] != 'pbal':
@@ -608,7 +622,8 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                         if context["library_type"] == "pbal":
                             return HttpResponseRedirect(instance.get_absolute_url())
                         else:
-                            return HttpResponseRedirect(reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
+                            return HttpResponseRedirect(
+                                reverse('{}:jira_ticket_confirm'.format(context['library_type'])))
                     elif all_valid and not create:
                         # save the formsets.
                         [formset.save() for formset in formsets.values()]
@@ -617,11 +632,10 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
                     messages.info(request, lib_form.errors)
                     return HttpResponseRedirect(request.get_full_path())
 
-
         except ValueError as e:
             #Can't join into a string when some args are ints, so convert them first
             for arg in e.args:
-                if(type(arg) is int):
+                if (type(arg) is int):
                     arg = str(arg)
                 error_message += arg.encode('ascii', 'ignore') + ' '
             error_message = "Failed to create the library. " + error_message + ". Please fix the errors below."
@@ -651,13 +665,12 @@ class LibraryCreate(LoginRequiredMixin, TemplateView):
             formsets[k] = formset
         return all_valid, formsets
 
-class LibraryUpdate(LibraryCreate):
 
+class LibraryUpdate(LibraryCreate):
     """
     Library update base class.
     """
-
-    class Meta: 
+    class Meta:
         abstract = True
 
     template_name = "core/library_update.html"
@@ -695,7 +708,6 @@ class LibraryUpdate(LibraryCreate):
 # Project views
 #----------------------------
 class ProjectList(LoginRequiredMixin, TemplateView):
-
     """
     Project detail page.
     """
@@ -707,6 +719,7 @@ class ProjectList(LoginRequiredMixin, TemplateView):
             'projects': Project.objects.all().order_by('name'),
         }
         return context
+
 
 class ProjectDetail(TemplateView):
 
@@ -720,7 +733,6 @@ class ProjectDetail(TemplateView):
 
 
 class ProjectDelete(LoginRequiredMixin, TemplateView):
-
     """
     Project delete page.
     """
@@ -741,8 +753,7 @@ class ProjectDelete(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect(reverse('core:project_list'))
 
 
-class ProjectCreate(LoginRequiredMixin,TemplateView):
-
+class ProjectCreate(LoginRequiredMixin, TemplateView):
     """
     Project create page.
     """
@@ -765,7 +776,6 @@ class ProjectCreate(LoginRequiredMixin,TemplateView):
 
 
 class ProjectUpdate(LoginRequiredMixin, TemplateView):
-
     """
     Project update page.
     """
@@ -773,12 +783,9 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
     template_name = "core/project_update.html"
 
     def get_context_data(self, pk):
-        dlp_library_set = [library.pk for library in get_object_or_404(
-            Project, pk=pk).dlplibrary_set.all()]
-        tenx_library_set = [library.pk for library in get_object_or_404(
-            Project, pk=pk).tenxlibrary_set.all()]
-        pbal_library_set = [library.pk for library in get_object_or_404(
-            Project, pk=pk).pballibrary_projects.all()]
+        dlp_library_set = [library.pk for library in get_object_or_404(Project, pk=pk).dlplibrary_set.all()]
+        tenx_library_set = [library.pk for library in get_object_or_404(Project, pk=pk).tenxlibrary_set.all()]
+        pbal_library_set = [library.pk for library in get_object_or_404(Project, pk=pk).pballibrary_projects.all()]
         context = {
             'pk': pk,
             'form': ProjectForm(instance=get_object_or_404(Project, pk=pk)),
@@ -792,8 +799,7 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
         return context
 
     def post(self, request, pk):
-        form = ProjectForm(
-            request.POST, instance=get_object_or_404(Project, pk=pk))
+        form = ProjectForm(request.POST, instance=get_object_or_404(Project, pk=pk))
         if form.is_valid():
             instance = form.save(commit=False)
             instance.dlplibrary_set = instance.dlplibrary_set.all() | form.cleaned_data['dlp_library_set']
@@ -809,16 +815,15 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(request.get_full_path())
 
 
-
 #============================
 # Sequencing views
 #----------------------------
 class SequencingList(LoginRequiredMixin, TemplateView):
-
     """
     Sequencing list base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -829,7 +834,8 @@ class SequencingList(LoginRequiredMixin, TemplateView):
         sequencing_list = self.sequencing_class.objects.all().order_by('library')
         for sequencing in sequencing_list:
             try:
-                sequencing.most_recent_lane = sequencing.dlplane_set.order_by('-id')[0].sequencing_date.strftime('%b. %d, %Y')
+                sequencing.most_recent_lane = sequencing.dlplane_set.order_by('-id')[0].sequencing_date.strftime(
+                    '%b. %d, %Y')
             except IndexError:
                 sequencing.most_recent_lane = None
             except AttributeError:
@@ -843,14 +849,12 @@ class SequencingList(LoginRequiredMixin, TemplateView):
         return context
 
 
-
-
 class SequencingDetail(LoginRequiredMixin, TemplateView):
-
     """
     Sequencing detail base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -878,11 +882,19 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
     def get(self, request):
         if request.session['library_type'] == 'dlp':
             #Set initial checkboxes to every Jira User associated with DLP
-            form = AddWatchersForm(initial={'watchers': list(JiraUser.objects.filter(associated_with_dlp=True).values_list('username', flat=True))})
-            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])
+            form = AddWatchersForm(initial={
+                'watchers':
+                list(JiraUser.objects.filter(associated_with_dlp=True).values_list('username', flat=True))
+            })
+            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(
+                request.session['number_of_lanes_requested'])
         elif request.session['library_type'] == 'tenx':
-            form = AddWatchersForm(initial={'watchers': list(JiraUser.objects.filter(associated_with_tenx=True).values_list('username', flat=True))})
-            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(request.session['number_of_lanes_requested'])
+            form = AddWatchersForm(initial={
+                'watchers':
+                list(JiraUser.objects.filter(associated_with_tenx=True).values_list('username', flat=True))
+            })
+            form.fields['comment'].initial = "A new Sequencing has been created and awaits {} lanes".format(
+                request.session['number_of_lanes_requested'])
         else:
             form = AddWatchersForm()
         context = {
@@ -896,11 +908,13 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
         form = AddWatchersForm(request.POST)
         if form.is_valid():
             if request.session['library_type'] == 'tenx' and request.session["jira_ticket"]:
-                for i in range(0,len(request.session["jira_ticket"])):
+                for i in range(0, len(request.session["jira_ticket"])):
                     reference_genome = get_reference_genome_from_sample_id(request.session['sample_id'][i])
-                    updated_description = generate_tenx_jira_description(request.session['sequencing_center'], reference_genome, request.session['pool_id'])
+                    updated_description = generate_tenx_jira_description(request.session['sequencing_center'],
+                                                                         reference_genome, request.session['pool_id'])
                     try:
-                        update_description(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'][i], updated_description)
+                        update_description(request.session['jira_user'], request.session['jira_password'],
+                                           request.session['jira_ticket'][i], updated_description)
                         self.update_watchers(request.session['jira_user'], request.session['jira_password'],
                                              request.session['jira_ticket'][i], form.cleaned_data['watchers'],
                                              form.cleaned_data['comment'])
@@ -910,7 +924,9 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
                         return self.get(request)
             elif request.session['library_type'] == 'dlp':
                 try:
-                    self.update_watchers(request.session['jira_user'], request.session['jira_password'], request.session['jira_ticket'], form.cleaned_data['watchers'], form.cleaned_data['comment'])
+                    self.update_watchers(request.session['jira_user'], request.session['jira_password'],
+                                         request.session['jira_ticket'], form.cleaned_data['watchers'],
+                                         form.cleaned_data['comment'])
                 except JIRAError as e:
                     msg = e.text
                     messages.error(request, msg)
@@ -918,18 +934,20 @@ class AddWatchers(LoginRequiredMixin, TemplateView):
             else:
                 messages.error(request, "Failed to create Jira ticket")
                 return self.get(request)
-        return HttpResponseRedirect('/{}/sequencing/{}'.format(request.session['library_type'], request.session['sequencing_id']))
+        return HttpResponseRedirect('/{}/sequencing/{}'.format(request.session['library_type'],
+                                                               request.session['sequencing_id']))
 
     def update_watchers(self, user, password, ticket, watchers, comment):
         add_watchers(user, password, ticket, watchers)
         add_jira_comment(user, password, ticket, comment)
 
-class SequencingCreate(LoginRequiredMixin, TemplateView):
 
+class SequencingCreate(LoginRequiredMixin, TemplateView):
     """
     Sequencing create base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -959,7 +977,7 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
 
-            if(validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password']) ):
+            if (validate_credentials(form.cleaned_data['jira_user'], form.cleaned_data['jira_password'])):
                 request.session['jira_user'] = form.cleaned_data['jira_user']
                 request.session['jira_password'] = form.cleaned_data['jira_password']
                 request.session['library_type'] = self.library_type
@@ -986,12 +1004,13 @@ class SequencingCreate(LoginRequiredMixin, TemplateView):
             messages.error(request, msg)
             return self.get_context_and_render(request, from_library, form)
 
-class SequencingUpdate(LoginRequiredMixin, TemplateView):
 
+class SequencingUpdate(LoginRequiredMixin, TemplateView):
     """
     Sequencing update base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -1005,8 +1024,8 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
         }
 
         if self.library_type != "tenx":
-            context['related_seqs'] =  self.sequencing_class.objects.all(),
-            context['selected_related_seqs'] =  sequencing.relates_to.only(),
+            context['related_seqs'] = self.sequencing_class.objects.all(),
+            context['selected_related_seqs'] = sequencing.relates_to.only(),
 
         return render(request, self.template_name, context)
 
@@ -1022,26 +1041,18 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             instance = form.save(commit=False)
             #Don't require JIRA integration if not updating the number of lanes field
-            if(old_count != instance.number_of_lanes_requested):
+            if (old_count != instance.number_of_lanes_requested):
                 jira_comment = "Sequencing Goal has been updated from {} to {} for this [Sequencing|https://colossus.canadacentral.cloudapp.azure.com/{}/sequencing/{}]".format(
                     old_count, instance.number_of_lanes_requested, self.library_type, pk)
                 try:
                     if self.library_type == "tenx" and instance.tenx_pool:
                         jira_tickets, sample_ids = instance.tenx_pool.jira_tickets()
                         for jira in jira_tickets:
-                            add_jira_comment(
-                                form.cleaned_data['jira_user'],
-                                form.cleaned_data['jira_password'],
-                                jira,
-                                jira_comment
-                            )
+                            add_jira_comment(form.cleaned_data['jira_user'], form.cleaned_data['jira_password'], jira,
+                                             jira_comment)
                     elif self.library_type == "dlp":
-                        add_jira_comment (
-                            form.cleaned_data['jira_user'],
-                            form.cleaned_data['jira_password'],
-                            instance.library.jira_ticket,
-                            jira_comment
-                        )
+                        add_jira_comment(form.cleaned_data['jira_user'], form.cleaned_data['jira_password'],
+                                         instance.library.jira_ticket, jira_comment)
                     else:
                         messages.error(request, "Failed to update Jira Ticket")
                         return self.get_context_and_render(request, sequencing, form)
@@ -1062,11 +1073,11 @@ class SequencingUpdate(LoginRequiredMixin, TemplateView):
 
 
 class SequencingDelete(LoginRequiredMixin, TemplateView):
-
     """
     Sequencing delete base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -1091,7 +1102,6 @@ class SequencingDelete(LoginRequiredMixin, TemplateView):
 # Lane views
 #----------------------------
 class LaneCreate(LoginRequiredMixin, TemplateView):
-
     """
     Lane create page.
     """
@@ -1129,14 +1139,12 @@ class LaneCreate(LoginRequiredMixin, TemplateView):
             return self.get_context_and_render(request, from_sequencing, form)
 
 
-
-
 class LaneUpdate(LoginRequiredMixin, TemplateView):
-
     """
     Lane update base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -1170,12 +1178,13 @@ class LaneUpdate(LoginRequiredMixin, TemplateView):
             messages.error(request, msg)
             return self.get_context_and_render(request, lane, form, pk)
 
-class LaneDelete(LoginRequiredMixin, TemplateView):
 
+class LaneDelete(LoginRequiredMixin, TemplateView):
     """
     Lane delete base class.
     """
     login_url = LOGIN_URL
+
     class Meta:
         abstract = True
 
@@ -1203,6 +1212,7 @@ class LaneDelete(LoginRequiredMixin, TemplateView):
         messages.success(request, msg)
         return HttpResponseRedirect(sequencing.get_absolute_url())
 
+
 #============================
 # Search view
 #----------------------------
@@ -1211,12 +1221,11 @@ class SearchView(TemplateView):
     login_url = LOGIN_URL
     template_name = "core/search/search_main.html"
 
-
     def get_context_data(self):
 
         query_str = self.request.GET.get('query_str')
 
         if len(query_str) < 1:
-            return {"total" : 0}
+            return {"total": 0}
 
         return return_text_search(query_str)

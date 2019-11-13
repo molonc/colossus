@@ -24,11 +24,11 @@ from django.forms import (
     ValidationError,
     inlineformset_factory,
     BaseInlineFormSet,
-    forms)
+    forms,
+)
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from itertools import chain
-
 
 #===========================
 # App imports
@@ -38,17 +38,15 @@ from .models import (
     Sample,
     AdditionalSampleInformation,
     JiraUser,
-    Project)
+    Project,
+)
 
 from dlp.models import (
-    DlpLibrary,
-)
+    DlpLibrary, )
 from tenx.models import (
-    TenxLibrary,
-)
+    TenxLibrary, )
 from pbal.models import (
-    PbalLibrary,
-)
+    PbalLibrary, )
 
 from .utils import parse_smartchipapp_results_file
 from .utils import generate_doublet_info
@@ -61,16 +59,13 @@ from colossus.settings import JIRA_URL
 #---------------------------
 
 
-
 #===========================
 # Helpers
 #---------------------------
 class SaveDefault(ModelForm):
-
     """
     Save the default values all the time.
     """
-
     def has_changed(self):
         """ Should returns True if data differs from initial.
         By always returning true even unchanged inlines will
@@ -88,8 +83,7 @@ class SaveDefault(ModelForm):
             self.add_error('pathology_disease_name', msg)
 
         # Only trigger this on the Sample form!
-        if (self.__class__.__name__ == 'AdditionalSampleInformationForm'
-                and tissue_type != 'N'
+        if (self.__class__.__name__ == 'AdditionalSampleInformationForm' and tissue_type != 'N'
                 and not pathology_disease_name):
             msg = "This field is required for diseased samples"
             self.add_error('pathology_disease_name', msg)
@@ -132,24 +126,34 @@ class SampleForm(ModelForm):
             for field in uneditable_fields:
                 self.fields[field].widget.attrs['readonly'] = 'true'
 
-AdditionalSampleInfoInlineFormset =  inlineformset_factory(
+
+AdditionalSampleInfoInlineFormset = inlineformset_factory(
     Sample,
     AdditionalSampleInformation,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'patient_biopsy_date': SelectDateWidget(
-            years=range(2000, 2020),
-            empty_label=('year', 'month', 'day'),
-        )
+    form=SaveDefault,
+    can_delete=False,
+    fields="__all__",
+    widgets={'patient_biopsy_date': SelectDateWidget(
+        years=range(2000, 2020),
+        empty_label=('year', 'month', 'day'),
+    )},
+    labels={
+        'tissue_type': ('*Tissue type'),
+        'anatomic_site': ('*Anatomic site'),
+        'pathology_disease_name': ('*Pathology/disease name (for diseased samples only)'),
+        'pathology_occurrence': ('**Pathology occurrence'),
+        'sex': ('**Sex'),
+        'receptor_status': ('**Receptor Status'),
+        'patient_treatment_status': ('**Patient Treatment Status'),
+        'sample_treatment_status': ('**Sample Treatment Status')
     },
-    labels = {
-        'tissue_type':('*Tissue type'),
-        'anatomic_site':('*Anatomic site'),
-        'pathology_disease_name': ('*Pathology/disease name (for diseased samples only)')
-    },
-)
+    help_texts={
+        'sex': ('Required if sample is a xenograft or organoid'),
+        'receptor_status': ('Required if sample is a xenograft or organoid'),
+        'pathology_occurrence': ('Required if sample is a xenograft or organoid'),
+        'patient_treatment_status': ('Required if sample is a xenograft or organoid'),
+        'sample_treatment_status': ('Required if sample is a xenograft or organoid'),
+    })
 
 
 def get_user_list():
@@ -163,13 +167,13 @@ def get_user_list():
 '''
 JIRA Ticket Creation Confirmation Form For Library Creation
 '''
+
+
 class JiraConfirmationForm(Form):
     title = forms.CharField(max_length=1000)
     description = forms.CharField(widget=forms.Textarea)
     project = forms.ChoiceField()
     reporter = forms.ChoiceField(choices=get_user_list)
-
-
 
 
 #===========================
@@ -178,6 +182,7 @@ class JiraConfirmationForm(Form):
 class LibraryForm(ModelForm):
     class Meta:
         abstract = True
+
 
 class SublibraryForm(Form):
     # SmartChipApp results file
@@ -202,11 +207,9 @@ class SublibraryForm(Form):
 
 
 class LibraryQuantificationAndStorageForm(ModelForm):
-
     """
     Base class for cleaning uploaded files.
     """
-
     class Meta:
         abstract = True
         fields = "__all__"
@@ -231,14 +234,14 @@ class ProjectForm(ModelForm):
         required=False,
     )
     tenx_library_set = forms.ModelMultipleChoiceField(
-        queryset=TenxLibrary.objects.all().order_by('id'), 
-        required=False, 
+        queryset=TenxLibrary.objects.all().order_by('id'),
+        required=False,
     )
     pbal_library_set = forms.ModelMultipleChoiceField(
         queryset=PbalLibrary.objects.all().order_by('id'),
         required=False,
     )
-    
+
 
 class AddWatchersForm(Form):
     watchers = forms.MultipleChoiceField(choices=get_user_list, widget=forms.CheckboxSelectMultiple())
@@ -249,19 +252,19 @@ class AddWatchersForm(Form):
 # Sequencing forms
 #---------------------------
 class SequencingForm(ModelForm):
-
     class Meta:
         abstract = True
         exclude = ['pool_id', 'lane_requested_date']
         widgets = {
             'submission_date': SelectDateWidget(
-                years=range(2000,2020),
+                years=range(2000, 2020),
                 empty_label=('year', 'month', 'day'),
             )
         }
         labels = {
             'library': ('*Library'),
         }
+
 
 #===========================
 # Lane forms
@@ -271,11 +274,11 @@ class LaneForm(ModelForm):
         abstract = True
         fields = "__all__"
 
+
 #===========================
 # GSC submission forms
 #---------------------------
 class GSCFormDeliveryInfo(Form):
-
     """
     Delivery information section of GSC submission form.
     """
@@ -328,7 +331,6 @@ class GSCFormDeliveryInfo(Form):
 
 
 class GSCFormSubmitterInfo(Form):
-
     """
     Delivery information section of GSC submission form.
     """
@@ -342,8 +344,8 @@ class GSCFormSubmitterInfo(Form):
     library_construction = (
         ('Nanowell Single Cell Genome', 'Nanowell Single Cell Genome'),
         ('Chromium Single Cell RNA', 'Chromium Single Cell RNA'),
-        ('Chromium Genome','Chromium Genome'),
-        ('Chromium Single Cell VDJ','Chromium Single Cell VDJ')
+        ('Chromium Genome', 'Chromium Genome'),
+        ('Chromium Single Cell VDJ', 'Chromium Single Cell VDJ'),
     )
 
     # fields
@@ -351,14 +353,8 @@ class GSCFormSubmitterInfo(Form):
         label="Name of Submitter",
         max_length=100,
     )
-    submitter_email = EmailField(
-        label="Submitter's email",
-    )
-    submission_date = DateField(
-        label="Submission Date",
-        help_text = 'yyyy-mm-dd',
-        initial= datetime.date.today
-    )
+    submitter_email = EmailField(label="Submitter's email", )
+    submission_date = DateField(label="Submission Date", help_text='yyyy-mm-dd', initial=datetime.date.today)
     submitting_org = CharField(
         label="Submitting Organization",
         max_length=100,
