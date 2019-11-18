@@ -219,7 +219,13 @@ verified_choices = (
     ('F', 'False'),
 )
 
-MONTAGE_STATUS_CHOICES = (('Success', 'Success'), ('Error', 'Error'), ('Ignore', 'Ignore'), ('Pending', 'Pending'))
+MONTAGE_STATUS_CHOICES = (
+    ('Success', 'Success'),
+    ('Error', 'Error'),
+    ('Deleted', 'Deleted'),
+    ('Ignore', 'Ignore'),
+    ('Pending', 'Pending'),
+)
 
 # Enumeration for TenxLibraryConstructionInformation library_type
 # choices
