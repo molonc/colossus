@@ -1,3 +1,4 @@
+from datetime import date
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
@@ -56,8 +57,7 @@ def analysis_detail(request, pk):
         'sequencings': analysis.tenxsequencing_set,
     }
 
-    tenx_pools = list(
-        map(lambda x: x.tenx_pool, analysis.tenxsequencing_set.all()))
+    tenx_pools = list(map(lambda x: x.tenx_pool, analysis.tenxsequencing_set.all()))
     context['tenx_pools'] = tenx_pools
     return context
 
@@ -69,22 +69,21 @@ def library_id_to_pk_redirect(request, pool_id):
 
 
 @login_required
-def get_gsc_submission_form(request):
+def get_gsc_submission_form(request, pk=None):
+    form_info = {
+        "name": request.user.get_full_name(),
+        "email": request.user.email,
+        "date": date.today(),
+        "pk": pk,
+    }
 
-    if request.method == 'POST':
-        form = TenxGSCSubmissionForm(request.POST)
-
-        if form.is_valid():
-            output_filename, workbook = fill_submission_form(form.cleaned_data)
-            response = HttpResponse(
-                workbook, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = f'attachment; filename={output_filename}'
-            return response
-
-        else:
-            form = TenxGSCSubmissionForm()
-
-    return render(request, 'core/tenx/tenxpool.html', {'form': form})
+    output_filename, workbook = fill_submission_form(form_info)
+    response = HttpResponse(
+        workbook,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    response['Content-Disposition'] = f'attachment; filename={output_filename}'
+    return response
 
 
 class TenxLibraryDetail(LibraryDetail):
@@ -185,7 +184,7 @@ class TenxPoolCreate(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self):
         context = {
-            'form': TenxPoolForm(), 
+            'form': TenxPoolForm(),
             'tenxlibraries': TenxLibrary.objects.all(),
         }
         return context
@@ -209,8 +208,7 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
     template_name = "core/tenx/tenxpool_update.html"
 
     def get_context_data(self, pk):
-        pool_library = [l.pk for l in get_object_or_404(
-            TenxPool, pk=pk).libraries.all()]
+        pool_library = [l.pk for l in get_object_or_404(TenxPool, pk=pk).libraries.all()]
         context = {
             'pk': pk,
             'form': TenxPoolForm(instance=get_object_or_404(TenxPool, pk=pk)),
@@ -220,8 +218,7 @@ class TenxPoolUpdate(LoginRequiredMixin, TemplateView):
         return context
 
     def post(self, request, pk):
-        form = TenxPoolForm(
-            request.POST, instance=get_object_or_404(TenxPool, pk=pk))
+        form = TenxPoolForm(request.POST, instance=get_object_or_404(TenxPool, pk=pk))
         if form.is_valid():
             instance = form.save(commit=False)
             form.save_m2m()
@@ -343,8 +340,8 @@ class TenxChipUpdate(LoginRequiredMixin, TemplateView):
         chip = get_object_or_404(TenxChip, pk=pk)
         form = TenxChipForm(instance=chip)
         context = {
-            "form": form, 
-            "pk": pk, 
+            "form": form,
+            "pk": pk,
         }
         return context
 

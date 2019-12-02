@@ -7,7 +7,7 @@ Created Oct 23, 2017
 from django.conf.urls import url
 from tenx import views
 from core.views import (
-    JiraTicketConfirm, 
+    JiraTicketConfirm,
     AddWatchers,
 )
 
@@ -25,7 +25,9 @@ urlpatterns = [
     url(r'^sequencing/list$', views.TenxSequencingList.as_view(), name='sequencing_list'),
     url(r'^sequencing/create/$', views.TenxSequencingCreate.as_view(), name='sequencing_create'),
     url(r'^sequencing/create/confirm$', AddWatchers.as_view(), name='add_watchers'),
-    url(r'^sequencing/create/(?P<from_library>\d+)$', views.TenxSequencingCreate.as_view(), name='sequencing_create_from_library'),
+    url(r'^sequencing/create/(?P<from_library>\d+)$',
+        views.TenxSequencingCreate.as_view(),
+        name='sequencing_create_from_library'),
     url(r'^sequencing/update/(?P<pk>\d+)$', views.TenxSequencingUpdate.as_view(), name='sequencing_update'),
     url(r'^sequencing/delete/(?P<pk>\d+)$', views.TenxSequencingDelete.as_view(), name='sequencing_delete'),
     url(r'^lane/create/$', views.TenxLaneCreate.as_view(), name='lane_create'),
@@ -42,7 +44,7 @@ urlpatterns = [
     url(r'^pool/create$', views.TenxPoolCreate.as_view(), name='pool_create'),
     url(r'^pool/update/(?P<pk>\d+)$', views.TenxPoolUpdate.as_view(), name='pool_update'),
     url(r'^pool/delete/(?P<pk>\d+)$', views.TenxPoolDelete.as_view(), name='pool_delete'),
-    url(r'^pool/gsc_form/$', views.get_gsc_submission_form, name='gsc_form'),
+    url(r'^pool/gsc_form/(?P<pk>\d+)$', views.get_gsc_submission_form, name='gsc_form'),
     url(r'^analysis/list$', views.analys_list, name='tenxanalysis_list'),
     url(r'^analysis/detail/(?P<pk>\d+)$', views.analysis_detail, name='tenxanalysis_detail'),
 ]

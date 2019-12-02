@@ -31,7 +31,7 @@ def fill_submission_form(form_info):
     form_workbook = load_workbook(gsc_tenx_submission_template, keep_vba=True)
     worksheet = form_workbook["Submission Info"]
 
-    tenxpool = get_object_or_404(TenxPool, pk=form_info["tenxpools"])
+    tenxpool = get_object_or_404(TenxPool, pk=form_info["pk"])
     libraries = tenxpool.libraries.all()
 
     output_filename = f"Aparicio_GSC-0297_Constructed_Library-Submission_Chromium_{tenxpool.pool_name}.xls"
