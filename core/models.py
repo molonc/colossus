@@ -210,6 +210,27 @@ class AdditionalSampleInformation(models.Model, FieldValue):
 
     history = HistoricalRecords(table_name='additional_sample_information_history')
 
+    def get_pathology_occurrence_display(self):
+        pathology_occurrence_choices = {
+            'PR': 'Primary',
+            'RC': 'Recurrent or Relapse',
+            'ME': 'Metastatic',
+            'RM': 'Remission',
+            'UN': 'Undetermined',
+            None: 'Unspecified',
+        }
+        return pathology_occurrence_choices[self.pathology_occurrence]
+
+    def get_treatment_status_display(self):
+        treatment_status_choices = {
+            'PR': 'Pre-treatment',
+            'IN': 'In-treatment',
+            'PO': 'Post-treatment',
+            None: 'N/A',
+            'UN': 'Unknown',
+        }
+        return treatment_status_choices[self.sample_treatment_status]
+
     def __str__(self):
         res = '_'.join([self.sample.sample_id, 'additional_information'])
         return res

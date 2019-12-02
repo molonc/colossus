@@ -43,13 +43,12 @@ def fill_submission_form(form_info):
     worksheet.cell(21, 2).value = form_info["email"]
     worksheet.cell(22, 2).value = form_info["date"]
 
-
     # Fill in Pool id and tube label in Pool Information
     worksheet.cell(66, 1).value = tenxpool.pool_name
     worksheet.cell(66, 2).value = tenxpool.pool_name
 
     # Dna Volume is the number of sublibraries times 30
-    worksheet.cell(66, 4).value = 30*len(libraries)
+    worksheet.cell(66, 4).value = 30 * len(libraries)
 
     for library in libraries:
         chromium_index = library.tenxlibraryconstructioninformation.index_used.split(",")[0]
@@ -59,7 +58,8 @@ def fill_submission_form(form_info):
             'Taxonomy ID': int(library.sample.taxonomy_id),
             'Anonymous Patient ID': library.sample.anonymous_patient_id,
             'Strain': library.sample.strain,
-            'Disease Condition/Health Status': library.sample.additionalsampleinformation.disease_condition_health_status,
+            'Disease Condition/Health Status':
+            library.sample.additionalsampleinformation.disease_condition_health_status,
             'Sex': library.sample.additionalsampleinformation.get_sex_display(),
             'Sample Collection Date': library.tenxlibrarysampledetail.sample_prep_date,
             'Anatomic Site': library.sample.additionalsampleinformation.anatomic_site,
@@ -68,8 +68,9 @@ def fill_submission_form(form_info):
             'Tissue Type': library.sample.additionalsampleinformation.get_tissue_type_display(),
             'Cell Type (if sorted)': library.sample.additionalsampleinformation.cell_type,
             'Cell Line ID': library.sample.cell_line_id,
-            'Pathology/Disease Name (for diseased sample only)': library.sample.additionalsampleinformation.pathology_disease_name,
-            'Additional Pathology Information': library.sample.additionalsampleinformation.additional_pathology_info,
+            'Pathology/Disease Name (for diseased sample only)':
+            library.sample.additionalsampleinformation.pathology_disease_name,
+            'Additional Pathology Information': library.sample.additionalsampleinformation.receptor_status,
             'Grade': library.sample.additionalsampleinformation.grade,
             'Stage': library.sample.additionalsampleinformation.stage,
             'Tumor content (%)': library.sample.additionalsampleinformation.tumour_content,
@@ -106,7 +107,7 @@ def fill_submission_form(form_info):
         for index, key in enumerate(sublibrary_info, start=1):
             worksheet.cell(sublibrary_start_row, index).value = sublibrary_info[key]
         sublibrary_start_row += 1
-        
+
     workbook = save_virtual_workbook(form_workbook)
 
     return output_filename, workbook
@@ -114,12 +115,13 @@ def fill_submission_form(form_info):
 
 def tenxlibrary_naming_scheme(library):
     if library.well_partition:
-        return "_".join(
-            ["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4), str(library.chip_well).zfill(3)+str(library.well_partition)]
-        )
+        return "_".join([
+            "SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4),
+            str(library.chip_well).zfill(3) + str(library.well_partition)
+        ])
     return "_".join(
-        ["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4), str(library.chip_well).zfill(3)]
-    )
+        ["SCRNA10X", library.chips.lab_name, "CHIP" + str(library.chips.pk).zfill(4),
+         str(library.chip_well).zfill(3)])
 
 
 def tenxpool_naming_scheme(pool):
