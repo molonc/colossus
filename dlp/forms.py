@@ -1,19 +1,12 @@
 import os
+import datetime
 
-from django.forms import (
-    inlineformset_factory,
-    forms
-)
+from django.forms import (inlineformset_factory, forms)
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
-from core.forms import (
-    LibraryForm,
-    LibraryQuantificationAndStorageForm,
-    SaveDefault,
-    SequencingForm,
-    LaneForm
-)
+from core.forms import (LibraryForm, LibraryQuantificationAndStorageForm, SaveDefault, SequencingForm, LaneForm)
 from .models import *
+
 
 class DlpLibraryForm(LibraryForm):
     field_order = [
@@ -28,7 +21,7 @@ class DlpLibraryForm(LibraryForm):
         'projects',
     ]
 
-    def __init__(self,*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(DlpLibraryForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             # Get Jira info
@@ -42,17 +35,13 @@ class DlpLibraryForm(LibraryForm):
         else:
             uneditable_fields = ['pool_id']
             for field in uneditable_fields:
-                    self.fields[field].widget.attrs['readonly'] = 'true'
+                self.fields[field].widget.attrs['readonly'] = 'true'
 
     class Meta:
         model = DlpLibrary
         exclude = ['num_sublibraries']
 
-        labels = {
-            'primary sample': ('*Sample'),
-            'pool_id': ('*Chip ID'),
-            'additional_title': ('*Additional Title')
-        }
+        labels = {'primary sample': ('*Sample'), 'pool_id': ('*Chip ID'), 'additional_title': ('*Additional Title')}
         help_texts = {
             'sample': ('Sequencing ID (usually SA ID) of the sample composing the majority of the library.'),
             'pool_id': ('Chip ID.'),
@@ -67,12 +56,11 @@ class DlpLibraryForm(LibraryForm):
                 msg = "Chip ID already exists."
                 self.add_error('pool_id', msg)
 
-class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
 
+class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
     """
     Clean uploaded DLP-related files.
     """
-
     class Meta(LibraryQuantificationAndStorageForm.Meta):
         model = DlpLibraryQuantificationAndStorage
 
@@ -118,51 +106,59 @@ class DlpLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm
                 self.add_error('agilent_bioanalyzer_image', msg)
         return file
 
+
 DlpLibrarySampleDetailInlineFormset = inlineformset_factory(
     DlpLibrary,
     DlpLibrarySampleDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'sample_spot_date': SelectDateWidget(
-            years=range(2000,2020),
+    form=SaveDefault,
+    can_delete=False,
+    fields="__all__",
+    widgets={
+        'sample_spot_date':
+        SelectDateWidget(
+            years=range(
+                2015,
+                datetime.date.today().year + 5,
+            ),
             empty_label=('year', 'month', 'day'),
         )
-    }
+    },
 )
 
-DlpLibraryConstructionInfoInlineFormset =  inlineformset_factory(
+DlpLibraryConstructionInfoInlineFormset = inlineformset_factory(
     DlpLibrary,
     DlpLibraryConstructionInformation,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'library_prep_date': SelectDateWidget(
-            years=range(2000,2020),
+    form=SaveDefault,
+    can_delete=False,
+    fields="__all__",
+    widgets={
+        'library_prep_date':
+        SelectDateWidget(
+            years=range(
+                2015,
+                datetime.date.today().year + 5,
+            ),
             empty_label=('year', 'month', 'day'),
         )
-    }
+    },
 )
 
-DlpLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
+DlpLibraryQuantificationAndStorageInlineFormset = inlineformset_factory(
     DlpLibrary,
     DlpLibraryQuantificationAndStorage,
-    form = DlpLibraryQuantificationAndStorageForm,
-    can_delete = False,
-    fields = "__all__",
-    help_texts = {
+    form=DlpLibraryQuantificationAndStorageForm,
+    can_delete=False,
+    fields="__all__",
+    help_texts={
         'agilent_bioanalyzer_xad': ('Select a xad file to upload.'),
         'agilent_bioanalyzer_png': ('Supported formats: png, jpg, jpeg, bmp.'),
-    }
+    },
 )
 
 
 class DlpSequencingForm(SequencingForm):
-
-    def __init__(self,*args,**kwargs):
-        super(DlpSequencingForm,self).__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(DlpSequencingForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             self.fields['jira_user'] = forms.CharField(max_length=100)
             self.fields['jira_password'] = forms.CharField(widget=forms.PasswordInput)
@@ -173,7 +169,7 @@ class DlpSequencingForm(SequencingForm):
     class Meta(SequencingForm.Meta):
         model = DlpSequencing
 
+
 class DlpLaneForm(LaneForm):
     class Meta(LaneForm.Meta):
         model = DlpLane
-

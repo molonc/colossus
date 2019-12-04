@@ -1,3 +1,4 @@
+import datetime
 from django.forms import inlineformset_factory, SelectDateWidget, ModelForm
 
 from core.forms import LibraryForm, LibraryQuantificationAndStorageForm, SaveDefault, SequencingForm, LaneForm
@@ -19,50 +20,56 @@ class PbalLibraryForm(LibraryForm):
         }
 
 
-
 class PbalLibraryQuantificationAndStorageForm(LibraryQuantificationAndStorageForm):
-
     """
     Clean uploaded PBAL-related files.
     """
-
     class Meta(LibraryQuantificationAndStorageForm.Meta):
         model = PbalLibraryQuantificationAndStorage
+
 
 PbalLibrarySampleDetailInlineFormset = inlineformset_factory(
     PbalLibrary,
     PbalLibrarySampleDetail,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'sample_spot_date': SelectDateWidget(
-            years=range(2000,2020),
+    form=SaveDefault,
+    can_delete=False,
+    fields="__all__",
+    widgets={
+        'sample_spot_date':
+        SelectDateWidget(
+            years=range(
+                2015,
+                datetime.date.today().year + 5,
+            ),
             empty_label=('year', 'month', 'day'),
         )
-    }
+    },
 )
 
-PbalLibraryConstructionInfoInlineFormset =  inlineformset_factory(
+PbalLibraryConstructionInfoInlineFormset = inlineformset_factory(
     PbalLibrary,
     PbalLibraryConstructionInformation,
-    form = SaveDefault,
-    can_delete = False,
-    fields = "__all__",
-    widgets = {
-        'submission_date': SelectDateWidget(
-            years=range(2000,2020),
+    form=SaveDefault,
+    can_delete=False,
+    fields="__all__",
+    widgets={
+        'submission_date':
+        SelectDateWidget(
+            years=range(
+                2015,
+                datetime.date.today().year + 5,
+            ),
             empty_label=('year', 'month', 'day'),
         )
-    }
+    },
 )
 
-PbalLibraryQuantificationAndStorageInlineFormset =  inlineformset_factory(
+PbalLibraryQuantificationAndStorageInlineFormset = inlineformset_factory(
     PbalLibrary,
     PbalLibraryQuantificationAndStorage,
-    form = PbalLibraryQuantificationAndStorageForm,
-    can_delete = False,
-    fields = "__all__",
+    form=PbalLibraryQuantificationAndStorageForm,
+    can_delete=False,
+    fields="__all__",
 )
 
 
@@ -70,9 +77,12 @@ class PbalSequencingForm(SequencingForm):
     class Meta(SequencingForm.Meta):
         model = PbalSequencing
 
+
 class PbalLaneForm(LaneForm):
     class Meta(LaneForm.Meta):
         model = PbalLane
+
+
 #===========================
 # Plate form
 #---------------------------

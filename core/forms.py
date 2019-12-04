@@ -97,8 +97,12 @@ class SampleForm(ModelForm):
         model = Sample
         fields = "__all__"
         widgets = {
-            'xenograft_biopsy_date': SelectDateWidget(
-                years=range(2000, 2020),
+            'xenograft_biopsy_date':
+            SelectDateWidget(
+                years=range(
+                    2015,
+                    datetime.date.today().year + 5,
+                ),
                 empty_label=('year', 'month', 'day'),
             )
         }
@@ -133,10 +137,16 @@ AdditionalSampleInfoInlineFormset = inlineformset_factory(
     form=SaveDefault,
     can_delete=False,
     fields="__all__",
-    widgets={'patient_biopsy_date': SelectDateWidget(
-        years=range(2000, 2020),
-        empty_label=('year', 'month', 'day'),
-    )},
+    widgets={
+        'patient_biopsy_date':
+        SelectDateWidget(
+            years=range(
+                2015,
+                datetime.date.today().year + 5,
+            ),
+            empty_label=('year', 'month', 'day'),
+        )
+    },
     labels={
         'tissue_type': ('*Tissue type'),
         'anatomic_site': ('*Anatomic site'),
@@ -256,8 +266,12 @@ class SequencingForm(ModelForm):
         abstract = True
         exclude = ['pool_id', 'lane_requested_date']
         widgets = {
-            'submission_date': SelectDateWidget(
-                years=range(2000, 2020),
+            'submission_date':
+            SelectDateWidget(
+                years=range(
+                    2015,
+                    datetime.date.today().year + 5,
+                ),
                 empty_label=('year', 'month', 'day'),
             )
         }
