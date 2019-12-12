@@ -513,37 +513,42 @@
                                     <td>
                                       {% if analysis.analysis_run.get_run_status_display == 'Complete' and analysis.montage_status != 'Success'%}
                                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Load onto Montage</button>
-                                        <form action="/load_montage/" method="post">
-                                        <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-                                            <div class="modal-dialog modal-lg" role="document">
-                                              <div class="modal-content">
-                                              <div class="modal-header">
-                                                  <h4 class="modal-title" id="myModalLabel">Load Analysis {{ analysis.analysis_jira_ticket }} onto Montage</h4>
-                                              </div>
-                                              <div class="modal-body">
-                                              <div class="jira_ticket_group">
-                                                <label for="jira_ticket"> Analysis Jira Ticket: </label>
-                                                <input id="jira_ticket" type="text" name="your_name" value="{{ analysis.analysis_jira_ticket }}" readonly>
-                                              </div>
-                                              <div class="server_group">
-                                              <label for="servers"> Select the destination server: </label>
-                                              <select id="servers" name="server_list">
-                                                  <option value="{{ servers.Test }}">Test</option>
-                                                  <option value="{{ servers.Production }}">Production</option>
-                                                  <option value="{{ servers.Collab_Brugge }}">Collab_Brugge</option>
-                                                  <option value="{{ servers.Collab_Imaxt }}">Collab_Imaxt</option>
-                                                  <option value="{{ servers.Collab_Crick }}">Collab_Crick</option>
-                                                  <option value="{{ servers.Collab_Tracerx_Peace }}">Collab_Tracerx_Peace</option>
-                                              </select>
-                                              </div>
-                                              </div>
-                                              <div class="modal-footer">
-                                                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                  <button type="submit" class="btn btn-primary">Save changes</button>
-                                              </div>
+
+                                        <form action="" method="post">
+                                            {% csrf_token %}
+                                            <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title" id="myModalLabel">Load Analysis {{ analysis.analysis_jira_ticket }} onto Montage</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                    <div class="jira_ticket_group">
+                                                        <label for="jira_ticket"> Analysis Jira Ticket: </label>
+                                                        <input id="jira_ticket" type="text" name="your_name" value="{{ analysis.analysis_jira_ticket }}" readonly>
+                                                    </div>
+
+                                                    <div class="server_group">
+                                                    <label for="servers"> Select the Destination Server: </label>
+                                                    <select id="servers" name="server_list">
+                                                        <option value="{{ servers.Test }}">Test</option>
+                                                        <option value="{{ servers.Production }}">Production</option>
+                                                        <option value="{{ servers.Collab_Brugge }}">Collab_Brugge</option>
+                                                        <option value="{{ servers.Collab_Imaxt }}">Collab_Imaxt</option>
+                                                        <option value="{{ servers.Collab_Crick }}">Collab_Crick</option>
+                                                        <option value="{{ servers.Collab_Tracerx_Peace }}">Collab_Tracerx_Peace</option>
+                                                    </select>
+                                                    </div>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Load</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            </div>
-                                        </div>
+
                                         </form>
                                       {% else %}
                                         Not available
