@@ -433,9 +433,6 @@ class DlpSequencing(models.Model, FieldValue):
         return reverse(self.library_type + ":sequencing_detail", kwargs={"pk": self.pk})
 
     def save(self, *args, **kwargs):
-        if (self.external_gsc_id is None) and self.library.sample.sample_id:
-            self.external_gsc_id=self.library.sample.sample_id
-
         if self.number_of_lanes_requested != self.old_number_of_lanes_requested:
             self.old_number_of_lanes_requested = self.number_of_lanes_requested
             self.lane_requested_date = datetime.date.today()
