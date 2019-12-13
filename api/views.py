@@ -214,6 +214,7 @@ class SequencingViewSet(RestrictedQueryMixin, viewsets.ModelViewSet):
         'gsc_library_id',
         'number_of_lanes_requested',
         'sequencing_center',
+        'external_gsc_id',
     )
 
 
