@@ -94,23 +94,23 @@ class AnalysisInformationFilter(filters.FilterSet):
 
 class CellIdFilter(filters.Filter):
     def filter(self, qs, value):
-        row = re.search(
-            r"-R(\d{2})",
-            value,
-        )
-        column = re.search(
-            r"-C(\d{2})",
-            value,
-        )
-
-        # check if value has form <sample>-<library>-R<row_number>-C<col-number>
-        try:
-            row = row.group(1)
-            column = column.group(1)
-        except:
-            return []
-
         if value:
+            row = re.search(
+                r"-R(\d{2})",
+                value,
+            )
+            column = re.search(
+                r"-C(\d{2})",
+                value,
+            )
+
+            # check if value has form <sample>-<library>-R<row_number>-C<col-number>
+            try:
+                row = row.group(1)
+                column = column.group(1)
+            except:
+                return []
+
             # TODO: refactor
             cell_id = value.split("-")
             # some sample ids have "-" in them
