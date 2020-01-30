@@ -100,7 +100,7 @@ class SampleForm(ModelForm):
             'xenograft_biopsy_date':
             SelectDateWidget(
                 years=range(
-                    2015,
+                    2010,
                     datetime.date.today().year + 5,
                 ),
                 empty_label=('year', 'month', 'day'),
@@ -141,7 +141,7 @@ AdditionalSampleInfoInlineFormset = inlineformset_factory(
         'patient_biopsy_date':
         SelectDateWidget(
             years=range(
-                2015,
+                2010,
                 datetime.date.today().year + 5,
             ),
             empty_label=('year', 'month', 'day'),
