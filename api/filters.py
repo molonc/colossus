@@ -94,12 +94,32 @@ class AnalysisInformationFilter(filters.FilterSet):
 
 class CellIdFilter(filters.Filter):
     def filter(self, qs, value):
+        row = re.search(
+            r"-R(\d{2})",
+            value,
+        )
+        column = re.search(
+            r"-C(\d{2})",
+            value,
+        )
+
+        # check if value has form <sample>-<library>-R<row_number>-C<col-number>
+        try:
+            row = row.group(1)
+            column = column.group(1)
+        except:
+            return []
+
         if value:
+            # TODO: refactor
             cell_id = value.split("-")
+            # some sample ids have "-" in them
+            # to take care of such samples, take strings from start of value up
+            # until the library value which is third last
             return qs.filter(
-                Q(library__pool_id__exact=cell_id[1]) & Q(sample_id__sample_id__exact=cell_id[0])
-                & Q(row__exact=int(re.search(r'\d+', cell_id[2]).group()))
-                & Q(column__exact=int(re.search(r'\d+', cell_id[3]).group()))) if len(cell_id) > 3 else []
+                Q(library__pool_id__exact=cell_id[-3]) & Q(sample_id__sample_id__exact="-".join(cell_id[:-3]))
+                & Q(row__exact=int(row))
+                & Q(column__exact=int(column))) if len(cell_id) > 3 else []
         else:
             return qs
 
