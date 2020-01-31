@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models import Q
 from django_filters import rest_framework as filters
 from django_filters import FilterSet
-from django_filters import Filter, DateFromToRangeFilter
+from django_filters import Filter, DateFromToRangeFilter, CharFilter
 from django_filters.fields import Lookup
 from core.models import (
     Sample,
@@ -65,6 +65,11 @@ class AnalysisInformationFilter(filters.FilterSet):
 
     analysis_run__last_updated = DateFromToRangeFilter(method='filter_analysis_run__last_updated')
 
+    analysis_run__run_status_ne = CharFilter(
+        label="Analysis Run Status Not Equal to",
+        method='filter_analysis_run__run_status_ne',
+    )
+
     def filter_analysis_run__last_updated(self, queryset, name, value):
         if value.start:
             queryset = queryset.filter(analysis_run__last_updated__gte=value.start)
@@ -74,7 +79,11 @@ class AnalysisInformationFilter(filters.FilterSet):
 
         return queryset
 
-    # jira_tickets = ListFilter(name='analysis_jira_ticket')
+    def filter_analysis_run__run_status_ne(self, queryset, name, value):
+        if value:
+            queryset = queryset.exclude(analysis_run__run_status=value)
+
+        return queryset
 
     class Meta:
         model = DlpAnalysisInformation
