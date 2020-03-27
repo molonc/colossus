@@ -143,6 +143,7 @@ sequencing_instrument_choices = (
     ('N500', 'NextSeq500'),
     ('N550', 'NextSeq550'),
     ('MI', 'MiSeq'),
+    ('BGI', 'BGI'),
     ('O', 'other'),
 )
 
