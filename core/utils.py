@@ -771,6 +771,7 @@ class GSCForm(object):
             'Cell Type (if sorted)': self._sample_addinfo.cell_type,
             'Cell Line ID': self._sample.cell_line_id,
             'Pathology/Disease Name (for diseased sample only)': self._sample_addinfo.pathology_disease_name,
+            'Additional Pathology Information': None,
             'Grade': self._sample_addinfo.grade,
             'Stage': self._sample_addinfo.stage,
             'Tumor content (%)': self._sample_addinfo.tumour_content,
