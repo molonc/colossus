@@ -183,6 +183,9 @@ class LibrarySerializer(serializers.ModelSerializer):
             'dlplibrarysampledetail',
             'dlplibraryquantificationandstorage',
             'exclude_from_analysis',
+            'normal_sample_type',
+            'normal_sample_id',
+            'normal_sample_library_id',
         )
 
 class SublibraryInformationSerializer(serializers.ModelSerializer):

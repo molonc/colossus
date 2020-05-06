@@ -117,6 +117,24 @@
                 <td id="tdid" class="notes">{{ library.exclude_from_analysis }}</td>
             {% endif %}
         </tr>
+        <tr>
+            {% if library_type == 'dlp' %}
+                <th id="thid">Normal sample type</th>
+                <td id="tdid">{{ library.normal_sample_type }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            {% if library_type == 'dlp' %}
+                <th id="thid">Normal sample ID</th>
+                <td id="tdid">{{ library.normal_sample_id }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            {% if library_type == 'dlp' %}
+                <th id="thid">Normal sample library ID</th>
+                <td id="tdid">{{ library.normal_sample_library_id }}</td>
+            {% endif %}
+        </tr>
     </table>
 </div>
 <!-- end of Meta Information -->

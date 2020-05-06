@@ -74,6 +74,27 @@ class DlpLibrary(models.Model, FieldValue, LibraryAssistant):
         on_delete=models.CASCADE,
     )
 
+    # related normal sample
+    normal_sample_type = create_chrfield(
+        "Normal sample type",
+        choices=normal_sample_type_chioces,
+        blank=True,
+        null=True,
+        default=None
+    )
+    normal_sample_id = create_chrfield(
+        "Normal sample ID",
+        blank=True,
+        null=True,
+        default=None
+    )
+    normal_sample_library_id = create_chrfield(
+        "Normal sample library ID",
+        blank=True,
+        null=True,
+        default=None
+    )
+
     # related libraries
     relates_to_dlp = models.ManyToManyField(
         'DlpLibrary',   # DlpLibrary hasn't been seen yet
