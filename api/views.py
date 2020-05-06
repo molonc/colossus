@@ -231,6 +231,9 @@ class LibraryViewSet(RestrictedQueryMixin, viewsets.ReadOnlyModelViewSet):
         'failed',
         'projects__name',
         'exclude_from_analysis',
+        'normal_sample_type',
+        'normal_sample_id',
+        'normal_sample_library_id',
     )
 
 

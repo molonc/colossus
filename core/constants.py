@@ -525,3 +525,9 @@ chromium_index_mapping = {
     'SI-GA-H11': 'GGCGAGTA; ACTTCTAT; CAAATACG; TTGCGCGC',
     'SI-GA-H12': 'GACAGCAT; TTTGTACA; AGGCCGTG; CCATATGC',
 }
+
+#normal sample type choices
+normal_sample_type_chioces =  (
+    ("D", "DLP+ library"),
+    ("W", "GSC WGS library")
+)
