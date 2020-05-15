@@ -217,6 +217,7 @@ class AdditionalSampleInformation(models.Model, FieldValue):
             'ME': 'Metastatic',
             'RM': 'Remission',
             'UN': 'Undetermined',
+            'US': 'Unspecified',
             None: 'Unspecified',
         }
         return pathology_occurrence_choices[self.pathology_occurrence]
