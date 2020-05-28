@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^project/update/(?P<pk>\d+)$', views.ProjectUpdate.as_view(), name='project_update'),
     url(r'^project/delete/(?P<pk>\d+)$', views.ProjectDelete.as_view(), name='project_delete'),
     url(r'^project/detail/(?P<pk>\d+)$', views.ProjectDetail.as_view(), name='project_detail'),
+    url(r'^project/export$', views.export_projects_csv, name='project_export'),
     url(r'^gsc$', views.gsc_submission_form, name='gsc_submission_form'),
     # url(r'^status/create$', views.PipeLineStatus.as_view(), name='pipeline_status_create'),
     url(r'^status$', views.PipeLineStatus.pipeline_status_page, name='pipeline_status'),

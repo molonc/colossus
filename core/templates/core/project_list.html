@@ -6,7 +6,13 @@
 
 {% block body %}
 <div class="container" style="padding: 0; margin-bottom: 5px;">
-    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'core:project_create' %}">Add Project</a>
+    <a class="btn btn-primary btn-sm" style="float: right; margin-top: 5px;" href="{% url 'core:project_create' %}">Add
+        Project
+    </a>
+    <a class="btn btn-default btn-sm" style="float: right; margin-top: 5px; margin-right: 5px;"
+        href="{% url 'core:project_export' %}">
+        Export to CSV
+    </a>
 </div>
 
 <div class="container" style="background-color:#F5F5F5;">
@@ -21,7 +27,7 @@
 
             </thead>
             <tbody>
-            {% for project in projects %}
+                {% for project in projects %}
                 <tr>
                     <td>
                         <p style="margin: 0;"><a href="{{ project.get_absolute_url }}">{{ project }}</a></p>
@@ -39,7 +45,7 @@
                         {{ project.get_libraries|length }}
                     </td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -47,12 +53,12 @@
 {% endblock %}
 
 {% block datatables_script %}
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $("#datatable").DataTable({
-                "columnDefs": [ 
-                ]
-            });
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#datatable").DataTable({
+            "columnDefs": [
+            ]
         });
-    </script>
+    });
+</script>
 {% endblock %}

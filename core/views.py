@@ -815,6 +815,118 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(request.get_full_path())
 
 
+def export_projects_csv(request):
+    """
+    Exports a csv containing library and sample info for all projects
+    """
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="projects.csv"'
+    # get projects
+    projects = Project.objects.all()
+
+    headers = [
+        'project',
+        'library_type',
+        'library',
+        'primary_sample',
+        'additional_samples',
+    ]
+
+    # get dlp libraries
+    dlp_df = pd.DataFrame(
+        list(projects.values(
+            'name',
+            'dlplibrary__pool_id',
+            'dlplibrary__sample__sample_id',
+        )),
+        columns=[
+            'name',
+            'dlplibrary__pool_id',
+            'dlplibrary__sample__sample_id',
+        ],
+    )
+    # rename dataframe columns
+    dlp_df.rename(
+        columns={
+            'name': 'project',
+            'dlplibrary__pool_id': 'library',
+            'dlplibrary__sample__sample_id': 'primary_sample',
+        },
+        inplace=True,
+    )
+    secondary_samples = []
+    # get secondary samples
+    for lib in projects.values('dlplibrary'):
+        try:
+            library = DlpLibrary.objects.get(id=lib['dlplibrary'])
+        except:
+            library = None
+
+        additional_samples = set()
+        if library:
+            # get secondary samples of library
+            metadata = ChipRegionMetadata.objects.filter(
+                chip_region__library=library,
+                metadata_field__field='sample_id',
+            )
+            # get all other samples in library from experimental metadata
+            additional_samples = set(
+                [m.metadata_value for m in metadata if m.metadata_value != library.sample.sample_id])
+
+        secondary_samples.append(", ".join(list(additional_samples)))
+
+    # add library type column
+    dlp_df.insert(1, "library_type", ['DLP'] * len(dlp_df['project']), True)
+    # add additional sample column
+    dlp_df['additional_samples'] = secondary_samples
+
+    # get tenx libraries
+    tenx_df = pd.DataFrame(
+        list(projects.values(
+            'name',
+            'tenxlibrary__name',
+            'tenxlibrary__sample__sample_id',
+        )),
+        columns=[
+            'name',
+            'tenxlibrary__name',
+            'tenxlibrary__sample__sample_id',
+        ],
+    )
+    # rename dataframe columns
+    tenx_df.rename(
+        columns={
+            'name': 'project',
+            'tenxlibrary__name': 'library',
+            'tenxlibrary__sample__sample_id': 'primary_sample',
+        },
+        inplace=True,
+    )
+    # add library type column
+    tenx_df.insert(1, "library_type", ['TenX'] * len(tenx_df['project']), True)
+
+    # concatenate library dataframes
+    df = pd.concat([dlp_df, tenx_df], sort=False)
+    # remove rows with no library or sample field
+    df.dropna(subset=['library', 'primary_sample'], inplace=True)
+    # sort dataframe
+    df.sort_values(
+        by=[
+            'project',
+            'library_type',
+            'library',
+            'primary_sample',
+        ],
+        inplace=True,
+    )
+    # rearrange columns
+    df = pd.DataFrame(df, columns=headers)
+
+    # export to csv
+    df.to_csv(response, index=False)
+    return response
+
+
 #============================
 # Sequencing views
 #----------------------------
