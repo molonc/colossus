@@ -810,7 +810,6 @@ class ProjectUpdate(LoginRequiredMixin, TemplateView):
             messages.success(request, msg)
             return HttpResponseRedirect(instance.get_absolute_url())
         else:
-            print("hello")
             messages.info(request, form.errors)
             return HttpResponseRedirect(request.get_full_path())
 
@@ -882,8 +881,6 @@ def export_projects_csv(request):
                 for s in library.dlpsequencing_set.filter(sequencing_center="BCCAGSC", ).values("gsc_library_id")
                 if s['gsc_library_id']
             ])
-
-            print(gsc_library_ids)
 
         secondary_samples.append(", ".join(list(additional_samples)))
         gsc_ids.append(", ".join(list(gsc_library_ids)))
