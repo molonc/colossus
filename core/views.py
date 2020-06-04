@@ -830,6 +830,7 @@ def export_projects_csv(request):
         'library',
         'primary_sample',
         'additional_samples',
+        'gsc_id',
     ]
 
     # get dlp libraries
@@ -855,7 +856,8 @@ def export_projects_csv(request):
         inplace=True,
     )
     secondary_samples = []
-    # get secondary samples
+    gsc_ids = []
+    # get secondary samples and gsc ids
     for lib in projects.values('dlplibrary'):
         try:
             library = DlpLibrary.objects.get(id=lib['dlplibrary'])
@@ -863,6 +865,7 @@ def export_projects_csv(request):
             library = None
 
         additional_samples = set()
+        gsc_library_ids = set()
         if library:
             # get secondary samples of library
             metadata = ChipRegionMetadata.objects.filter(
@@ -873,12 +876,23 @@ def export_projects_csv(request):
             additional_samples = set(
                 [m.metadata_value for m in metadata if m.metadata_value != library.sample.sample_id])
 
+            # get all gsc id of the library sequencings
+            gsc_library_ids = set([
+                s['gsc_library_id']
+                for s in library.dlpsequencing_set.filter(sequencing_center="BCCAGSC", ).values("gsc_library_id")
+                if s['gsc_library_id']
+            ])
+
+            print(gsc_library_ids)
+
         secondary_samples.append(", ".join(list(additional_samples)))
+        gsc_ids.append(", ".join(list(gsc_library_ids)))
 
     # add library type column
     dlp_df.insert(1, "library_type", ['DLP'] * len(dlp_df['project']), True)
     # add additional sample column
     dlp_df['additional_samples'] = secondary_samples
+    dlp_df['gsc_id'] = gsc_ids
 
     # get tenx libraries
     tenx_df = pd.DataFrame(
@@ -902,8 +916,26 @@ def export_projects_csv(request):
         },
         inplace=True,
     )
+
+    gsc_ids = []
+    # get gsc ids
+    for lib in projects.values('tenxlibrary'):
+        try:
+            library = TenxLibrary.objects.get(id=lib['tenxlibrary'])
+        except:
+            library = None
+
+        gsc_library_id = None
+        if library:
+            gsc_library_id = library.gsc_library_id
+
+        gsc_ids.append(gsc_library_id if gsc_library_id else "")
+
     # add library type column
     tenx_df.insert(1, "library_type", ['TenX'] * len(tenx_df['project']), True)
+
+    # add gsc ids
+    tenx_df['gsc_id'] = gsc_ids
 
     # concatenate library dataframes
     df = pd.concat([dlp_df, tenx_df], sort=False)
