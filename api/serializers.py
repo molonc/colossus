@@ -395,6 +395,7 @@ class ChipRegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChipRegion
         fields = (
+            'id',
             'jira_ticket',
             'library',
             'region_code',
@@ -674,3 +675,4 @@ class KuduTenxAnalysisSerializer(serializers.ModelSerializer):
             'version',
             'run_status'
         )
+
