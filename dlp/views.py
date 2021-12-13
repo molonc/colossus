@@ -34,13 +34,24 @@ from core.views import (
 
 import collections
 
+
 class DlpLibraryList(LibraryList):
     order = 'pool_id'
     library_class = DlpLibrary
     library_type = 'dlp'
 
     def get_context_data(self):
-        all_libraries = self.library_class.objects.all().order_by(self.order)
+        all_libraries = self.library_class.objects.all().order_by(self.order).prefetch_related(
+            'sample',
+            'projects',
+            'dlplibrarysampledetail',
+            'dlplibraryconstructioninformation',
+            'dlplibraryconstructioninformation',
+            'dlplibraryquantificationandstorage',
+            'dlpsequencing_set',
+            'dlpanalysisinformation_set',
+            'dlpanalysisinformation_set__sequencings'
+        )
 
         for library in all_libraries:
             library.num_sequencings = library.dlpsequencing_set.count()
@@ -55,17 +66,23 @@ class DlpLibraryList(LibraryList):
         }
         return context
 
+
 class DlpSequencingDetail(SequencingDetail):
     sequencing_class = DlpSequencing
     library_type = 'dlp'
 
+#todo
 class DlpLibraryDetail(LibraryDetail):
     def get(self, request, pk):
+
         library = get_object_or_404(DlpLibrary, pk=pk)
+
+
         library_type = 'dlp'
         analyses = DlpAnalysisInformation.objects.filter(sequencings__in=library.dlpsequencing_set.all()).distinct()
         sublibinfo = SublibraryInformation()
-        fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list('field', flat=True).distinct()
+        fields = MetadataField.objects.distinct().filter(chipregionmetadata__chip_region__library=library).values_list(
+            'field', flat=True).distinct()
         metadata_dict = collections.OrderedDict()
         controls_to_exclude = ["NCC", "gDNA", "hTERT", "NTC"]
         additional_samples = []
@@ -76,11 +93,11 @@ class DlpLibraryDetail(LibraryDetail):
             for metadata in metadata_set:
                 d1[metadata.metadata_field.field] = metadata.metadata_value
                 # Get additional non-control samples
-                if ((not any(control in chip_region.region_code for control in controls_to_exclude)) 
-                    and str(metadata.metadata_field) == "sample_id"):
+                if ((not any(control in chip_region.region_code for control in controls_to_exclude))
+                        and str(metadata.metadata_field) == "sample_id"):
                     try:
                         additional_samples.append(Sample.objects.get(
-                            sample_id=metadata.metadata_value,))
+                            sample_id=metadata.metadata_value, ))
                     except:
                         continue
 
@@ -96,17 +113,20 @@ class DlpLibraryDetail(LibraryDetail):
 
         # Remove duplicates and samples equaling primary sample
         additional_samples = list(dict.fromkeys(additional_samples))
-        additional_samples = [a for a in additional_samples if a.sample_id != library.sample.sample_id]   
+        additional_samples = [a for a in additional_samples if a.sample_id != library.sample.sample_id]
 
-        return self.get_context_and_render(request, library, library_type, analyses, sublibinfo.get_fields(), metadata_dict, fields, additional_samples=additional_samples,)
+        return self.get_context_and_render(request, library, library_type, analyses, sublibinfo.get_fields(),
+                                           metadata_dict, fields, additional_samples=additional_samples, )
 
     def sort_library_order(self, library):
-        new_library_order = ['Description', 'Result', 'Title', 'Jira ticket', 'Quality', 'Chip ID', 'Number of sublibraries']
+        new_library_order = ['Description', 'Result', 'Title', 'Jira ticket', 'Quality', 'Chip ID',
+                             'Number of sublibraries']
         sorted_library_dict = OrderedDict()
         library_dict_original = dict(library.get_field_values())
         for x in new_library_order:
             sorted_library_dict[x] = library_dict_original[x]
         return sorted_library_dict
+
 
 class DlpLibraryUpdate(LibraryUpdate):
     library_class = DlpLibrary
@@ -115,6 +135,7 @@ class DlpLibraryUpdate(LibraryUpdate):
     libcons_formset_class = DlpLibraryConstructionInfoInlineFormset
     libqs_formset_class = DlpLibraryQuantificationAndStorageInlineFormset
     library_type = 'dlp'
+
 
 class DlpLibraryDelete(LibraryDelete):
     library_class = DlpLibrary
@@ -133,11 +154,37 @@ class DlpSequencingList(SequencingList):
     sequencing_class = DlpSequencing
     library_type = 'dlp'
 
+    #rewrite function
+    def get_context_data(self):
+
+        sequencing_list = DlpSequencing.objects.all().order_by('library').prefetch_related("library", "library__sample", 'dlplane_set')
+
+        dlp_lanes = DlpLane.objects.all()
+        # computation of date is resource intense
+        for sequencing in sequencing_list:
+            aDates = []
+            sequencing.most_recent_lane = None
+            for dlp_lane in dlp_lanes:
+                if sequencing.id == dlp_lane.sequencing_id:
+                    if dlp_lane.sequencing_date:
+                        aDates.append(dlp_lane.sequencing_date)
+            if len(aDates) > 0:
+                sequencing.most_recent_lane = max(aDates).strftime('%b. %d, %Y')
+
+        context = {
+            'sequencings': sequencing_list,
+            'library_type': self.library_type,
+        }
+
+        return context
+
+
 class DlpSequencingCreate(SequencingCreate):
     library_class = DlpLibrary
     sequencing_class = DlpSequencing
     form_class = DlpSequencingForm
     library_type = 'dlp'
+
 
 class DlpSequencingUpdate(SequencingUpdate):
     sequencing_class = DlpSequencing
@@ -148,6 +195,7 @@ class DlpSequencingUpdate(SequencingUpdate):
 class DlpSequencingDelete(SequencingDelete):
     sequencing_class = DlpSequencing
     library_type = 'dlp'
+
 
 class DlpSequencingCreateGSCFormView(LoginRequiredMixin, TemplateView):
     login_url = LOGIN_URL
@@ -201,38 +249,42 @@ def library_id_to_pk_redirect(request, pool_id):
     pk = get_object_or_404(DlpLibrary, pool_id=pool_id).pk
     return redirect("/dlp/library/{}".format(pk))
 
+
 class DlpLaneCreate(LaneCreate):
     sequencing_class = DlpSequencing
     form_class = DlpLaneForm
     library_type = 'dlp'
+
 
 class DlpLaneUpdate(LaneUpdate):
     lane_class = DlpLane
     form_class = DlpLaneForm
     library_type = 'dlp'
 
+
 class DlpLaneDelete(LaneDelete):
     lane_class = DlpLane
     library_type = 'dlp'
 
-#============================
+
+# ============================
 # Summary view
-#----------------------------
+# ----------------------------
 @Render("core/summary.html")
 def dlp_summary_view(request):
+    library_per_sample_count = {s.sample_id: s.dlplibrary_set.count() for s in Sample.objects.all()}
 
-    library_per_sample_count = {s.sample_id : s.dlplibrary_set.count() for s in Sample.objects.all()}
+    sublibrary_per_sample_count = {s.sample_id: s.sublibraryinformation_set.count() for s in Sample.objects.all()}
 
-    sublibrary_per_sample_count = {s.sample_id : s.sublibraryinformation_set.count() for s in Sample.objects.all()}
-
-    context ={
+    context = {
         'library_per_sample': library_per_sample_count,
         'sublibrary_per_sample': sublibrary_per_sample_count,
         'total_sublibs': SublibraryInformation.objects.count(),
         'total_libs': DlpLibrary.objects.count(),
-        'samples':Sample.objects.all().order_by('sample_id'),
+        'samples': Sample.objects.all().order_by('sample_id'),
     }
     return context
+
 
 def dlp_get_filtered_sublib_count(sublibs):
     unfiltered_count = sublibs.count()
@@ -246,7 +298,6 @@ def dlp_get_filtered_sublib_count(sublibs):
 
 
 def dlp_get_cell_graph(request):
-
     data = []
     libs = DlpLibrary.objects.filter(dlpsequencing__isnull=False, sublibraryinformation__isnull=False).distinct()
 
@@ -268,9 +319,9 @@ def dlp_get_cell_graph(request):
     output_csv_path = os.path.join(settings.MEDIA_ROOT, ofilename)
     df.to_csv(output_csv_path, index=False)
 
-
     rscript_path = os.path.join(settings.BASE_DIR, "scripts", "every_cell_count_plot.R")
-    cmd = "Rscript {rscript} {input_csv} {media_dir}output.pdf".format(rscript=rscript_path, input_csv=output_csv_path, media_dir=settings.MEDIA_ROOT)
+    cmd = "Rscript {rscript} {input_csv} {media_dir}output.pdf".format(rscript=rscript_path, input_csv=output_csv_path,
+                                                                       media_dir=settings.MEDIA_ROOT)
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     r_stdout, r_stderr = p.communicate()
     if p.returncode != 0:
@@ -287,12 +338,14 @@ def dlp_get_cell_graph(request):
 
     return response
 
-def export_sublibrary_csv(request,pk):
+
+def export_sublibrary_csv(request, pk):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="Sublibrary-info.csv"'
     dlp = DlpLibrary.objects.get(id=pk)
     df = pd.DataFrame(list(dlp.sublibraryinformation_set.all().values()))
-    df = df.assign(Sublibrary_information = pd.Series([x.get_sublibrary_id()for x in dlp.sublibraryinformation_set.all()], index=df.index))
+    df = df.assign(
+        Sublibrary_information=pd.Series([x.get_sublibrary_id() for x in dlp.sublibraryinformation_set.all()],
+                                         index=df.index))
     df.to_csv(response)
     return response
-
