@@ -250,9 +250,20 @@ def analysis_delete(request, pk):
 @login_required
 def analysisinformation_list(request):
     """list of analysis information."""
+    aAnalyses = DlpAnalysisInformation.objects.prefetch_related(
+        'analysis_run',
+        'library__sample',
+        "library",
+        "sequencings",
+        "sequencings__library",
+        "sequencings__library__sample",
+        "sequencings__dlplane_set",
+        "sequencings__dlpanalysisinformation_set",
+        "sequencings__library__relates_to_dlp",
+    )
 
     context = {
-        'analyses': DlpAnalysisInformation.objects.all().order_by('analysis_jira_ticket'),
+        'analyses': aAnalyses,
     }
     return context
 
