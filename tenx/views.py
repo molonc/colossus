@@ -37,12 +37,25 @@ class TenxLibraryList(LibraryList):
     library_class = TenxLibrary
     library_type = 'tenx'
 
+    # rewrite get context to speed things up
+    def get_context_data(self):
+        context = {
+            'libraries': TenxLibrary.objects.all().order_by('sample_id').prefetch_related(
+                'sample',
+                'tenxlibrarysampledetail',
+                'tenxlibraryconstructioninformation',
+                'projects'
+            ),
+            'library_type': self.library_type,
+        }
+        return context
 
 @Render("core/tenxanalysis_list.html")
 @login_required
 def analys_list(request):
+    qs = TenxAnalysis.objects.all().order_by('id').prefetch_related("tenx_library")
     context = {
-        'analyses': TenxAnalysis.objects.all().order_by('id'),
+        'analyses': qs,
     }
     return context
 
@@ -142,8 +155,14 @@ class TenxPoolList(LoginRequiredMixin, TemplateView):
     template_name = "core/tenx/tenxpool_list.html"
 
     def get_context_data(self):
+
+        aTenxPools = TenxPool.objects.all().order_by('id').prefetch_related(
+            "libraries",
+            "libraries__sample",
+            "tenxsequencing_set")
+
         context = {
-            'pools': TenxPool.objects.all().order_by('id'),
+            'pools': aTenxPools,
             'form': TenxGSCSubmissionForm(),
         }
         return context
@@ -238,8 +257,14 @@ class TenxSequencingList(TemplateView):
     template_name = "core/tenx/tenxsequencing_list.html"
 
     def get_context_data(self):
+
+        qs = TenxSequencing.objects.all().order_by('id').prefetch_related(
+            "tenx_pool",
+            "tenx_pool__libraries"
+        )
+
         context = {
-            'sequencings': TenxSequencing.objects.all().order_by('id'),
+            'sequencings': qs,
         }
         return context
 
@@ -312,7 +337,10 @@ class TenxChipList(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self):
         context = {
-            'chips': TenxChip.objects.all().order_by('id'),
+            'chips': TenxChip.objects.all().order_by('id').prefetch_related(
+                "tenxlibrary_set",
+                "tenxlibrary_set__sample"
+            ),
         }
         return context
 
