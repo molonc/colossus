@@ -91,7 +91,7 @@ azure-storage-file==1.4.0
 azure-storage-queue==1.4.0
 backports.shutil-get-terminal-size==1.0.0
 billiard==3.5.0.2
-celery==4.0.0
+celery==5.2.2
 certifi==2019.3.9
 cffi==1.11.5
 chardet==3.0.4
