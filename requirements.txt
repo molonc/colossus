@@ -126,7 +126,7 @@ idna==2.7
 idna-ssl==1.1.0
 inflection==0.3.1
 ipaddress==1.0.22
-ipython==5.8.0
+ipython==7.16.3
 ipython-genutils==0.2.0
 isodate==0.6.0
 itypes==1.1.0
