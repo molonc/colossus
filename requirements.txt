@@ -159,7 +159,7 @@ ptyprocess==0.6.0
 pycparser==2.18
 pydot==1.4.1
 Pygments==2.3.1
-PyJWT==1.6.4
+PyJWT==2.4.0
 pyparsing==2.3.1
 python-dateutil==2.5.3
 pytz==2016.4
