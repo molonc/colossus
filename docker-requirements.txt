@@ -44,7 +44,7 @@ pandas==0.18.1
 pbr==4.2.0
 psycopg2==2.6.1
 pycparser==2.18
-PyJWT==1.6.4
+PyJWT==2.4.0
 python-dateutil==2.5.3
 pytz==2016.4
 PyYAML==3.12
