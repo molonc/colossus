@@ -38,7 +38,7 @@ kombu==4.0.1
 MarkupSafe==1.0
 model-mommy==1.2.6
 names==0.3.0
-numpy==1.11.0
+numpy==1.21.0
 oauthlib==2.1.0
 pandas==0.18.1
 pbr==4.2.0
