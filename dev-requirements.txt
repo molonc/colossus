@@ -15,7 +15,7 @@ functools32==3.2.3.post2
 kombu==4.0.1
 model-mommy==1.2.6
 names==0.3.0
-numpy==1.11.0
+numpy==1.22.0
 pandas==0.18.1
 psycopg2==2.7.1
 python-dateutil==2.5.3
