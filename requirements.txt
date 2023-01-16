@@ -131,7 +131,7 @@ ipython-genutils==0.2.0
 isodate==0.6.0
 itypes==1.1.0
 jdcal==1.4.1
-Jinja2==2.10
+Jinja2==2.11.3
 jira==2.0.0
 jsonpointer==1.14
 jsonschema==2.6.0
