@@ -158,7 +158,7 @@ psycopg2-binary==2.8.4
 ptyprocess==0.6.0
 pycparser==2.18
 pydot==1.4.1
-Pygments==2.3.1
+Pygments==2.7.4
 PyJWT==1.6.4
 pyparsing==2.3.1
 python-dateutil==2.5.3
